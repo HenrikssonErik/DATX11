@@ -9,7 +9,7 @@ DoD (for code):
 - Methods under 50 lines of code
 
 
-<h3> To set up and start the server <h3>
+<h5> To set up and start the server </h5>
 
 In server map run the following command to install all required packages:
 pip install -r requirements.txt
@@ -17,6 +17,7 @@ pip install -r requirements.txt
 To run the server use the following command:
 flask run -h 0.0.0.0
 
+<h5> Useful links </h5>
 Drive: https://drive.google.com/drive/folders/1_0LktptmAsCMuN0dEcAQgfYW6tbDZROz
 
 Trello: https://trello.com/b/OGgIgD5a/kandidatarbete2023
