@@ -9,7 +9,7 @@ DoD (for code):
 - Methods under 50 lines of code
 
 
-To set up and start the server
+<h3> To set up and start the server <h3>
 
 In server map run the following command to install all required packages:
 pip install -r requirements.txt
