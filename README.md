@@ -9,13 +9,6 @@ DoD (for code):
 - Methods under 50 lines of code
 
 
-<h4> To set up and start the server </h4>
-
-In server map run the following command to install all required packages:
-pip install -r requirements.txt
-
-To run the server use the following command:
-flask run -h 0.0.0.0
 
 <h4> Useful links </h4>
 Drive: https://drive.google.com/drive/folders/1_0LktptmAsCMuN0dEcAQgfYW6tbDZROz
