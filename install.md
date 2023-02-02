@@ -17,6 +17,7 @@ npm install -g @angular/cli
 cd client
 npm install
 cd ..
+cd ..
 ```
 
 ## 2. Installing Python 3 dependencies
@@ -24,7 +25,7 @@ cd ..
 VENV=YOUR/VENV/PATH
 python3 -m venv $VENV
 source $VENV/bin/activate
-cd server
+cd DATX11/server
 pip install -r requirements.txt
 deactivate
 cd ..
@@ -33,7 +34,7 @@ cd ..
 ## 3. Start The Servers
 This step is needed to be done to start the servers each time. The variable `$VENV` will not exist if a new instance is used.
 ```bash
-(source $VENV"/bin/activate" && export FLASK_APP="server/src/app.py" && flask run --host 0.0.0.0) & (cd client && ng serve) && fg
+(source ../$VENV"/bin/activate" && export FLASK_APP="server/src/app.py" && flask run --host 0.0.0.0) & (cd client && ng serve) && fg
 ```
 
 ## 4. Open website
