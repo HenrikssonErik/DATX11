@@ -21,3 +21,11 @@ Latex: https://www.overleaf.com/read/mmwdshwhfbjk (read only)
 
 Github: https://github.com/HenrikssonErik/DATX11/blob/main/README.md
 
+## Radon
+For single file
+.\radon cc server/src/app.py
+
+For all files in server
+.\radon cc server/
+    
+
