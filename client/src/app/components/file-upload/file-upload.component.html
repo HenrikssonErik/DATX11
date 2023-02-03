@@ -1,0 +1,44 @@
+
+<div class="container">
+  <div class="row">
+    <div [ngClass]="files.length > 0 ? 'col-6' : 'col-12'">
+      <div class="file-drop-area">
+        <div appDnd (fileDropped)="onFileDropped($event)">
+          <input type="file" #fileUpload id="fileUpload" multiple (change)="fileBrowseHandler($event)">
+          <i class="fa-solid fa-arrow-up-from-bracket upload-icon"></i>
+          <h3>Drag and drop a file here</h3>
+          <h3>or</h3>
+          <button class="btn btn-primary">
+            <label for="fileUpload">Browse</label>
+          </button>
+          <br>
+          <p><small class="small-text">Supported files: .py</small></p>
+        </div>
+      </div>
+    </div>
+    <div [ngClass]="{'col-6 right-column': files.length > 0}">
+      <div *ngIf="files.length > 0">
+        <div class="files-list">
+          <div class="row">
+            <div class="info-wrap">
+              <div class="single-file" *ngFor="let file of files; let i = index">
+                <img src="assets/py-file.png" width="45px" alt="file">
+                <div class="info">
+                  <h4 class="name">
+                    {{ file?.name }}
+                  </h4>
+                  <p class="size">
+                    {{formatBytes(file?.size)}}
+                  </p>
+                </div>
+                <i class="fa-solid fa-trash delete" (click)="deleteFile(i)"></i>
+              </div>
+          </div>
+          </div>
+        </div> 
+        <button class="btn btn-primary upload-button" (click)="uploadFiles()">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
