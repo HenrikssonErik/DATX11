@@ -49,20 +49,21 @@ export class FileUploadComponent {
   }
 
   prepareFilesList(files: Array<File>): void {
-    const allowedTypes = ['application/python', 'application/pdf', 'text/plain'];
+    console.log(files)
+    const allowedTypes = ['text/x-python', 'application/pdf', 'text/plain'];
     for (const file of files) {
       const index = this.files.findIndex(f => f.name === file.name);
       if (allowedTypes.includes(file.type)) {
         if (index !== -1) {
           this.files[index] = file;
-          this.toastr.info('File was replaced with duplicate', 'Duplicate file', {
+          this.toastr.info(file.name + ' was replaced', 'Duplicate file', {
             closeButton: true,
           });
         } else {
           this.files.push(file);
         }
       }else {
-        this.toastr.warning('That file type is not supported', 'Wrong file type', {
+        this.toastr.warning(file.type + ' is not supported', 'Wrong file type', {
           closeButton: true,
         });
       }
