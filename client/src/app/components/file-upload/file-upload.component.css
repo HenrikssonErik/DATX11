@@ -36,7 +36,7 @@
 }
 
 .info {
-  width: 100%;
+  width: 85px;
   margin-left: 5px;
 }
 
@@ -70,6 +70,7 @@
   margin-left: 175px;    
   cursor: pointer;
   float: right;
+  color: #d40d12;
 
 }
 
@@ -105,15 +106,6 @@ button.btn {
   width: 100%;
 
 }
-
-.fa-trash{
-  color: #d40d12;
-}
-
-.fa-trash:hover{
-  color: #a90000;
-}
-
 
 h3 {
   font-size: 20px;
