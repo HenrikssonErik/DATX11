@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { API_URL } from 'src/environments/environment';
 
 @Component({
@@ -12,7 +13,7 @@ export class FileUploadComponent {
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private toastr: ToastrService) {}
 
   /**
   * Method to handle the file drop event and prepares the list of files
@@ -48,9 +49,23 @@ export class FileUploadComponent {
   }
 
   prepareFilesList(files: Array<File>): void {
-    // TODO: Handle incorrect file types and duplicates.
+    const allowedTypes = ['application/python', 'application/pdf', 'text/plain'];
     for (const file of files) {
-      this.files.push(file);
+      const index = this.files.findIndex(f => f.name === file.name);
+      if (allowedTypes.includes(file.type)) {
+        if (index !== -1) {
+          this.files[index] = file;
+          this.toastr.info('File was replaced with duplicate', 'Duplicate file', {
+            closeButton: true,
+          });
+        } else {
+          this.files.push(file);
+        }
+      }else {
+        this.toastr.warning('That file type is not supported', 'Wrong file type', {
+          closeButton: true,
+        });
+      }
     }
     this.fileDropEl.nativeElement.value = '';
   }
@@ -77,7 +92,7 @@ export class FileUploadComponent {
  *
  * @returns {void}
  */
-  uploadFiles() {
+  uploadFiles() : void {
     const formData = new FormData();
     this.files.forEach((file : File) : void => formData.append('files', file, file.name));
   
