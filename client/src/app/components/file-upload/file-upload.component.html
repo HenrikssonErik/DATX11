@@ -25,10 +25,10 @@
                 <img src="assets/py-file.png" width="45px" alt="file">
                 <div class="info">
                   <h4 class="name">
-                    {{ file?.name }}
+                    {{ file.name }}
                   </h4>
                   <p class="size">
-                    {{formatBytes(file?.size)}}
+                    {{formatBytes(file.size)}}
                   </p>
                 </div>
                 <i class="fa-solid fa-trash delete" (click)="deleteFile(i)"></i>
