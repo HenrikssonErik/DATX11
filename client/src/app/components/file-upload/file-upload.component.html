@@ -22,7 +22,8 @@
           <div class="row">
             <div class="info-wrap">
               <div class="single-file" *ngFor="let file of files; let i = index">
-                <i [ngClass]="{'fa-brands fa-python': file.type === 'text/x-python', 'fa-solid fa-file' : file.type === 'text/plain', 'fa-regular fa-file-pdf' : file.type === 'application/pdf'}"></i>
+                <img src="assets/{{getImageType(file)}}" width="45px" alt="file">
+                <!--<i [ngClass]="{'fa-brands fa-python file-type': file.type === 'text/x-python', 'fa-solid fa-file file-type' : file.type === 'text/plain', 'fa-regular fa-file-pdf file-type' : file.type === 'application/pdf'}"></i>-->
                 <div class="info">
                   <h4 class="name">
                     {{ file.name }}
