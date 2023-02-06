@@ -48,8 +48,12 @@ export class FileUploadComponent {
     this.files.splice(index, 1);
   }
 
+  /**
+ * Adds/updates allowed file types to files list
+ * @param {Array<File>} files - Array of selected files
+ * @returns {void}
+ */
   prepareFilesList(files: Array<File>): void {
-    console.log(files)
     const allowedTypes = ['text/x-python', 'application/pdf', 'text/plain'];
     for (const file of files) {
       const index = this.files.findIndex(f => f.name === file.name);
@@ -63,7 +67,7 @@ export class FileUploadComponent {
           this.files.push(file);
         }
       }else {
-        this.toastr.warning(file.type + ' is not supported', 'Wrong file type', {
+        this.toastr.warning(file.type + ' is not supported', 'Unsupported file type', {
           closeButton: true,
         });
       }
@@ -86,6 +90,18 @@ export class FileUploadComponent {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+  getImageType(file : File) : string{
+    if(file.type === 'text/plain'){
+      return 'txt-file.png'
+    }
+    if(file.type === 'text/x-python'){
+      return 'py-file.png'
+    }
+    if(file.type === 'application/pdf'){
+      return 'pdf-file.png'
+    }
+    return 'file.png';
   }
 
   /**
