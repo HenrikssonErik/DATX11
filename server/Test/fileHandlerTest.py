@@ -1,7 +1,7 @@
 import sys
+from pathlib import Path
 
-#import no working
-sys.path.append('../server')
+sys.path.append(str(Path().absolute().parent))
 
 import unittest
 from src.fileHandler import handle_files
