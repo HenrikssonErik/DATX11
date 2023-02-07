@@ -7,12 +7,12 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 CORS(app)
 
+#temp variables, should be moved to another package later and taken from database
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
-
-#temp variables, should be moved to another package later
 allowed_filenames = {"test", "test2"}
 nr_of_files = 3
 
+#useless in the future, TODO: Remove
 @app.route('/test', methods=['GET'])
 def testGet(): 
     #do the doings here
@@ -20,8 +20,7 @@ def testGet():
 
 @app.route('/files', methods=['POST'])
 def post_files(): 
-    #do the doings here
-    print('recieved request')
+    
     files = request.files.getlist('files')
 
     if not files:
@@ -37,7 +36,7 @@ def post_files():
     for file in files:
         res_object = {}
 
-        #add check duplicate files
+        #TODO: check for missing file, mb remove ok name from set so it cant appear again, and then we can check if there is  name left at the end
         if not (file.filename in allowed_filenames):
             res_object.update({"File Name": "Not allowed file name"})
             res_code = 406
@@ -54,8 +53,8 @@ def post_files():
         response_args.update({file.filename: res_object})
     print(response_args)
     return jsonify(response_args) , res_code
-
-#checks file extension for allowed files
+    
+#Method to check file extension for allowed files
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
