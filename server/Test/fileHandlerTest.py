@@ -1,6 +1,7 @@
 
 import unittest
 from src.fileHandler import handle_files
+from src.app import post_files
 
 class TestStringMethods(unittest.TestCase):
 
@@ -19,6 +20,9 @@ class TestStringMethods(unittest.TestCase):
     def test_send_multiple_files(self):
         files = [open("Test1.pdf"), open("test2.txt"),open("fileHandlerTest.py")]
         self.assertEqual(handle_files(files)[1], 406) #only allows one file at the moment
+
+    def test_post_no_files(self):
+        self.assertEqual(post_files()[1],406)
 
 
 if __name__ == '__main__':
