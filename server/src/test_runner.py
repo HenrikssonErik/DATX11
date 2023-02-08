@@ -1,15 +1,31 @@
 from pathlib import Path
 import shutil
-import unittest
+import subprocess
+import json
+from dataclasses import dataclass
 
-
-
-
-def test_runner(file: Path, tests: list[Path], run_directory: Path) -> unittest.TestResult:
+@dataclass
+class TestResults:
     """
-    This function copy's the `file` and `tests` to the `run_directory` and then puts all 
-    the `tests` in to a test suite. Then the tests are run and the result is returned back 
-    to the calle.
+    A dataclass to store the results of the tests that have been run.
+    """
+    testsRun: int
+    wasSuccessful: bool
+    errors: list[tuple[str, str]]
+    failures: list[tuple[str, str]]
+    expectedFailures: list[tuple[str, str]]
+    unexpectedSuccesses: list[str]
+    skipped: list[tuple[str, str]]
+
+
+
+def test_runner(file: Path, tests: list[Path], run_directory: Path) -> TestResults:
+    """
+    This function copy's the `file` and `tests` to the `run_directory` and starts another 
+    instance of python which will execute the test. This is done so we dont clutter up the 
+    namespace of the main instance.
+    After the new instance is started, it will start to gather all the test in to a test suit.
+    Then the tests are run and the result is returned back.
 
     Takes in:
         file: `pathlib.Path` to the file which should be tested.
@@ -17,31 +33,28 @@ def test_runner(file: Path, tests: list[Path], run_directory: Path) -> unittest.
         run_directory: `pathlib.Path` to the directory where the file will be tested with 
         the given tests.
 
-    Returns: a `unittest.TestResult` which is where the results of the tests is stored.
+    Returns: a `TestResults` which is where the results of the tests is stored.
 
     Note:
     Currently it is up to the calle to ensure that the run_directory does not have any files 
     of the same names as the the `file` or `tests`.
     """
+    
+    executor = Path(__file__).parent/"test_executor.py"
+    test_dir = run_directory/"test_dir"
 
-    # receive tests from DB (currently we take them in as parameters)
-    # execute the tests on the python file
-    # return the result
-
-    # look at: 
-    # https://stackoverflow.com/questions/284043/outputting-data-from-unit-test-in-python
-    # https://stackoverflow.com/a/284192/11933712
-    # https://docs.python.org/3/library/unittest.html#unittest.TestCase
-
-
-    shutil.copy(str(file.absolute()), run_directory)
+    test_dir.mkdir()
+    executor_copy = shutil.copy(str(executor), run_directory)
+    shutil.copy(str(file.absolute()), test_dir)
 
     for test in tests:
-        shutil.copy(str(test.absolute()), run_directory)
+        shutil.copy(str(test.absolute()), test_dir)
 
-    test_suit = unittest.TestLoader().discover(str(run_directory), pattern="test_*.py")
 
-    results = test_suit.run(unittest.TestResult(verbosity=2))
+    PYTHON_COMMAND = "py"
 
-    return results
+    proc = subprocess.run([PYTHON_COMMAND, str(executor_copy), str(test_dir)], cwd=str(run_directory), capture_output=True)
+
+    
+    return TestResults(**json.loads(proc.stdout))
 
