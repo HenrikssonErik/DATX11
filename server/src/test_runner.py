@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 import shutil
 import subprocess
 import json
@@ -51,7 +52,7 @@ def test_runner(file: Path, tests: list[Path], run_directory: Path) -> TestResul
         shutil.copy(str(test.absolute()), test_dir)
 
 
-    PYTHON_COMMAND = "py"
+    PYTHON_COMMAND = sys.executable
 
     proc = subprocess.run([PYTHON_COMMAND, str(executor_copy), str(test_dir)], cwd=str(run_directory), capture_output=True)
 
