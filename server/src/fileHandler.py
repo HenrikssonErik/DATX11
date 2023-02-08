@@ -8,11 +8,12 @@ __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 __allowed_filenames = {"test1.pdf", "test2.txt", "fileHandlerTest.py"}
 __nr_of_files = 1
 
+
 """
 Sanitizes files, checks for number of files, allowed file names and file types
 Returns: json object with feedback on submitted files
 """
-def handle_files(files): 
+def handle_files(files:list): 
 
     response_args = {}
     res_code = 200
@@ -44,6 +45,6 @@ def handle_files(files):
     return jsonify(response_args) , res_code
     
 #Method to check file extension for allowed files
-def allowed_file(filename):
+def allowed_file(filename: str):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in __ALLOWED_EXTENSIONS
