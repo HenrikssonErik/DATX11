@@ -7,6 +7,8 @@ from fileHandler import handle_files
 
 # creating the Flask application
 app = Flask(__name__)
+
+#made need to change
 CORS(app)
 
 #useless in the future, TODO: Remove along with front end button

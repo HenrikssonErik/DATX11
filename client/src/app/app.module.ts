@@ -7,10 +7,13 @@ import { TestApiService } from './test.service';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { DndDirective } from './directives/dnd.directive';
 import { FormsModule } from '@angular/forms';
+import { ToastrModule } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [AppComponent, FileUploadComponent, DndDirective],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule, FormsModule],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, FormsModule, CommonModule, BrowserAnimationsModule, ToastrModule.forRoot()],
   providers: [TestApiService], //should be replaced with the real deal later
   bootstrap: [AppComponent],
 })

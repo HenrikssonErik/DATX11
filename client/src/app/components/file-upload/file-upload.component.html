@@ -12,7 +12,7 @@
             <label for="fileUpload">Browse</label>
           </button>
           <br>
-          <p><small class="small-text">Supported files: .py</small></p>
+          <p><small class="small-text">Supported files: .py, .pdf, .txt</small></p>
         </div>
       </div>
     </div>
@@ -22,7 +22,8 @@
           <div class="row">
             <div class="info-wrap">
               <div class="single-file" *ngFor="let file of files; let i = index">
-                <img src="assets/py-file.png" width="45px" alt="file">
+                <img src="assets/{{getImageType(file)}}" width="45px" alt="file">
+                <!--<i [ngClass]="{'fa-brands fa-python file-type': file.type === 'text/x-python', 'fa-solid fa-file file-type' : file.type === 'text/plain', 'fa-regular fa-file-pdf file-type' : file.type === 'application/pdf'}"></i>-->
                 <div class="info">
                   <h4 class="name">
                     {{ file.name }}
@@ -31,7 +32,7 @@
                     {{formatBytes(file.size)}}
                   </p>
                 </div>
-                <i class="fa-solid fa-trash delete" (click)="deleteFile(i)"></i>
+                <i class="fa-solid fa-xmark delete" (click)="deleteFile(i)"></i>
               </div>
           </div>
           </div>
