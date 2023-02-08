@@ -20,5 +20,5 @@ def post_files():
 
     if not files:
         return "Files not found", 406
-
-    return handle_files(files)
+    res = handle_files(files)
+    return jsonify(res[0]), res[1]

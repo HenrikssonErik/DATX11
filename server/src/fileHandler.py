@@ -2,7 +2,6 @@
 
 from flask import jsonify
 from werkzeug.utils import secure_filename
-from werkzeug.datastructures import FileStorage
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 #TODO: temp variables, should be taken from database when it is implemented
@@ -21,6 +20,7 @@ def handle_files(files:list):
 
     if not(len(files) == __nr_of_files):
         response_args.update({"Wrong amount of files": "Recieved " + str(len(files)) + ", should be " + str(__nr_of_files) + " files"})
+        res_code = 406
     
     for file in files:
         res_object = {}
@@ -43,7 +43,7 @@ def handle_files(files:list):
         response_args.update({file.filename: res_object})
 
     #TODO: decide what to do with the files here, eg. file.save(file.filename), to save the file to dir
-    return jsonify(response_args) , res_code
+    return response_args , res_code
     
 #Method to check file extension for allowed files
 def allowed_file(filename: str):
