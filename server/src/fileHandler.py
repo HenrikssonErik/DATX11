@@ -1,7 +1,7 @@
 
 
-from flask import jsonify
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 #TODO: temp variables, should be taken from database when it is implemented
@@ -9,11 +9,12 @@ __allowed_filenames = {"Test1.pdf", "test2.txt", "PythonFile.py"}
 __nr_of_files = 1
 
 
-"""
-Sanitizes files, checks for number of files, allowed file names and file types
-Returns: json object with feedback on submitted files
-"""
-def handle_files(files:list): 
+
+def handle_files(files:list[FileStorage]) -> tuple[dict[str, str], int] : 
+    """
+    Sanitizes files, checks for number of files, allowed file names and file types
+    Returns: json object with feedback on submitted files
+    """
 
     response_args = {}
     res_code = 200
@@ -24,14 +25,12 @@ def handle_files(files:list):
     
     for file in files:
         res_object = {}
-
         file.filename = secure_filename(file.filename)
-        
         if not (file.filename in __allowed_filenames):
             res_object.update({"File Name": "Not allowed file name"})
             res_code = 406
         else: 
-            res_object.update({"Name": "OK!"})
+            res_object.update({"File Name": "OK!"})
 
         if not (allowed_file(file.filename)): 
             res_object.update({"File Type": " Not allowed filetype"})
