@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 
 #TODO: temp variables, should be taken from database when it is implemented
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
-__allowed_filenames = {"test1.pdf", "test2.txt", "fileHandlerTest.py"}
+__allowed_filenames = {"Test1.pdf", "test2.txt", "PythonFile.py"}
 __nr_of_files = 1
 
 
