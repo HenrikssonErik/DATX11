@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from werkzeug.datastructures import FileStorage
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
@@ -10,19 +11,35 @@ from src.app import post_files
 class TestStringMethods(unittest.TestCase):
 
     def test_send_PDF_file(self):
-        files=[File("Test1.pdf")]
+        with open("Test1.pdf") as fp:
+            file = FileStorage(fp)
+        files=[file]
         self.assertEqual(handle_files(files)[1], 200)
 
     def test_send_txt_file(self):
-        files=[File("test2.txt")]
+        with open("test2.txt") as fp:
+            file = FileStorage(fp)
+        files=[file]
         self.assertEqual(handle_files(files)[1], 200)
     
     def test_send_PY_file(self):
-        files=[File("fileHandlerTest.py")]
+        with open("PythonFile.py") as fp:
+            file = FileStorage(fp)
+        files=[file]
         self.assertEqual(handle_files(files)[1], 200)
 
     def test_send_multiple_files(self):
-        files = [File("Test1.pdf"), File("test2.txt"), File("fileHandlerTest.py")]
+        files=[]
+        with open("Test1.pdf") as fp:
+            file = FileStorage(fp)
+            files.append(file)
+        with open("test2.txt") as fp:
+            file = FileStorage(fp)
+            files.append(file)
+        
+        with open("PythonFile.py") as fp:
+            file = FileStorage(fp)
+            files.append(file)
         self.assertEqual(handle_files(files)[1], 406) #only allows one file at the moment
 
     def test_post_no_files(self):

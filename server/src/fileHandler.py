@@ -2,6 +2,7 @@
 
 from flask import jsonify
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 #TODO: temp variables, should be taken from database when it is implemented
