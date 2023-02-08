@@ -41,7 +41,7 @@ def handle_files(files:list):
         
         response_args.update({file.filename: res_object})
 
-        #TODO: decide what to do with the files here, eg. file.save(file.filename), to save the file
+    #TODO: decide what to do with the files here, eg. file.save(file.filename), to save the file to dir
     return jsonify(response_args) , res_code
     
 #Method to check file extension for allowed files
