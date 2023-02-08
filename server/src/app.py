@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 
-from .fileHandler import handle_files
+from fileHandler import handle_files
 
 # creating the Flask application
 app = Flask(__name__)
