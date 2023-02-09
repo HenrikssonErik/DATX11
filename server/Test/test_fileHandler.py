@@ -14,7 +14,6 @@ class TestStringMethods(unittest.TestCase):
         with open("Test1.pdf") as fp:
             file = FileStorage(fp)
         files=[file]
-        print(handle_files(files)[1])
         self.assertEqual(handle_files(files)[1], 200)
 
     def test_send_txt_file(self):
@@ -41,7 +40,6 @@ class TestStringMethods(unittest.TestCase):
         with open("PythonFile.py") as fp:
             file = FileStorage(fp)
             files.append(file)
-        print(len(files))
         self.assertEqual(handle_files(files)[1], 406) #only allows one file at the moment
 
     #def test_post_no_files(self):
