@@ -39,7 +39,6 @@ def handle_files(files:list[FileStorage]) -> tuple[dict[str, str], int] :
         else:
             res_object.update({"File Type": "OK!"})
 
-        
         response_args.update({file.filename: res_object})
         saveToDB(file)
     #TODO: decide what to do with the files here, eg. file.save(file.filename), to save the file to dir
@@ -53,10 +52,19 @@ def allowed_file(filename: str):
 def saveToDB(file: FileStorage):
     print("saving to Db")
     print(file)
+    file.save(file.filename)
+    f= open(file.filename,"rb") #rb = reading in binary
+    filedata = f.read()
+    print("read file")
+    print(filedata)
+    binary = psycopg2.Binary(filedata)
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
 
     with conn.cursor() as cur:
-        query = """INSERT into roles (role_id, role_name)"""
-        cur.execute(query, (70,'testrole'))
+        query = """INSERT INTO
+    AssignmentFiles (GroupId, course, filename, filedata, filetype)
+    VALUES (%s, %s, %s, %s, %s);"""
+
+        cur.execute(query, (700,'tda357', file.filename, binary, 'pdf'))
         conn.commit()
         
