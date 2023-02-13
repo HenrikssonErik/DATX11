@@ -2,6 +2,7 @@
 
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
+import psycopg2
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 #TODO: temp variables, should be taken from database when it is implemented
@@ -40,7 +41,7 @@ def handle_files(files:list[FileStorage]) -> tuple[dict[str, str], int] :
 
         
         response_args.update({file.filename: res_object})
-
+        saveToDB(file)
     #TODO: decide what to do with the files here, eg. file.save(file.filename), to save the file to dir
     return response_args , res_code
     
@@ -48,3 +49,14 @@ def handle_files(files:list[FileStorage]) -> tuple[dict[str, str], int] :
 def allowed_file(filename: str):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in __ALLOWED_EXTENSIONS
+
+def saveToDB(file: FileStorage):
+    print("saving to Db")
+    print(file)
+    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
+
+    with conn.cursor() as cur:
+        query = """INSERT into roles (role_id, role_name)"""
+        cur.execute(query, (70,'testrole'))
+        conn.commit()
+        

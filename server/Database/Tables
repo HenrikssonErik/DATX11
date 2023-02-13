@@ -1,0 +1,8 @@
+CREATE Table AssignmentFiles (
+		GroupId INTEGER  NOT NULL,
+		Course CHAR (6) NOT NULL,
+		FileName TEXT NOT NULL,
+		FileData BYTEA NOT NULL, 
+		FileType TEXT NOT NULL,
+		PRIMARY KEY(GroupId,Course, FileName)
+	);
