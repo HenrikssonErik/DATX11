@@ -11,12 +11,18 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   constructor(private renderer: Renderer2) { }
 
   ngOnInit(): void {
+    const nav : Element | null = document.querySelector('.nav');
+    if(!nav){
+      return;
+    }
+
+    const classList : DOMTokenList = nav.classList;
 
     this.renderer.listen('window', 'scroll', (event) => {
       if (window.scrollY > 50) {
-        this.renderer.addClass(document.querySelector('.nav'), 'affix');
+        classList.add('affix');
       } else {
-        this.renderer.removeClass(document.querySelector('.nav'), 'affix');
+        classList.remove('affix');
       }
     });
   }
