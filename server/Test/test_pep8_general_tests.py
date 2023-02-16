@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
-from src.general_tests import pep8_check
+from src.general_tests import pep8_check   # noqa: E402
 
 
 def move_test_file(file: str | Path, dir: str | Path):
