@@ -2,3 +2,4 @@
 show-source = True
 statistics = True
 exclude = client, server/Test/test_files_*
+max-complexity = 10

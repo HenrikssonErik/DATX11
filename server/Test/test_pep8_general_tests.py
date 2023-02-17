@@ -227,3 +227,15 @@ class TestPEP8CheckWithConfig(unittest.TestCase):
         result = pep8_check(self.tmp_dir_path, flake8_config=self.config)
 
         self.assertEqual(result.count("E111"), 3)
+
+    def test_pep8_check_cyclomatic_complexity_bad(self):
+        with open(self.config, "w") as f:
+            f.write("[flake8]\nstatistics = True\nmax-complexity = 10")
+        move_test_file(
+            self.test_file_dir/"cyclomatic_complexity_bad.py",
+            self.tmp_dir_path
+        )
+
+        result = pep8_check(self.tmp_dir_path, flake8_config=self.config)
+
+        self.assertEqual(result.count("C901"), 2)
