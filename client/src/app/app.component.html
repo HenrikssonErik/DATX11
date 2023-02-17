@@ -3,15 +3,19 @@
 <div class="row">
   <div class="col-6" style="border-right: 1px solid #ccc;">
     <button (click)="getTemplateFile()" style="margin-top: 20px; margin-left: 20px;" class="btn btn-primary">Download template<i style="padding-left: 10px;" class="fa-solid fa-arrow-down"></i></button>
-    <h3 style="padding-top: 42px;" class="d-flex justify-content-center">Upload Unit Tests</h3>
-    <div style="padding-top: 50px; margin-bottom: 700px;" class="d-flex justify-content-center">
+    <h4 style="padding-top: 42px;" class="d-flex justify-content-center text-muted">Upload Unit Tests</h4>
+    <div style="padding-top: 50px; margin-bottom: 300px;" class="d-flex justify-content-center">
       <app-file-upload [config]="uploadUnitTestFile"></app-file-upload>
     </div>
   </div>
   <div class="col-6">
-    <h3 style="padding-top: 100px;" class="d-flex justify-content-center">Upload Test File(s)</h3>
-    <div style="padding-top: 50px; margin-bottom: 700px;" class="d-flex justify-content-center">
+    <h4 style="padding-top: 100px;" class="d-flex justify-content-center text-muted">Upload Test File(s)</h4>
+    <div style="padding-top: 50px;" class="d-flex justify-content-center">
       <app-file-upload [config]="uploadTestFile"></app-file-upload>
+    </div>
+    <h4 class="text-muted" style="margin-top: 40px; margin-left: 10px;">Feedback:</h4>
+    <div style="padding-top: 50px; margin-bottom: 300px;">
+      
     </div>
   </div>
 </div>
