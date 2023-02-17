@@ -2,9 +2,9 @@
 
 <div class="row">
   <div class="col-6" style="border-right: 1px solid #ccc;">
-    <button (click)="getTemplateFile()" style="margin-top: 20px; margin-left: 20px;" class="btn btn-primary">Download template<i style="padding-left: 10px;" class="fa-solid fa-arrow-down"></i></button>
-    <h4 style="padding-top: 42px;" class="d-flex justify-content-center text-muted">Upload Unit Tests</h4>
-    <div style="padding-top: 50px; margin-bottom: 300px;" class="d-flex justify-content-center">
+    <button (click)="getTemplateFile()" style="margin-top: 50px; margin-left: 30px; background-color: #3D9970; border: #3D9970;" class="btn btn-primary">Template<i style="padding-left: 10px;" class="fa-solid fa-arrow-down"></i></button>
+    <h4 style="padding-top: 12px;" class="d-flex justify-content-center text-muted">Upload Unit Tests</h4>
+    <div style="padding-top: 50px; margin-bottom: 100px;" class="d-flex justify-content-center">
       <app-file-upload [config]="uploadUnitTestFile"></app-file-upload>
     </div>
   </div>
@@ -14,7 +14,7 @@
       <app-file-upload [config]="uploadTestFile"></app-file-upload>
     </div>
     <h4 class="text-muted" style="margin-top: 40px; margin-left: 10px;">Feedback:</h4>
-    <div style="padding-top: 10px; margin-bottom: 300px;">
+    <div style="padding-top: 10px; margin-bottom: 100px;">
       <app-test-feedback></app-test-feedback>
     </div>
   </div>

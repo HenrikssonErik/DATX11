@@ -3,7 +3,7 @@
   height: auto;
   padding: 2rem;
   text-align: center;
-  border: dashed 1px #0d6efd;
+  border: dashed 1px #3D9970;
   position: relative;
   margin: 0 auto;
   border-radius: 21.5px;
@@ -76,7 +76,7 @@
 
 .upload-icon{
   font-size: 60px;
-  color: #0d6efd;
+  color: #3D9970;
   margin-bottom: 30px;
 }
 
