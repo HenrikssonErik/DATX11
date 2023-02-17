@@ -8,7 +8,8 @@ import os
 def pep8_check(
     run_directory: Path,
     filename_patterns: list[str] | None = None,
-    flake8_config: None | Path = None
+    flake8_config: None | Path = None,
+    cyclomatic_complexity: int = 10
 ) -> str:
     """Check different pep8 conventions in python files.
 
@@ -50,6 +51,20 @@ def pep8_check(
         "-m", "flake8"
     ]
 
+    # create the default settings for flake8
+    default_config = run_directory / "default.flake8"
+    with open(default_config, "w") as f:
+        if cyclomatic_complexity < 0:
+            cyclomatic_complexity = 0
+        f.writelines([
+            "[flake8]\n",
+            f"max-complexity={cyclomatic_complexity}\n",
+        ])
+
+    flake8_commands.append(
+        f"--append-config={str(default_config.absolute())}",
+    )
+
     if flake8_config is not None:
         if not flake8_config.exists() or not flake8_config.is_file():
             err = FileNotFoundError(
@@ -60,6 +75,7 @@ def pep8_check(
                 f" `{flake8_config.name}`"
             )
             raise err
+
         flake8_commands.extend([
             f"--append-config={str(flake8_config.absolute())}",
             "--tee"  # We add this because, in the case the user specified

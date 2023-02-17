@@ -8,10 +8,15 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 from src.general_tests import pep8_check   # noqa: E402
 
 
-def move_test_file(file: str | Path, dir: str | Path):
+def move_test_file(file: str | Path,
+                   dir: str | Path,
+                   new_name: str | None = None
+                   ):
     f = Path(file)
     d = Path(dir)
     shutil.copy(f, d)
+    if new_name is not None:
+        shutil.move(d/f.name, d/new_name)
 
 
 class TestPEP8CheckNoConfig(unittest.TestCase):
@@ -58,6 +63,17 @@ class TestPEP8CheckNoConfig(unittest.TestCase):
 
         self.assertEqual(result.count("E111"), 2)
 
+    def test_pep8_check_cyclomatic_complexity_bad(self):
+        move_test_file(
+            self.test_file_dir/"cyclomatic_complexity_bad.py",
+            self.tmp_dir_path
+        )
+
+        result = pep8_check(self.tmp_dir_path, cyclomatic_complexity=0)
+        self.assertEqual(result.count("C901"), 1)
+        result = pep8_check(self.tmp_dir_path, cyclomatic_complexity=20)
+        self.assertEqual(result.count("C901"), 0)
+
 
 class TestPEP8CheckNoConfigFilenamePat(unittest.TestCase):
     def setUp(self):
@@ -85,9 +101,12 @@ class TestPEP8CheckNoConfigFilenamePat(unittest.TestCase):
         self.assertEqual(len(result), 0)
 
     def test_pep8_check_import_bad_no_match(self):
-        move_test_file(self.test_file_dir/"import_bad.py", self.tmp_dir_path)
+        move_test_file(self.test_file_dir/"import_bad.py",
+                       self.tmp_dir_path,
+                       )
 
-        result = pep8_check(self.tmp_dir_path, filename_patterns=["no_match"])
+        result = pep8_check(self.tmp_dir_path,
+                            filename_patterns=["no_match"])
 
         self.assertEqual(result.count("E401"), 0)
 
@@ -142,7 +161,7 @@ class TestPEP8CheckNoConfigFilenamePat(unittest.TestCase):
 
         self.assertEqual(result.count("E111"), 2)
 
-    def test_pep8_check_many_pats(self):
+    def test_pep8_check_many_pats_no_match(self):
         move_test_file(
             self.test_file_dir/"indentation_bad.py", self.tmp_dir_path
         )
@@ -236,6 +255,21 @@ class TestPEP8CheckWithConfig(unittest.TestCase):
             self.tmp_dir_path
         )
 
-        result = pep8_check(self.tmp_dir_path, flake8_config=self.config)
+        result = pep8_check(
+            self.tmp_dir_path, flake8_config=self.config)
 
         self.assertEqual(result.count("C901"), 2)
+
+    def test_pep8_check_cyclomatic_complexity_bad_with_cmd_arg(self):
+        with open(self.config, "w") as f:
+            f.write("[flake8]\nstatistics = True\nmax-complexity = 20")
+        move_test_file(
+            self.test_file_dir/"cyclomatic_complexity_bad.py",
+            self.tmp_dir_path
+        )
+
+        result = pep8_check(self.tmp_dir_path,
+                            flake8_config=self.config,
+                            )
+
+        self.assertEqual(result.count("C901"), 0)
