@@ -40,7 +40,8 @@ def handle_files(files:list[FileStorage]) -> tuple[dict[str, str], int] :
             res_object.update({"File Type": "OK!"})
 
         response_args.update({file.filename: res_object})
-        saveToDB(file)
+        #saveToDB(file)
+        get_file_from_database(701, 'tda353', 'test2.txt')
     #TODO: decide what to do with the files here, eg. file.save(file.filename), to save the file to dir
     return response_args , res_code
     
@@ -65,6 +66,18 @@ def saveToDB(file: FileStorage):
     AssignmentFiles (GroupId, course, filename, filedata, filetype)
     VALUES (%s, %s, %s, %s, %s);"""
 
-        cur.execute(query, (700,'tda357', file.filename, binary, 'pdf'))
+        cur.execute(query, (701,'tda353', file.filename, binary, 'pdf'))
         conn.commit()
         
+
+def get_file_from_database(groupId, course, fileName):
+    print("Retrieving from db")
+
+    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
+    cursor = conn.cursor()
+    queryData = "SELECT FileData FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.course = %s"
+    cursor.execute(queryData, (fileName, groupId, course))
+    data = cursor.fetchall()
+    file_binary = data[0][0].tobytes()
+    with open('test2.txt','wb') as file: #wb = write in binary
+        file.write((file_binary))
