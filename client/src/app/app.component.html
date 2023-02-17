@@ -1,6 +1,19 @@
 <app-navbar></app-navbar>
-<div style="padding-top: 150px" class="d-flex justify-content-center">
-  <app-file-upload></app-file-upload>
+
+<div class="row">
+  <div class="col-6" style="border-right: 1px solid #ccc;">
+    <h3 style="padding-top: 42px;" class="d-flex justify-content-center">Upload Unit Tests</h3>
+    <div style="padding-top: 50px; margin-bottom: 200px;" class="d-flex justify-content-center">
+      <app-file-upload [config]="uploadUnitTestFile"></app-file-upload>
+    </div>
+  </div>
+  <div class="col-6">
+    <h3 style="padding-top: 100px;" class="d-flex justify-content-center">Upload Test File(s)</h3>
+    <div style="padding-top: 50px; margin-bottom: 200px;" class="d-flex justify-content-center">
+      <app-file-upload [config]="uploadTestFile"></app-file-upload>
+    </div>
+  </div>
 </div>
 
-<div style="height: 1000px;"></div> 
+
+
