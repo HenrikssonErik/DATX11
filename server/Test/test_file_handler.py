@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 from src.file_handler import handle_files  # noqa: E402
 
 
-class TestStringMethods(unittest.TestCase):
+class TestFileHandler(unittest.TestCase):
 
     def setUp(self):
         self.test_file_dir = Path(__file__).parent/"test_files_file_handler"
@@ -49,6 +49,16 @@ class TestStringMethods(unittest.TestCase):
 
         # only allows one file at the moment
         self.assertEqual(handle_files(files)[1], 406)
+
+    def test_send_pep8_checks_results(self):
+        with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
+            file = FileStorage(BytesIO(fp.read()), filename="PythonFile.py")
+
+        respons = handle_files([file])
+
+        self.assertEqual(respons[1], 200)
+        self.assertEqual(respons[0]["PEP8_results"].count("F401"), 2)
+        self.assertEqual(respons[0]["PEP8_results"].count("E401"), 1)
 
 
 if __name__ == '__main__':
