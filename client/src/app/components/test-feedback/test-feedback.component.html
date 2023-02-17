@@ -1,0 +1,47 @@
+<div class="card mb-1 failed slide-in-right delay-1" (click)="openFeedBackModal()">
+  <div class="card-body">
+    <h6 class="card-subtitle mb-2" style="color:#8B0000">Failed</h6>
+    <p class="card-text"> Test: findPythargorasTheorem has failed.</p>
+    <p><small class="text-muted">Expected 2.35 but got 3 at line 45</small></p>
+  </div>
+</div>
+<div class="card mb-1 warning slide-in-right delay-2" (click)="openFeedBackModal()">
+  <div class="card-body">
+    <h6 class="card-subtitle mb-2" style="color:#FFC300;">Warning</h6>
+    <p class="card-text"> Test: findDuplicatesInArray has a warning</p>
+    <p><small class="text-muted">Doesnt follow name convention pep-8.....</small></p>
+  </div>
+  <p></p>
+</div>
+<div class="card mb-1 passed slide-in-right delay-3" (click)="openFeedBackModal()">
+  <div class="card-body">
+    <h6 class="card-subtitle mb-2" style="color:#006C5C;">Passed</h6>
+    <p class="card-text"> Test: findAreaOfTriangle passed.</p>
+  </div>
+</div>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
