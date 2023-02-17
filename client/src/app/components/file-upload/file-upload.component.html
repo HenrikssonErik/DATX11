@@ -12,7 +12,13 @@
             <label for="fileUpload">Browse</label>
           </button>
           <br>
-          <p><small class="small-text">Supported files: .py, .pdf, .txt</small></p>
+          <p>
+            <small class="small-text">Supported files:
+              <span *ngFor="let supportedFileType of config.allowedFileTypesForPrint; let isLast = last">
+                {{supportedFileType}}{{isLast ? '' : ','}}&nbsp;
+              </span>
+            </small>
+          </p>
         </div>
       </div>
     </div>
