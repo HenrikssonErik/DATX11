@@ -11,4 +11,9 @@ export class AppComponent {
   constructor(public uploadTestFile : UploadFileConfigService, public uploadUnitTestFile: UploadUnitTestConfigService) {}
 
 
+  getTemplateFile() {
+    // TODO: Temporarily do a get request here and retrieve the file.
+  }
+
+
 }
