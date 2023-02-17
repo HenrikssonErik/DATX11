@@ -41,7 +41,7 @@ def handle_files(files:list[FileStorage]) -> tuple[dict[str, str], int] :
 
         response_args.update({file.filename: res_object})
         #saveToDB(file)
-        get_file_from_database(701, 'tda353', 'test2.txt')
+        get_file_from_database(701, 'tda353', 'Test1.pdf')
     #TODO: decide what to do with the files here, eg. file.save(file.filename), to save the file to dir
     return response_args , res_code
     
@@ -79,5 +79,5 @@ def get_file_from_database(groupId, course, fileName):
     cursor.execute(queryData, (fileName, groupId, course))
     data = cursor.fetchall()
     file_binary = data[0][0].tobytes()
-    with open('test2.txt','wb') as file: #wb = write in binary
+    with open(fileName,'wb') as file: #wb = write in binary
         file.write((file_binary))
