@@ -11,9 +11,10 @@ import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @NgModule({
-  declarations: [AppComponent, FileUploadComponent, DndDirective, NavbarComponent],
+  declarations: [AppComponent, FileUploadComponent, DndDirective, NavbarComponent, FooterComponent],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule, FormsModule, CommonModule, BrowserAnimationsModule, ToastrModule.forRoot()],
   providers: [TestApiService], //should be replaced with the real deal later
   bootstrap: [AppComponent],
