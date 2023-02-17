@@ -3,7 +3,6 @@ from werkzeug.datastructures import FileStorage
 from . import general_tests
 import tempfile
 from pathlib import Path
-import os
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
@@ -53,6 +52,8 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
 
     # Running general tests here
     with tempfile.TemporaryDirectory(prefix="DATX11__") as dir:
+
+        # saves the user submitted files in a temp dir
         dir_path = Path(dir)
         py_file_names = []
         for file in files:
@@ -61,16 +62,16 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
                 with open(dir_path / file.filename, "wb") as f:
                     f.write(file.stream.read())
 
+        # Check PEP8 conventions + cyclomatic complexity
         pep8_result = general_tests.pep8_check(dir_path,
                                                filename_patterns=py_file_names
                                                )
-        print(pep8_result)
+        response_args.update({"PEP8_results": pep8_result})
 
     return response_args, res_code
 
+
 # Method to check file extension for allowed files
-
-
 def allowed_file(filename: str):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in __ALLOWED_EXTENSIONS
