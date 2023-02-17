@@ -1,5 +1,9 @@
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
+from . import general_tests
+import tempfile
+from pathlib import Path
+import os
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
@@ -46,6 +50,22 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
 
     # TODO: decide what to do with the files here, eg.
     # file.save(file.filename), to save the file to dir
+
+    # Running general tests here
+    with tempfile.TemporaryDirectory(prefix="DATX11__") as dir:
+        dir_path = Path(dir)
+        py_file_names = []
+        for file in files:
+            if file.filename is not None and file.filename.endswith(".py"):
+                py_file_names.append("./" + file.filename)
+                with open(dir_path / file.filename, "wb") as f:
+                    f.write(file.stream.read())
+
+        pep8_result = general_tests.pep8_check(dir_path,
+                                               filename_patterns=py_file_names
+                                               )
+        print(pep8_result)
+
     return response_args, res_code
 
 # Method to check file extension for allowed files
