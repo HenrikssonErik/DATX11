@@ -10,9 +10,10 @@ import { FormsModule } from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 @NgModule({
-  declarations: [AppComponent, FileUploadComponent, DndDirective],
+  declarations: [AppComponent, FileUploadComponent, DndDirective, NavbarComponent],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule, FormsModule, CommonModule, BrowserAnimationsModule, ToastrModule.forRoot()],
   providers: [TestApiService], //should be replaced with the real deal later
   bootstrap: [AppComponent],
