@@ -68,7 +68,7 @@ class TestFileHandler(unittest.TestCase):
         self.assertEqual(respons[1], 200)
         self.assertEqual(respons[0]["PEP8_results"].count("F401"), 2)
         self.assertEqual(respons[0]["PEP8_results"].count("E401"), 1)
-        print(respons[0])
+        
 
 
 if __name__ == '__main__':

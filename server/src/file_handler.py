@@ -56,29 +56,48 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
 
     # if the files ar ok proceed to save and test them
     if (res_code == 200):
-        for file in files:
-            saveAssignmentToDB(file,groupId,courseId,assignment)
+        with tempfile.TemporaryDirectory(prefix="DATX11__") as dir:
+            save_dir = Path(dir)/"saves"
+            save_dir.mkdir()
+            file_paths: list[Path] = []
+
+            # save file to tempdir
+            for file in files:
+                if file.filename is None:
+                    raise ValueError("filename does not exits")
+
+                with open(save_dir/file.filename, "wb") as f:
+                    f.write(file.stream.read())
+                    file_paths.append(save_dir/file.filename)
+
+            # read the filename and filedata from `save_dir` and give it to
+            # saveAssignmentToDB
+            for file_path in file_paths:
+                filename = file_path.name
+                filedata = file_path.read_bytes()
+
+                save_assignment_to_db(filename, filedata,
+                                   groupId, courseId, assignment)
 
         # Running general tests here
-        with tempfile.TemporaryDirectory(prefix="DATX11__") as dir:
 
             # saves the user submitted files in a temp dir
-            dir_path = Path(dir)
+            pep8_test_dir = Path(dir)/"pep8_tests"
+            pep8_test_dir.mkdir()
             py_file_names = []
-            for file in files:
-                if file.filename is not None and file.filename.endswith(".py"):
-                    print('checking file: ' + file.filename)
-                    py_file_names.append("./" + file.filename)
-                    with open(dir_path / file.filename, "wb") as f:
-                        f.write(file.stream.read())
+            for file_path in file_paths:
+                if file_path.suffix == ".py":
+                    f_name = pep8_test_dir/file_path.name
+                    py_file_names.append("./" + str(file_path.name))
+                    f_name.write_bytes(file_path.read_bytes())
 
             # Check PEP8 conventions + cyclomatic complexity
-            pep8_result = general_tests.pep8_check(dir_path,
-                                               filename_patterns=py_file_names
-                                               )
-            response_args.update({"PEP8_results": pep8_result})
+            pep8_result = general_tests.pep8_check(
+                pep8_test_dir,
+                filename_patterns=py_file_names
+            )
 
-    
+            response_args.update({"PEP8_results": pep8_result})
 
     return response_args, res_code
 
@@ -99,7 +118,7 @@ def handle_testFile (files: FileStorage):
 
         response_args.update({file.filename: res_object})
     
-        saveTestToDB(file,courseId, assignment)
+        save_test_to_db(file,courseId, assignment)
 
 
     return response_args, res_code
@@ -111,7 +130,7 @@ def allowed_file(filename: str):
            filename.rsplit('.', 1)[1].lower() in __ALLOWED_EXTENSIONS
 
 
-def saveTestToDB(file: FileStorage, courseId, assignment):
+def save_test_to_db(file: FileStorage, courseId, assignment):
 
     file.filename = str(courseId) + 'Tests' + str(assignment)+'.py'
 
@@ -138,31 +157,23 @@ def saveTestToDB(file: FileStorage, courseId, assignment):
     f.close()
     os.remove(file.filename)
 
-def saveAssignmentToDB(file: FileStorage, groupId, courseId, assignment):
+def save_assignment_to_db(filename: str, filedata: bytes, groupId, courseId, assignment):
 
-    if(os.path.exists(file.filename)): 
-        raise Exception("file exists in dir, not allowed filename")
-
-    file.save(file.filename)
-    f= open(file.filename,"rb") #rb = reading in binary
-    filedata = f.read()
     binary = psycopg2.Binary(filedata)
-    
-    #the DB-login data should not be shown here, better to load it from local document
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant", user="postgres", password="BorasSuger-1")
 
-    filetype = file.filename.rsplit('.', 1)[1].lower();    
+    # the DB-login data should not be shown here, better to load it from local document
+    conn = psycopg2.connect(host="95.80.39.50", port="5432",
+                            dbname="hydrant", user="postgres", password="BorasSuger-1")
+
+    filetype = filename.rsplit('.', 1)[1].lower()
     with conn.cursor() as cur:
         query = """INSERT INTO
     AssignmentFiles (GroupId, CourseId, Assignment, filename, filedata, filetype)
     VALUES (%s, %s, %s, %s, %s, %s);"""
 
-        
-        cur.execute(query, (groupId, courseId, assignment, file.filename, binary, filetype))
+        cur.execute(query, (groupId, courseId, assignment,
+                    filename, binary, filetype))
         conn.commit()
-    f.close()
-    os.remove(file.filename)
-
 def resubmit_files(file: FileStorage, groupId, course):
     print("Resubmission")
     
@@ -172,7 +183,7 @@ def resubmit_files(file: FileStorage, groupId, course):
     queryData = "DELETE FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.courseid = %s"
     cursor.execute(queryData, (file.filename, groupId, course))
 
-    saveAssignmentToDB(file, groupId, course)
+    save_assignment_to_db(file, groupId, course)
 
 
 
