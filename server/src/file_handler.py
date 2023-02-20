@@ -89,7 +89,6 @@ def handle_testFile (files: FileStorage):
     for file in files:
         res_object = {}
         file.filename = secure_filename(file.filename)
-        print(file.filename)
         
         if not (allowed_file(file.filename)):
             res_object.update({"File Type": " Not allowed filetype"})
@@ -100,7 +99,7 @@ def handle_testFile (files: FileStorage):
         response_args.update({file.filename: res_object})
     
     #add renamin the files
-        saveTestToDB(file)
+        saveTestToDB(file,courseId, assignment)
 
 
     return response_args, res_code
@@ -112,20 +111,17 @@ def allowed_file(filename: str):
            filename.rsplit('.', 1)[1].lower() in __ALLOWED_EXTENSIONS
 
 
-def saveTestToDB(file: FileStorage):
-    print("saving to Db")
-    print(file)
+def saveTestToDB(file: FileStorage, courseId, assignment):
+
+    file.filename = courseId + 'Tests' + assignment
 
     if(os.path.exists(file.filename)):
-        ##this is very dangerous, e.g if the submitted file is "app.py" wveryhting breaks!! TODO: change this
-        print("file exists")
-        os.remove(file.filename)
-        print("file removed, new file is being saved.")
+        
+        raise Exception("file exists in dir, not allowed filename")
+        
     file.save(file.filename)
     f= open(file.filename,"rb") #rb = reading in binary
     filedata = f.read()
-    print("read file")
-    print(filedata)
     binary = psycopg2.Binary(filedata)
     
     #the DB-login data should not be shown here, better to load it from local document
@@ -139,6 +135,8 @@ def saveTestToDB(file: FileStorage):
         
         cur.execute(query, (courseId, assignment, file.filename, binary))
         conn.commit()
+    
+    os.remove(file.filename)
 
 def saveAssignmentToDB(file: FileStorage, groupId, courseId, assignment):
     print("saving to Db")
