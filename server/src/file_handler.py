@@ -115,8 +115,7 @@ def saveTestToDB(file: FileStorage, courseId, assignment):
 
     file.filename = courseId + 'Tests' + assignment
 
-    if(os.path.exists(file.filename)):
-        
+    if(os.path.exists(file.filename)): 
         raise Exception("file exists in dir, not allowed filename")
         
     file.save(file.filename)
@@ -142,10 +141,9 @@ def saveAssignmentToDB(file: FileStorage, groupId, courseId, assignment):
     print("saving to Db")
     print(file)
 
-    if(os.path.exists(file.filename)):
-        print("file exists")
-        os.remove(file.filename)
-        print("file removed, new file is being saved.")
+    if(os.path.exists(file.filename)): 
+        raise Exception("file exists in dir, not allowed filename")
+
     file.save(file.filename)
     f= open(file.filename,"rb") #rb = reading in binary
     filedata = f.read()
@@ -166,6 +164,8 @@ def saveAssignmentToDB(file: FileStorage, groupId, courseId, assignment):
         cur.execute(query, (groupId, courseId, assignment, file.filename, binary, filetype))
         conn.commit()
 
+    os.remove(file.filename)
+
 def resubmit_files(file: FileStorage, groupId, course):
     print("Resubmission")
     
@@ -179,13 +179,13 @@ def resubmit_files(file: FileStorage, groupId, course):
 
 
 
-def get_file_from_database(groupId, course, fileName):
+def get_file_from_database(groupId, course, assignemnt, fileName):
     print("Retrieving from database")
 
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
     cursor = conn.cursor()
-    queryData = "SELECT FileData FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.course = %s"
-    cursor.execute(queryData, (fileName, groupId, course))
+    queryData = "SELECT FileData FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.courseid = %s AND assignmentfiles.assignment = %s"
+    cursor.execute(queryData, (fileName, groupId, course, assignment))
     data = cursor.fetchall()
     file_binary = data[0][0].tobytes()
     with open(fileName,'wb') as file: #wb = write in binary
