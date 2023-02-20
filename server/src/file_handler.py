@@ -98,7 +98,6 @@ def handle_testFile (files: FileStorage):
 
         response_args.update({file.filename: res_object})
     
-    #add renamin the files
         saveTestToDB(file,courseId, assignment)
 
 
@@ -113,7 +112,7 @@ def allowed_file(filename: str):
 
 def saveTestToDB(file: FileStorage, courseId, assignment):
 
-    file.filename = courseId + 'Tests' + assignment
+    file.filename = str(courseId) + 'Tests' + str(assignment)+'.py'
 
     if(os.path.exists(file.filename)): 
         raise Exception("file exists in dir, not allowed filename")
@@ -134,12 +133,11 @@ def saveTestToDB(file: FileStorage, courseId, assignment):
         
         cur.execute(query, (courseId, assignment, file.filename, binary))
         conn.commit()
-    
+
+    f.close()
     os.remove(file.filename)
 
 def saveAssignmentToDB(file: FileStorage, groupId, courseId, assignment):
-    print("saving to Db")
-    print(file)
 
     if(os.path.exists(file.filename)): 
         raise Exception("file exists in dir, not allowed filename")
@@ -163,7 +161,7 @@ def saveAssignmentToDB(file: FileStorage, groupId, courseId, assignment):
         
         cur.execute(query, (groupId, courseId, assignment, file.filename, binary, filetype))
         conn.commit()
-
+    f.close()
     os.remove(file.filename)
 
 def resubmit_files(file: FileStorage, groupId, course):
