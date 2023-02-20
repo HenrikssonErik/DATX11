@@ -6,7 +6,7 @@ from pathlib import Path
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
-__allowed_filenames = {"Test1.pdf", "test2.txt", "PythonFile.py"}
+__allowed_filenames = {"Test1.pdf", "test2.txt", "test_runner.py"}
 __nr_of_files = 1
 
 
@@ -33,6 +33,7 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
     for file in files:
         res_object = {}
         file.filename = secure_filename(file.filename)
+        print(file.filename)
         if not (file.filename in __allowed_filenames):
             res_object.update({"File Name": "Not allowed file name"})
             res_code = 406
@@ -75,3 +76,56 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
 def allowed_file(filename: str):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in __ALLOWED_EXTENSIONS
+
+def saveToDB(file: FileStorage, groupId, course):
+    print("saving to Db")
+    print(file)
+
+    if(os.path.exists(file.filename)):
+        print("file exists")
+        os.remove(file.filename)
+        print("file removed, new file is being saved.")
+    file.save(file.filename)
+    f= open(file.filename,"rb") #rb = reading in binary
+    filedata = f.read()
+    print("read file")
+    print(filedata)
+    binary = psycopg2.Binary(filedata)
+    
+    #the DB-login data should not be shown here, better to load it from local document
+    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
+
+    filetype = file.filename.rsplit('.', 1)[1].lower();    
+    with conn.cursor() as cur:
+        query = """INSERT INTO
+    AssignmentFiles (GroupId, course, filename, filedata, filetype)
+    VALUES (%s, %s, %s, %s, %s);"""
+
+        
+        cur.execute(query, (groupId, course, file.filename, binary, filetype))
+        conn.commit()
+
+def resubmit_files(file: FileStorage, groupId, course):
+    print("Resubmission")
+    
+    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
+    cursor = conn.cursor()
+
+    queryData = "DELETE FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.course = %s"
+    cursor.execute(queryData, (file.filename, groupId, course))
+
+    saveToDB(file, groupId, course)
+
+
+
+def get_file_from_database(groupId, course, fileName):
+    print("Retrieving from database")
+
+    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
+    cursor = conn.cursor()
+    queryData = "SELECT FileData FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.course = %s"
+    cursor.execute(queryData, (fileName, groupId, course))
+    data = cursor.fetchall()
+    file_binary = data[0][0].tobytes()
+    with open(fileName,'wb') as file: #wb = write in binary
+        file.write((file_binary))
