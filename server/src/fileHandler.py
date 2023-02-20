@@ -68,6 +68,8 @@ def saveToDB(file: FileStorage, groupId, course):
     print("read file")
     print(filedata)
     binary = psycopg2.Binary(filedata)
+    
+    #the DB-login data should not be shown here, better to load it from local document
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
 
     filetype = file.filename.rsplit('.', 1)[1].lower();    

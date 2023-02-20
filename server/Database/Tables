@@ -1,3 +1,6 @@
+
+-- CourseInstance, group and lab assignment shoudl be primary key here
+
 CREATE Table AssignmentFiles (
 		GroupId INTEGER  NOT NULL,
 		Course CHAR (6) NOT NULL,
@@ -6,3 +9,13 @@ CREATE Table AssignmentFiles (
 		FileType TEXT NOT NULL,
 		PRIMARY KEY(GroupId,Course, FileName)
 	);
+
+
+--USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
+CREATE Table Courses (
+	courseId serial,
+	Course Char(6) NOT NULL,
+	teachingPeriod INTEGER,
+	courseYear INTEGER, 
+	CHECK (teachingPeriod BETWEEN 1 AND 4)
+)
