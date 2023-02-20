@@ -8,7 +8,7 @@ import psycopg2
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
-__allowed_filenames = {"Test1.pdf", "test2.txt", "good.py"}
+__allowed_filenames = {"Test1.pdf", "test2.txt", "PythonFile.py"}
 __nr_of_files = 1
 
 #for DB, should be recieved from frontend(?) later on
@@ -59,7 +59,7 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
         for file in files:
             saveAssignmentToDB(file,groupId,courseId,assignment)
 
-    # Running general tests here
+        # Running general tests here
         with tempfile.TemporaryDirectory(prefix="DATX11__") as dir:
 
             # saves the user submitted files in a temp dir
@@ -67,6 +67,7 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
             py_file_names = []
             for file in files:
                 if file.filename is not None and file.filename.endswith(".py"):
+                    print('checking file: ' + file.filename)
                     py_file_names.append("./" + file.filename)
                     with open(dir_path / file.filename, "wb") as f:
                         f.write(file.stream.read())
@@ -145,8 +146,6 @@ def saveAssignmentToDB(file: FileStorage, groupId, courseId, assignment):
     file.save(file.filename)
     f= open(file.filename,"rb") #rb = reading in binary
     filedata = f.read()
-    print("read file")
-    print(filedata)
     binary = psycopg2.Binary(filedata)
     
     #the DB-login data should not be shown here, better to load it from local document
@@ -177,7 +176,7 @@ def resubmit_files(file: FileStorage, groupId, course):
 
 
 
-def get_file_from_database(groupId, course, assignemnt, fileName):
+def get_file_from_database(groupId, course, assignment, fileName):
     print("Retrieving from database")
 
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
