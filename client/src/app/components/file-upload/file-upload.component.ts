@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { UploadFileConfigService } from 'src/app/services/upload-test-file-config.service';
+import { UploadUnitTestConfigService } from 'src/app/services/upload-unit-test-config.service';
 import { API_URL } from 'src/environments/environment';
 
 @Component({
@@ -13,7 +15,10 @@ export class FileUploadComponent {
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
 
-  constructor(private http: HttpClient, private toastr: ToastrService) {}
+  @Input() config!: UploadFileConfigService | UploadUnitTestConfigService
+
+  constructor(private http: HttpClient, private toastr: ToastrService) { 
+  }
 
   /**
   * Method to handle the file drop event and prepares the list of files
@@ -54,7 +59,7 @@ export class FileUploadComponent {
  * @returns {void}
  */
   prepareFilesList(files: Array<File>): void {
-    const allowedTypes = ['text/x-python', 'application/pdf', 'text/plain'];
+    const allowedTypes = this.config.allowedFileTypes;
     for (const file of files) {
       const index = this.files.findIndex(f => f.name === file.name);
       if (allowedTypes.includes(file.type)) {
@@ -91,6 +96,8 @@ export class FileUploadComponent {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
+  
+  
   getImageType(file : File) : string{
     if(file.type === 'text/plain'){
       return 'txt-file.png'
@@ -113,7 +120,7 @@ export class FileUploadComponent {
     const formData = new FormData();
     this.files.forEach((file : File) : void => formData.append('files', file, file.name));
   
-    this.http.post(`${API_URL}/files`, formData).subscribe({
+    this.http.post(`${API_URL}/` + this.config.endpoint, formData).subscribe({
       next: (response ) => {
         //TODO: Handle the success response
       },

@@ -6,13 +6,19 @@
         <div appDnd (fileDropped)="onFileDropped($event)">
           <input type="file" #fileUpload id="fileUpload" multiple (change)="fileBrowseHandler($event)">
           <i class="fa-solid fa-arrow-up-from-bracket upload-icon"></i>
-          <h3>Drag and drop a file here</h3>
-          <h3>or</h3>
-          <button class="btn btn-primary">
+          <h3 class="text-muted">Drag and drop a file here</h3>
+          <h3 class="text-muted">or</h3>
+          <button class="btn btn-primary" style="background-color: #3D9970; border: #3D9970">
             <label for="fileUpload">Browse</label>
           </button>
           <br>
-          <p><small class="small-text">Supported files: .py, .pdf, .txt</small></p>
+          <p>
+            <small class="small-text">Supported files:
+              <span *ngFor="let supportedFileType of config.allowedFileTypesForPrint; let isLast = last">
+                {{supportedFileType}}{{isLast ? '' : ','}}&nbsp;
+              </span>
+            </small>
+          </p>
         </div>
       </div>
     </div>
@@ -37,7 +43,7 @@
           </div>
           </div>
         </div> 
-        <button class="btn btn-primary upload-button" (click)="uploadFiles()">Upload</button>
+        <button style="background-color: #3D9970; border: #3D9970" class="btn btn-primary upload-button" (click)="uploadFiles()">Upload</button>
       </div>
     </div>
   </div>
