@@ -38,7 +38,7 @@ def post_tests ():
     res = handle_test_file(files)
     return jsonify(res[0]), res[1]
 
-@app.route('/getAssignmetnFiles', methods=['GET'])
+@app.route('/getAssignmentFiles', methods=['GET'])
 def post_files():
     data = get_assignment_file_from_database(1,5,1, 'Test1.pdf')
     return send_file(data, as_attachment=True, download_name='Test1.pdf')
