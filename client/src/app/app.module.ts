@@ -13,9 +13,10 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { TestFeedbackComponent } from './components/test-feedback/test-feedback.component';
+import { TestFeedbackCardComponent } from './components/test-feedback-card/test-feedback-card.component';
 
 @NgModule({
-  declarations: [AppComponent, FileUploadComponent, DndDirective, NavbarComponent, FooterComponent, TestFeedbackComponent],
+  declarations: [AppComponent, FileUploadComponent, DndDirective, NavbarComponent, FooterComponent, TestFeedbackComponent, TestFeedbackCardComponent],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule, FormsModule, CommonModule, BrowserAnimationsModule, ToastrModule.forRoot()],
   providers: [TestApiService], //should be replaced with the real deal later
   bootstrap: [AppComponent],
