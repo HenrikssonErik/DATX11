@@ -102,7 +102,7 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
     return response_args, res_code
 
 
-def handle_testFile (files: FileStorage):
+def handle_test_file (files: FileStorage):
     response_args = {}
     res_code = 200
 
@@ -158,7 +158,9 @@ def save_test_to_db(file: FileStorage, courseId, assignment):
     os.remove(file.filename)
 
 def save_assignment_to_db(filename: str, filedata: bytes, groupId, courseId, assignment):
-
+    """ Saves assignmentfile to the database and removed previous file if it exists """
+    #if it is a resubmission a remove is done before adding the new file
+    remove_existing_assignment(filename, groupId,courseId,assignment )
     binary = psycopg2.Binary(filedata)
 
     # the DB-login data should not be shown here, better to load it from local document
@@ -174,20 +176,21 @@ def save_assignment_to_db(filename: str, filedata: bytes, groupId, courseId, ass
         cur.execute(query, (groupId, courseId, assignment,
                     filename, binary, filetype))
         conn.commit()
-def resubmit_files(file: FileStorage, groupId, course):
-    print("Resubmission")
-    
+
+def remove_existing_assignment(filename: str, groupId, course, assignment):
+    """ Removes file from assignment table in the database"""
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant", user="postgres", password="BorasSuger-1")
     cursor = conn.cursor()
 
-    queryData = "DELETE FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.courseid = %s"
-    cursor.execute(queryData, (file.filename, groupId, course))
+    queryData = """DELETE FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.courseid = %s AND assignmentfiles.assignment = %s;"""
+    cursor.execute(queryData, (filename, groupId, course, assignment))
+    conn.commit()
+    #save_assignment_to_db(file, groupId, course)
 
-    save_assignment_to_db(file, groupId, course)
 
 
-
-def get_file_from_database(groupId, course, assignment, fileName):
+def get_assignment_file_from_database(groupId, course, assignment, fileName):
+    """retrieves file from database"""
     print("Retrieving from database")
 
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")

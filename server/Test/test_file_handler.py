@@ -6,7 +6,7 @@ from werkzeug.datastructures import FileStorage
 from io import BytesIO
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.file_handler import handle_files  # noqa: E402
+from src.file_handler import handle_files, handle_test_file 
 
 
 
@@ -69,6 +69,12 @@ class TestFileHandler(unittest.TestCase):
         self.assertEqual(respons[0]["PEP8_results"].count("F401"), 2)
         self.assertEqual(respons[0]["PEP8_results"].count("E401"), 1)
         
+    def test_send_py_test_file(self, mock_connect):
+        with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
+            file = FileStorage(BytesIO(fp.read()), filename="PythonFile.py")
+
+        files = [file]
+        self.assertEqual(handle_test_file(files)[1], 200)
 
 
 if __name__ == '__main__':

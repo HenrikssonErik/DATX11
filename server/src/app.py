@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from .file_handler import handle_files, handle_testFile
+from .file_handler import handle_files, handle_test_file
 
 # creating the Flask application
 app = Flask(__name__)
@@ -35,7 +35,7 @@ def post_tests ():
 
     if not files:
         return "Files not found", 406
-    res = handle_testFile(files)
+    res = handle_test_file(files)
     return jsonify(res[0]), res[1]
 
 
