@@ -193,7 +193,7 @@ def remove_existing_assignment(filename: str, groupId, course, assignment):
 
 
 
-def get_assignment_file_from_database(groupId, course, assignment, fileName):
+def get_assignment_files_from_database(groupId, course, assignment, fileName):
     """retrieves file from database"""
     print("Retrieving from database")
 
@@ -204,6 +204,9 @@ def get_assignment_file_from_database(groupId, course, assignment, fileName):
     data = cursor.fetchall()
     file_binary = data[0][0].tobytes()
     
-    #with open(fileName,'wb') as file: #wb = write in binary
-     #   file.write((file_binary))
-    return io.BytesIO(file_binary)
+    with open(fileName,'wb') as file: #wb = write in binary
+        file.write((file_binary))
+    #return
+
+    #this line creates a zip archive to, havent figuered out how to recreate it in front en though
+    #make_archive("archiveName", 'zip',"zip-all-Files-in-this-dir" )
