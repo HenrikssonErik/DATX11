@@ -21,7 +21,10 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], str, i
     number_of_files = {}
     res_code = 200
 
-    file_amount, res_code = ("OK", res_code) if (len(files) == __nr_of_files) else (f"Received {len(files)}, " + f"should be {__nr_of_files} files", 406)
+    file_amount, res_code = ("OK", res_code)  \
+        if (len(files) == __nr_of_files) \
+        else (f"Received {len(files)}, " + f"should be {__nr_of_files} files", 406)
+    
     number_of_files.update({"number_of_files": file_amount})
 
     response_items = []
