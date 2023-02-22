@@ -10,7 +10,7 @@ __allowed_filenames = {"Test1.pdf", "test2.txt", "test_runner.py"}
 __nr_of_files = 1
 
 
-def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
+def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], str, int]:
     """
     Sanitizes files, checks for number of files, allowed file names and file
     types
@@ -18,13 +18,13 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
     Returns: json object with feedback on submitted files
     """
 
-    response_args = {}
+    number_of_files = {}
     res_code = 200
 
-    
-    file_msg, res_code = ("OK", res_code) if (len(files) == __nr_of_files) else (f"Received {len(files)}, " + f"should be {__nr_of_files} files", 406)
+    file_amount, res_code = ("OK", res_code) if (len(files) == __nr_of_files) else (f"Received {len(files)}, " + f"should be {__nr_of_files} files", 406)
+    number_of_files.update({"number_of_files": file_amount})
 
-    response_args.update({"number_of_files": file_msg})
+    response_items = []
 
     #Could do the same one-line if-else as above instead of one after the other in this for-loop
     for file in files:
@@ -39,7 +39,7 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
         file_type, res_code = ("OK", res_code) if (allowed_file(file.filename)) else ("Not allowed file type", 406)
         res_object.update({"file_type": file_type})
 
-        response_args.update({"tested_file": res_object})
+        response_items.append({"tested_file": res_object})
 
     # TODO: decide what to do with the files here, eg.
     # file.save(file.filename), to save the file to dir
@@ -50,19 +50,20 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
         # saves the user submitted files in a temp dir
         dir_path = Path(dir)
         py_file_names = []
-        for file in files:
+        for count, file in enumerate(files):
+            pep8_result = "OK"
             if file.filename is not None and file.filename.endswith(".py"):
                 py_file_names.append("./" + file.filename)
                 with open(dir_path / file.filename, "wb") as f:
                     f.write(file.stream.read())
 
-        # Check PEP8 conventions + cyclomatic complexity
-        pep8_result = general_tests.pep8_check(dir_path,
-                                               filename_patterns=py_file_names
-                                               )
-        response_args.update({"PEP8_results": pep8_result})
+                # Check PEP8 conventions + cyclomatic complexity in this .py-file
+                pep8_result = general_tests.pep8_check(dir_path,
+                                                    filename_patterns=py_file_names
+                                                    )
+            response_items[count].update({"PEP8_results": pep8_result})
 
-    return response_args, res_code
+    return response_items, number_of_files, res_code
 
 
 # Method to check file extension for allowed files
