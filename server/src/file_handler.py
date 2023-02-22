@@ -1,3 +1,4 @@
+import io
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from . import general_tests
@@ -153,6 +154,7 @@ def save_test_to_db(file: FileStorage, courseId, assignment):
         
         cur.execute(query, (courseId, assignment, file.filename, binary))
         conn.commit()
+        conn.close()
 
     f.close()
     os.remove(file.filename)
@@ -176,6 +178,7 @@ def save_assignment_to_db(filename: str, filedata: bytes, groupId, courseId, ass
         cur.execute(query, (groupId, courseId, assignment,
                     filename, binary, filetype))
         conn.commit()
+        conn.close
 
 def remove_existing_assignment(filename: str, groupId, course, assignment):
     """ Removes file from assignment table in the database"""
@@ -185,6 +188,7 @@ def remove_existing_assignment(filename: str, groupId, course, assignment):
     queryData = """DELETE FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.courseid = %s AND assignmentfiles.assignment = %s;"""
     cursor.execute(queryData, (filename, groupId, course, assignment))
     conn.commit()
+    conn.close()
     #save_assignment_to_db(file, groupId, course)
 
 
@@ -193,11 +197,13 @@ def get_assignment_file_from_database(groupId, course, assignment, fileName):
     """retrieves file from database"""
     print("Retrieving from database")
 
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
+    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant", user="postgres", password="BorasSuger-1")
     cursor = conn.cursor()
     queryData = "SELECT FileData FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.courseid = %s AND assignmentfiles.assignment = %s"
     cursor.execute(queryData, (fileName, groupId, course, assignment))
     data = cursor.fetchall()
     file_binary = data[0][0].tobytes()
-    with open(fileName,'wb') as file: #wb = write in binary
-        file.write((file_binary))
+    
+    #with open(fileName,'wb') as file: #wb = write in binary
+     #   file.write((file_binary))
+    return io.BytesIO(file_binary)
