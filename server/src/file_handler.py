@@ -21,32 +21,25 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
     response_args = {}
     res_code = 200
 
-    if not (len(files) == __nr_of_files):
-        response_args.update(
-            {
-                "Wrong amount of files": f"Recieved {len(files)}, " +
-                                         f"should be {__nr_of_files} files"
-            }
-        )
-        res_code = 406
+    
+    file_msg, res_code = ("OK", res_code) if (len(files) == __nr_of_files) else (f"Received {len(files)}, " + f"should be {__nr_of_files} files", 406)
 
+    response_args.update({"number_of_files": file_msg})
+
+    #Could do the same one-line if-else as above instead of one after the other in this for-loop
     for file in files:
         res_object = {}
         file.filename = secure_filename(file.filename)
         print(file.filename)
-        if not (file.filename in __allowed_filenames):
-            res_object.update({"File Name": "Not allowed file name"})
-            res_code = 406
-        else:
-            res_object.update({"File Name": "OK!"})
+        res_object.update({"file": file.filename})
 
-        if not (allowed_file(file.filename)):
-            res_object.update({"File Type": " Not allowed filetype"})
-            res_code = 406
-        else:
-            res_object.update({"File Type": "OK!"})
+        file_name, res_code = ("OK", res_code) if (file.filename in __allowed_filenames) else ("Not allowed file name", 406)
+        res_object.update({"file_name": file_name})
 
-        response_args.update({file.filename: res_object})
+        file_type, res_code = ("OK", res_code) if (allowed_file(file.filename)) else ("Not allowed file type", 406)
+        res_object.update({"file_type": file_type})
+
+        response_args.update({"tested_file": res_object})
 
     # TODO: decide what to do with the files here, eg.
     # file.save(file.filename), to save the file to dir
