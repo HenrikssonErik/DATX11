@@ -136,7 +136,7 @@ export class FileUploadComponent {
   }
 
   //this method if called will get a file from the serverand download it
-  getfiles(): void {
+  getFiles(): void {
     this.http
       .get(`${API_URL}/getAssignmentFiles`, {
         observe: 'response',

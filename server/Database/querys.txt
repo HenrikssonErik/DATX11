@@ -1,0 +1,8 @@
+select filename, groupid from assignmentfiles INNER JOIN Assignments ON assignment = Assignments.Assignment;
+
+insert into courses(courseid, course, teachingperiod, courseyear) values (6,
+
+insert into assignments(courseId, Assignment) values (6, 6);
+
+
+insert into assignmentfiles(groupid, courseid, assignment, filename, filedata, filetype) values (6,  6,  6, 'test2.txt', '\x68656a2068656a0d0a70c3a5206469672064696e206c696c6c6120746a656a', 'txt');
