@@ -42,9 +42,10 @@ def post_tests ():
 def get_files():
 
     #TODO send all files with correct filename from a temp_dir, then remove files from the temp_dir toreset it
-    get_assignment_files_from_database(1,5,1, 'Test1.pdf')
-
+    result = get_assignment_files_from_database(6, 6, 6, 'Test1.pdf')
+    print(result)
+    return send_file(result, as_attachment = True) 
     #this returns the very specific file
-    return send_file(path_or_file=r"C:\Users\sebas\Documents\GitHub\DATX11\server\src\Test1.pdf", as_attachment=True)
+    #return send_file(path_or_file=r"C:\Users\sebas\Documents\GitHub\DATX11\server\src\test2.txt", as_attachment=True)
     #return Response(files, headers={'Content-Disposition': 'attachment', 'filename': 'files.zip'}, mimetype='application/zip')
 

@@ -136,7 +136,7 @@ export class FileUploadComponent {
   }
 
   //this method if called will get a file from the serverand download it
-  getfiles(): void {
+  getFiles(): void {
     this.http
       .get(`${API_URL}/getAssignmentFiles`, { responseType: 'blob' })
       .subscribe({
@@ -148,7 +148,7 @@ export class FileUploadComponent {
           const url = URL.createObjectURL(file);
           const link = document.createElement('a');
           link.href = url;
-          link.download = 'Assignment';
+          link.download = 'assblast';
           link.click();
         },
         error: (err) => {
