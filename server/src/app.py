@@ -1,4 +1,6 @@
-from flask import Flask, Response, jsonify, make_response, request, send_file
+import os
+import time
+from flask import Flask, Response, after_this_request, jsonify, make_response, request, send_file
 from flask_cors import CORS
 
 from .file_handler import handle_files, handle_test_file, get_assignment_files_from_database
@@ -9,8 +11,6 @@ app = Flask(__name__)
 CORS(app)
 
 # useless in the future, TODO: Remove along with front end button
-
-
 @app.route('/test', methods=['GET'])
 def test_get():
     return jsonify("hello")
@@ -38,14 +38,19 @@ def post_tests ():
     res = handle_test_file(files)
     return jsonify(res[0]), res[1]
 
+#should be a post further on
 @app.route('/getAssignmentFiles', methods=['GET'])
 def get_files():
-
-    #TODO send all files with correct filename from a temp_dir, then remove files from the temp_dir toreset it
-    result = get_assignment_files_from_database(1,5,1, 'Test1.pdf')
-
-    headers= {"Access-Control-Expose-Headers": "Content-Disposition", 'Content-Disposition': 'attachment; filename={}'.format("Test.pdf")}
-    res = make_response(send_file(path_or_file=result))
-    res.headers= headers
     
+    filename = 'test2.txt' ## should also be imported from frontend
+    result = get_assignment_files_from_database(1,5,1, filename) #here we should send in info from user
+
+    with open(result, 'rb') as f:
+       res= make_response( send_file(f, download_name=filename, as_attachment=True))
+
+    headers= {"Access-Control-Expose-Headers": "Content-Disposition", 'Content-Disposition': 'attachment; filename={}'.format(filename)}
+    os.remove(result)
+    res.headers= headers
     return res
+
+    
