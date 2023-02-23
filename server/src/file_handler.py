@@ -1,3 +1,5 @@
+import os
+import psycopg2
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from . import general_tests
@@ -6,11 +8,12 @@ from pathlib import Path
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
-__allowed_filenames = {"Test1.pdf", "test2.txt", "test_runner.py"}
-__nr_of_files = 1
+__allowed_filenames = {"Test1.pdf", "test2.txt", "ha1.py", "file_handler.py"}
+__nr_of_files = 2
 
 
-def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], str, int]:
+def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
+                                                    dict[str, str], int]:
     """
     Sanitizes files, checks for number of files, allowed file names and file
     types
@@ -23,23 +26,29 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], str, i
 
     file_amount, res_code = ("OK", res_code)  \
         if (len(files) == __nr_of_files) \
-        else (f"Received {len(files)}, " + f"should be {__nr_of_files} files", 406)
-    
+        else (f"Received {len(files)}, should be {__nr_of_files} files",
+              406)
+
     number_of_files.update({"number_of_files": file_amount})
 
     response_items = []
 
-    #Could do the same one-line if-else as above instead of one after the other in this for-loop
+    # Could do the same one-line if-else as above instead of one after the
+    # other in this for-loop
     for file in files:
         res_object = {}
         file.filename = secure_filename(file.filename)
         print(file.filename)
         res_object.update({"file": file.filename})
 
-        file_name, res_code = ("OK", res_code) if (file.filename in __allowed_filenames) else ("Not allowed file name", 406)
+        file_name, res_code = ("OK", res_code) \
+            if (file.filename in __allowed_filenames) \
+            else ("Not allowed file name", 406)
         res_object.update({"file_name": file_name})
 
-        file_type, res_code = ("OK", res_code) if (allowed_file(file.filename)) else ("Not allowed file type", 406)
+        file_type, res_code = ("OK", res_code) \
+            if (allowed_file(file.filename)) \
+            else ("Not allowed file type", 406)
         res_object.update({"file_type": file_type})
 
         response_items.append({"tested_file": res_object})
@@ -60,10 +69,9 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], str, i
                 with open(dir_path / file.filename, "wb") as f:
                     f.write(file.stream.read())
 
-                # Check PEP8 conventions + cyclomatic complexity in this .py-file
+                # Check file's PEP8 conventions + cyclomatic complexity
                 pep8_result = general_tests.pep8_check(dir_path,
-                                                    filename_patterns=py_file_names
-                                                    )
+                                                       filename_patterns=["./" + file.filename])
             response_items[count].update({"PEP8_results": pep8_result})
 
     return response_items, number_of_files, res_code
@@ -74,38 +82,47 @@ def allowed_file(filename: str):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in __ALLOWED_EXTENSIONS
 
+
 def saveToDB(file: FileStorage, groupId, course):
     print("saving to Db")
     print(file)
 
-    if(os.path.exists(file.filename)):
+    if (os.path.exists(file.filename)):
         print("file exists")
         os.remove(file.filename)
         print("file removed, new file is being saved.")
     file.save(file.filename)
-    f= open(file.filename,"rb") #rb = reading in binary
+    f = open(file.filename, "rb")  # rb = reading in binary
     filedata = f.read()
     print("read file")
     print(filedata)
     binary = psycopg2.Binary(filedata)
-    
-    #the DB-login data should not be shown here, better to load it from local document
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
 
-    filetype = file.filename.rsplit('.', 1)[1].lower();    
+    # the DB-login data should not be shown here, better to load it from local document
+    conn = psycopg2.connect(host="95.80.39.50",
+                            port="5432",
+                            dbname="test_erp",
+                            user="postgres",
+                            password="BorasSuger-1")
+
+    filetype = file.filename.rsplit('.', 1)[1].lower()
     with conn.cursor() as cur:
         query = """INSERT INTO
     AssignmentFiles (GroupId, course, filename, filedata, filetype)
     VALUES (%s, %s, %s, %s, %s);"""
 
-        
         cur.execute(query, (groupId, course, file.filename, binary, filetype))
         conn.commit()
 
+
 def resubmit_files(file: FileStorage, groupId, course):
     print("Resubmission")
-    
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
+
+    conn = psycopg2.connect(host="95.80.39.50",
+                            port="5432",
+                            dbname="test_erp",
+                            user="postgres",
+                            password="BorasSuger-1")
     cursor = conn.cursor()
 
     queryData = "DELETE FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.course = %s"
@@ -114,15 +131,18 @@ def resubmit_files(file: FileStorage, groupId, course):
     saveToDB(file, groupId, course)
 
 
-
 def get_file_from_database(groupId, course, fileName):
     print("Retrieving from database")
 
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="test_erp", user="postgres", password="BorasSuger-1")
+    conn = psycopg2.connect(host="95.80.39.50",
+                            port="5432",
+                            dbname="test_erp",
+                            user="postgres",
+                            password="BorasSuger-1")
     cursor = conn.cursor()
     queryData = "SELECT FileData FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.course = %s"
     cursor.execute(queryData, (fileName, groupId, course))
     data = cursor.fetchall()
     file_binary = data[0][0].tobytes()
-    with open(fileName,'wb') as file: #wb = write in binary
+    with open(fileName, 'wb') as file:  # wb = write in binary
         file.write((file_binary))
