@@ -198,22 +198,12 @@ def remove_existing_assignment(filename: str, groupId, course, assignment):
 
 def get_assignment_files_from_database(groupId, course, assignment, fileName):
     """retrieves file from database"""
-    print("Retrieving from database1")
-
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant", user="postgres", password="BorasSuger-1")
-    print("Retrieving from database2")
-
     cursor = conn.cursor()
-    print("Retrieving from database3")
-
     queryData = "SELECT FileData FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.courseid = %s AND assignmentfiles.assignment = %s"
-    print("Retrieving from database4")
-
     cursor.execute(queryData, (fileName, groupId, course, assignment))
-    print("Retrieving from database5")
     
     data = cursor.fetchall()
-    print(data)
     file_binary = data[0][0].tobytes()
     
     save_path =  'temp_directory/' #filedialog.askopenfilename(initialfile = fileName)
