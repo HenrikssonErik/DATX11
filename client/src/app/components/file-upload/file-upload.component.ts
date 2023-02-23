@@ -138,17 +138,28 @@ export class FileUploadComponent {
   //this method if called will get a file from the serverand download it
   getfiles(): void {
     this.http
-      .get(`${API_URL}/getAssignmentFiles`, { responseType: 'blob' })
+      .get(`${API_URL}/getAssignmentFiles`, {
+        observe: 'response',
+        responseType: 'blob',
+      })
       .subscribe({
         next: (response) => {
-          //TODO: Handle the success response
-          console.log(response);
-          var file = new File([response], 'assignment');
+          const contentDispositionHeader = response.headers.getAll(
+            'Content-Disposition'
+          )![0];
+          const filename = contentDispositionHeader
+            .split(';')[1]
+            .split('=')[1]
+            .replace(/"/g, '')
+            .trim();
+          console.log(filename);
+          console.log(response.body);
+          var file = new File([response.body!], 'assignment');
 
           const url = URL.createObjectURL(file);
           const link = document.createElement('a');
           link.href = url;
-          link.download = 'Assignment';
+          link.download = filename;
           link.click();
         },
         error: (err) => {

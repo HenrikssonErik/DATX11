@@ -1,4 +1,4 @@
-from flask import Flask, Response, jsonify, request, send_file
+from flask import Flask, Response, jsonify, make_response, request, send_file
 from flask_cors import CORS
 
 from .file_handler import handle_files, handle_test_file, get_assignment_files_from_database
@@ -41,10 +41,10 @@ def post_tests ():
 @app.route('/getAssignmentFiles', methods=['GET'])
 def get_files():
 
-    #TODO send all files with correct filename from a temp_dir, then remove files from the temp_dir toreset it
-    get_assignment_files_from_database(1,5,1, 'Test1.pdf')
+    get_assignment_files_from_database(6,6,6, 'Test1.pdf')
 
-    #this returns the very specific file
-    return send_file(path_or_file=r"C:\Users\sebas\Documents\GitHub\DATX11\server\src\Test1.pdf", as_attachment=True)
-    #return Response(files, headers={'Content-Disposition': 'attachment', 'filename': 'files.zip'}, mimetype='application/zip')
-
+    headers= {"Access-Control-Expose-Headers": "Content-Disposition", 'Content-Disposition': 'attachment; filename={}'.format("Test.pdf")}
+    res = make_response(send_file(path_or_file=r"C:\Users\sebas\Documents\GitHub\DATX11\server\src\Test1.pdf"))
+    res.headers= headers
+    
+    return res
