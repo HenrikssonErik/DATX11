@@ -1,5 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { link } from 'fs';
 import { ToastrService } from 'ngx-toastr';
 import { UploadFileConfigService } from 'src/app/services/upload-test-file-config.service';
 import { UploadUnitTestConfigService } from 'src/app/services/upload-unit-test-config.service';
@@ -134,5 +135,27 @@ export class FileUploadComponent {
         //TODO: Handle the error
       },
     });
+  }
+
+  //this method if called will get a file from the serverand download it
+  getFiles(): void {
+    this.http
+      .get(`${API_URL}/getAssignmentFiles`, { responseType: 'blob' })
+      .subscribe({
+        next: (response) => {
+          //TODO: Handle the success response
+          console.log(response);
+          var file = new File([response], 'assignment');
+
+          const url = URL.createObjectURL(file);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'assblast';
+          link.click();
+        },
+        error: (err) => {
+          //TODO: Handle the error
+        },
+      });
   }
 }

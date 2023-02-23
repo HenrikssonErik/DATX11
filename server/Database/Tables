@@ -1,21 +1,43 @@
 
 -- CourseInstance, group and lab assignment shoudl be primary key here
-
 CREATE Table AssignmentFiles (
-		GroupId INTEGER  NOT NULL,
-		Course CHAR (6) NOT NULL,
+		GroupId INTEGER  NOT NULL, --should be taken from some user/grouptable later on
+		CourseId serial,
+		Assignment INTEGER,
 		FileName TEXT NOT NULL,
 		FileData BYTEA NOT NULL, 
 		FileType TEXT NOT NULL,
-		PRIMARY KEY(GroupId,Course, FileName)
-	);
+		PRIMARY KEY(GroupId,CourseId, Assignment, FileName),
+		CONSTRAINT fk_assignment
+		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment)
+	)
 
 
 --USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
 CREATE Table Courses (
-	courseId serial,
+	CourseId serial PRIMARY KEY,
 	Course Char(6) NOT NULL,
-	teachingPeriod INTEGER,
-	courseYear INTEGER, 
-	CHECK (teachingPeriod BETWEEN 1 AND 4)
+	TeachingPeriod INTEGER,
+	CourseYear INTEGER,
+	CHECK (teachingPeriod BETWEEN 1 AND 4),
+	UNIQUE ( Course, teachingPeriod, CourseYear)
+)
+
+CREATE Table Assignments(
+	CourseId serial,
+	Assignment INTEGER check (Assignment > 0),
+	PRIMARY KEY (courseId, Assignment),
+	CONSTRAINT fk_course
+	FOREIGN KEY (CourseId) REFERENCES Courses(CourseId)
+)
+
+--for unittests
+CREATE Table TestFiles (
+	CourseId serial ,
+	Assignment INTEGER , 
+	Filename TEXT NOT NULL,
+	FileData BYTEA NOT NULL,
+	PRIMARY KEY(CourseId, Assignment),
+	CONSTRAINT fk_assignment
+	FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments(CourseId, Assignment)
 )
