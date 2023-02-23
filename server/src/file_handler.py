@@ -8,8 +8,8 @@ import psycopg2
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
-__allowed_filenames = {"Test1.pdf", "test2.txt", "ha1.py", "file_handler.py"}
-__nr_of_files = 1
+__allowed_filenames = {"Test1.pdf", "test2.txt", "1ha1.py", "1file_handler.py"}
+__nr_of_files = 2
 
 # for DB, should be recieved from frontend(?) later on
 courseId = 6
@@ -68,19 +68,10 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], dict[s
                 if file.filename is None:
                     raise ValueError("filename does not exits")
 
-        # saves the user submitted files in a temp dir
-        dir_path = Path(dir)
-        py_file_names = []
-        for count, file in enumerate(files):
-            pep8_result = "OK"
-            if file.filename is not None and file.filename.endswith(".py"):
-                py_file_names.append("./" + file.filename)
-                with open(dir_path / file.filename, "wb") as f:
+                with open(save_dir/file.filename, "wb") as f:
                     f.write(file.stream.read())
                     file_paths.append(save_dir/file.filename)
 
-            # read the filename and filedata from `save_dir` and give it to
-            # saveAssignmentToDB
             for file_path in file_paths:
                 filename = file_path.name
                 filedata = file_path.read_bytes()
@@ -88,22 +79,21 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], dict[s
                 save_assignment_to_db(filename, filedata,
                                       groupId, courseId, assignment)
 
-               # get_assignment_files_from_database(groupId, courseId, assignment, filename)
-        # Running general tests here
-
-            # saves the user submitted files in a temp dir
             pep8_test_dir = Path(dir)/"pep8_tests"
             pep8_test_dir.mkdir()
             py_file_names = []
-            for file_path in file_paths:
+            for count, file_path in enumerate(file_paths):
+                pep8_result = "OK"
                 if file_path.suffix == ".py":
                     f_name = pep8_test_dir/file_path.name
                     py_file_names.append("./" + str(file_path.name))
                     f_name.write_bytes(file_path.read_bytes())
 
-                    # Check file's PEP8 conventions + cyclomatic complexity
-                    pep8_result = general_tests.pep8_check(dir_path,
-                                                           filename_patterns=["./" + file.filename])
+                    # Check PEP8 conventions + cyclomatic complexity
+                    pep8_result = general_tests.pep8_check(
+                        pep8_test_dir,
+                        filename_patterns=py_file_names
+                    )
                 response_items[count].update({"PEP8_results": pep8_result})
 
     return response_items, number_of_files, res_code
