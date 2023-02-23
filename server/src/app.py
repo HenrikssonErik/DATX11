@@ -1,5 +1,7 @@
+from io import BytesIO
 import os
 import time
+from typing import BinaryIO
 from flask import Flask, Response, after_this_request, jsonify, make_response, request, send_file
 from flask_cors import CORS
 
@@ -41,15 +43,13 @@ def post_tests ():
 #should be a post further on
 @app.route('/getAssignmentFiles', methods=['GET'])
 def get_files():
-    
-    filename = 'test2.txt' ## should also be imported from frontend
-    result = get_assignment_files_from_database(1,5,1, filename) #here we should send in info from user
 
-    with open(result, 'rb') as f:
-       res= make_response( send_file(f, download_name=filename, as_attachment=True))
+    filename = 'Test1.pdf' ## should also be imported from frontend
+    result = get_assignment_files_from_database(6,6,6, filename) #here we should send in info from user
+    
+    res= make_response(send_file(path_or_file= result, download_name=filename, as_attachment=True))
 
     headers= {"Access-Control-Expose-Headers": "Content-Disposition", 'Content-Disposition': 'attachment; filename={}'.format(filename)}
-    os.remove(result)
     res.headers= headers
     return res
 

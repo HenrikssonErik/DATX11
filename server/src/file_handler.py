@@ -204,18 +204,19 @@ def get_assignment_files_from_database(groupId, course, assignment, fileName):
     cursor.execute(queryData, (fileName, groupId, course, assignment))
     
     data = cursor.fetchall()
-    file_binary = data[0][0].tobytes()
+    #print(data[0][0])
+    file_binary = io.BytesIO(data[0][0].tobytes())
     
     save_path =  'temp_directory/' #filedialog.askopenfilename(initialfile = fileName)
  
     completeName = os.path.join(save_path, fileName)         
 
-    with open(completeName, "wb") as file1:
-        file1.write((file_binary))
+    #with open(completeName, "wb") as file1:
+    #   file1.write((file_binary))
 
-    file1.close()
+    #file1.close()
 
-    return completeName
- 
+    #return completeName
+    return file_binary
     #this line creates a zip archive to, havent figuered out how to recreate it in front en though
     #make_archive("archiveName", 'zip',"zip-all-Files-in-this-dir" )
