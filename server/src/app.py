@@ -41,11 +41,14 @@ def post_tests ():
     return jsonify(res[0]), res[1]
 
 #should be a post further on
-@app.route('/getAssignmentFiles', methods=['GET'])
+@app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
-
-    filename = 'Test1.pdf' ## should also be imported from frontend
-    result = get_assignment_files_from_database(6,6,6, filename) #here we should send in info from user
+    data = request.get_json()
+    groupId = data['groupId']
+    course = data['course']
+    assignment = data['assignment']
+    filename = data['filename'] ## should also be imported from frontend
+    result = get_assignment_files_from_database(groupId,course,assignment, filename) #here we should send in info from user
     
     res= make_response(send_file(path_or_file= result, download_name=filename, as_attachment=True))
 

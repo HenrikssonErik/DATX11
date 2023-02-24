@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { UploadFileConfigService } from './services/upload-test-file-config.service';
 import { UploadUnitTestConfigService } from './services/upload-unit-test-config.service';
@@ -20,12 +20,17 @@ export class AppComponent {
     // TODO: Temporarily do a get request here and retrieve the file.
   }
 
-  getfiles(): void {
+  getfile(): void {
     this.http
-      .get(`${API_URL}/getAssignmentFiles`, {
-        observe: 'response',
-        responseType: 'blob',
-      })
+      .post(
+        `${API_URL}/getAssignmentFile`,
+        { groupId: 6, course: 6, assignment: 6, filename: 'Test1.pdf' },
+
+        {
+          observe: 'response',
+          responseType: 'blob',
+        }
+      )
       .subscribe({
         next: (response) => {
           const contentDispositionHeader = response.headers.getAll(
@@ -36,8 +41,6 @@ export class AppComponent {
             .split('=')[1]
             .replace(/"/g, '')
             .trim();
-          console.log(filename);
-          console.log(response.body);
           var file = new File([response.body!], 'assignment');
 
           const url = URL.createObjectURL(file);
