@@ -1,8 +1,9 @@
 FROM python:3.11
 
-ADD test_runner.py .
+ADD podman_test_executer.py .
 
-CMD ["python", "./test_runner.py"]
+RUN mkdir /DATX11/
+CMD ["python", "./podman_test_executer.py"]
 
 
 
