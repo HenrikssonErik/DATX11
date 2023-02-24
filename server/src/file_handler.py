@@ -1,4 +1,3 @@
-import io
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from . import general_tests
@@ -6,21 +5,19 @@ import tempfile
 from pathlib import Path
 import os
 import psycopg2
-from tkinter import *
-from tkinter import filedialog
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
-__allowed_filenames = {"Test1.pdf", "test2.txt", "PythonFile.py"}
-__nr_of_files = 1
+__allowed_filenames = {"Test1.pdf", "test2.txt", "1ha1.py", "1file_handler.py"}
+__nr_of_files = 2
 
-#for DB, should be recieved from frontend(?) later on
+# for DB, should be recieved from frontend(?) later on
 courseId = 6
-assignment= 6
-groupId= 6
+assignment = 6
+groupId = 6
 
 
-def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
+def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], dict[str, str], int]:
     """
     Sanitizes files, checks for number of files, allowed file names and file
     types
@@ -28,34 +25,36 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
     Returns: json object with feedback on submitted files
     """
 
-    response_args = {}
+    number_of_files = {}
     res_code = 200
 
-    if not (len(files) == __nr_of_files):
-        response_args.update(
-            {
-                "Wrong amount of files": f"Recieved {len(files)}, " +
-                                         f"should be {__nr_of_files} files"
-            }
-        )
-        res_code = 406
+    file_amount, res_code = ("OK", res_code)  \
+        if (len(files) == __nr_of_files) \
+        else (f"Received {len(files)}, should be {__nr_of_files} files",
+              406)
 
+    number_of_files.update({"number_of_files": file_amount})
+
+    response_items = []
+
+    # Could do the same one-line if-else as above instead of one after the
+    # other in this for-loop
     for file in files:
         res_object = {}
         file.filename = secure_filename(file.filename)
-        if not (file.filename in __allowed_filenames):
-            res_object.update({"File Name": "Not allowed file name"})
-            res_code = 406
-        else:
-            res_object.update({"File Name": "OK!"})
+        res_object.update({"file": file.filename})
 
-        if not (allowed_file(file.filename)):
-            res_object.update({"File Type": " Not allowed filetype"})
-            res_code = 406
-        else:
-            res_object.update({"File Type": "OK!"})
+        file_name, res_code = ("OK", res_code) \
+            if (file.filename in __allowed_filenames) \
+            else ("Not allowed file name", 406)
+        res_object.update({"file_name": file_name})
 
-        response_args.update({file.filename: res_object})
+        file_type, res_code = ("OK", res_code) \
+            if (allowed_file(file.filename)) \
+            else ("Not allowed file type", 406)
+        res_object.update({"file_type": file_type})
+
+        response_items.append({"tested_file": res_object})
 
     # if the files ar ok proceed to save and test them
     if (res_code == 200):
@@ -73,47 +72,41 @@ def handle_files(files: list[FileStorage]) -> tuple[dict[str, str], int]:
                     f.write(file.stream.read())
                     file_paths.append(save_dir/file.filename)
 
-            # read the filename and filedata from `save_dir` and give it to
-            # saveAssignmentToDB
             for file_path in file_paths:
                 filename = file_path.name
                 filedata = file_path.read_bytes()
 
                 save_assignment_to_db(filename, filedata,
-                                   groupId, courseId, assignment)
+                                      groupId, courseId, assignment)
 
-               # get_assignment_files_from_database(groupId, courseId, assignment, filename)
-        # Running general tests here
-
-            # saves the user submitted files in a temp dir
             pep8_test_dir = Path(dir)/"pep8_tests"
             pep8_test_dir.mkdir()
             py_file_names = []
-            for file_path in file_paths:
+            for count, file_path in enumerate(file_paths):
+                pep8_result = "OK"
                 if file_path.suffix == ".py":
                     f_name = pep8_test_dir/file_path.name
                     py_file_names.append("./" + str(file_path.name))
                     f_name.write_bytes(file_path.read_bytes())
 
-            # Check PEP8 conventions + cyclomatic complexity
-            pep8_result = general_tests.pep8_check(
-                pep8_test_dir,
-                filename_patterns=py_file_names
-            )
+                    # Check PEP8 conventions + cyclomatic complexity
+                    pep8_result = general_tests.pep8_check(
+                        pep8_test_dir,
+                        filename_patterns=py_file_names
+                    )
+                response_items[count].update({"PEP8_results": pep8_result})
 
-            response_args.update({"PEP8_results": pep8_result})
-
-    return response_args, res_code
+    return response_items, number_of_files, res_code
 
 
-def handle_test_file (files: FileStorage):
+def handle_test_file(files: list[FileStorage]):
     response_args = {}
     res_code = 200
 
     for file in files:
         res_object = {}
         file.filename = secure_filename(file.filename)
-        
+
         if not (allowed_file(file.filename)):
             res_object.update({"File Type": " Not allowed filetype"})
             res_code = 406
@@ -121,9 +114,8 @@ def handle_test_file (files: FileStorage):
             res_object.update({"File Type": "OK!"})
 
         response_args.update({file.filename: res_object})
-    
-        save_test_to_db(file,courseId, assignment)
 
+        save_test_to_db(file, courseId, assignment)
 
     return response_args, res_code
 
@@ -138,44 +130,62 @@ def save_test_to_db(file: FileStorage, courseId, assignment):
 
     file.filename = str(courseId) + 'Tests' + str(assignment)+'.py'
 
-    if(os.path.exists(file.filename)): 
+    if (os.path.exists(file.filename)):
         raise Exception("file exists in dir, not allowed filename")
-        
+
     file.save(file.filename)
-    f= open(file.filename,"rb") #rb = reading in binary
+    f = open(file.filename, "rb")  # rb = reading in binary
     filedata = f.read()
     binary = psycopg2.Binary(filedata)
-    
-    #the DB-login data should not be shown here, better to load it from local document
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant", user="postgres", password="BorasSuger-1")
 
+    # the DB-login data should not be shown here
+    # better to load it from local document
+    conn = psycopg2.connect(host="95.80.39.50",
+                            port="5432",
+                            dbname="hydrant",
+                            user="postgres",
+                            password="BorasSuger-1")
+
+    filetype = file.filename.rsplit('.', 1)[1].lower()
     with conn.cursor() as cur:
         query = """INSERT INTO
-    TestFiles (courseId, assignment, filename, filedata)
-    VALUES (%s, %s, %s,%s);"""
+        TestFiles (courseId, assignment, filename, filedata)
+        VALUES (%s, %s, %s,%s);"""
 
-        
-        cur.execute(query, (courseId, assignment, file.filename, binary))
-        conn.commit()
-        conn.close()
+    cur.execute(query, (groupId, courseId, file.filename, binary, filetype))
 
+    conn.commit()
+    conn.close()
     f.close()
     os.remove(file.filename)
 
-def save_assignment_to_db(filename: str, filedata: bytes, groupId, courseId, assignment):
-    """ Saves assignmentfile to the database and removed previous file if it exists """
-    #if it is a resubmission a remove is done before adding the new file
-    remove_existing_assignment(filename, groupId,courseId,assignment )
+
+def save_assignment_to_db(filename: str,
+                          filedata: bytes,
+                          groupId,
+                          courseId,
+                          assignment):
+    """
+    Saves assignmentfile to the database
+    Removed previous file if it exists
+    """
+    # if it is a resubmission a remove is done before adding the new file
+    remove_existing_assignment(filename, groupId, courseId, assignment)
     binary = psycopg2.Binary(filedata)
 
-    # the DB-login data should not be shown here, better to load it from local document
-    conn = psycopg2.connect(host="95.80.39.50", port="5432",
-                            dbname="hydrant", user="postgres", password="BorasSuger-1")
+    # the DB-login data should not be shown here
+    # better to load it from local document
+    conn = psycopg2.connect(host="95.80.39.50",
+                            port="5432",
+                            dbname="hydrant",
+                            user="postgres",
+                            password="BorasSuger-1")
 
     filetype = filename.rsplit('.', 1)[1].lower()
     with conn.cursor() as cur:
         query = """INSERT INTO
-    AssignmentFiles (GroupId, CourseId, Assignment, filename, filedata, filetype)
+    AssignmentFiles (GroupId, CourseId, Assignment,
+                     filename, filedata, filetype)
     VALUES (%s, %s, %s, %s, %s, %s);"""
 
         cur.execute(query, (groupId, courseId, assignment,
@@ -183,22 +193,32 @@ def save_assignment_to_db(filename: str, filedata: bytes, groupId, courseId, ass
         conn.commit()
         conn.close
 
+
 def remove_existing_assignment(filename: str, groupId, course, assignment):
     """ Removes file from assignment table in the database"""
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant", user="postgres", password="BorasSuger-1")
+    conn = psycopg2.connect(host="95.80.39.50",
+                            port="5432",
+                            dbname="hydrant",
+                            user="postgres",
+                            password="BorasSuger-1")
     cursor = conn.cursor()
 
     queryData = """DELETE FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.courseid = %s AND assignmentfiles.assignment = %s;"""
     cursor.execute(queryData, (filename, groupId, course, assignment))
     conn.commit()
     conn.close()
-    #save_assignment_to_db(file, groupId, course)
-
+    # save_assignment_to_db(file, groupId, course)
 
 
 def get_assignment_files_from_database(groupId, course, assignment, fileName):
     """retrieves file from database"""
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant", user="postgres", password="BorasSuger-1")
+
+    conn = psycopg2.connect(host="95.80.39.50",
+                            port="5432",
+                            dbname="hydrant",
+                            user="postgres",
+                            password="BorasSuger-1")
+
     cursor = conn.cursor()
     queryData = "SELECT FileData FROM AssignmentFiles WHERE assignmentfiles.filename = %s AND assignmentfiles.groupid = %s AND assignmentfiles.courseid = %s AND assignmentfiles.assignment = %s"
     cursor.execute(queryData, (fileName, groupId, course, assignment))
@@ -220,3 +240,4 @@ def get_assignment_files_from_database(groupId, course, assignment, fileName):
     return file_binary
     #this line creates a zip archive to, havent figuered out how to recreate it in front en though
     #make_archive("archiveName", 'zip',"zip-all-Files-in-this-dir" )
+

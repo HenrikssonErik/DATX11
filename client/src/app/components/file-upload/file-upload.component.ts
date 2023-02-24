@@ -127,9 +127,11 @@ export class FileUploadComponent {
 
     this.http.post(`${API_URL}/` + this.config.endpoint, formData).subscribe({
       next: (response) => {
+        console.log(response);
         //TODO: Handle the success response
       },
       error: (err) => {
+        console.log(err.error);
         //TODO: Handle the error
       },
     });

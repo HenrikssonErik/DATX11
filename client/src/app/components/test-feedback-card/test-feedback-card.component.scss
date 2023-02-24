@@ -1,0 +1,54 @@
+.card{
+    border-radius: 0;
+    border: 0;
+    box-shadow: -4px 2px 4px -5px rgba(0,0,0,0.75);
+    background-color: #f5f5f5 ;
+    
+  }
+  
+  .passed{
+    border-left: 5px solid #006C5C;
+  }
+  
+  .failed{
+    border-left: 5px solid #8B0000;
+  }
+  
+  .warning{
+    border-left: 5px solid #FFC300;
+  
+  }
+  
+  .card:hover {
+    box-shadow: 0px 0px 10px #aaa;
+    transform: translateY(-5px);
+  }
+  
+  .slide-in-right {
+    animation: slide-in-right 0.8s ease-out;
+    animation-fill-mode: forwards;
+    opacity: 0;
+  }
+  
+  .delay-1 {
+    animation-delay: 0.1s;
+  }
+  
+  .delay-2 {
+    animation-delay: 0.2s;
+  }
+  
+  .delay-3 {
+    animation-delay: 0.3s;
+  } 
+  
+  @keyframes slide-in-right {
+    0% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }

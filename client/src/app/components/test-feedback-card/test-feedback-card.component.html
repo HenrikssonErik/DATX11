@@ -1,0 +1,25 @@
+<div *ngIf="testFeedback!.fileStatus==='success'; else notPassed" class="card mb-1 passed slide-in-right delay-3" (click)="openFeedBackModal()" >
+    <div class="card-body">
+      <h6 class="card-subtitle mb-2" style="color:#006C5C;">Passed</h6>
+      <p class="card-text"> Test: {{testFeedback!.fileName}} passed.</p>
+    </div>
+</div>
+<ng-template #notPassed>
+  <div  *ngIf="testFeedback!.fileStatus==='warning'; else failed"  class="card mb-1 warning slide-in-right delay-2" (click)="openFeedBackModal()">
+    <div class="card-body">
+      <h6 class="card-subtitle mb-2" style="color:#FFC300;">Warning</h6>
+      <p class="card-text"> Test: {{testFeedback!.fileName}} has a warning</p>
+      <p><small class="text-muted">{{testFeedback!.testResponse}}</small></p>
+    </div>
+    <p></p>
+  </div>
+</ng-template>
+<ng-template #failed>
+    <div class="card mb-1 failed slide-in-right delay-1" (click)="openFeedBackModal()">
+        <div class="card-body">
+            <h6 class="card-subtitle mb-2" style="color:#8B0000">Failed</h6>
+            <p class="card-text"> Test: {{testFeedback!.fileName}} has failed.</p>
+            <p><small class="text-muted">{{testFeedback!.testResponse}}</small></p>
+        </div>
+    </div>
+</ng-template>
