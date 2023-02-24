@@ -76,6 +76,8 @@ class TestFileHandler(unittest.TestCase):
         files = [file]
         self.assertEqual(handle_test_file(files)[1], 200)
 
+    #add test for uppload file?
+    #add test for send in unittest
 
 if __name__ == '__main__':
     unittest.main()
