@@ -5,7 +5,8 @@ from typing import BinaryIO
 from flask import Flask, Response, after_this_request, jsonify, make_response, request, send_file
 from flask_cors import CORS
 
-from .file_handler import handle_files, handle_test_file, get_assignment_files_from_database
+from .file_handler import handle_files, \
+    handle_test_file, get_assignment_files_from_database
 
 # creating the Flask application
 app = Flask(__name__)
@@ -26,12 +27,14 @@ def post_files():
     if not files:
         return "Files not found", 406
     res = handle_files(files)
+    feedback_res = {}
+    feedback_res.update({"feedback": res[0]})
+    feedback_res.update(res[1])
+    return jsonify(feedback_res), res[1]
 
-    return jsonify(res[0]), res[1]
-    
 
 @app.route('/unitTest', methods=['POST'])
-def post_tests ():
+def post_tests():
     print(request)
     files = request.files.getlist('files')
 
@@ -53,4 +56,3 @@ def get_files():
     res.headers= headers
     return res
 
-    
