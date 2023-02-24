@@ -1,7 +1,4 @@
-from io import BytesIO
-import os
-import time
-from typing import BinaryIO
+
 from flask import Flask, Response, after_this_request, jsonify, make_response, request, send_file
 from flask_cors import CORS
 
@@ -30,7 +27,7 @@ def post_files():
     feedback_res = {}
     feedback_res.update({"feedback": res[0]})
     feedback_res.update(res[1])
-    return jsonify(feedback_res), res[1]
+    return Response(jsonify(feedback_res), status = res[1])
 
 
 @app.route('/unitTest', methods=['POST'])
@@ -41,7 +38,7 @@ def post_tests():
     if not files:
         return "Files not found", 406
     res = handle_test_file(files)
-    return jsonify(res[0]), res[1]
+    return Response(jsonify(res[0]), status=res[1])
 
 #should be a post further on
 @app.route('/getAssignmentFile', methods=['POST'])

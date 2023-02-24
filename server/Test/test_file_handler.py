@@ -28,21 +28,21 @@ class TestFileHandler(unittest.TestCase):
             file = FileStorage(BytesIO(fp.read()), filename="Test1.pdf")
 
         files = [file]
-        self.assertEqual(handle_files(files)[1], 200)
+        self.assertEqual(handle_files(files)[2], 200)
 
     def test_send_txt_file(self, mock_connect):
         with open(self.test_file_dir/"test2.txt", "rb") as fp:
             file = FileStorage(BytesIO(fp.read()), filename="test2.txt")
 
         files = [file]
-        self.assertEqual(handle_files(files)[1], 200)
+        self.assertEqual(handle_files(files)[2], 200)
 
     def test_send_py_file(self, mock_connect):
         with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
             file = FileStorage(BytesIO(fp.read()), filename="PythonFile.py")
 
         files = [file]
-        self.assertEqual(handle_files(files)[1], 200)
+        self.assertEqual(handle_files(files)[2], 200)
 
     def test_send_multiple_files(self,mock_connect):
         files = []
@@ -58,14 +58,14 @@ class TestFileHandler(unittest.TestCase):
             files.append(file)
 
         # only allows one file at the moment
-        self.assertEqual(handle_files(files)[1], 406)
+        self.assertEqual(handle_files(files)[2], 406)
 
     def test_send_pep8_checks_results(self,mock_connect):
         with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
             file = FileStorage(BytesIO(fp.read()), filename="PythonFile.py")
-
+        
         respons = handle_files([file])
-        self.assertEqual(respons[1], 200)
+        self.assertEqual(respons[2], 200)
         self.assertEqual(respons[0]["PEP8_results"].count("F401"), 2)
         self.assertEqual(respons[0]["PEP8_results"].count("E401"), 1)
         
@@ -77,6 +77,16 @@ class TestFileHandler(unittest.TestCase):
         self.assertEqual(handle_test_file(files)[1], 200)
 
     #add test for uppload file?
+
+    def test_send_multiple_unit_test_files(self, mock_connect):
+        with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
+            file1 = FileStorage(BytesIO(fp.read()), filename="PythonFile.py")
+        files = [file1]
+        with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
+            file2 = FileStorage(BytesIO(fp.read()), filename="PythonFile.py")
+
+        files.append(file2)
+        self.assertEqual(handle_test_file(files)[1], 200)
     #add test for send in unittest
 
 if __name__ == '__main__':
