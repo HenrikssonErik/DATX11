@@ -27,14 +27,12 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], dict[s
 
     number_of_files = {}
     res_code = 200
-    print("files len: " + str(len(files)))
     file_amount, res_code = ("OK", res_code)  \
         if (len(files) == __nr_of_files) \
         else (f"Received {len(files)}, should be {__nr_of_files} files",
               406)
 
     number_of_files.update({"number_of_files": file_amount})
-    print("3: " + str(res_code))
     response_items = []
 
     # Could do the same one-line if-else as above instead of one after the
@@ -48,7 +46,6 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], dict[s
             if (file.filename in __allowed_filenames) \
             else ("Not allowed file name", 406)
         res_object.update({"file_name": file_name})
-        print("4: " + str(res_code))
         file_type, res_code = ("OK", res_code) \
             if (allowed_file(file.filename)) \
             else ("Not allowed file type", 406)
@@ -57,7 +54,6 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], dict[s
         response_items.append({"tested_file": res_object})
 
     # if the files ar ok proceed to save and test them
-    print("5: " + str(res_code))
     if (res_code == 200):
         with tempfile.TemporaryDirectory(prefix="DATX11__") as dir:
             save_dir = Path(dir)/"saves"
