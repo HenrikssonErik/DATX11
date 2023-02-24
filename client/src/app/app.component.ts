@@ -20,12 +20,14 @@ export class AppComponent {
     // TODO: Temporarily do a get request here and retrieve the file.
   }
 
+  //downloads a assignment file from the specified course and group.
   getfile(): void {
     this.http
       .post(
         `${API_URL}/getAssignmentFile`,
-        { groupId: 6, course: 6, assignment: 6, filename: 'Test1.pdf' },
 
+        // replace fixed values with dynamic user input, when that is implemented
+        { groupId: 6, course: 6, assignment: 6, filename: 'Test1.pdf' },
         {
           observe: 'response',
           responseType: 'blob',

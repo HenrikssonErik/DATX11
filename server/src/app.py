@@ -46,6 +46,12 @@ def post_tests():
 #should be a post further on
 @app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
+
+    """
+    Takes in information from the frontend about a specific course assignment file to then return its file content
+    Input data structure: { groupId: number, course: number, assignment: number, filename: string }
+    Returns a file to be downloaded
+    """
     data = request.get_json()
     groupId = data['groupId']
     course = data['course']
