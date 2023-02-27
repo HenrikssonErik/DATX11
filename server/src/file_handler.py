@@ -2,7 +2,6 @@ import io
 import os
 from pathlib import Path
 import tempfile
-
 from . import general_tests
 import psycopg2
 from werkzeug.utils import secure_filename
@@ -60,7 +59,7 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
     return response_items, number_of_files, res_code
 
 
-def save_to_temp_and_database(files: list[FileStorage], response_items):
+def save_to_temp_and_database(files: list[FileStorage], response_items: dict) -> None:
     """Downloads the file to temp directory and then to saves into
 
     the database. Also checks pep8 and cyclomatic complexity.
@@ -105,7 +104,7 @@ def save_to_temp_and_database(files: list[FileStorage], response_items):
             response_items[count].update({"PEP8_results": pep8_result})
 
 
-def handle_test_file(files: list[FileStorage]):
+def handle_test_file(files: list[FileStorage]) -> tuple[dict, int]:
     """Handles the incoming test files to check if the type is allowed"""
     response_args = {}
     res_code = 200
@@ -127,14 +126,14 @@ def handle_test_file(files: list[FileStorage]):
     return response_args, res_code
 
 
-def allowed_file(filename: str):
+def allowed_file(filename: str) -> bool:
     """Retrieve extension from full file name"""
 
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in __ALLOWED_EXTENSIONS
 
 
-def save_test_to_db(file: FileStorage, course_id, assignment):
+def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
     """Saves the teacher's tests to the database"""
 
     file.filename = str(course_id) + 'Tests' + str(assignment)+'.py'
@@ -143,16 +142,17 @@ def save_test_to_db(file: FileStorage, course_id, assignment):
         raise Exception("file exists in dir, not allowed filename")
 
     file.save(file.filename)
-    f = open(file.filename, "rb")  # rb = reading in binary
-    file_data = f.read()
+    with open(file.filename, "rb") as f:
+        file_data = f.read()
+
     binary = psycopg2.Binary(file_data)
 
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
                             user="postgres", password="BorasSuger-1")
 
-    #filetype = file.filename.rsplit('.', 1)[1].lower()
+    # filetype = file.filename.rsplit('.', 1)[1].lower()
     with conn.cursor() as cur:
-        query = """INSERT INTO TestFiles 
+        query = """INSERT INTO TestFiles
                 (courseId, assignment, filename, filedata)
                 VALUES (%s, %s, %s,%s);
                 """
@@ -161,12 +161,11 @@ def save_test_to_db(file: FileStorage, course_id, assignment):
 
         conn.commit()
         conn.close()
-    f.close()
     os.remove(file.filename)
 
 
-def save_assignment_to_db(file_name: str, file_data: bytes, group_id,
-                          course_id, assignment):
+def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
+                          course_id: int, assignment: int):
     """Saves assignmentfile to the database
 
     Removed previous file if it exists
@@ -208,7 +207,6 @@ def remove_existing_assignment(
                  AND   assignmentfiles.courseid   = %s 
                  AND   assignmentfiles.assignment = %s;
                  """
-                    
     cursor.execute(query_data, (file_name, group_id, course_id, assignment))
     conn.commit()
     conn.close()
@@ -232,11 +230,9 @@ def get_assignment_files_from_database(
                 AND   assignmentfiles.courseid   = %s 
                 AND   assignmentfiles.assignment = %s
                 """
-    
+
     cursor.execute(query_data, (file_name, group_id, course, assignment))
-    
+
     data = cursor.fetchall()
     file_binary = io.BytesIO(data[0][0].tobytes())
-    
     return file_binary
-
