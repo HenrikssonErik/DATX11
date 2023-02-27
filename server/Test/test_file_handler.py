@@ -47,7 +47,7 @@ class TestFileHandler(unittest.TestCase):
         files = [file]
         self.assertEqual(handle_files(files)[2], 200)
 
-    def test_send_multiple_files(self,mock_connect):
+    def test_send_multiple_files(self, mock_connect):
         files = []
         with open(self.test_file_dir/"Test1.pdf", "rb") as fp:
             file = FileStorage(BytesIO(fp.read()), filename="Test1.pdf")
