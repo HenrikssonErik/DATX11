@@ -43,3 +43,28 @@ CREATE Table TestFiles (
 )
 
 CREATE TABLE UserEmail (email TEXT PRIMARY KEY CONSTRAINT proper_email CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'));
+
+CREATE TABLE UserData (
+	cid TEXT,
+	email TEXT,
+	passphrase TEXT,
+	PRIMARY KEY (cid),
+	FOREIGN KEY (email) REFERENCES userEmail(email)
+	);
+
+CREATE TABLE Groups (
+	groupId serial,
+	groupNumber INTEGER,
+	course INTEGER,
+	PRIMARY KEY (groupId),
+	CONSTRAINT courseGroups UNIQUE (groupNumber,course),
+	FOREIGN KEY (course) REFERENCES Courses(courseId)
+);
+
+CREATE TABLE UserInGroup (
+	userCID TEXT,
+	groupId INTEGER,
+	PRIMARY KEY (userCID, groupId),
+	FOREIGN KEY (groupId) REFERENCES Groups(groupId),
+	FOREIGN KEY (userCID) REFERENCES UserData(cid)
+);
