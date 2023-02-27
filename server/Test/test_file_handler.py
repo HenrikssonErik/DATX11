@@ -15,11 +15,16 @@ class TestFileHandler(unittest.TestCase):
     def setUp(self):
         self.test_file_dir = Path(__file__).parent/"test_files_file_handler"
 
-    #use this to return data from mock db 
-        #mock_con = mock_connect.return_value  # result of psycopg2.connect(**connection_stuff)
-        #mock_cur = mock_con.cursor.return_value  # result of con.cursor(cursor_factory=DictCursor)
-        #mock_cur.fetchall.return_value = expected  # return this when calling cur.fetchall()
-    
+        # use this to return data from mock db
+        # result of psycopg2.connect(**connection_stuff)
+        # mock_con = mock_connect.return_value
+
+        # result of con.cursor(cursor_factory=DictCursor)
+        # mock_cur = mock_con.cursor.return_value
+
+        # return this when calling cur.fetchall()
+        # mock_cur.fetchall.return_value = expected
+
     def test_send_pdf_file(self, mock_connect):
 
         with open(self.test_file_dir/"Test1.pdf", "rb") as fp:
