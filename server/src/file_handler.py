@@ -21,17 +21,12 @@ course_id = 6
 assignment = 6
 group_id = 6
 
-
-
 def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], 
                                                     dict[str, str], int]: 
     """Sanitizes files, checks for number of files, 
-
     allowed file names and file types
-    
     Returns: json object with feedback on submitted files
     """
-
     number_of_files = {}
     res_code = 200
     file_amount, res_code = ("OK", res_code)  \
@@ -99,10 +94,8 @@ def save_to_temp_and_database(files: list[FileStorage], response_items):
                 f_name = pep8_test_dir/file_path.name
                 py_file_names.append("./" + str(file_path.name))
                 f_name.write_bytes(file_path.read_bytes())
-
-                
-                pep8_result = general_tests.pep8_check(   # And cyclomatic complexity   
-                    pep8_test_dir,
+                                
+                pep8_result = general_tests.pep8_check(pep8_test_dir,
                     filename_patterns=py_file_names)
 
             response_items[count].update({"PEP8_results": pep8_result})
