@@ -1,2 +1,6 @@
-<h4 class="text-muted ml-1 mb-4" style="margin-top: 40px;">Test results:</h4>
-<app-test-feedback-card *ngFor="let feedback of feedbackFiles; index as i" [testFeedback]="feedback" [index]="i"></app-test-feedback-card>
+<app-spinner></app-spinner>
+<div style="margin-left: 10px;">
+  <h4 class="text-muted ml-1 mb-4" style="margin-top: 40px;">Test results:</h4>
+  <app-test-feedback-card  *ngFor="let feedback of feedbackFiles" [file]="feedback">
+  </app-test-feedback-card>
+</div>
