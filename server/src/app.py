@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 CORS(app)
 
+
 # useless in the future, TODO: Remove along with front end button
 @app.route('/test', methods=['GET'])
 def test_get():

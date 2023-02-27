@@ -12,7 +12,7 @@ from werkzeug.datastructures import FileStorage
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
 
-__allowed_filenames = {"Test1.pdf", "test2.txt", 
+__allowed_filenames = {"Test1.pdf", "test2.txt",
                        "1ha1.py", "PythonFile.py"}
 __nr_of_files = 1
 
@@ -21,9 +21,10 @@ course_id = 6
 assignment = 6
 group_id = 1
 
-def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], 
-                                                    dict[str, str], int]: 
-    """Sanitizes files, checks for number of files, 
+
+def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
+                                                    dict[str, str], int]:
+    """Sanitizes files, checks for number of files,
     allowed file names and file types
     Returns: json object with feedback on submitted files
     """
@@ -60,8 +61,8 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
 
 
 def save_to_temp_and_database(files: list[FileStorage], response_items):
-    """Downloads the file to temp directory and then to saves into 
-    
+    """Downloads the file to temp directory and then to saves into
+
     the database. Also checks pep8 and cyclomatic complexity.
     """
 
@@ -69,7 +70,7 @@ def save_to_temp_and_database(files: list[FileStorage], response_items):
         save_dir = Path(dir)/"saves"
         save_dir.mkdir()
         file_paths: list[Path] = []
-            
+
         for file in files:   # save file to tempdir
             if file.filename is None:
                 raise ValueError("filename does not exits")
@@ -82,8 +83,9 @@ def save_to_temp_and_database(files: list[FileStorage], response_items):
             file_name = file_path.name
             file_data = file_path.read_bytes()
 
-            save_assignment_to_db(file_name, file_data,
-                                    group_id, course_id, assignment)
+            save_assignment_to_db(
+                file_name, file_data, group_id, course_id, assignment
+            )
 
         pep8_test_dir = Path(dir)/"pep8_tests"
         pep8_test_dir.mkdir()
@@ -95,8 +97,10 @@ def save_to_temp_and_database(files: list[FileStorage], response_items):
                 py_file_names.append("./" + str(file_path.name))
                 f_name.write_bytes(file_path.read_bytes())
 
-                pep8_result = general_tests.pep8_check(pep8_test_dir,
-                    filename_patterns=py_file_names)
+                pep8_result = general_tests.pep8_check(
+                    pep8_test_dir,
+                    filename_patterns=py_file_names
+                )
 
             response_items[count].update({"PEP8_results": pep8_result})
 
@@ -186,10 +190,14 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id,
         conn.close
 
 
-def remove_existing_assignment(file_name: str, group_id, 
-                               course_id, assignment):
+def remove_existing_assignment(
+        file_name: str,
+        group_id,
+        course_id,
+        assignment
+):
     """Removes file from assignment table in the database"""
-  
+
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
                             user="postgres", password="BorasSuger-1")
     cursor = conn.cursor()
@@ -206,8 +214,12 @@ def remove_existing_assignment(file_name: str, group_id,
     conn.close()
 
 
-def get_assignment_files_from_database(group_id, course, 
-                                       assignment, file_name):
+def get_assignment_files_from_database(
+        group_id,
+        course,
+        assignment,
+        file_name
+):
     """Retrieves file from database"""
 
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
