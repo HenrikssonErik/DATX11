@@ -20,7 +20,8 @@ def copy_files(path: str, container_id: str):
     """
     for file_name in os.listdir(path):
         print(file_name)
-        cmd = ["podman", "cp", f"{path}/{file_name}", f"{container_id}:/DATX11/{file_name}"]
+        cmd = ["podman", "cp", f"{path}/{file_name}",
+               f"{container_id}:/DATX11/{file_name}"]
         subprocess.run(cmd)
 
 
