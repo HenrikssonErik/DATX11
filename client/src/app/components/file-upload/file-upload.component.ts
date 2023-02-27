@@ -1,5 +1,12 @@
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Component, ElementRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { link } from 'fs';
 import { ToastrService } from 'ngx-toastr';
 import { UploadFileConfigService } from 'src/app/services/upload-test-file-config.service';
@@ -18,8 +25,8 @@ export class FileUploadComponent {
   fileDropEl!: ElementRef;
 
   @Input() config!: UploadFileConfigService | UploadUnitTestConfigService;
-  
-  testFeedBackArray :any[]= [];
+
+  testFeedBackArray: any[] = [];
 
   constructor(private http: HttpClient, private toastr: ToastrService) {}
 
@@ -125,57 +132,63 @@ export class FileUploadComponent {
   uploadFiles(): void {
     let header: HttpHeaders = new HttpHeaders();
     header = header.append('Content-Type', 'application/json');
- 
+
     const formData = new FormData();
     this.files.forEach((file: File): void =>
       formData.append('files', file, file.name)
     );
 
-    this.http.post<HttpResponse<any>>(`${API_URL}/` + this.config.endpoint, formData, 
-      {observe: 'response'}
-    ).subscribe({
-      // TODO: Initiate loading 
-      // TODO: Check if we shouldnt remove next: why even have it? 
-      next: (response : any) => {
-        /** Code below is to typecast the any-response to the tuple we get back from file_handler.
-         * Since this tuple may yet be subject to change, we will not typecast it right now. To be set.
-         */
-        //const tupleResponse = response as {feedback: Array<[string, string]>, number_of_files: string}
-        //console.log(tupleResponse.number_of_files);
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/` + this.config.endpoint, formData, {
+        observe: 'response',
+      })
+      .subscribe({
+        // TODO: Initiate loading
+        // TODO: Check if we shouldnt remove next: why even have it?
+        next: (response: any) => {
+          /** Code below is to typecast the any-response to the tuple we get back from file_handler.
+           * Since this tuple may yet be subject to change, we will not typecast it right now. To be set.
+           */
+          //const tupleResponse = response as {feedback: Array<[string, string]>, number_of_files: string}
+          //console.log(tupleResponse.number_of_files);
 
-        if(response.status == 200){
-          this.toastr.success('The file was successfully uploaded', 'Sucess!', {
-            closeButton: true,
-          });
+          if (response.status == 200) {
+            this.toastr.success(
+              'The file was successfully uploaded',
+              'Sucess!',
+              {
+                closeButton: true,
+              }
+            );
 
-          //TODO: Stop loading.
-        }
-
-        console.log(response)
-        
-        for (const file of response.body.feedback) {
-          const testFeedBackItem  = {
-            file : file.tested_file,
-            fileContent : file.PEP8_results
+            //TODO: Stop loading.
           }
 
-          this.testFeedBackArray.push(testFeedBackItem);
+          console.log(response);
 
-        }  
+          for (const file of response.body.feedback) {
+            const testFeedBackItem = {
+              file: file.tested_file,
+              fileContent: file.PEP8_results,
+            };
 
+            this.testFeedBackArray.push(testFeedBackItem);
+          }
 
-        
-
-        //TODO: Handle the success response
-      },
-      error: (err) => {
-        this.toastr.error('Something went wrong, probably Kvalles fault', 'Fuck!', {
-          closeButton: true,
-        });
-        console.log(err.error);
-        //TODO: Handle the error
-      },
-    });
+          //TODO: Handle the success response
+        },
+        error: (err) => {
+          this.toastr.error(
+            err.error.number_of_files,
+            'Soemething went wrong!',
+            {
+              closeButton: true,
+            }
+          );
+          console.log(err.error);
+          //TODO: Handle the error
+        },
+      });
   }
 
   //this method if called will get a file from the serverand download it
