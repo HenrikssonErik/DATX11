@@ -4,7 +4,7 @@ import json
 
 if __name__ == "__main__":
     # test_dir = sys.argv[1]
-    test_dir = str(Path(__file__).absolute().parent/"DATX11")
+    test_dir = str(Path(__file__).absolute().parent/"test_files_test_runner")
     print(test_dir)
 
     test_suit = unittest.TestLoader().discover(

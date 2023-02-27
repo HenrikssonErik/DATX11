@@ -18,11 +18,8 @@ def copy_files(path: str, container_id: str):
     path: Absolute path for directory
     container_id: Specifies container
     """
-    for file_name in os.listdir(path):
-        print(file_name)
-        cmd = ["podman", "cp", f"{path}/{file_name}",
-               f"{container_id}:/DATX11/{file_name}"]
-        subprocess.run(cmd)
+    cmd = ["podman", "cp", path, f"{container_id}:/"]
+    subprocess.run(cmd)
 
 
 # This is to be changed, temporary poc
