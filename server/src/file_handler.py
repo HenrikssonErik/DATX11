@@ -167,7 +167,6 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id,
 
     Removed previous file if it exists
     """
-    print(file_name,group_id,course_id,assignment)
     remove_existing_assignment(file_name, group_id, course_id, assignment)
     binary = psycopg2.Binary(file_data)
 
