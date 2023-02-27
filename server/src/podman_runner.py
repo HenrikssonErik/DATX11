@@ -1,21 +1,27 @@
 import subprocess
-import sys
+import os
 from pathlib import Path
 
+
+def gen_requirements(path: str):
+    cmd = ["pipreqs", "--force", path]
+    subprocess.run(cmd)
+
+
+def copy_files(path: str, id: str):
+    for name in os.listdir(path):
+        print(name)
+        cmd = ["podman", "cp", f"{path}/{name}", f"{id}:/DATX11/{name}"]
+        subprocess.run(cmd)
+
+
+test_files = str(Path(__file__).absolute().parent/"test_files_test_runner")
+gen_requirements(test_files)
 subprocess.run(["podman", "build", "-t", "podman_test_executor", "."])
-
-proc = subprocess.run(["podman", "create", "podman_test_executor"],text=True, capture_output=True)
+proc = subprocess.run(["podman", "create", "podman_test_executor"],
+                      text=True, capture_output=True)
 id = proc.stdout.removesuffix("\n")
-test_files = Path(__file__).absolute().parent.parent/"Test"/"test_files_test_runner"
+copy_files(test_files, id)
 
 
-my_file = (test_files/"my_test_file.py").absolute()
-test_0 = (test_files/"test_0.py").absolute()
-test_1 = (test_files/"test_1.py").absolute()
-
-subprocess.run(["podman", "cp", f"{str(test_0)}",  f"{id}:/DATX11/{test_0.name}"])
-subprocess.run(["podman", "cp", f"{str(test_1)}",  f"{id}:/DATX11/{test_1.name}"])
-subprocess.run(["podman", "cp", f"{str(my_file)}",  f"{id}:/DATX11/{my_file.name}"])
-
-
-subprocess.run(["podman", "start","--attach", id])
+subprocess.run(["podman", "start", "--attach", id])

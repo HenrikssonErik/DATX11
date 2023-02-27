@@ -1,7 +1,6 @@
 from pathlib import Path
 import unittest
 import json
-import sys
 
 if __name__ == "__main__":
     # test_dir = sys.argv[1]
