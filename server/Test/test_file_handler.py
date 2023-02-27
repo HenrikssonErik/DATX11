@@ -6,7 +6,7 @@ from werkzeug.datastructures import FileStorage
 from io import BytesIO
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.file_handler import handle_files, handle_test_file 
+from src.file_handler import handle_files, handle_test_file  # noqa: E402
 
 
 
