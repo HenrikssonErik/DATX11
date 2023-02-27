@@ -26,9 +26,7 @@ def post_files():
     res = handle_files(files)
     feedback_res = {}
     feedback_res.update({"feedback": res[0]})
-    feedback_res.update(res[1])
-    print(jsonify(feedback_res))
-    print(res[2])      
+    feedback_res.update(res[1])     
     return make_response(jsonify(feedback_res), res[2])
 
 
