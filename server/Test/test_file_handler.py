@@ -90,7 +90,7 @@ class TestFileHandler(unittest.TestCase):
 
         files.append(file2)
         self.assertEqual(handle_test_file(files)[1], 200)
-    #add test for send in unittest
+    # add test for send in unittest
 
 if __name__ == '__main__':
     unittest.main()
