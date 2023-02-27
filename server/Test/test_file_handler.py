@@ -79,7 +79,7 @@ class TestFileHandler(unittest.TestCase):
         files = [file]
         self.assertEqual(handle_test_file(files)[1], 200)
 
-    #add test for uppload file?
+    # add test for uppload file?
 
     def test_send_multiple_unit_test_files(self, mock_connect):
         with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
