@@ -94,7 +94,7 @@ def save_to_temp_and_database(files: list[FileStorage], response_items):
                 f_name = pep8_test_dir/file_path.name
                 py_file_names.append("./" + str(file_path.name))
                 f_name.write_bytes(file_path.read_bytes())
-                                
+
                 pep8_result = general_tests.pep8_check(pep8_test_dir,
                     filename_patterns=py_file_names)
 
@@ -146,17 +146,17 @@ def save_test_to_db(file: FileStorage, course_id, assignment):
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
                             user="postgres", password="BorasSuger-1")
 
-    filetype = file.filename.rsplit('.', 1)[1].lower()
+    #filetype = file.filename.rsplit('.', 1)[1].lower()
     with conn.cursor() as cur:
         query = """INSERT INTO TestFiles 
                 (courseId, assignment, filename, filedata)
                 VALUES (%s, %s, %s,%s);
                 """
 
-    cur.execute(query, (group_id, course_id, file.filename, binary, filetype))
+        cur.execute(query, (course_id, assignment, file.filename, binary))
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
     f.close()
     os.remove(file.filename)
 
@@ -167,7 +167,7 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id,
 
     Removed previous file if it exists
     """
-
+    print(file_name,group_id,course_id,assignment)
     remove_existing_assignment(file_name, group_id, course_id, assignment)
     binary = psycopg2.Binary(file_data)
 

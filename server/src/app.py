@@ -27,7 +27,9 @@ def post_files():
     feedback_res = {}
     feedback_res.update({"feedback": res[0]})
     feedback_res.update(res[1])
-    return Response(jsonify(feedback_res), status = res[1])
+    print(jsonify(feedback_res))
+    print(res[2])      
+    return make_response(jsonify(feedback_res), res[2])
 
 
 @app.route('/unitTest', methods=['POST'])
@@ -38,7 +40,7 @@ def post_tests():
     if not files:
         return "Files not found", 406
     res = handle_test_file(files)
-    return Response(jsonify(res[0]), status=res[1])
+    return make_response(jsonify(res[0]), res[1])
 
 #should be a post further on
 @app.route('/getAssignmentFile', methods=['POST'])
