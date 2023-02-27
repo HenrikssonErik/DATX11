@@ -1,7 +1,7 @@
 
 -- CourseInstance, group and lab assignment shoudl be primary key here
 CREATE Table AssignmentFiles (
-		GroupId INTEGER  NOT NULL, --should be taken from some user/grouptable later on
+		GroupId INTEGER  NOT NULL, 
 		CourseId serial,
 		Assignment INTEGER,
 		FileName TEXT NOT NULL,
@@ -9,8 +9,9 @@ CREATE Table AssignmentFiles (
 		FileType TEXT NOT NULL,
 		PRIMARY KEY(GroupId,CourseId, Assignment, FileName),
 		CONSTRAINT fk_assignment
-		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment)
-	)
+		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),
+		FOREIGN Key (groupId) REFERENCES Groups(groupId)
+	);
 
 
 --USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
@@ -21,7 +22,7 @@ CREATE Table Courses (
 	CourseYear INTEGER,
 	CHECK (teachingPeriod BETWEEN 1 AND 4),
 	UNIQUE ( Course, teachingPeriod, CourseYear)
-)
+);
 
 CREATE Table Assignments(
 	CourseId serial,

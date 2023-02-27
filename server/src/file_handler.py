@@ -19,7 +19,7 @@ __nr_of_files = 1
 # for DB, should be recieved from frontend(?) later on
 course_id = 6
 assignment = 6
-group_id = 6
+group_id = 1
 
 def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]], 
                                                     dict[str, str], int]: 

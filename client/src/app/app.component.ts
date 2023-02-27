@@ -27,7 +27,7 @@ export class AppComponent {
         `${API_URL}/getAssignmentFile`,
 
         // replace fixed values with dynamic user input, when that is implemented
-        { groupId: 6, course: 6, assignment: 6, filename: 'Test1.pdf' },
+        { groupId: 1, course: 6, assignment: 6, filename: 'Test1.pdf' },
         {
           observe: 'response',
           responseType: 'blob',
