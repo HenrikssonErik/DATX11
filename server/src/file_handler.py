@@ -236,3 +236,39 @@ def get_assignment_files_from_database(
     data = cursor.fetchall()
     file_binary = io.BytesIO(data[0][0].tobytes())
     return file_binary
+
+
+def get_unit_test_files_from_db(
+        courseid: int,
+        assignment: int
+) -> list[tuple[str, io.BytesIO]]:
+    """Gets all the unit-tests for a specific assignment in a specific course.
+    """
+
+    conn = psycopg2.connect(
+        host="95.80.39.50",
+        port="5432",
+        dbname="hydrant",
+        user="postgres",
+        password="BorasSuger-1"
+    )
+
+    files: list[tuple[str, io.BytesIO]] = []
+
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT filename, filedata FROM testfiles
+                    WHERE testfiles.courseid     = %s
+                    AND testfiles.\"assignment\" = %s;
+                """,
+                (courseid, assignment)
+            )
+            for (filename, filedata) in cur:
+                files.append(
+                    (filename, io.BytesIO(filedata.tobytes()))
+                )
+
+    conn.close()
+    return files
