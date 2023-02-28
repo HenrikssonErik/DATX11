@@ -1,58 +1,65 @@
-<!-- <div *ngIf="testFeedback!.fileStatus==='success'; else notPassed" class="card mb-1 passed slide-in-right delay-3" (click)="openFeedBackModal()" >
-    <div class="card-body">
-      <h6 class="card-subtitle mb-2" style="color:#006C5C;">Passed</h6>
-      <p class="card-text"> Test: {{testFeedback!.fileName}} passed.</p>
-    </div>
-</div>
-<ng-template #notPassed>
-  <div  *ngIf="testFeedback!.fileStatus==='warning'; else failed"  class="card mb-1 warning slide-in-right delay-2" (click)="openFeedBackModal()">
-    <div class="card-body">
-      <h6 class="card-subtitle mb-2" style="color:#FFC300;">Warning</h6>
-      <p class="card-text"> Test: {{testFeedback!.fileName}} has a warning</p>
-      <p><small class="text-muted">{{testFeedback!.testResponse}}</small></p>
-    </div>
-    <p></p>
-  </div>
-</ng-template>
-<ng-template #failed>
-    <div class="card mb-1 failed slide-in-right delay-1" (click)="openFeedBackModal()">
-        <div class="card-body">
-            <h6 class="card-subtitle mb-2" style="color:#8B0000">Failed</h6>
-            <p class="card-text"> Test: {{testFeedback!.fileName}} has failed.</p>
-            <p><small class="text-muted">{{testFeedback!.testResponse}}</small></p>
-        </div>
-    </div>
-</ng-template> -->
-
-<div class="card mb-1 warning slide-in-right delay-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+<div
+  class="card mb-1 warning slide-in-right delay-2"
+  data-bs-toggle="modal"
+  data-bs-target="#exampleModal"
+>
   <div class="card-body">
-    <h6 class="card-subtitle mb-2" style="color:#FFC300;">Warning</h6>
-    <p class="card-text">{{file.file.file}} has warnings</p>
+    <h6 class="card-subtitle mb-2" style="color: #ffc300">Warning</h6>
+    <p class="card-text">{{ file.file.file }} has warnings</p>
     <p><small class="text-muted">Warnings in file</small></p>
   </div>
   <p></p>
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content" style="background-color: #f5f5f5;">
-      <div class="modal-header" style="background-color: #26734d; color:whitesmoke;">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Errors in: {{file.file.file}}</h1>
-        <button data-bs-theme=“dark” type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content" style="background-color: #f5f5f5">
+      <div
+        class="modal-header"
+        style="background-color: #26734d; color: whitesmoke"
+      >
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Errors in: {{ file.file.file }}
+        </h1>
+        <button
+          data-bs-theme="“dark”"
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
       <div class="modal-body">
-        <div *ngFor="let error of parseLintErrors(file.fileContent);">
-          <p style="border-left: 3px solid #FFC300; padding-left: 5px;" data-bs-toggle="popover" title="More info" data-bs-content="In col x">On line: {{error.lineNum}} | {{error.message}}</p>
-          <hr>
+        <div *ngFor="let error of errors">
+          <p
+            style="border-left: 3px solid #ffc300; padding-left: 5px"
+            data-bs-toggle="popover"
+            title="More info"
+            data-bs-content="In col x"
+          >
+            On line: {{ error.lineNum }} | {{ error.message }}
+          </p>
+          <hr />
         </div>
       </div>
       <div class="modal-footer">
         <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
-        <button type="button" style=" background-color: #3d9970;
-        border: #3d9970;" class="btn btn-primary" data-bs-dismiss="modal">Ok</button>
+        <button
+          type="button"
+          style="background-color: #3d9970; border: #3d9970"
+          class="btn btn-primary"
+          data-bs-dismiss="modal"
+        >
+          Ok
+        </button>
       </div>
     </div>
   </div>
 </div>
-
