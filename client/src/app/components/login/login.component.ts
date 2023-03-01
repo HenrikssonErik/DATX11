@@ -39,6 +39,20 @@ export class LoginComponent implements OnInit {
     this.success = true;
   }
 
+  flipToSignUp() {
+    const form = document.getElementById("loginForm");
+    if (form) {
+      form.style.transform = 'rotateY(0deg)';
+    }
+  }
+
+  flipToLogin(){
+    const form = document.getElementById("loginForm");
+    if(form){
+      form.style.transform = 'rotateY(180deg)';
+    }
+  }
+
   onInputFocus(input: string) {
     const control = this.loginForm.get(input);
     

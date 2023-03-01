@@ -3,6 +3,8 @@
   justify-content: center;
   align-items: center;
   height: 100%;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
 }
 
 .card {
@@ -18,6 +20,24 @@
 .form-control:focus {
   border-color: #26734d;
   box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
+}
+
+.loginForm{
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  transform: rotateY(180deg);
+  position: relative;
+}
+
+.signUp, .signIn {
+  position: relative;
+  backface-visibility: hidden;
+ 
+}
+
+.signIn {
+  transform: rotateY(-180deg);
 }
 
 .btn-primary {
@@ -95,4 +115,50 @@ span {
   100% {
     transform: scale(1);
   }
+}
+
+
+.flip-card {
+ 
+  width: 400px;
+  height: 100%;
+  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+}
+
+/* This container is needed to position the front and back side */
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  margin-top: 200px;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+/* Do an horizontal flip when you move the mouse over the flip box container */
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Position the front and back side */
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+}
+
+/* Style the front side (fallback if image is missing) */
+.flip-card-front {
+  background-color: #bbb;
+  color: black;
+}
+
+/* Style the back side */
+.flip-card-back {
+  background-color: dodgerblue;
+  color: white;
+  transform: rotateY(180deg);
 }
