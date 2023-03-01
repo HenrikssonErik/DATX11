@@ -169,7 +169,7 @@ def remove_existing_assignment(file_name: str, group_id: int, course_id: int,
                  """
 
             cur.execute(query, (file_name, group_id, course_id, assignment))
-        conn.close
+    conn.close()
 
 
 def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
@@ -194,7 +194,7 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
 
             cur.execute(query, (group_id, course_id, assignment,
                         file_name, binary, file_type))
-        conn.close
+    conn.close()
 
 
 def remove_existing_test_file(
@@ -227,17 +227,18 @@ def get_assignment_files_from_database(
 
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
                             user="postgres", password="BorasSuger-1")
+    with conn:
+        with conn.cursor() as cur:
+            query_data = """SELECT FileData FROM AssignmentFiles
+                        WHERE assignmentfiles.filename   = %s
+                        AND   assignmentfiles.groupid    = %s
+                        AND   assignmentfiles.courseid   = %s
+                        AND   assignmentfiles.assignment = %s
+                        """
 
-    cursor = conn.cursor()
-    query_data = """SELECT FileData FROM AssignmentFiles
-                WHERE assignmentfiles.filename   = %s
-                AND   assignmentfiles.groupid    = %s
-                AND   assignmentfiles.courseid   = %s
-                AND   assignmentfiles.assignment = %s
-                """
+            cur.execute(query_data, (file_name, group_id, course, assignment))
+            data = cur.fetchall()
+    conn.close()
 
-    cursor.execute(query_data, (file_name, group_id, course, assignment))
-
-    data = cursor.fetchall()
     file_binary = io.BytesIO(data[0][0].tobytes())
     return file_binary
