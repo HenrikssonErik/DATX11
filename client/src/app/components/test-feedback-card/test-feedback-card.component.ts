@@ -1,17 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-interface LintError{
+interface LintError {
   filePath: string;
   lineNum: number;
   colNum: number;
   errorCode: string;
   message: string;
-};
+}
 
 @Component({
   selector: 'app-test-feedback-card',
   templateUrl: './test-feedback-card.component.html',
-  styleUrls: ['./test-feedback-card.component.scss']
+  styleUrls: ['./test-feedback-card.component.scss'],
 })
 export class TestFeedbackCardComponent implements OnInit {
   /*@Input() testFeedback: {
@@ -19,27 +19,24 @@ export class TestFeedbackCardComponent implements OnInit {
     fileName: string;
     testResponse: string;
   } | undefined;*/
-  @Input() file :any;
+  @Input() file: any;
 
-  constructor() { }
+  errors: LintError[] = [];
+
+  constructor() {}
 
   ngOnInit(): void {
-
-    this.parseLintErrors(this.file.fileContent)
+    this.errors = this.parseLintErrors(this.file.fileContent);
   }
 
   parseLintErrors(str: string): LintError[] {
-    
-    const errors: LintError[] = [];
-    const lines = str.split("\n");
-  
+    let lintErrors: LintError[] = [];
+    const lines = str.split('\n');
+
     for (const line of lines) {
-      const matches = line.match(
-        /(.+):(\d+):(\d+):\s*(\w+)\s*(.*)/
-      );
+      const matches = line.match(/(.+):(\d+):(\d+):\s*(\w+)\s*(.*)/);
       if (matches) {
-        const [, filePath, lineNum, colNum, errorCode, message] =
-          matches;
+        const [, filePath, lineNum, colNum, errorCode, message] = matches;
         const error: LintError = {
           filePath,
           lineNum: parseInt(lineNum),
@@ -47,16 +44,14 @@ export class TestFeedbackCardComponent implements OnInit {
           errorCode,
           message,
         };
-        errors.push(error);
+        lintErrors.push(error);
       }
     }
-
-    console.log(errors);
-  
-    return errors;
+    console.log(lintErrors);
+    return lintErrors;
   }
 
   openFeedBackModal() {
-    alert("Här tänkte jag kanske att man kunde öppna en modal med mer info???");
+    alert('Här tänkte jag kanske att man kunde öppna en modal med mer info???');
   }
 }
