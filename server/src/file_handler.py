@@ -193,7 +193,7 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
                     """
 
             cur.execute(query, (group_id, course_id, assignment,
-                    file_name, binary, file_type))
+                        file_name, binary, file_type))
         conn.close
 
 
