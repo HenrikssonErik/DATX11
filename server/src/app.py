@@ -53,15 +53,15 @@ def get_files():
     Returns a file to be downloaded
     """
     data = request.get_json()
-    groupId = data['groupId']
+    group_id = data['groupId']
     course = data['course']
     assignment = data['assignment']
     filename = data['filename']  # should also be imported from frontend
     result = get_assignment_files_from_database(
-        groupId, course, assignment, filename)
+        group_id, course, assignment, filename)
 
     res = make_response(send_file(path_or_file=result,
-                                   download_name=filename, as_attachment=True))
+                                  download_name=filename, as_attachment=True))
 
     headers = {"Access-Control-Expose-Headers": "Content-Disposition",
                'Content-Disposition': 'attachment; filename={}'
