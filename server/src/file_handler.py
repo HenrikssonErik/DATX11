@@ -1,5 +1,4 @@
 import io
-import os
 from pathlib import Path
 import tempfile
 from . import general_tests
@@ -59,9 +58,11 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
     return response_items, number_of_files, res_code
 
 
-def save_to_temp_and_database(files: list[FileStorage], response_items: dict) -> None:
+def save_to_temp_and_database(
+        files: list[FileStorage],
+        response_items: dict
+) -> None:
     """Downloads the file to temp directory and then to saves into
-
     the database. Also checks pep8 and cyclomatic complexity.
     """
 
@@ -85,20 +86,18 @@ def save_to_temp_and_database(files: list[FileStorage], response_items: dict) ->
             save_assignment_to_db(
                 file_name, file_data, group_id, course_id, assignment
             )
-
         pep8_test_dir = Path(dir)/"pep8_tests"
         pep8_test_dir.mkdir()
-        py_file_names = []
+
         for count, file_path in enumerate(file_paths):
             pep8_result = "OK"
             if file_path.suffix == ".py":
                 f_name = pep8_test_dir/file_path.name
-                py_file_names.append("./" + str(file_path.name))
                 f_name.write_bytes(file_path.read_bytes())
 
                 pep8_result = general_tests.pep8_check(
                     pep8_test_dir,
-                    filename_patterns=py_file_names
+                    filename_patterns=["./" + str(file_path.name)]
                 )
 
             response_items[count].update({"PEP8_results": pep8_result})
@@ -136,32 +135,41 @@ def allowed_file(filename: str) -> bool:
 def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
     """Saves the teacher's tests to the database"""
 
-    file.filename = str(course_id) + 'Tests' + str(assignment)+'.py'
-
-    if (os.path.exists(file.filename)):
-        raise Exception("file exists in dir, not allowed filename")
-
-    file.save(file.filename)
-    with open(file.filename, "rb") as f:
-        file_data = f.read()
-
-    binary = psycopg2.Binary(file_data)
+    file.filename = file.filename + 'TestFile.py'
+    remove_existing_test_file(file.filename, course_id, assignment)
+    binary = psycopg2.Binary(file.stream.read())
 
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
                             user="postgres", password="BorasSuger-1")
 
     # filetype = file.filename.rsplit('.', 1)[1].lower()
-    with conn.cursor() as cur:
-        query = """INSERT INTO TestFiles
-                (courseId, assignment, filename, filedata)
-                VALUES (%s, %s, %s,%s);
-                """
+    with conn:
+        with conn.cursor() as cur:
+            query = """INSERT INTO TestFiles
+                    (courseId, assignment, filename, filedata)
+                    VALUES (%s, %s, %s,%s);
+                    """
 
-        cur.execute(query, (course_id, assignment, file.filename, binary))
+            cur.execute(query, (course_id, assignment, file.filename, binary))
+    conn.close()
 
-        conn.commit()
-        conn.close()
-    os.remove(file.filename)
+
+def remove_existing_assignment(file_name, group_id, course_id, assignment):
+
+    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
+                            user="postgres", password="BorasSuger-1")
+
+    with conn:
+        with conn.cursor() as cur:
+            query = """DELETE FROM AssignmentFiles
+                 WHERE assignmentfiles.filename   = %s
+                 AND   assignmentfiles.groupid    = %s
+                 AND   assignmentfiles.courseid   = %s
+                 AND   assignmentfiles.assignment = %s;
+                 """
+
+            cur.execute(query, (file_name, group_id, course_id, assignment))
+        conn.close
 
 
 def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
@@ -177,38 +185,35 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
                             user="postgres", password="BorasSuger-1")
 
     file_type = file_name.rsplit('.', 1)[1].lower()
-    with conn.cursor() as cur:
-        query = """INSERT INTO AssignmentFiles 
-                (GroupId, CourseId, Assignment, filename, filedata, filetype)
-                VALUES (%s, %s, %s, %s, %s, %s);
-                """
+    with conn:
+        with conn.cursor() as cur:
+            query = """INSERT INTO AssignmentFiles
+                    (GroupId, CourseId, Assignment, filename,
+                    filedata, filetype) VALUES (%s, %s, %s, %s, %s, %s);
+                    """
 
-        cur.execute(query, (group_id, course_id, assignment,
+            cur.execute(query, (group_id, course_id, assignment,
                     file_name, binary, file_type))
-        conn.commit()
         conn.close
 
 
-def remove_existing_assignment(
+def remove_existing_test_file(
         file_name: str,
-        group_id,
-        course_id,
-        assignment
+        course_id: int,
+        assignment: int
 ):
-    """Removes file from assignment table in the database"""
+    """Removes file from testFile table in the database"""
 
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
                             user="postgres", password="BorasSuger-1")
-    cursor = conn.cursor()
-
-    query_data = """DELETE FROM AssignmentFiles 
-                 WHERE assignmentfiles.filename   = %s 
-                 AND   assignmentfiles.groupid    = %s 
-                 AND   assignmentfiles.courseid   = %s 
-                 AND   assignmentfiles.assignment = %s;
+    with conn:
+        with conn.cursor() as cur:
+            query_data = """DELETE FROM TestFiles
+                 WHERE testfiles.filename   = %s
+                 AND   testfiles.courseid   = %s
+                 AND   testfiles.assignment = %s;
                  """
-    cursor.execute(query_data, (file_name, group_id, course_id, assignment))
-    conn.commit()
+            cur.execute(query_data, (file_name, course_id, assignment))
     conn.close()
 
 
@@ -224,10 +229,10 @@ def get_assignment_files_from_database(
                             user="postgres", password="BorasSuger-1")
 
     cursor = conn.cursor()
-    query_data = """SELECT FileData FROM AssignmentFiles 
+    query_data = """SELECT FileData FROM AssignmentFiles
                 WHERE assignmentfiles.filename   = %s
-                AND   assignmentfiles.groupid    = %s 
-                AND   assignmentfiles.courseid   = %s 
+                AND   assignmentfiles.groupid    = %s
+                AND   assignmentfiles.courseid   = %s
                 AND   assignmentfiles.assignment = %s
                 """
 

@@ -38,7 +38,7 @@ CREATE Table TestFiles (
 	Assignment INTEGER , 
 	Filename TEXT NOT NULL,
 	FileData BYTEA NOT NULL,
-	PRIMARY KEY(CourseId, Assignment),
+	PRIMARY KEY(CourseId, Assignment, FileName),
 	CONSTRAINT fk_assignment
 	FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments(CourseId, Assignment)
 )
