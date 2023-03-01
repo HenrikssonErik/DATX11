@@ -40,16 +40,16 @@ export class LoginComponent implements OnInit {
   }
 
   flipToSignUp() {
-    const form = document.getElementById("loginForm");
+    const form = document.getElementById("flip-card-inner");
     if (form) {
-      form.style.transform = 'rotateY(0deg)';
+      form.style.transform = 'rotateY(180deg)';
     }
   }
 
   flipToLogin(){
-    const form = document.getElementById("loginForm");
+    const form = document.getElementById("flip-card-inner");
     if(form){
-      form.style.transform = 'rotateY(180deg)';
+      form.style.transform = 'rotateY(0deg)';
     }
   }
 

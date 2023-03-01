@@ -1,62 +1,49 @@
-<!-- <div class="container my-5 flip-card">
-  <div class="flip-card-inner" id="">
-    <div class="card p-4" style="background-color: #eee;">
-    
-      <div class="flip-card-front">
-        <form (ngSubmit)="onSubmit()" [formGroup]="loginForm">
-          <h3 class="text-center text-muted mb-4">Hydrant Login</h3>
-          <div class="form-group mb-3">
-            <label for="email" class="text-muted">Email address</label>
-            <input [ngClass]="{'success': loginForm.get('email')?.valid, 'error': loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)}" type="email" formControlName="email" class="form-control" id="email" placeholder="Enter email" (focus)="onInputFocus('email')" required>
-            <div class="error-message" *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)">
-              Please enter a valid email address.
-            </div>
-          </div>
-          <div class="form-group mb-2">
-            <label for="password" class="text-muted">Password</label>
-            <input [ngClass]="{'success': loginForm.get('password')?.valid, 'error': loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)}" type="password" formControlName="password" class="form-control" id="password" placeholder="Password" (focus)="onInputFocus('password')" required>
-            <div class="error-message" *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
-              Please enter a password.
-            </div>
-          </div>
-          <div class="form-group form-check">
-            <input type="checkbox" formControlName="rememberMe" class="form-check-input" id="rememberMe">
-            <label class="form-check-label text-muted" for="rememberMe">Remember me</label>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block mt-4 w-100" [disabled]="loginForm.invalid">Login</button>
-          <p style="float: right;" class="mt-2 mb-0 text-muted ml-auto"><a style="color: inherit" href="/forgot-password">Forgot Password?</a></p>
-          <div style="clear: both"></div>
-          <div class="error-message text-center mt-4" *ngIf="submitFailed">
-            Please enter valid email and password.
-          </div>
-          <h2><span>Or</span></h2>
-          <button type="button" class="btn btn-secondary btn-block mt-3 w-100">Login with Chalmers-SSO</button>
-          <div class="text-center">
-            <p class="mt-3 text-muted mb-0">Need an account? <a [routerLink]="" (click)="flipToSignUp()" style="color: inherit" href="/signup">Sign Up!</a></p>
-          </div>
-        </form>
-        </div>
-      
-      <div class="flip-card-back">
-        <h3 class="text-center text-muted mb-4">Hydrant Sign Up</h3>
-        <button class="btn btn-primary" (click)="flipToLogin()">Hej</button>
+<div class="d-flex justify-content-center">
+  <div class="flip-card">
+    <div class="flip-card-inner" id="flip-card-inner">
+      <div class="flip-card-front p-4">
+        <h1>John Doe</h1>
+        <p>Architect & Engineer</p>
+        <p>We love that guy</p>
+        <button class="btn btn-primary" (click)="flipToLogin()">Flip Back</button>
       </div>
-     
-    </div>
-  </div>
-</div> -->
-
-
-
-<div class="flip-card">
-  <div class="flip-card-inner">
-    <div class="flip-card-front">
-      <p>Hej</p>
-    </div>
-    <div class="flip-card-back">
-      <h1>John Doe</h1>
-      <p>Architect & Engineer</p>
-      <p>We love that guy</p>
+      <div class="flip-card-back p-4">
+        <div class="container">
+          <form (ngSubmit)="onSubmit()" [formGroup]="loginForm">
+          
+            <h3 class="text-center text-muted mb-4">Hydrant Login</h3>
+            <div class="form-group mb-3">
+              <label for="email" class="text-muted">Email address</label>
+              <input [ngClass]="{'success': loginForm.get('email')?.valid, 'error': loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)}" type="email" formControlName="email" class="form-control" id="email" placeholder="Enter email" (focus)="onInputFocus('email')" required>
+              <div class="error-message" *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)">
+                Please enter a valid email address.
+              </div>
+            </div>
+            <div class="form-group mb-2">
+              <label for="password" class="text-muted">Password</label>
+              <input [ngClass]="{'success': loginForm.get('password')?.valid, 'error': loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)}" type="password" formControlName="password" class="form-control" id="password" placeholder="Password" (focus)="onInputFocus('password')" required>
+              <div class="error-message" *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
+                Please enter a password.
+              </div>
+            </div>
+            <div class="form-group form-check">
+              <input type="checkbox" formControlName="rememberMe" class="form-check-input" id="rememberMe">
+              <label class="form-check-label text-muted" for="rememberMe">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block mt-4 w-100" [disabled]="loginForm.invalid">Login</button>
+            <p style="float: right;" class="mt-2 mb-0 text-muted ml-auto"><a style="color: inherit" href="/forgot-password">Forgot Password?</a></p>
+            <div style="clear: both"></div>
+            <div class="error-message text-center mt-4" *ngIf="submitFailed">
+              Please enter valid email and password.
+            </div>
+            <h2><span>Or</span></h2>
+            <button type="button" class="btn btn-secondary btn-block mt-3 w-100">Login with Chalmers-SSO</button>
+            <div class="text-center">
+              <p class="mt-3 text-muted mb-0">Need an account? <a [routerLink]="" (click)="flipToSignUp()" style="color: inherit" href="/signup">Sign Up!</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>
