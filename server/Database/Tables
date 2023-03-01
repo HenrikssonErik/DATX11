@@ -1,0 +1,71 @@
+
+-- CourseInstance, group and lab assignment shoudl be primary key here
+CREATE Table AssignmentFiles (
+		GroupId INTEGER  NOT NULL, 
+		CourseId serial,
+		Assignment INTEGER,
+		FileName TEXT NOT NULL,
+		FileData BYTEA NOT NULL, 
+		FileType TEXT NOT NULL,
+		PRIMARY KEY(GroupId,CourseId, Assignment, FileName),
+		CONSTRAINT fk_assignment
+		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),
+		FOREIGN Key (groupId) REFERENCES Groups(groupId)
+	);
+
+
+--USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
+CREATE Table Courses (
+	CourseId serial PRIMARY KEY,
+	Course Char(6) NOT NULL,
+	TeachingPeriod INTEGER,
+	CourseYear INTEGER,
+	CHECK (teachingPeriod BETWEEN 1 AND 4),
+	UNIQUE ( Course, teachingPeriod, CourseYear)
+);
+
+CREATE Table Assignments(
+	CourseId serial,
+	Assignment INTEGER check (Assignment > 0),
+	PRIMARY KEY (courseId, Assignment),
+	CONSTRAINT fk_course
+	FOREIGN KEY (CourseId) REFERENCES Courses(CourseId)
+)
+
+--for unittests
+CREATE Table TestFiles (
+	CourseId serial ,
+	Assignment INTEGER , 
+	Filename TEXT NOT NULL,
+	FileData BYTEA NOT NULL,
+	PRIMARY KEY(CourseId, Assignment, FileName),
+	CONSTRAINT fk_assignment
+	FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments(CourseId, Assignment)
+)
+
+CREATE TABLE UserEmail (email TEXT PRIMARY KEY CONSTRAINT proper_email CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'));
+
+CREATE TABLE UserData (
+	cid TEXT,
+	email TEXT,
+	passphrase TEXT,
+	PRIMARY KEY (cid),
+	FOREIGN KEY (email) REFERENCES userEmail(email)
+	);
+
+CREATE TABLE Groups (
+	groupId serial,
+	groupNumber INTEGER,
+	course INTEGER,
+	PRIMARY KEY (groupId),
+	CONSTRAINT courseGroups UNIQUE (groupNumber,course),
+	FOREIGN KEY (course) REFERENCES Courses(courseId)
+);
+
+CREATE TABLE UserInGroup (
+	userCID TEXT,
+	groupId INTEGER,
+	PRIMARY KEY (userCID, groupId),
+	FOREIGN KEY (groupId) REFERENCES Groups(groupId),
+	FOREIGN KEY (userCID) REFERENCES UserData(cid)
+);

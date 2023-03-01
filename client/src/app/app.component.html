@@ -1,20 +1,41 @@
 <app-navbar></app-navbar>
 
 <div class="row">
-  <div class="col-6" style="border-right: 1px solid #ccc;">
-    <button (click)="getTemplateFile()" style="margin-top: 50px; margin-left: 30px; background-color: #3D9970; border: #3D9970;" class="btn btn-primary">Template<i style="padding-left: 10px;" class="fa-solid fa-arrow-down"></i></button>
-    <h4 style="padding-top: 12px;" class="d-flex justify-content-center text-muted">Upload Unit Tests</h4>
-    <div style="padding-top: 50px; margin-bottom: 100px;" class="d-flex justify-content-center">
+  <div class="col-6" style="border-right: 1px solid #ccc">
+    <button
+      (click)="getfile()"
+      style="
+        margin-top: 50px;
+        margin-left: 30px;
+        background-color: #3d9970;
+        border: #3d9970;
+      "
+      class="btn btn-primary"
+    >
+      Template<i style="padding-left: 10px" class="fa-solid fa-arrow-down"></i>
+    </button>
+    <h4
+      style="padding-top: 12px"
+      class="d-flex justify-content-center text-muted"
+    >
+      Upload Unit Tests
+    </h4>
+    <div
+      style="padding-top: 50px; margin-bottom: 100px"
+      
+    >
       <app-file-upload [config]="uploadUnitTestFile"></app-file-upload>
     </div>
   </div>
   <div class="col-6">
-    <h4 style="padding-top: 100px;" class="d-flex justify-content-center text-muted">Upload Test File(s)</h4>
-    <div style="padding-top: 50px;" class="d-flex justify-content-center">
+    <h4
+      style="padding-top: 100px"
+      class="d-flex justify-content-center text-muted"
+    >
+      Upload Test File(s)
+    </h4>
+    <div style="padding-top: 50px">
       <app-file-upload [config]="uploadTestFile"></app-file-upload>
-    </div>
-    <div style="padding-top: 10px; margin-bottom: 100px;">
-      <app-test-feedback></app-test-feedback>
     </div>
   </div>
 </div>

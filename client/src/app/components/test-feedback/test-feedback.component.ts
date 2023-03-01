@@ -1,19 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 
 @Component({
   selector: 'app-test-feedback',
   templateUrl: './test-feedback.component.html',
-  styleUrls: ['./test-feedback.component.scss']
+  styleUrls: ['./test-feedback.component.scss'],
 })
 export class TestFeedbackComponent implements OnInit {
+  @Input() feedbackFiles: any;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
+    /* Should (of course) be done dynamically in the future */
   }
-
-  openFeedBackModal() {
-    alert("Här tänkte jag kanske att man kunde öppna en modal med mer info???");
-  }
-
 }
