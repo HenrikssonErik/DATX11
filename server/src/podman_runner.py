@@ -1,4 +1,5 @@
 import subprocess
+import json
 from pathlib import Path
 
 
@@ -40,10 +41,16 @@ def create_image(alias: str) -> str:
 
 
 # This is to be changed, temporary poc
+
 test_files = str(Path(__file__).absolute().parent/"test_files_test_runner")
+# This should be done once when assigment is to be tested
 gen_requirements(test_files)
 build_image("podman_test_executer", ".")
+
 id = create_image("podman_test_executer")
 copy_files(test_files, id)
-subprocess.run(["podman", "start", "--attach", id])
-subprocess.run(["podman", "rm", id])
+proc = subprocess.run(["podman", "start", "--attach", id],
+                      text=True, capture_output=True)
+json_feedback = json.dumps(proc.stdout)
+# subprocess.run(["podman", "rm", id])
+subprocess.run(["podman", "rmi", "-f", "podman_test_executer"])
