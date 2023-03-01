@@ -32,7 +32,7 @@ def build_image(alias: str, directory: str):
     subprocess.run(["podman", "build", "-t", alias, directory])
 
 
-def create_image(alias: str):
+def create_image(alias: str) -> str:
     proc = subprocess.run(["podman", "create", alias],
                           text=True, capture_output=True)
     id = proc.stdout.removesuffix("\n")
@@ -46,3 +46,4 @@ build_image("podman_test_executer", ".")
 id = create_image("podman_test_executer")
 copy_files(test_files, id)
 subprocess.run(["podman", "start", "--attach", id])
+subprocess.run(["podman", "rm", id])
