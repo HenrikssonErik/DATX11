@@ -57,11 +57,14 @@ def get_files():
     course = data['course']
     assignment = data['assignment']
     filename = data['filename']  # should also be imported from frontend
-    result = get_assignment_files_from_database(groupId, course, assignment, filename)
+    result = get_assignment_files_from_database(
+        groupId, course, assignment, filename)
 
     res = make_response(send_file(path_or_file=result,
                                    download_name=filename, as_attachment=True))
 
-    headers = {"Access-Control-Expose-Headers": "Content-Disposition", 'Content-Disposition': 'attachment; filename={}'.format(filename)}
+    headers = {"Access-Control-Expose-Headers": "Content-Disposition",
+               'Content-Disposition': 'attachment; filename={}'
+               .format(filename)}
     res.headers = headers
     return res
