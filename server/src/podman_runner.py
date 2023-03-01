@@ -44,8 +44,14 @@ def create_container(image_name: str) -> str:
 
 def run_container(image_name: str) -> str:
     """
-    Runs a created but not started container. Receives the feedback f
+    Creates and runs container but not started container and returns
+    feedback from tests. Deletes image when feedback been received.
+    --Parameters--
+    image_name: Name of image to create and delete
+    --Returns--
+    str: unittest feedback in json string format
     """
+
     id = create_container(image_name)
     copy_files(test_files, id)
     proc = subprocess.run(["podman", "start", "--attach", id],
