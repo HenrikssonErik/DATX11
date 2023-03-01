@@ -142,7 +142,6 @@ def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
                             user="postgres", password="BorasSuger-1")
 
-    # filetype = file.filename.rsplit('.', 1)[1].lower()
     with conn:
         with conn.cursor() as cur:
             query = """INSERT INTO TestFiles
@@ -154,7 +153,8 @@ def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
     conn.close()
 
 
-def remove_existing_assignment(file_name, group_id, course_id, assignment):
+def remove_existing_assignment(file_name: str, group_id: int, course_id: int,
+                               assignment: int):
 
     conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
                             user="postgres", password="BorasSuger-1")
@@ -218,10 +218,10 @@ def remove_existing_test_file(
 
 
 def get_assignment_files_from_database(
-        group_id,
-        course,
-        assignment,
-        file_name
+        group_id: int,
+        course: int,
+        assignment: int,
+        file_name: str
 ):
     """Retrieves file from database"""
 
