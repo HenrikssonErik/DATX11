@@ -1,5 +1,4 @@
 import subprocess
-import json
 from pathlib import Path
 
 
@@ -23,34 +22,41 @@ def copy_files(path: str, container_id: str):
     subprocess.run(cmd)
 
 
-def build_image(alias: str, directory: str):
+def build_image(image_name: str, directory: str):
     """
     Builds an image in a given directory
     --Parameters--
     alias: alias for the built image
     directory: Directory of the dockerfile, "." for current dir
     """
-    subprocess.run(["podman", "build", "-t", alias, directory])
+    subprocess.run(["podman", "build", "-t", image_name, directory])
 
 
-def create_image(alias: str) -> str:
-    proc = subprocess.run(["podman", "create", alias],
+def create_container(image_name: str) -> str:
+    """
+    creates a container from a given image name
+    """
+    proc = subprocess.run(["podman", "create", image_name],
                           text=True, capture_output=True)
     id = proc.stdout.removesuffix("\n")
     return id
 
 
-# This is to be changed, temporary poc
+def run_container(image_name: str) -> str:
+    """
+    Runs a created but not started container. Receives the feedback f
+    """
+    id = create_container(image_name)
+    copy_files(test_files, id)
+    proc = subprocess.run(["podman", "start", "--attach", id],
+                          text=True, capture_output=True)
+    subprocess.run(["podman", "rmi", "-f", image_name])
+    return proc.stdout
 
+
+# This is to be changed, temporary poc
 test_files = str(Path(__file__).absolute().parent/"test_files_test_runner")
 # This should be done once when assigment is to be tested
 gen_requirements(test_files)
 build_image("podman_test_executer", ".")
-
-id = create_image("podman_test_executer")
-copy_files(test_files, id)
-proc = subprocess.run(["podman", "start", "--attach", id],
-                      text=True, capture_output=True)
-json_feedback = json.dumps(proc.stdout)
-# subprocess.run(["podman", "rm", id])
-subprocess.run(["podman", "rmi", "-f", "podman_test_executer"])
+json_feedback = run_container("podman_test_executer")
