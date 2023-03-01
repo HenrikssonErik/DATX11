@@ -42,18 +42,19 @@ def create_container(image_name: str) -> str:
     return id
 
 
-def run_container(image_name: str) -> str:
+def run_container(image_name: str, test_dir: str) -> str:
     """
     Creates and runs container but not started container and returns
     feedback from tests. Deletes image when feedback been received.
     --Parameters--
     image_name: Name of image to create and delete
+    test_dir: Absolute path of test directory
     --Returns--
     str: unittest feedback in json string format
     """
 
     id = create_container(image_name)
-    copy_files(test_files, id)
+    copy_files(test_dir, id)
     proc = subprocess.run(["podman", "start", "--attach", id],
                           text=True, capture_output=True)
     subprocess.run(["podman", "rmi", "-f", image_name])
@@ -65,4 +66,4 @@ test_files = str(Path(__file__).absolute().parent/"test_files_test_runner")
 # This should be done once when assigment is to be tested
 gen_requirements(test_files)
 build_image("podman_test_executer", ".")
-json_feedback = run_container("podman_test_executer")
+json_feedback = run_container("podman_test_executer", test_files)
