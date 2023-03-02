@@ -7,71 +7,202 @@
             <h3 class="text-center text-muted mb-4">Hydrant Sign Up</h3>
             <div class="form-group mb-3">
               <label for="cid" class="text-muted">Chalmers ID (CID)</label>
-              <input [ngClass]="{'success': signUpForm.get('cid')?.valid, 'error': signUpForm.get('cid')?.invalid && (signUpForm.get('cid')?.dirty || signUpForm.get('cid')?.touched)}" type="text" formControlName="cid" class="form-control" id="cid" placeholder="Enter CID" (focus)="onInputFocus('cid', signUpForm)" required>
-             <!--  <div class="error-message" *ngIf="signUpForm.get('cid')?.invalid && (signUpForm.get('cid')?.dirty || signUpForm.get('cid')?.touched)">
+              <input
+                [ngClass]="{
+                  success: signUpForm.get('cid')?.valid,
+                  error:
+                    signUpForm.get('cid')?.invalid &&
+                    (signUpForm.get('cid')?.dirty ||
+                      signUpForm.get('cid')?.touched)
+                }"
+                type="text"
+                formControlName="cid"
+                class="form-control"
+                id="cid"
+                placeholder="Enter CID"
+                (focus)="onInputFocus('cid', signUpForm)"
+                required
+              />
+              <!--  <div class="error-message" *ngIf="signUpForm.get('cid')?.invalid && (signUpForm.get('cid')?.dirty || signUpForm.get('cid')?.touched)">
                 Please enter a CID
               </div> -->
             </div>
             <div class="form-group mb-3">
               <label for="signUpemail" class="text-muted">Email address</label>
-              <input [ngClass]="{'success': signUpForm.get('signUpemail')?.valid, 'error': signUpForm.get('signUpemail')?.invalid && (signUpForm.get('signUpemail')?.dirty || signUpForm.get('signUpemail')?.touched)}" type="email" formControlName="signUpemail" class="form-control" id="signUpemail" placeholder="Enter email" (focus)="onInputFocus('email', signUpForm)" required>
-             <!--  <div class="error-message" *ngIf="signUpForm.get('signUpemail')?.invalid && (signUpForm.get('signUpemail')?.dirty || signUpForm.get('signUpemail')?.touched)">
+              <input
+                [ngClass]="{
+                  success: signUpForm.get('signUpemail')?.valid,
+                  error:
+                    signUpForm.get('signUpemail')?.invalid &&
+                    (signUpForm.get('signUpemail')?.dirty ||
+                      signUpForm.get('signUpemail')?.touched)
+                }"
+                type="email"
+                formControlName="signUpemail"
+                class="form-control"
+                id="signUpemail"
+                placeholder="Enter email"
+                (focus)="onInputFocus('email', signUpForm)"
+                required
+              />
+              <!--  <div class="error-message" *ngIf="signUpForm.get('signUpemail')?.invalid && (signUpForm.get('signUpemail')?.dirty || signUpForm.get('signUpemail')?.touched)">
                 Please enter a valid email address.
               </div> -->
             </div>
             <div class="form-group mb-1">
               <label for="signUpPassword" class="text-muted">Password</label>
-              <input [ngClass]="{'success': signUpForm.get('signUpPassword')?.valid, 'error': signUpForm.get('signUpPassword')?.invalid && (signUpForm.get('signUpPassword')?.dirty || signUpForm.get('signUpPassword')?.touched)}" type="password" formControlName="signUpPassword" class="form-control" id="signUpPassword" placeholder="Password" (focus)="onInputFocus('signUpPassword', signUpForm)" required>
-             <!--  <div class="error-message" *ngIf="signUpForm.get('password')?.invalid && (signUpForm.get('password')?.dirty || signUpForm.get('password')?.touched)">
+              <input
+                [ngClass]="{
+                  success: signUpForm.get('signUpPassword')?.valid,
+                  error:
+                    signUpForm.get('signUpPassword')?.invalid &&
+                    (signUpForm.get('signUpPassword')?.dirty ||
+                      signUpForm.get('signUpPassword')?.touched)
+                }"
+                type="password"
+                formControlName="signUpPassword"
+                class="form-control"
+                id="signUpPassword"
+                placeholder="Password"
+                (focus)="onInputFocus('signUpPassword', signUpForm)"
+                required
+              />
+              <!--  <div class="error-message" *ngIf="signUpForm.get('password')?.invalid && (signUpForm.get('password')?.dirty || signUpForm.get('password')?.touched)">
                 Please enter a password.
               </div> -->
             </div>
             <div class="form-group form-check mt-3">
-              <input type="checkbox" formControlName="termsAndCon" class="form-check-input" id="termsAndCon">
-              <label class="form-check-label text-muted" for="termsAndCon">I agree to the <a style="color: inherit" href="#">Terms and Conditions</a></label>
+              <input
+                type="checkbox"
+                formControlName="termsAndCon"
+                class="form-check-input"
+                id="termsAndCon"
+              />
+              <label class="form-check-label text-muted" for="termsAndCon"
+                >I agree to the
+                <a style="color: inherit" href="#"
+                  >Terms and Conditions</a
+                ></label
+              >
             </div>
-            <button type="submit" class="btn btn-primary btn-block mt-3 w-100" [disabled]="signUpForm.invalid">Sign Up</button>
+            <button
+              type="submit"
+              class="btn btn-primary btn-block mt-3 w-100"
+              [disabled]="signUpForm.invalid"
+            >
+              Sign Up
+            </button>
             <div class="text-center">
-              <p class="mt-3 text-muted mb-0">Already have an account? <a [routerLink]="" (click)="flipToLogin()" style="color: inherit" class="signUp-link" href="/signup">Log in</a></p>
+              <p class="mt-3 text-muted mb-0">
+                Already have an account?
+                <a
+                  [routerLink]=""
+                  (click)="flipToLogin()"
+                  style="color: inherit"
+                  class="signUp-link"
+                  href="/signup"
+                  >Log in</a
+                >
+              </p>
             </div>
-          <!--   <h2 class="signUpHorizontal"><span>Or</span></h2>
+            <!--   <h2 class="signUpHorizontal"><span>Or</span></h2>
             <button type="button" (click)="flipToLogin()" class="btn btn-secondary btn-block mt-2 w-100">Go Back to Login</button> -->
           </form>
         </div>
       </div>
+
       <div class="flip-card-back card p-4">
         <div class="container">
           <form (ngSubmit)="onSubmitLogin()" [formGroup]="loginForm">
-          
             <h3 class="text-center text-muted mb-4">Hydrant Login</h3>
             <div class="form-group mb-3">
               <label for="email" class="text-muted">Email address</label>
-              <input [ngClass]="{'success': loginForm.get('email')?.valid, 'error': loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)}" type="email" formControlName="email" class="form-control" id="email" placeholder="Enter email" (focus)="onInputFocus('email', loginForm)" required>
-             <!--  <div class="error-message" *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)">
+              <input
+                [ngClass]="{
+                  success: loginForm.get('email')?.valid,
+                  error:
+                    loginForm.get('email')?.invalid &&
+                    (loginForm.get('email')?.dirty ||
+                      loginForm.get('email')?.touched)
+                }"
+                type="email"
+                formControlName="email"
+                class="form-control"
+                id="email"
+                placeholder="Enter email"
+                (focus)="onInputFocus('email', loginForm)"
+                required
+              />
+              <!--  <div class="error-message" *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)">
                 Please enter a valid email address.
               </div> -->
             </div>
             <div class="form-group mb-2">
               <label for="password" class="text-muted">Password</label>
-              <input [ngClass]="{'success': loginForm.get('password')?.valid, 'error': loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)}" type="password" formControlName="password" class="form-control" id="password" placeholder="Password" (focus)="onInputFocus('password', loginForm)" required>
-             <!--  <div class="error-message" *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
+              <input
+                [ngClass]="{
+                  success: loginForm.get('password')?.valid,
+                  error:
+                    loginForm.get('password')?.invalid &&
+                    (loginForm.get('password')?.dirty ||
+                      loginForm.get('password')?.touched)
+                }"
+                type="password"
+                formControlName="password"
+                class="form-control"
+                id="password"
+                placeholder="Password"
+                (focus)="onInputFocus('password', loginForm)"
+                required
+              />
+              <!--  <div class="error-message" *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
                 Please enter a password.
               </div> -->
             </div>
             <div class="form-group form-check">
-              <input type="checkbox" formControlName="rememberMe" class="form-check-input" id="rememberMe">
-              <label class="form-check-label text-muted" for="rememberMe">Remember me</label>
+              <input
+                type="checkbox"
+                formControlName="rememberMe"
+                class="form-check-input"
+                id="rememberMe"
+              />
+              <label class="form-check-label text-muted" for="rememberMe"
+                >Remember me</label
+              >
             </div>
-            <button type="submit" class="btn btn-primary btn-block mt-4 w-100" [disabled]="loginForm.invalid">Login</button>
-            <p style="float: right;" class="mt-2 mb-0 text-muted ml-auto"><a style="color: inherit" href="#">Forgot Password?</a></p>
+            <button
+              type="submit"
+              class="btn btn-primary btn-block mt-4 w-100"
+              [disabled]="loginForm.invalid"
+            >
+              Login
+            </button>
+            <p style="float: right" class="mt-2 mb-0 text-muted ml-auto">
+              <a style="color: inherit" href="#">Forgot Password?</a>
+            </p>
             <div style="clear: both"></div>
-           <!--  <div class="error-message text-center mt-4" *ngIf="submitFailed">
+            <!--  <div class="error-message text-center mt-4" *ngIf="submitFailed">
               Please enter valid email and password.
             </div> -->
             <h2><span>Or</span></h2>
-            <button type="button" class="btn btn-secondary btn-block mt-3 w-100">Login with Chalmers-SSO</button>
+            <button
+              type="button"
+              class="btn btn-secondary btn-block mt-3 w-100"
+            >
+              Login with Chalmers-SSO
+            </button>
             <div class="text-center">
-              <p class="mt-3 text-muted mb-0">Need an account? <a [routerLink]="" (click)="flipToSignUp()" style="color: inherit" class="signUp-link" href="/signup">Sign Up!</a></p>
+              <p class="mt-3 text-muted mb-0">
+                Need an account?
+                <a
+                  [routerLink]=""
+                  (click)="flipToSignUp()"
+                  style="color: inherit"
+                  class="signUp-link"
+                  href="/signup"
+                  >Sign Up!</a
+                >
+              </p>
             </div>
           </form>
         </div>
