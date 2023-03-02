@@ -1,43 +1,39 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as bcrypt from 'bcrypt';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
 
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-
   loginForm: FormGroup = new FormGroup({});
-  signUpForm : FormGroup = new FormGroup({})
+  signUpForm: FormGroup = new FormGroup({});
   submitFailed: boolean = false;
   success: boolean = false;
-  signUpFailed : boolean = false; 
-  signUpSuccess : boolean = false;
+  signUpFailed: boolean = false;
+  signUpSuccess: boolean = false;
   bcrypt = require('bcryptjs');
 
-  constructor(private fb: FormBuilder) {
-  
-  }
-  
+  constructor(private fb: FormBuilder) {}
+
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
-      rememberMe: [false]
+      rememberMe: [false],
     });
 
     this.signUpForm = this.fb.group({
       cid: ['', [Validators.required]],
       signUpemail: ['', [Validators.required, Validators.email]],
       signUpPassword: ['', [Validators.required]],
-      termsAndCon: ['', [Validators.required]]
+      termsAndCon: ['', [Validators.required]],
     });
   }
 
-  onSubmitLogin() : void {
+  onSubmitLogin(): void {
     if (this.loginForm.invalid) {
       this.submitFailed = true;
       return;
@@ -54,9 +50,9 @@ export class LoginComponent implements OnInit {
     this.success = true;
   }
 
-  onSubmitSignUp() : void {
-    if(this.signUpForm.invalid){
-      this.signUpFailed = true; 
+  onSubmitSignUp(): void {
+    if (this.signUpForm.invalid) {
+      this.signUpFailed = true;
       return;
     }
 
@@ -68,27 +64,27 @@ export class LoginComponent implements OnInit {
   }
 
   flipToSignUp() {
-    const form = document.getElementById("flip-card-inner");
+    const form = document.getElementById('flip-card-inner');
     if (form) {
       form.style.transform = 'rotateY(180deg)';
     }
   }
 
-  flipToLogin(){
-    const form = document.getElementById("flip-card-inner");
-    if(form){
+  flipToLogin() {
+    const form = document.getElementById('flip-card-inner');
+    if (form) {
       form.style.transform = 'rotateY(0deg)';
     }
   }
-  
+
   hashPassword(password: string): string {
     const hash: string = this.bcrypt.hashSync(password, 10);
     return hash;
   }
 
-  onInputFocus(input: string, form : FormGroup) : void {
+  onInputFocus(input: string, form: FormGroup): void {
     const control = form.get(input);
-  
+
     if (control) {
       const isValid = control.valid;
       const isInvalid = control.invalid && (control.dirty || control.touched);
@@ -105,4 +101,4 @@ export class LoginComponent implements OnInit {
       }
     }
   }
-}  
+}
