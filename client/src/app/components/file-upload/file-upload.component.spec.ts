@@ -4,16 +4,18 @@ import { ToastrModule } from "ngx-toastr";
 import { FileUploadComponent } from "./file-upload.component";
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { API_URL } from 'src/environments/environment';
+import { UploadFileConfigService } from "src/app/services/upload-test-file-config.service";
+import { UploadUnitTestConfigService } from "src/app/services/upload-unit-test-config.service";
 
-describe('Testing Creating the component', () => { 
+describe('Testing Creating the file-upload component', () => { 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [ HttpClientModule, ToastrModule.forRoot()],
       declarations: [FileUploadComponent],
-      providers : [HttpClient]
+      providers : [HttpClient, UploadFileConfigService, UploadUnitTestConfigService]
     })
   })
-  it('should create the app',(() => {
+  it('should create the file-upload component',(() => {
     const fixture = TestBed.createComponent(FileUploadComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
@@ -23,16 +25,19 @@ describe('Testing Creating the component', () => {
 describe('Testing formatBytesMethod', () => {
   let fileUploadComponent : FileUploadComponent;
   let fixture: ComponentFixture<FileUploadComponent>;
+  let configService: UploadFileConfigService;
  
   beforeEach(() => {
+    configService = new UploadUnitTestConfigService();
     TestBed.configureTestingModule({
       imports: [ HttpClientModule, ToastrModule.forRoot()],
       declarations: [FileUploadComponent],
-      providers : [HttpClient]
+      providers : [HttpClient, { provide: UploadUnitTestConfigService, useValue: configService }]
     })
 
     fixture = TestBed.createComponent(FileUploadComponent);
     fileUploadComponent = fixture.componentInstance;
+    fileUploadComponent.config = configService;
     fixture.detectChanges();
     
   })
@@ -63,16 +68,19 @@ describe('Testing deleteFile', () => {
   let fileUploadComponent : FileUploadComponent;
   let fixture: ComponentFixture<FileUploadComponent>;
   let files: File[];
+  let configService: UploadFileConfigService;
  
   beforeEach(() => {
+    configService = new UploadUnitTestConfigService();
     TestBed.configureTestingModule({
       imports: [ HttpClientModule, ToastrModule.forRoot()],
       declarations: [FileUploadComponent],
-      providers : [HttpClient]
+      providers : [HttpClient, { provide: UploadUnitTestConfigService, useValue: configService }]
     })
 
     fixture = TestBed.createComponent(FileUploadComponent);
     fileUploadComponent = fixture.componentInstance;
+    fileUploadComponent.config = configService;
     files = [new File(['file1'], 'file1', { type: 'text/plain' }), new File(['file2'], 'file2', { type: 'text/plain' }), new File(['file3'], 'file3', { type: 'text/plain' })];
     fileUploadComponent.files = files;
     fixture.detectChanges();
@@ -99,15 +107,18 @@ describe('Testing prepareFilesList', () => {
   let fileUploadComponent : FileUploadComponent;
   let fixture: ComponentFixture<FileUploadComponent>;
   let files: File[];
- 
+  let configService: UploadFileConfigService;
+
   beforeEach(() => {
+    configService = new UploadUnitTestConfigService();
     TestBed.configureTestingModule({
       imports: [ HttpClientModule, ToastrModule.forRoot()],
       declarations: [FileUploadComponent],
-      providers : [HttpClient]
+      providers : [HttpClient, { provide: UploadUnitTestConfigService, useValue: configService }]
     })
     fixture = TestBed.createComponent(FileUploadComponent);
     fileUploadComponent = fixture.componentInstance;
+    fileUploadComponent.config = configService;
     fixture.detectChanges();
     files = [new File(['file1'], 'file1', { type: 'text/plain' }), new File(['file2'], 'file2', { type: 'application/pdf' }), new File(['file3'], 'file3', { type: 'text/x-python' })];
   })
@@ -142,15 +153,18 @@ describe('Testing prepareFilesList', () => {
 describe('Testing getImageType', () => {
   let fileUploadComponent : FileUploadComponent;
   let fixture: ComponentFixture<FileUploadComponent>;
+  let configService: UploadFileConfigService;
  
   beforeEach(() => {
+    configService = new UploadUnitTestConfigService();
     TestBed.configureTestingModule({
       imports: [ HttpClientModule, ToastrModule.forRoot()],
       declarations: [FileUploadComponent],
-      providers : [HttpClient]
+      providers : [HttpClient, { provide: UploadUnitTestConfigService, useValue: configService }]
     })
     fixture = TestBed.createComponent(FileUploadComponent);
     fileUploadComponent = fixture.componentInstance;
+    fileUploadComponent.config = configService;
     fixture.detectChanges();
   })
 
@@ -182,15 +196,18 @@ describe('Testing getImageType', () => {
 describe('Testing fileBrowseHandler', () => {
   let fileUploadComponent : FileUploadComponent;
   let fixture: ComponentFixture<FileUploadComponent>;
+  let configService: UploadFileConfigService;
  
   beforeEach(() => {
+    configService = new UploadUnitTestConfigService();
     TestBed.configureTestingModule({
       imports: [ HttpClientModule, ToastrModule.forRoot()],
       declarations: [FileUploadComponent],
-      providers : [HttpClient]
+      providers : [HttpClient, { provide: UploadUnitTestConfigService, useValue: configService }]
     })
     fixture = TestBed.createComponent(FileUploadComponent);
     fileUploadComponent = fixture.componentInstance;
+    fileUploadComponent.config = configService;
     fixture.detectChanges();
   })
 
@@ -209,15 +226,18 @@ describe('Testing fileBrowseHandler', () => {
 describe('Testing onFileDropped', () => {
   let fileUploadComponent : FileUploadComponent;
   let fixture: ComponentFixture<FileUploadComponent>;
+  let configService: UploadFileConfigService;
  
   beforeEach(() => {
+    configService = new UploadUnitTestConfigService();
     TestBed.configureTestingModule({
       imports: [ HttpClientModule, ToastrModule.forRoot()],
       declarations: [FileUploadComponent],
-      providers : [HttpClient]
+      providers : [HttpClient, { provide: UploadUnitTestConfigService, useValue: configService }]
     })
     fixture = TestBed.createComponent(FileUploadComponent);
     fileUploadComponent = fixture.componentInstance;
+    fileUploadComponent.config = configService;
     fixture.detectChanges();
   })
 
@@ -234,15 +254,18 @@ describe('Testing uploadFiles', () => {
   let fileUploadComponent : FileUploadComponent;
   let fixture: ComponentFixture<FileUploadComponent>;
   let httpMock: HttpTestingController;
+  let configService: UploadFileConfigService;
  
   beforeEach(() => {
+    configService = new UploadUnitTestConfigService();
     TestBed.configureTestingModule({
       imports: [ HttpClientTestingModule, ToastrModule.forRoot()],
       declarations: [FileUploadComponent],
-      providers : [HttpClient]
+      providers : [HttpClient, { provide: UploadUnitTestConfigService, useValue: configService }]
     })
     fixture = TestBed.createComponent(FileUploadComponent);
     fileUploadComponent = fixture.componentInstance;
+    fileUploadComponent.config = configService;
     httpMock = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
   })
@@ -255,7 +278,7 @@ describe('Testing uploadFiles', () => {
     const mockFiles = [new File([], 'file1.txt'), new File([], 'file2.txt')];
     fileUploadComponent.files = mockFiles;
     fileUploadComponent.uploadFiles();
-    const req = httpMock.expectOne(`${API_URL}/files`);
+    const req = httpMock.expectOne(`${API_URL}/` + configService.endpoint);
     expect(req.request.method).toBe('POST');
     expect(req.request.body.getAll('files').length).toBe(2);
 
