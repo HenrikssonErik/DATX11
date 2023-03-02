@@ -4,7 +4,7 @@ from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
-# from .login_handler import
+from .login_handler import user_registration
 
 # creating the Flask application
 app = Flask(__name__)
@@ -32,6 +32,7 @@ def sign_up():
     cid = request.form['cid']
     password = request.form['password']
     email = request.form['email']
+    user_registration(request)
 
     return jsonify({"cid": cid, 'Pass': password, "Email": email})
 
