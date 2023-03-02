@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import * as bcrypt from 'bcrypt';
 
 @Component({
   selector: 'app-login',
