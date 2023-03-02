@@ -9,34 +9,51 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class LoginComponent implements OnInit {
 
   loginForm: FormGroup = new FormGroup({});
+  signUpForm : FormGroup = new FormGroup({})
   submitFailed: boolean = false;
   success: boolean = false;
+  signUpFailed : boolean = false; 
+  signUpSuccess : boolean = false;
 
   constructor(private fb: FormBuilder) {
   
   }
   
-
-
-
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       rememberMe: [false]
     });
-  
+
+    this.signUpForm = this.fb.group({
+      cid: ['', [Validators.required]],
+      signUpemail: ['', [Validators.required, Validators.email]],
+      signUpPassword: ['', [Validators.required]],
+      termsAndCon: ['', [Validators.required]]
+    });
   }
 
-  onSubmit() {
+  onSubmitLogin() : void {
     if (this.loginForm.invalid) {
       this.submitFailed = true;
       return;
     }
-
-    // Logic to submit form data to server
-
+    // Logic to submit login
     this.success = true;
+  }
+
+  onSubmitSignUp() : void {
+    if(this.signUpForm.invalid){
+      this.signUpFailed = true; 
+      return;
+    }
+
+    // Logic to submit the new user creation
+
+    // TODO: Show visual feedback to user that account creation was successfull.
+
+    this.signUpSuccess = true;
   }
 
   flipToSignUp() {
@@ -53,9 +70,9 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  onInputFocus(input: string) {
-    const control = this.loginForm.get(input);
-    
+  onInputFocus(input: string, form : FormGroup) : void {
+    const control = form.get(input);
+  
     if (control) {
       const isValid = control.valid;
       const isInvalid = control.invalid && (control.dirty || control.touched);
