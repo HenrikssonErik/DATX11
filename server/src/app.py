@@ -1,19 +1,39 @@
 
+
 from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
+# from .login_handler import
 
 # creating the Flask application
 app = Flask(__name__)
 
 CORS(app)
 
-
 # useless in the future, TODO: Remove along with front end button
+
+
 @app.route('/test', methods=['GET'])
 def test_get():
     return jsonify("hello")
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    password = request.form['password']
+    email = request.form['email']
+
+    return jsonify({'Pass': password, "Email": email})
+
+
+@app.route('/signUp', methods=['POST'])
+def sign_up():
+    cid = request.form['cid']
+    password = request.form['password']
+    email = request.form['email']
+
+    return jsonify({"cid": cid, 'Pass': password, "Email": email})
 
 
 @app.route('/files', methods=['POST'])
@@ -44,7 +64,6 @@ def post_tests():
 # should be a post further on
 @app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
-
     """
     Takes in information from the frontend about a specific course assignment
       file to then return its file content.

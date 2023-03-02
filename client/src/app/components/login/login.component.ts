@@ -1,5 +1,7 @@
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { API_URL } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +18,7 @@ export class LoginComponent implements OnInit {
   signUpSuccess: boolean = false;
   bcrypt = require('bcryptjs');
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private http: HttpClient) {}
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -39,15 +41,28 @@ export class LoginComponent implements OnInit {
       return;
     }
     // Logic to submit login
-    console.log(this.loginForm.get('password')?.value);
 
     const hashedpassword = this.hashPassword(
       this.loginForm.get('password')?.value
     );
+    console.log('hashed: ' + hashedpassword);
+    const formData = new FormData();
+    formData.append('email', this.loginForm.get('email')?.value);
+    formData.append('password', hashedpassword);
+    console.log(formData.get('password'));
 
-    // Logic to submit form data to server
-    //TODO: create method to hash password with bcrypt(done) -> send to backend -> handle response with/without token
-    this.success = true;
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/` + 'login', formData, {
+        observe: 'response',
+      })
+      .subscribe({
+        //TODO: save token and id
+        next: (response: any) => {
+          console.log(response);
+        },
+      });
+
+    //TODO: this.success = true;
   }
 
   onSubmitSignUp(): void {
@@ -55,6 +70,26 @@ export class LoginComponent implements OnInit {
       this.signUpFailed = true;
       return;
     }
+
+    const hashedpassword = this.hashPassword(
+      this.signUpForm.get('signUpPassword')!.value
+    );
+    console.log('hashed: ' + hashedpassword);
+    const formData = new FormData();
+    formData.append('cid', this.signUpForm.get('cid')!.value);
+    formData.append('email', this.signUpForm.get('signUpemail')!.value);
+    formData.append('password', hashedpassword);
+    console.log(formData.get('password'));
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/` + 'signUp', formData, {
+        observe: 'response',
+      })
+      .subscribe({
+        next: (response: any) => {
+          console.log(response);
+        },
+      });
 
     // Logic to submit the new user creation
 
