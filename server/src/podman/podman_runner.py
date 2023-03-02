@@ -62,9 +62,9 @@ def run_container(image_name: str, test_dir: str) -> str:
 
 
 # This is to be changed, temporary poc
-test_files = "tempf"
+#test_files = "tempf"
 # This should be done once when assigment is to be tested
 
-gen_requirements(test_files)
-build_image("podman_test_executer", ".")
-json_feedback = run_container("podman_test_executer", test_files)
+#gen_requirements(test_files)
+#build_image("podman_test_executer", ".")
+#json_feedback = run_container("podman_test_executer", test_files)

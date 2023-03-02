@@ -5,7 +5,7 @@ from . import general_tests
 import psycopg2
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
-from podman.podman_runner import gen_requirements, run_container, build_image
+from .podman.podman_runner import gen_requirements, run_container, build_image
 
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
@@ -285,10 +285,12 @@ def run_unit_tests_in_container(
         courseid: int,
         assignment: int,
 ) -> str: 
-    path = Path("/podman/temp")
+    path = Path("./podman/temp").absolute()
     path.mkdir(parents=True, exist_ok=True)
+    print(path)
     files = get_unit_test_files_from_db(courseid, assignment)
-    files.append(get_assignment_files_from_database(courseid, assignment))
+    files.append(get_assignment_files_from_database(courseid, assignment, 1,
+                                                    "general_tests.py"))
     for (name, data) in files:
         with open(path/name, "wb") as f:
             f.write(data)
