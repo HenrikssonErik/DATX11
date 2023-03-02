@@ -31,7 +31,9 @@
 }
 
 .success {
+
   box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.8);
+ 
 }
 
 .form-group input {
@@ -39,10 +41,12 @@
   transition: box-shadow 0.2s ease-in-out;
 }
 
+
 /* .form-group {
   position: relative;
   padding-bottom: 1rem;
 } */
+
 
 .focus {
   box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
@@ -82,6 +86,7 @@ span {
   color: inherit; 
   cursor: pointer;
   text-decoration: underline;
+
 }
 
 
@@ -103,14 +108,12 @@ span {
   }
 }
 
-
 .flip-card {
   width: 400px;
   height: 100%;
   perspective: 1000px; /* Remove this if you don't want the 3D effect */
 }
 
-/* This container is needed to position the front and back side */
 .flip-card-inner {
   position: relative;
   width: 100%;
@@ -119,12 +122,10 @@ span {
   transform-style: preserve-3d;
 }
 
-/* Do an horizontal flip when you move the mouse over the flip box container */
 /* .flip-card:hover .flip-card-inner {
   transform: rotateY(180deg);
 } */
 
-/* Position the front and back side */
 .flip-card-front, .flip-card-back {
   position: absolute;
   width: 100%;
@@ -144,7 +145,3 @@ span {
   background-color: #eee;
 }
 
-.horizontal{
-  color:#26734d;
-  opacity: 1;
-}

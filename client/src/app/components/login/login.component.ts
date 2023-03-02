@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
+
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
@@ -14,6 +15,7 @@ export class LoginComponent implements OnInit {
   success: boolean = false;
   signUpFailed : boolean = false; 
   signUpSuccess : boolean = false;
+  bcrypt = require('bcryptjs');
 
   constructor(private fb: FormBuilder) {
   
@@ -40,6 +42,14 @@ export class LoginComponent implements OnInit {
       return;
     }
     // Logic to submit login
+    console.log(this.loginForm.get('password')?.value);
+
+    const hashedpassword = this.hashPassword(
+      this.loginForm.get('password')?.value
+    );
+
+    // Logic to submit form data to server
+    //TODO: create method to hash password with bcrypt(done) -> send to backend -> handle response with/without token
     this.success = true;
   }
 
@@ -69,6 +79,11 @@ export class LoginComponent implements OnInit {
       form.style.transform = 'rotateY(0deg)';
     }
   }
+  
+  hashPassword(password: string): string {
+    const hash: string = this.bcrypt.hashSync(password, 10);
+    return hash;
+  }
 
   onInputFocus(input: string, form : FormGroup) : void {
     const control = form.get(input);
@@ -77,7 +92,6 @@ export class LoginComponent implements OnInit {
       const isValid = control.valid;
       const isInvalid = control.invalid && (control.dirty || control.touched);
       const el = document.getElementById(input);
-  
       if (isValid) {
         el?.classList.add('success');
         el?.classList.remove('error');
