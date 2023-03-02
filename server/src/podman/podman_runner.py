@@ -1,5 +1,5 @@
 import subprocess
-from pathlib import Path
+# from pathlib import Path
 
 
 def gen_requirements(path: str):
@@ -8,7 +8,7 @@ def gen_requirements(path: str):
     --Parameters--
     path: Absolute path for directory
     """
-    cmd = ["pipreqs", "--force", path]
+    cmd = ["pipreqs", "--force", f"./{path}"]
     subprocess.run(cmd)
 
 
@@ -62,8 +62,9 @@ def run_container(image_name: str, test_dir: str) -> str:
 
 
 # This is to be changed, temporary poc
-test_files = str(Path(__file__).absolute().parent/"test_files_test_runner")
+test_files = "tempf"
 # This should be done once when assigment is to be tested
+
 gen_requirements(test_files)
 build_image("podman_test_executer", ".")
 json_feedback = run_container("podman_test_executer", test_files)

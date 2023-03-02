@@ -63,7 +63,7 @@ class TestFileHandler(unittest.TestCase):
         # only allows one file at the moment
         self.assertEqual(handle_files(files)[2], 406)
 
-    def test_send_pep8_checks_results(self,mock_connect):
+    def test_send_pep8_checks_results(self, mock_connect):
         with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
             file = FileStorage(BytesIO(fp.read()), filename="PythonFile.py")
     
