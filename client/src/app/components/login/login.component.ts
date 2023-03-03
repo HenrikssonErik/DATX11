@@ -4,6 +4,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { API_URL } from 'src/environments/environment';
 
+interface ResponseToToastr {
+  [key: string]: string[];
+}
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -97,14 +101,35 @@ export class LoginComponent implements OnInit {
           });
         },
         error: (err) => {
-          if (err.error.status === 'already_registered')
-            this.toastr.error(
+          /* This response_to_toastr should probably be relocated to a service where you
+          can fetch the appropriate [string,string] that should be output in the toastr 
+          @Maltecarlstedt please check this idea before anything is decided. */
+          const response_to_toastr: ResponseToToastr = {
+            already_registered: [
               'You seem to be registered already. Have you forgotten your password?',
               'User with that CID is already registered!',
-              {
-                closeButton: true,
-              }
-            );
+            ],
+            cid_missing: ['CID may not be empty', 'CID is empty!'],
+            email_missing: ['Email may not be empty', 'Email is empty!'],
+            wrong_format: [
+              'Email must be formatted as: CID@chalmers.se',
+              'Wrong formatting!',
+            ],
+            unallowed_tokens: [
+              'Please use letters only',
+              'Unallowed use of tokens!',
+            ],
+            pass_not_ok: [
+              'Possible characters include A-Z, a-z, 0-9 (OCH ALLA JÄVLA KÖNSTIGA KARAKTÄRER)',
+              'You cannot use those characters in the password!',
+            ],
+          };
+          /* console.log(err.error.status); */
+          const [errorMessage, errorTitle]: string[] =
+            response_to_toastr[err.error.status];
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
         },
       });
 

@@ -1,6 +1,5 @@
 import os
 
-
 def get_conn_string() -> str:
     file_path = os.path.join(
         os.path.dirname(

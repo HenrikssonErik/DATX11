@@ -30,7 +30,7 @@ def login():
 
 @app.route('/signUp', methods=['POST'])
 def sign_up():
-    response: tuple[str, Literal[200,406]] = user_registration(request.form)
+    response: tuple[str, Literal[200,400, 406]] = user_registration(request.form)
     
     sign_up_response = {}
     sign_up_response.update({'status': response[0]})

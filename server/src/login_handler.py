@@ -1,16 +1,40 @@
 from typing import Literal
-from flask import jsonify, request, Request, Response  # , jsonify
+from flask import jsonify, request, Request, Response
+import bcrypt
+#from werkzeug.security import gen_salt, generate_password_hash, check_password_hash
 from ..Database.connector import get_conn_string
 import psycopg2
-import bcrypt
+import string
 
-
-def user_registration(data: Request.form) -> tuple[str, Literal[200, 406]]:
-    salt = 100
+def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 400]]:
+    if not cid.isalpha():
+        return 'unallowed_tokens', 400
+    if not cid:
+        return 'cid_missing', 400
+    if not email:
+        return 'email_missing', 400
+    if not email == cid + "@chalmers.se":
+        return "wrong_format", 400
+    allowed_characters = set(string.ascii_letters + string.digits + string.punctuation)
+    if not set(pwd) <= allowed_characters:
+        return "pass_not_ok", 400
+    return "OK", 200
     
-    encodedPass = data['password'] + str(salt)
+#Break this god-function up if possible.
+def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
     
+    email: str = data['email'] 
+    cid: str = data['cid']
+    pwd = data['password']
     
+    invalid_data = check_data_input(cid, email, pwd)
+    
+    if(invalid_data[1] != 200):
+        return invalid_data
+    
+    print(email, "\n", cid, "\n", pwd)
+    salt = bcrypt.gensalt()
+    hashed_pass = bcrypt.hashpw(pwd.encode('utf-8')+salt, salt)
 
     conn = psycopg2.connect(get_conn_string())
     with conn:
@@ -22,7 +46,7 @@ def user_registration(data: Request.form) -> tuple[str, Literal[200, 406]]:
                 cur.execute(query, (
                     data['cid'], 
                     data['email'], 
-                    encodedPass, 
+                    hashed_pass, 
                     salt
                     ))
                 status = 'OK'
