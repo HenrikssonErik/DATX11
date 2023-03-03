@@ -4,7 +4,7 @@ from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
-from .login_handler import user_registration
+from .login_handler import user_registration, log_in
 
 # creating the Flask application
 app = Flask(__name__)
@@ -21,9 +21,9 @@ def test_get():
 
 @app.route('/login', methods=['POST'])
 def login():
-    password = request.form['password']
-    email = request.form['email']
-
+    password: str = request.form['password']
+    email: str = request.form['email']
+    log_in(email, password)
     return jsonify({'Pass': password, "Email": email})
 
 

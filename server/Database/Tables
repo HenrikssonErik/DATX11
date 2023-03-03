@@ -47,12 +47,12 @@ CREATE TABLE UserEmail (email TEXT PRIMARY KEY CONSTRAINT proper_email CHECK (em
 
 CREATE TABLE UserData (
 	userId SERIAL,
-	cid TEXT,
-	email TEXT,
-	passphrase TEXT,
-	salt TEXT,
+	cid TEXT NOT NULL,
+	email TEXT NOT NULL,
+	passphrase TEXT NOT NULL,
+	salt TEXT NOT NULL,
 	PRIMARY KEY (cid),
-	FOREIGN KEY (email) REFERENCES userEmail(email)
+	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
 
 CREATE TABLE Groups (
