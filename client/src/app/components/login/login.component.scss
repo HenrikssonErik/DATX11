@@ -16,7 +16,7 @@
 
 .form-check-input:checked {
   background-color: #216b42 !important;
-  border-color: #216b42
+  border-color: #216b42;
 }
 
 .form-check-input:focus {
@@ -31,9 +31,7 @@
 }
 
 .success {
-
   box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.8);
- 
 }
 
 .form-group input {
@@ -41,60 +39,53 @@
   transition: box-shadow 0.2s ease-in-out;
 }
 
-
 /* .form-group {
   position: relative;
   padding-bottom: 1rem;
 } */
-
 
 .focus {
   box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
 }
 
 h2 {
-  width: 100%; 
-  text-align: center; 
-  border-bottom: 1px solid #26734d; 
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #26734d;
   line-height: 0.1em;
-  margin: 10px 0 20px; 
+  margin: 10px 0 20px;
 }
 
 /* h2.signUpHorizontal {
   margin-top: 20px;
 } */
 
-span { 
+span {
   background: #eee;
-  padding: 0 10px; 
-  color: #26734d; 
-  font-weight: bold; 
-  text-transform: uppercase; 
-  font-size: 14px; 
+  padding: 0 10px;
+  color: #26734d;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
 }
 
 .error-message {
-  color: #8B0000;
+  color: #8b0000;
   margin-top: 5px;
   /* position: absolute;
   top: 100%;
   left: 0; */
-  
 }
 
-.signUp-link{
-  color: inherit; 
+.signUp-link {
+  color: inherit;
   cursor: pointer;
   text-decoration: underline;
-
 }
-
 
 .error {
   box-shadow: 0 0 0 0.2rem rgba(139, 0, 0, 0.5);
 }
-  
-
 
 @keyframes pulse {
   0% {
@@ -126,7 +117,8 @@ span {
   transform: rotateY(180deg);
 } */
 
-.flip-card-front, .flip-card-back {
+.flip-card-front,
+.flip-card-back {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -145,3 +137,6 @@ span {
   background-color: #eee;
 }
 
+.toastrLayout {
+  width: 2000px;
+}

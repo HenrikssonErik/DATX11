@@ -1,6 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { API_URL } from 'src/environments/environment';
 
 @Component({
@@ -18,7 +19,11 @@ export class LoginComponent implements OnInit {
   signUpSuccess: boolean = false;
   bcrypt = require('bcryptjs');
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -87,7 +92,19 @@ export class LoginComponent implements OnInit {
       })
       .subscribe({
         next: (response: any) => {
-          console.log(response);
+          this.toastr.success('Success!', 'User created!', {
+            closeButton: true,
+          });
+        },
+        error: (err) => {
+          if (err.error.status === 'already_registered')
+            this.toastr.error(
+              'You seem to be registered already. Have you forgotten your password?',
+              'User with that CID is already registered!',
+              {
+                closeButton: true,
+              }
+            );
         },
       });
 
