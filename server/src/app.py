@@ -1,6 +1,7 @@
 
 
-from flask import Flask, jsonify, make_response, request, send_file
+from typing import Literal
+from flask import Flask, Response, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
@@ -29,12 +30,13 @@ def login():
 
 @app.route('/signUp', methods=['POST'])
 def sign_up():
-    cid = request.form['cid']
-    password = request.form['password']
-    email = request.form['email']
-    user_registration(request)
-
-    return jsonify({"cid": cid, 'Pass': password, "Email": email})
+    response: tuple[str, Literal[200,406]] = user_registration(request.form)
+    
+    sign_up_response = {}
+    sign_up_response.update({'status': response[0]})
+    res = make_response(sign_up_response, response[1])
+    print(res)
+    return res
 
 
 @app.route('/files', methods=['POST'])

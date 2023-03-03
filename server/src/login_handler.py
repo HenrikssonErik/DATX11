@@ -1,13 +1,35 @@
-from flask import request, Request  # , jsonify
+from typing import Literal
+from flask import jsonify, request, Request, Response  # , jsonify
 from ..Database.connector import get_conn_string
 import psycopg2
 
 
-def user_registration(data: Request):
+def user_registration(data: Request.form) -> tuple[str, Literal[200, 406]]:
+    salt = 100
+    
+    encodedPass = data['password'] + str(salt)
+    
+    
 
     conn = psycopg2.connect(get_conn_string())
-    print("hej")
     with conn:
         with conn.cursor() as cur:
-            print("Connection to db")
+            try: 
+                query = """INSERT INTO UserData
+                (cid, email, passphrase, salt) 
+                VALUES (%s, %s, %s, %s);"""
+                cur.execute(query, (
+                    data['cid'], 
+                    data['email'], 
+                    encodedPass, 
+                    salt
+                    ))
+                status = 'OK'
+                res_code = 200
+            except:
+                status = 'already_registered'
+                res_code = 406
+                
     conn.close()
+    return status, res_code
+    

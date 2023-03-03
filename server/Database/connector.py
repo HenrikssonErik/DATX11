@@ -9,5 +9,4 @@ def get_conn_string() -> str:
         'connection_config.txt')
     with open(file_path, 'r') as file:
         conn_str = file.readline()
-        print(conn_str)
     return conn_str
