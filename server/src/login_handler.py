@@ -2,6 +2,7 @@ from typing import Literal
 from flask import jsonify, request, Request, Response  # , jsonify
 from ..Database.connector import get_conn_string
 import psycopg2
+import bcrypt
 
 
 def user_registration(data: Request.form) -> tuple[str, Literal[200, 406]]:
@@ -36,6 +37,14 @@ def user_registration(data: Request.form) -> tuple[str, Literal[200, 406]]:
 
 def log_in(email: str, password: str) -> str:
     conn = psycopg2.connect(dsn=get_conn_string())
+
+    salt = bcrypt.gensalt()
+    print(salt)
+    print(password)
+    print(bcrypt.hashpw(password.encode('utf8')+salt, salt))
+    print(bcrypt.hashpw(password.encode('utf8'), salt))
+    print(bcrypt.hashpw(b'heh', salt))
+    
     with conn:
         with conn.cursor() as cur:
             query_data = """SELECT userId, passphrase, salt FROM UserData
@@ -46,10 +55,13 @@ def log_in(email: str, password: str) -> str:
             data = cur.fetchone()
             print(data)
             id = data[0]
-            password = data[1]
-            salt = data[2]
+            passphrase: bytes = data[1]
+            salt: bytes = data[2]
     conn.close()
-    #TODO: check h^2 + salt = password
+
+    if (bcrypt.checkpw(passphrase.encode('utf8') + salt, password)):
+        # create token
+        print('') 
     #create token
     #return appropriate message
 

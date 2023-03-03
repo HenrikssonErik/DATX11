@@ -49,8 +49,8 @@ CREATE TABLE UserData (
 	userId SERIAL,
 	cid TEXT NOT NULL,
 	email TEXT NOT NULL,
-	passphrase TEXT NOT NULL,
-	salt TEXT NOT NULL,
+	passphrase BYTEA NOT NULL,
+	salt BYTEA NOT NULL,
 	PRIMARY KEY (cid),
 	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
