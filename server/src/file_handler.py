@@ -5,6 +5,7 @@ from . import general_tests
 import psycopg2
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
+from ..Database.connector import get_conn_string
 
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
