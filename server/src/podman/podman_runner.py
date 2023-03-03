@@ -8,7 +8,7 @@ def gen_requirements(path: str):
     --Parameters--
     path: Absolute path for directory
     """
-    cmd = ["pipreqs", "--force", f"./{path}"]
+    cmd = ["pipreqs", "--force", path]
     subprocess.run(cmd)
 
 
