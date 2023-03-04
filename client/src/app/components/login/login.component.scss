@@ -4,7 +4,7 @@
   height: 100%;
 }
 
-.form-control:focus {
+.focus-border:focus {
   border-color: #26734d;
   box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
 }
@@ -43,6 +43,10 @@
   position: relative;
   padding-bottom: 1rem;
 } */
+
+.input-group-text {
+  text-transform: lowercase;
+}
 
 .focus {
   box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);

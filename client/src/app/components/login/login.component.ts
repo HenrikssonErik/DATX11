@@ -22,6 +22,7 @@ export class LoginComponent implements OnInit {
   signUpFailed: boolean = false;
   signUpSuccess: boolean = false;
   bcrypt = require('bcryptjs');
+  cid: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -38,7 +39,7 @@ export class LoginComponent implements OnInit {
 
     this.signUpForm = this.fb.group({
       cid: ['', [Validators.required]],
-      signUpemail: ['', [Validators.required, Validators.email]],
+      signUpemail: [''],
       signUpPassword: ['', [Validators.required]],
       termsAndCon: ['', [Validators.required]],
     });
@@ -79,6 +80,13 @@ export class LoginComponent implements OnInit {
       this.signUpFailed = true;
       return;
     }
+
+    const cid = this.signUpForm.get('cid')?.value;
+    const email = `${cid}@chalmers.se`;
+
+    this.signUpForm.get('signUpemail')?.setValue(email);
+
+    console.log(this.signUpForm);
 
     const hashedpassword = this.hashPassword(
       this.signUpForm.get('signUpPassword')!.value
