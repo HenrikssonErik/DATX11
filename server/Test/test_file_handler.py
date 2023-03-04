@@ -96,7 +96,7 @@ class TestFileHandler(unittest.TestCase):
 class TestFileHandl(unittest.TestCase):
     def test_container(self):
         self.assertEqual(1, 1)
-        run_unit_tests_in_container(6, 6)
+        run_unit_tests_in_container(6, 6, 1)
 
 
 if __name__ == '__main__':

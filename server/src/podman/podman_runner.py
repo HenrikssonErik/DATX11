@@ -59,12 +59,3 @@ def run_container(image_name: str, test_dir: str) -> str:
                           text=True, capture_output=True)
     subprocess.run(["podman", "rmi", "-f", image_name])
     return proc.stdout
-
-
-# This is to be changed, temporary poc
-#test_files = "tempf"
-# This should be done once when assigment is to be tested
-
-#gen_requirements(test_files)
-#build_image("podman_test_executer", ".")
-#json_feedback = run_container("podman_test_executer", test_files)

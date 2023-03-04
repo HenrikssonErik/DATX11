@@ -1,6 +1,6 @@
 FROM python:3.11
 
-COPY tempf/requirements.txt /req/
+COPY temp/requirements.txt /req/
 RUN pip install -r /req/requirements.txt
 ADD podman_test_executer.py .
 

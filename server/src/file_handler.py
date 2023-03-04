@@ -282,16 +282,56 @@ def get_unit_test_files_from_db(
     return files
 
 
+def get_all_assignment_files_from_db(
+        course_id: int,
+        assignment: int,
+        group_id: int
+) -> list[tuple[str, io.BytesIO]]:
+    """Gets all the unit-tests for a specific assignment in a specific course.
+    """
+
+    conn = psycopg2.connect(
+        host="95.80.39.50",
+        port="5432",
+        dbname="hydrant",
+        user="postgres",
+        password="BorasSuger-1"
+    )
+
+    files: list[tuple[str, io.BytesIO]] = []
+
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT filename, filedata FROM AssignmentFiles
+                    WHERE GroupId        = %s
+                    AND   CourseId       = %s
+                    AND   FileType     NOT LIKE 'pdf'
+                    AND   \"assignment\"   = %s;
+                """,
+                (group_id, course_id, assignment)
+            )
+            for (filename, filedata) in cur:
+                files.append(
+                    (filename, io.BytesIO(filedata.tobytes()))
+                )
+
+    conn.close()
+    return files
+
+
 def run_unit_tests_in_container(
         courseid: int,
         assignment: int,
-) -> str: 
+        group_id: int,
+) -> str:
     path = Path(__file__).absolute().parent/"podman"/"temp"
     path.mkdir(parents=True, exist_ok=True)
     print(path)
     files = get_unit_test_files_from_db(courseid, assignment)
-#   files.append(get_assignment_files_from_database(1, courseid, assignment,
-#                                                    "general_tests.py"))
+    files += (get_all_assignment_files_from_db(courseid, assignment,
+                                               group_id))
     for (name, data) in files:
         with open(path/name, "wb") as f:
             f.write(data.read())
