@@ -2,6 +2,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
 import { API_URL } from 'src/environments/environment';
 
 interface ResponseToToastr {
@@ -27,7 +28,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private tooltipEnabler: TooltipEnablerService
   ) {}
 
   ngOnInit(): void {
@@ -43,6 +45,8 @@ export class LoginComponent implements OnInit {
       signUpPassword: ['', [Validators.required]],
       termsAndCon: ['', [Validators.required]],
     });
+
+    this.tooltipEnabler.enableTooltip();
   }
 
   onSubmitLogin(): void {
