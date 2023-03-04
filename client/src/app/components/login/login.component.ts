@@ -82,9 +82,7 @@ export class LoginComponent implements OnInit {
     }
 
     const cid = this.signUpForm.get('cid')?.value;
-    const email = `${cid}@chalmers.se`;
-
-    this.signUpForm.get('signUpemail')?.setValue(email);
+    this.signUpForm.get('signUpemail')?.setValue(cid);
 
     console.log(this.signUpForm);
 
@@ -94,7 +92,11 @@ export class LoginComponent implements OnInit {
     console.log('hashed: ' + hashedpassword);
     const formData = new FormData();
     formData.append('cid', this.signUpForm.get('cid')!.value);
-    formData.append('email', this.signUpForm.get('signUpemail')!.value);
+    //TODO: Fult som fan att concatenatea här men idk. Gör väl inget
+    formData.append(
+      'email',
+      this.signUpForm.get('signUpemail')!.value + '@chalmers.se'
+    );
     formData.append('password', hashedpassword);
     console.log(formData.get('password'));
 
