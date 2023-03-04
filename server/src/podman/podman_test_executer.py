@@ -4,8 +4,7 @@ import json
 
 if __name__ == "__main__":
     # test_dir = sys.argv[1]
-    test_dir = str(Path(__file__).absolute().parent/"tempf")
-    print(test_dir)
+    test_dir = str(Path(__file__).absolute().parent/"temp")
 
     test_suit = unittest.TestLoader().discover(
         test_dir, pattern="test_*.py"

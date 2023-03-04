@@ -13,7 +13,7 @@ __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
 
 __allowed_filenames = {"Test1.pdf", "test2.txt",
-                       "1ha1.py", "PythonFile.py"}
+                       "1ha1.py", "PythonFile.py", "my_test_file.py"}
 __nr_of_files = 1
 
 # for DB, should be recieved from frontend(?) later on
@@ -330,14 +330,15 @@ def run_unit_tests_in_container(
     path.mkdir(parents=True, exist_ok=True)
     print(path)
     files = get_unit_test_files_from_db(courseid, assignment)
-    files += (get_all_assignment_files_from_db(courseid, assignment,
-                                               group_id))
+    files.extend(get_all_assignment_files_from_db(courseid, assignment,
+                                                  group_id))
     for (name, data) in files:
+        print(name)
         with open(path/name, "wb") as f:
             f.write(data.read())
     gen_requirements(str(path))
     build_image("podman_test_executer", str(path.parent))
-    json_feedback = run_container("podman_test_executer", path)
+    json_feedback = run_container("podman_test_executer", str(path))
     shutil.rmtree(str(path))
     print(json_feedback)
     return json_feedback

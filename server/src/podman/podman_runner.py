@@ -18,6 +18,7 @@ def copy_files(path: str, container_id: str):
     path: Absolute path for directory
     container_id: Specifies container
     """
+    print(path)
     cmd = ["podman", "cp", path, f"{container_id}:/"]
     subprocess.run(cmd)
 
@@ -57,5 +58,6 @@ def run_container(image_name: str, test_dir: str) -> str:
     copy_files(test_dir, id)
     proc = subprocess.run(["podman", "start", "--attach", id],
                           text=True, capture_output=True)
+    json_feedback = proc.stdout
     subprocess.run(["podman", "rmi", "-f", image_name])
-    return proc.stdout
+    return json_feedback
