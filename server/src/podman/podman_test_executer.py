@@ -23,5 +23,4 @@ if __name__ == "__main__":
         ],
         "skipped": [(e[0].id(), e[1]) for e in results.skipped],
     }
-
     print(json.dumps(json_result))

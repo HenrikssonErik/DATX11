@@ -17,13 +17,15 @@ __allowed_filenames = {"Test1.pdf", "test2.txt",
 __nr_of_files = 1
 
 # for DB, should be recieved from frontend(?) later on
-course_id = 6
-assignment = 6
-group_id = 1
+course_id = 2
+assignment = 2
+group_id = 2
 
 
 def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
-                                                    dict[str, str], int]:
+                                                    dict[str, str],
+                                                    dict[str, str],
+                                                    int]:
     """Sanitizes files, checks for number of files,
     allowed file names and file types
     Returns: json object with feedback on submitted files
@@ -56,8 +58,9 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
 
     if (res_code == 200):
         save_to_temp_and_database(files, response_items)
-
-    return response_items, number_of_files, res_code
+        unittest_feedback = {"unittest_feedback": 
+                             run_unit_tests_in_container(2, 2, 2)}
+    return response_items, number_of_files, unittest_feedback, res_code
 
 
 def save_to_temp_and_database(
@@ -340,5 +343,4 @@ def run_unit_tests_in_container(
     build_image("podman_test_executer", str(path.parent))
     json_feedback = run_container("podman_test_executer", str(path))
     shutil.rmtree(str(path))
-    print(json_feedback)
     return json_feedback
