@@ -138,10 +138,6 @@ export class LoginComponent implements OnInit {
             pass_not_ok: [
               'Possible characters include A-Z, a-z, 0-9 (OCH ALLA JÄVLA KÖNSTIGA KARAKTÄRER)',
               'You cannot use those characters in the password!',
-            ],            
-            cid_does_not_exist: [
-              'CID is not correct.',
-              'CID is not correct.'
             ],
           };
           /* console.log(err.error.status); */

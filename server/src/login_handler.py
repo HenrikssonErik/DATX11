@@ -5,7 +5,6 @@ import bcrypt
 from ..Database.connector import get_conn_string
 import psycopg2
 import string
-import subprocess
 
 def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 400]]:
     if not cid.isalpha():
@@ -19,16 +18,8 @@ def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 
     allowed_characters = set(string.ascii_letters + string.digits + string.punctuation)
     if not set(pwd) <= allowed_characters:
         return "pass_not_ok", 400
-    if not check_against_ldap(cid):
-        return "cid_does_not_exist", 400
     return "OK", 200
     
-def check_against_ldap(cid: str):
-    output = subprocess.run(["go", "run", "goLookUp/cidCheck.go", cid], capture_output=True)
-    result = output.stdout.decode().strip()  # convert bytes to string and remove whitespace
-    print(result)
-    return result == "User Exists"
-
 #Break this god-function up if possible.
 def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
     
