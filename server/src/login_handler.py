@@ -39,27 +39,23 @@ def log_in(email: str, password: str) -> str:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     salt = bcrypt.gensalt()
-    print(salt)
-    print(password)
-    print(bcrypt.hashpw(password.encode('utf8')+salt, salt))
-    print(bcrypt.hashpw(password.encode('utf8'), salt))
-    print(bcrypt.hashpw(b'heh', salt))
     
     with conn:
         with conn.cursor() as cur:
             query_data = """SELECT userId, passphrase, salt FROM UserData
                         WHERE userdata.email = %s"""
-            print(type(email))
-            print(email)
             cur.execute(query_data, (email,))
             data = cur.fetchone()
-            print(data)
             id = data[0]
-            passphrase: bytes = data[1]
-            salt: bytes = data[2]
+            passphrase: bytes = data[1].tobytes()
+            #salt: bytes = data[2].tobytes()
     conn.close()
-    test = bcrypt.checkpw(passphrase.encode('utf8') + salt, password)
-    print(test)
+    print(password)
+    print(passphrase)
+    print(bcrypt.compare(password, passphrase))
+    #test = bcrypt.checkpw(passphrase.encode('utf8') + salt, password)
+
+    #print(test)
     
     #create token
     #return appropriate message

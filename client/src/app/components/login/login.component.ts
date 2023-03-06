@@ -130,7 +130,8 @@ export class LoginComponent implements OnInit {
   }
 
   hashPassword(password: string): string {
-    const hash: string = this.bcrypt.hashSync(password, 10);
+    console.log('before hash:', password);
+    const hash: string = this.bcrypt.hashSync(password, 12);
     return hash;
   }
 
