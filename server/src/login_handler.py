@@ -41,13 +41,12 @@ def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
         with conn.cursor() as cur:
             try: 
                 query = """INSERT INTO UserData
-                (cid, email, passphrase, salt) 
+                (cid, email, passphrase) 
                 VALUES (%s, %s, %s, %s);"""
                 cur.execute(query, (
                     data['cid'], 
-                    data['email'], 
-                    hashed_pass, 
-                    salt
+                    data['email'],
+                    hashed_pass
                     ))
                 status = 'OK'
                 res_code = 200
@@ -78,7 +77,7 @@ def log_in(email: str, password: str) -> str:
     print(bcrypt.hashpw(password.encode('utf8') + salt, salt))
     print(bcrypt.hashpw(password.encode('utf8') + salt, bcrypt.gensalt()))
     print(passphrase)
-    
+
     #use the line below to check for correct password, (password is from frontend, passphrase and salt i db)
     print(bcrypt.checkpw(password.encode('utf8'), passphrase))
     #test = bcrypt.checkpw(passphrase.encode('utf8') + salt, password)
