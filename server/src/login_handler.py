@@ -42,7 +42,7 @@ def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
             try: 
                 query = """INSERT INTO UserData
                 (cid, email, passphrase) 
-                VALUES (%s, %s, %s, %s);"""
+                VALUES (%s, %s, %s);"""
                 cur.execute(query, (
                     data['cid'], 
                     data['email'],
@@ -71,7 +71,6 @@ def log_in(email: str, password: str) -> str:
             data = cur.fetchone()
             id = data[0]
             passphrase: bytes = data[1].tobytes()
-            salt: bytes = data[2].tobytes()
     conn.close()
     print(password.encode('utf8') + salt)
     print(bcrypt.hashpw(password.encode('utf8') + salt, salt))
