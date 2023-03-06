@@ -24,12 +24,13 @@ def test_get():
 def login():
     password: str = request.form['password']
     email: str = request.form['email']
-    log_in(email, password)
-    return jsonify({'Pass': password, "Email": email})
-
+    data = log_in(email, password)
+    res = make_response(data[0], data[1])
+    return res
 
 @app.route('/signUp', methods=['POST'])
 def sign_up():
+    print("cghj")
     response: tuple[str, Literal[200,400, 406]] = user_registration(request.form)
     
     sign_up_response = {}

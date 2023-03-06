@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Literal
 from flask import jsonify, request, Request, Response
 import bcrypt
@@ -5,6 +6,8 @@ import bcrypt
 from ..Database.connector import get_conn_string
 import psycopg2
 import string
+import jwt
+
 
 def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 400]]:
     if not cid.isalpha():
@@ -20,7 +23,7 @@ def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 
         return "pass_not_ok", 400
     return "OK", 200
     
-#Break this god-function up if possible.
+# Break this god-function up if possible.
 def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
     
     email: str = data['email'] 
@@ -58,32 +61,54 @@ def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
     return status, res_code
     
 
-def log_in(email: str, password: str) -> str:
+def log_in(email: str, password: str) -> tuple[str, Literal[200, 401]]:
     conn = psycopg2.connect(dsn=get_conn_string())
 
-    salt = bcrypt.gensalt()
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT userId, passphrase FROM UserData
+                            WHERE userdata.email = %s"""
+                cur.execute(query_data, (email,))
+                data = cur.fetchone()
+                id = data[0]
+                passphrase: bytes = data[1].tobytes()
+        conn.close()
+        if not data:
+            raise Exception("Wrong Credentials")
+    # use the line below to check for correct password, (password is from frontend, passphrase and salt i db)
+        if (bcrypt.checkpw(password.encode('utf8'), passphrase)):
+            token = create_token(id)
+            return token, 200
+        else:
+            raise Exception("Wrong Credentials")
     
-    with conn:
-        with conn.cursor() as cur:
-            query_data = """SELECT userId, passphrase FROM UserData
-                        WHERE userdata.email = %s"""
-            cur.execute(query_data, (email,))
-            data = cur.fetchone()
-            id = data[0]
-            passphrase: bytes = data[1].tobytes()
-    conn.close()
-    print(password.encode('utf8') + salt)
-    print(bcrypt.hashpw(password.encode('utf8') + salt, salt))
-    print(bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt()))
-    print(passphrase)
+    except Exception as e:
+        print(e)
+        return "Wrong credentials", 401
 
-    #use the line below to check for correct password, (password is from frontend, passphrase and salt i db)
-    print(bcrypt.checkpw(password.encode('utf8'), passphrase))
-    #test = bcrypt.checkpw(passphrase.encode('utf8') + salt, password)
 
-    #print(test)
-    
-    #create token
-    #return appropriate message
+def create_token(id: int) -> tuple:
+    data = {'iss': 'Hydrant',
+            'id': id,
+            'exp': datetime.utcnow() + timedelta(hours=1)
+            }
+    # generate secret key, set exp-time
+    token = jwt.encode(payload=data, key='secret')
+    return token
 
-    return "token"
+
+def verify_token(token: str) -> int:
+    try:
+        # Verify and decode the token
+        decoded_token: dict = jwt.decode(token, 'secret', algorithms=['HS256'])
+        # If decoding was successful, return the user id
+        return decoded_token['id']
+
+    except jwt.ExpiredSignatureError:
+        # If the token has expired, raise an exception
+        raise Exception('Invalid token')
+
+    except jwt.InvalidTokenError:
+        # If the token is invalid, raise an exception
+        raise Exception('Invalid token')
