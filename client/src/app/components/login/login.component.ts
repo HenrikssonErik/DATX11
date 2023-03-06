@@ -2,7 +2,12 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
 import { API_URL } from 'src/environments/environment';
+
+interface ResponseToToastr {
+  [key: string]: string[];
+}
 
 @Component({
   selector: 'app-login',
@@ -18,11 +23,13 @@ export class LoginComponent implements OnInit {
   signUpFailed: boolean = false;
   signUpSuccess: boolean = false;
   bcrypt = require('bcryptjs');
+  cid: string = '';
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private tooltipEnabler: TooltipEnablerService
   ) {}
 
   ngOnInit(): void {
@@ -34,10 +41,12 @@ export class LoginComponent implements OnInit {
 
     this.signUpForm = this.fb.group({
       cid: ['', [Validators.required]],
-      signUpemail: ['', [Validators.required, Validators.email]],
+      signUpemail: [''],
       signUpPassword: ['', [Validators.required]],
       termsAndCon: ['', [Validators.required]],
     });
+
+    this.tooltipEnabler.enableTooltip();
   }
 
   onSubmitLogin(): void {
@@ -76,13 +85,22 @@ export class LoginComponent implements OnInit {
       return;
     }
 
+    const cid = this.signUpForm.get('cid')?.value;
+    this.signUpForm.get('signUpemail')?.setValue(cid);
+
+    console.log(this.signUpForm);
+
     const hashedpassword = this.hashPassword(
       this.signUpForm.get('signUpPassword')!.value
     );
     console.log('hashed: ' + hashedpassword);
     const formData = new FormData();
     formData.append('cid', this.signUpForm.get('cid')!.value);
-    formData.append('email', this.signUpForm.get('signUpemail')!.value);
+    //TODO: Fult som fan att concatenatea här men idk. Gör väl inget
+    formData.append(
+      'email',
+      this.signUpForm.get('signUpemail')!.value + '@chalmers.se'
+    );
     formData.append('password', hashedpassword);
     console.log(formData.get('password'));
 
@@ -97,14 +115,35 @@ export class LoginComponent implements OnInit {
           });
         },
         error: (err) => {
-          if (err.error.status === 'already_registered')
-            this.toastr.error(
+          /* This response_to_toastr should probably be relocated to a service where you
+          can fetch the appropriate [string,string] that should be output in the toastr 
+          @Maltecarlstedt please check this idea before anything is decided. */
+          const response_to_toastr: ResponseToToastr = {
+            already_registered: [
               'You seem to be registered already. Have you forgotten your password?',
               'User with that CID is already registered!',
-              {
-                closeButton: true,
-              }
-            );
+            ],
+            cid_missing: ['CID may not be empty', 'CID is empty!'],
+            email_missing: ['Email may not be empty', 'Email is empty!'],
+            wrong_format: [
+              'Email must be formatted as: CID@chalmers.se',
+              'Wrong formatting!',
+            ],
+            unallowed_tokens: [
+              'Please use letters only',
+              'Unallowed use of tokens!',
+            ],
+            pass_not_ok: [
+              'Possible characters include A-Z, a-z, 0-9 (OCH ALLA JÄVLA KÖNSTIGA KARAKTÄRER)',
+              'You cannot use those characters in the password!',
+            ],
+          };
+          /* console.log(err.error.status); */
+          const [errorMessage, errorTitle]: string[] =
+            response_to_toastr[err.error.status];
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
         },
       });
 

@@ -16,8 +16,9 @@
                       signUpForm.get('cid')?.touched)
                 }"
                 type="text"
+                [(ngModel)]="cid"
                 formControlName="cid"
-                class="form-control"
+                class="form-control focus-border"
                 id="cid"
                 placeholder="Enter CID"
                 (focus)="onInputFocus('cid', signUpForm)"
@@ -28,23 +29,29 @@
               </div> -->
             </div>
             <div class="form-group mb-3">
-              <label for="signUpemail" class="text-muted">Email address</label>
-              <input
-                [ngClass]="{
-                  success: signUpForm.get('signUpemail')?.valid,
-                  error:
-                    signUpForm.get('signUpemail')?.invalid &&
-                    (signUpForm.get('signUpemail')?.dirty ||
-                      signUpForm.get('signUpemail')?.touched)
-                }"
-                type="email"
-                formControlName="signUpemail"
-                class="form-control"
-                id="signUpemail"
-                placeholder="Enter email"
-                (focus)="onInputFocus('email', signUpForm)"
-                required
-              />
+              <label for="signUpemail" class="text-muted"
+                >Email address<span
+                  ><i
+                    class="fa-regular fa-circle-question"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Only Chalmers email is allowed"
+                  ></i></span
+              ></label>
+              <div class="input-group">
+                <input
+                  type="email"
+                  formControlName="signUpemail"
+                  class="form-control text-muted"
+                  onfocus="this.blur()"
+                  id="signUpemail"
+                  [value]="cid"
+                  readonly
+                />
+                <span class="input-group-text" id="emailending"
+                  >@chalmers.se</span
+                >
+              </div>
               <!--  <div class="error-message" *ngIf="signUpForm.get('signUpemail')?.invalid && (signUpForm.get('signUpemail')?.dirty || signUpForm.get('signUpemail')?.touched)">
                 Please enter a valid email address.
               </div> -->
@@ -61,7 +68,7 @@
                 }"
                 type="password"
                 formControlName="signUpPassword"
-                class="form-control"
+                class="form-control focus-border"
                 id="signUpPassword"
                 placeholder="Password"
                 (focus)="onInputFocus('signUpPassword', signUpForm)"
@@ -80,7 +87,10 @@
               />
               <label class="form-check-label text-muted" for="termsAndCon"
                 >I agree to the
-                <a style="color: inherit" href="#"
+                <a
+                  href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley"
+                  style="color: inherit"
+                  target="_blank"
                   >Terms and Conditions</a
                 ></label
               >
@@ -127,7 +137,7 @@
                 }"
                 type="email"
                 formControlName="email"
-                class="form-control"
+                class="form-control focus-border"
                 id="email"
                 placeholder="Enter email"
                 (focus)="onInputFocus('email', loginForm)"
@@ -149,7 +159,7 @@
                 }"
                 type="password"
                 formControlName="password"
-                class="form-control"
+                class="form-control focus-border"
                 id="password"
                 placeholder="Password"
                 (focus)="onInputFocus('password', loginForm)"
