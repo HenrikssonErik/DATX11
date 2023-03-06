@@ -56,14 +56,15 @@ export class LoginComponent implements OnInit {
     }
     // Logic to submit login
 
-    const hashedpassword = this.hashPassword(
-      this.loginForm.get('password')?.value
-    );
-    console.log('hashed: ' + hashedpassword);
+    /*const hashedpassword = this.hashPassword(
+      this.loginForm.get('password')?.value,
+      this.loginForm.get('email')?.value
+    ); */
+
     const formData = new FormData();
     formData.append('email', this.loginForm.get('email')?.value);
-    formData.append('password', hashedpassword);
-    console.log(formData.get('password'));
+    formData.append('password', this.loginForm.get('password')!.value);
+    //console.log(formData.get('password'));
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/` + 'login', formData, {
@@ -90,10 +91,11 @@ export class LoginComponent implements OnInit {
 
     console.log(this.signUpForm);
 
-    const hashedpassword = this.hashPassword(
-      this.signUpForm.get('signUpPassword')!.value
-    );
-    console.log('hashed: ' + hashedpassword);
+    /*const hashedpassword = this.hashPassword(
+      this.signUpForm.get('signUpPassword')!.value,
+      this.signUpForm.get('signUpemail')!.value
+    ); */
+
     const formData = new FormData();
     formData.append('cid', this.signUpForm.get('cid')!.value);
     //TODO: Fult som fan att concatenatea här men idk. Gör väl inget
@@ -101,8 +103,8 @@ export class LoginComponent implements OnInit {
       'email',
       this.signUpForm.get('signUpemail')!.value + '@chalmers.se'
     );
-    formData.append('password', hashedpassword);
-    console.log(formData.get('password'));
+    formData.append('password', this.signUpForm.get('signUpPassword')!.value);
+    //console.log(formData.get('password'));
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/` + 'signUp', formData, {
@@ -168,11 +170,10 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  hashPassword(password: string): string {
-    console.log('before hash:', password);
-    const hash: string = this.bcrypt.hashSync(password, 12);
+  /*hashPassword(password: string, email: string): string {
+    const has h: string = this.bcrypt.hashSync(password, 10);
     return hash;
-  }
+  } */
 
   onInputFocus(input: string, form: FormGroup): void {
     const control = form.get(input);

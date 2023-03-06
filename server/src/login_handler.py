@@ -34,7 +34,7 @@ def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
     
     print(email, "\n", cid, "\n", pwd)
     salt = bcrypt.gensalt()
-    hashed_pass = bcrypt.hashpw(pwd.encode('utf-8')+salt, salt)
+    hashed_pass = bcrypt.hashpw(pwd.encode('utf-8'), salt)
 
     conn = psycopg2.connect(get_conn_string())
     with conn:
@@ -72,11 +72,15 @@ def log_in(email: str, password: str) -> str:
             data = cur.fetchone()
             id = data[0]
             passphrase: bytes = data[1].tobytes()
-            #salt: bytes = data[2].tobytes()
+            salt: bytes = data[2].tobytes()
     conn.close()
-    print(password)
+    print(password.encode('utf8') + salt)
+    print(bcrypt.hashpw(password.encode('utf8') + salt, salt))
+    print(bcrypt.hashpw(password.encode('utf8') + salt, bcrypt.gensalt()))
     print(passphrase)
-    print(bcrypt.compare(password, passphrase))
+    
+    #use the line below to check for correct password, (password is from frontend, passphrase and salt i db)
+    print(bcrypt.checkpw(password.encode('utf8'), passphrase))
     #test = bcrypt.checkpw(passphrase.encode('utf8') + salt, password)
 
     #print(test)
