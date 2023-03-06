@@ -58,10 +58,9 @@ def log_in(email: str, password: str) -> str:
             passphrase: bytes = data[1]
             salt: bytes = data[2]
     conn.close()
-
-    if (bcrypt.checkpw(passphrase.encode('utf8') + salt, password)):
-        # create token
-        print('') 
+    test = bcrypt.checkpw(passphrase.encode('utf8') + salt, password)
+    print(test)
+    
     #create token
     #return appropriate message
 
