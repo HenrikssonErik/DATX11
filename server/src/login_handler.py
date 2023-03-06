@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Literal
 from flask import jsonify, request, Request, Response
 import bcrypt
-#from werkzeug.security import gen_salt, generate_password_hash, check_password_hash
+# from werkzeug.security import gen_salt, generate_password_hash, check_password_hash
 from ..Database.connector import get_conn_string
 import psycopg2
 import string
@@ -18,23 +18,25 @@ def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 
         return 'email_missing', 400
     if not email == cid + "@chalmers.se":
         return "wrong_format", 400
-    allowed_characters = set(string.ascii_letters + string.digits + string.punctuation)
+    allowed_characters = set(string.ascii_letters + string.digits +
+                             string.punctuation)
     if not set(pwd) <= allowed_characters:
         return "pass_not_ok", 400
     return "OK", 200
-    
+
+
 # Break this god-function up if possible.
 def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
-    
+
     email: str = data['email'] 
     cid: str = data['cid']
     pwd = data['password']
-    
+
     invalid_data = check_data_input(cid, email, pwd)
-    
-    if(invalid_data[1] != 200):
+
+    if (invalid_data[1] != 200):
         return invalid_data
-    
+
     print(email, "\n", cid, "\n", pwd)
     salt = bcrypt.gensalt()
     hashed_pass = bcrypt.hashpw(pwd.encode('utf-8'), salt)
@@ -56,10 +58,10 @@ def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
             except:
                 status = 'already_registered'
                 res_code = 406
-                
+
     conn.close()
     return status, res_code
-    
+
 
 def log_in(email: str, password: str) -> tuple[str, Literal[200, 401]]:
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -82,7 +84,7 @@ def log_in(email: str, password: str) -> tuple[str, Literal[200, 401]]:
             return token, 200
         else:
             raise Exception("Wrong Credentials")
-    
+
     except Exception as e:
         print(e)
         return "Wrong credentials", 401
@@ -112,3 +114,5 @@ def verify_token(token: str) -> int:
     except jwt.InvalidTokenError:
         # If the token is invalid, raise an exception
         raise Exception('Invalid token')
+
+# TODO method to construct secret key
