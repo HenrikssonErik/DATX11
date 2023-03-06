@@ -65,7 +65,7 @@ def log_in(email: str, password: str) -> str:
     
     with conn:
         with conn.cursor() as cur:
-            query_data = """SELECT userId, passphrase, salt FROM UserData
+            query_data = """SELECT userId, passphrase FROM UserData
                         WHERE userdata.email = %s"""
             cur.execute(query_data, (email,))
             data = cur.fetchone()
@@ -74,7 +74,7 @@ def log_in(email: str, password: str) -> str:
     conn.close()
     print(password.encode('utf8') + salt)
     print(bcrypt.hashpw(password.encode('utf8') + salt, salt))
-    print(bcrypt.hashpw(password.encode('utf8') + salt, bcrypt.gensalt()))
+    print(bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt()))
     print(passphrase)
 
     #use the line below to check for correct password, (password is from frontend, passphrase and salt i db)
