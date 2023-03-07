@@ -13,7 +13,8 @@ __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
 
 __allowed_filenames = {"Test1.pdf", "test2.txt",
-                       "1ha1.py", "PythonFile.py", "my_test_file.py"}
+                       "1ha1.py", "PythonFile.py", "my_test_file.py",
+                       "my_test_file_demo.py"}
 __nr_of_files = 1
 
 # for DB, should be recieved from frontend(?) later on
@@ -30,6 +31,7 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
     allowed file names and file types
     Returns: json object with feedback on submitted files
     """
+    unittest_feedback = {"unittest_feedback": ""}
     number_of_files = {}
     res_code = 200
     file_amount, res_code = ("OK", res_code)  \
@@ -55,11 +57,12 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
         res_object.update({"file_type": file_type})
 
         response_items.append({"tested_file": res_object})
-
     if (res_code == 200):
         save_to_temp_and_database(files, response_items)
         unittest_feedback = {"unittest_feedback": 
-                             run_unit_tests_in_container(2, 2, 2)}
+                             run_unit_tests_in_container(course_id,
+                                                         assignment, group_id)}
+        
     return response_items, number_of_files, unittest_feedback, res_code
 
 
@@ -140,7 +143,7 @@ def allowed_file(filename: str) -> bool:
 def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
     """Saves the teacher's tests to the database"""
 
-    file.filename = file.filename + 'TestFile.py'
+    file.filename = 'test_' + file.filename
     remove_existing_test_file(file.filename, course_id, assignment)
     binary = psycopg2.Binary(file.stream.read())
 
