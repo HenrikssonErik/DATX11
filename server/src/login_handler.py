@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import json
 from typing import Literal
 from flask import jsonify, request, Request, Response
 import bcrypt
@@ -113,7 +114,7 @@ def create_token(id: int) -> tuple:
     # generate secret key, set exp-time
 
     token = jwt.encode(payload=data, key=__SECRET_KEY)
-    return token
+    return {'Token': token}
 
 
 def verify_token(token: str) -> int:

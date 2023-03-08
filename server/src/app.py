@@ -26,7 +26,7 @@ def login():
     password: str = request.form['password']
     email: str = request.form['email']
     data = log_in(email, password)
-    res = make_response(data[0], data[1])
+    res = make_response(jsonify(data[0]), data[1])
     return res
 
 @app.route('/signUp', methods=['POST'])

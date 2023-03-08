@@ -54,12 +54,6 @@ export class LoginComponent implements OnInit {
       this.submitFailed = true;
       return;
     }
-    // Logic to submit login
-
-    /*const hashedpassword = this.hashPassword(
-      this.loginForm.get('password')?.value,
-      this.loginForm.get('email')?.value
-    ); */
 
     const formData = new FormData();
     formData.append('email', this.loginForm.get('email')?.value);
@@ -73,7 +67,11 @@ export class LoginComponent implements OnInit {
       .subscribe({
         //TODO: save token and id
         next: (response: any) => {
-          console.log(response);
+          console.log(response.body.Token);
+          if (response.body.token) {
+            document.cookie = `sessionToken=${response.body.token}
+          )}`;
+          }
         },
       });
 
