@@ -67,7 +67,6 @@ export class LoginComponent implements OnInit {
       .subscribe({
         //TODO: save token and id
         next: (response: any) => {
-          console.log(response.body.Token);
           if (response.body.token) {
             document.cookie = `sessionToken=${response.body.token}
           )}`;
