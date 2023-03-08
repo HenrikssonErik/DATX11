@@ -7,6 +7,21 @@ from ..Database.connector import get_conn_string
 import psycopg2
 import string
 import jwt
+import random
+
+__SECRET_KEY: str = None
+
+
+def createKey():
+    global __SECRET_KEY
+    __SECRET_KEY = random_string()
+
+
+def random_string() -> str:
+    # length of key, with 8 chars it takes aproxiamtley 1 year to brute force, we use 40 chars
+    length = 40
+    letters_and_digits = string.ascii_lowercase + string.digits
+    return ''.join(random.choice(letters_and_digits) for i in range(length))
 
 
 def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 400]]:
@@ -96,14 +111,16 @@ def create_token(id: int) -> tuple:
             'exp': datetime.utcnow() + timedelta(hours=1)
             }
     # generate secret key, set exp-time
-    token = jwt.encode(payload=data, key='secret')
+
+    token = jwt.encode(payload=data, key=__SECRET_KEY)
     return token
 
 
 def verify_token(token: str) -> int:
     try:
         # Verify and decode the token
-        decoded_token: dict = jwt.decode(token, 'secret', algorithms=['HS256'])
+        decoded_token: dict = jwt.decode(token, __SECRET_KEY,
+                                         algorithms=['HS256'])
         # If decoding was successful, return the user id
         return decoded_token['id']
 

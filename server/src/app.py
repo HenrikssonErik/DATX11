@@ -5,16 +5,17 @@ from flask import Flask, Response, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
-from .login_handler import user_registration, log_in
+from .login_handler import user_registration, log_in, createKey
 
 # creating the Flask application
 app = Flask(__name__)
 
 CORS(app)
+# creating private key for signing tokens
+createKey()
+
 
 # useless in the future, TODO: Remove along with front end button
-
-
 @app.route('/test', methods=['GET'])
 def test_get():
     return jsonify("hello")
@@ -31,7 +32,7 @@ def login():
 @app.route('/signUp', methods=['POST'])
 def sign_up():
     print("cghj")
-    response: tuple[str, Literal[200,400, 406]] = user_registration(request.form)
+    response: tuple[str, Literal[200, 400, 406]] = user_registration(request.form)
     
     sign_up_response = {}
     sign_up_response.update({'status': response[0]})
