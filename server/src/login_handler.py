@@ -40,7 +40,7 @@ def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 
 
 
 def user_registration(data: Request.form) -> \
-        tuple[str, Literal[200, 400, 401, 406]]:
+        tuple[dict[str, str], Literal[200, 400, 401, 406]]:
 
     email: str = data['email']
     cid: str = data['cid']
@@ -49,21 +49,23 @@ def user_registration(data: Request.form) -> \
     invalid_data = check_data_input(cid, email, pwd)
 
     if (invalid_data[1] != 200):
-        return invalid_data
+        return {'error': invalid_data[0]}, invalid_data[1]
 
     salt: bytes = bcrypt.gensalt()
     hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
 
-    res_query: tuple[str, Literal[200, 406]
+    res_query: tuple[dict[str, str], Literal[200, 406]
                      ] = registration_query(cid, email, hashed_pass)
 
     res_object = (log_in(email, pwd)) if (res_query[1] == 200) else (res_query)
+
+    print(res_object)
 
     return res_object
 
 
 def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
-        tuple[str, Literal[200, 406]]:
+        tuple[dict[str, str], Literal[200, 406]]:
     conn = psycopg2.connect(get_conn_string())
     with conn:
         with conn.cursor() as cur:
@@ -83,10 +85,10 @@ def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
                 status = 'already_registered'
                 res_code = 406
     conn.close()
-    return status, res_code
+    return {'error': status}, res_code
 
 
-def log_in(email: str, password: str) -> tuple[str, Literal[200, 401]]:
+def log_in(email: str, password: str) -> tuple[dict[str, str], Literal[200, 401]]:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -103,17 +105,17 @@ def log_in(email: str, password: str) -> tuple[str, Literal[200, 401]]:
             raise Exception("Wrong Credentials")
     # use the line below to check for correct password, (password is from frontend, passphrase and salt i db)
         if (bcrypt.checkpw(password.encode('utf8'), passphrase)):
-            token = create_token(id)
+            token: dict[str, str] = create_token(id)
             return token, 200
         else:
             raise Exception("Wrong Credentials")
 
     except Exception as e:
         print(e)
-        return "Wrong Credentials", 401
+        return {'error': "Wrong Credentials"}, 401
 
 
-def create_token(id: int) -> dict:
+def create_token(id: int) -> dict[str, str]:
     data = {'iss': 'Hydrant',
             'id': id,
             'exp': datetime.utcnow() + timedelta(hours=1)
