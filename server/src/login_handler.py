@@ -28,8 +28,6 @@ def random_string() -> str:
 def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 400]]:
     if not cid.isalpha():
         return 'unallowed_tokens', 400
-    if not cid:
-        return 'cid_missing', 400
     if not email:
         return 'email_missing', 400
     if not email == cid + "@chalmers.se":
@@ -44,7 +42,7 @@ def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 
 # Break this god-function up if possible.
 def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
 
-    email: str = data['email'] 
+    email: str = data['email']
     cid: str = data['cid']
     pwd = data['password']
 
@@ -60,18 +58,19 @@ def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
     conn = psycopg2.connect(get_conn_string())
     with conn:
         with conn.cursor() as cur:
-            try: 
+            try:
                 query = """INSERT INTO UserData
                 (cid, email, passphrase) 
                 VALUES (%s, %s, %s);"""
                 cur.execute(query, (
-                    data['cid'], 
+                    data['cid'],
                     data['email'],
                     hashed_pass
-                    ))
+                ))
                 status = 'OK'
                 res_code = 200
-            except:
+            except Exception as e:
+                print(e)
                 status = 'already_registered'
                 res_code = 406
 
