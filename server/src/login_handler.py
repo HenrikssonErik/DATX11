@@ -1,9 +1,7 @@
 from datetime import datetime, timedelta
-import json
 from typing import Literal
-from flask import jsonify, request, Request, Response
+from flask import Request
 import bcrypt
-# from werkzeug.security import gen_salt, generate_password_hash, check_password_hash
 from .connector import get_conn_string
 import psycopg2
 import string
@@ -23,7 +21,9 @@ def createKey():
 def random_string() -> str:
     """Creates a random string of size 'length' to be used as a secret key
     for encryption and singatures
-    For lenght reference: A string of 8 Chars takes aproximatly 1 year to brute force with bcryp-signatures."""
+
+    For lenght reference: A string of 8 Chars takes aproximatly 1 year to
+    brute force with bcryp-signatures."""
     length = 40
     letters_and_digits = string.ascii_lowercase + string.digits
     return ''.join(random.choice(letters_and_digits) for i in range(length))
