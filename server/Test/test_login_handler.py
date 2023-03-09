@@ -1,4 +1,4 @@
-from src.login_handler import log_in, verify_token, create_token, createKey, check_data_input
+from src.login_handler import log_in, verify_token, create_token, create_key, check_data_input
 import sys
 from pathlib import Path
 import unittest
@@ -12,7 +12,7 @@ class TestFileHandler(unittest.TestCase):
 
     def setUp(self):
         self.test_file_dir = Path(__file__).parent/"test_files_file_handler"
-        createKey()
+        create_key()
 
     def test_check_data_input(self):
         # Test case where input data is valid
@@ -51,7 +51,8 @@ class TestFileHandler(unittest.TestCase):
         mock_cursor.fetchone.return_value = [1, passphrase]
         result = log_in('test1.chalmers.se', 'pass')
         self.assertEqual(result[1], 200)
-        self.assertTrue(result[0].get('Token').startswith('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'))
+        self.assertTrue(result[0].get('Token').startswith(
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'))
 
     @patch('psycopg2.connect')
     def test_unsucessfull_log_in(self, mock_connect):

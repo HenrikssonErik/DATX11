@@ -11,7 +11,7 @@ import random
 __SECRET_KEY: str = None
 
 
-def createKey():
+def create_key():
     """ Creates a secret key, should be called from APP.py at start
       or login/registration will fail"""
     global __SECRET_KEY

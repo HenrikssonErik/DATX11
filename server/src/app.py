@@ -5,14 +5,14 @@ from flask import Flask, Response, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
-from .login_handler import user_registration, log_in, createKey
+from .login_handler import user_registration, log_in, create_key
 
 # creating the Flask application
 app = Flask(__name__)
 
 CORS(app)
 # creating private key for signing tokens
-createKey()
+create_key()
 
 
 # useless in the future, TODO: Remove along with front end button
