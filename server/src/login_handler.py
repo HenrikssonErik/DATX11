@@ -39,41 +39,49 @@ def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 
     return "OK", 200
 
 
-# Break this god-function up if possible.
-def user_registration(data: Request.form) -> tuple[str, Literal[200, 400, 406]]:
+def user_registration(data: Request.form) -> \
+        tuple[str, Literal[200, 400, 401, 406]]:
 
     email: str = data['email']
     cid: str = data['cid']
-    pwd = data['password']
+    pwd: str = data['password']
 
     invalid_data = check_data_input(cid, email, pwd)
 
     if (invalid_data[1] != 200):
         return invalid_data
 
-    print(email, "\n", cid, "\n", pwd)
-    salt = bcrypt.gensalt()
-    hashed_pass = bcrypt.hashpw(pwd.encode('utf-8'), salt)
+    salt: bytes = bcrypt.gensalt()
+    hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
 
+    res_query: tuple[str, Literal[200, 406]
+                     ] = registration_query(cid, email, hashed_pass)
+
+    res_object = (log_in(email, pwd)) if (res_query[1] == 200) else (res_query)
+
+    return res_object
+
+
+def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
+        tuple[str, Literal[200, 406]]:
     conn = psycopg2.connect(get_conn_string())
     with conn:
         with conn.cursor() as cur:
             try:
                 query = """INSERT INTO UserData
-                (cid, email, passphrase) 
+                (cid, email, passphrase)
                 VALUES (%s, %s, %s);"""
                 cur.execute(query, (
-                    data['cid'],
-                    data['email'],
+                    cid,
+                    email,
                     hashed_pass
                 ))
                 status = 'OK'
                 res_code = 200
             except Exception as e:
-                print(e)
+                print("NOT HERE", e)
                 status = 'already_registered'
                 res_code = 406
-
     conn.close()
     return status, res_code
 
@@ -101,7 +109,7 @@ def log_in(email: str, password: str) -> tuple[str, Literal[200, 401]]:
             raise Exception("Wrong Credentials")
 
     except Exception as e:
-        print(e)
+        print("HERE", e)
         return "Wrong credentials", 401
 
 

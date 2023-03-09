@@ -29,15 +29,16 @@ def login():
     res = make_response(jsonify(data[0]), data[1])
     return res
 
+
 @app.route('/signUp', methods=['POST'])
 def sign_up():
-    print("cghj")
-    response: tuple[str, Literal[200, 400, 406]] = user_registration(request.form)
-    
+    response: tuple[str, Literal[200, 400, 401, 406]] =\
+        user_registration(request.form)
+
     sign_up_response = {}
     sign_up_response.update({'status': response[0]})
     res = make_response(sign_up_response, response[1])
-    print(res)
+    print(response)
     return res
 
 
