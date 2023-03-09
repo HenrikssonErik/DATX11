@@ -16,15 +16,16 @@ class TestFileHandler(unittest.TestCase):
         createKey()
 
     @patch('psycopg2.connect')
-    def test_log_in(self, mock_connect):
+    def test_sucessfull_log_in(self, mock_connect):
         # Set up the mock return value
         salt = bcrypt.gensalt()
-        passphrase = bcrypt.hashpw('pass'.encode('utf8'), salt)
+        passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
         mock_cursor = MagicMock()
         mock_conn = MagicMock()
         mock_connect.return_value = mock_conn
         mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
         mock_cursor.fetchone.return_value = [1, passphrase]
 
-        res = log_in('test1.chalmers.se', 'pass')
-        print(res)
+        result = log_in('test1.chalmers.se', 'pass')
+        self.assertEqual(result[1], 200)
+        self.assertTrue(result[0].get('Token').startswith('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'))
