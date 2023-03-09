@@ -1,4 +1,5 @@
-from src.login_handler import log_in, verify_token, create_token, create_key, check_data_input
+from src.login_handler import log_in, verify_token, create_token, create_key, \
+    check_data_input, user_registration
 import sys
 from pathlib import Path
 import unittest
@@ -37,7 +38,13 @@ class TestFileHandler(unittest.TestCase):
 
     @patch('psycopg2.connect')
     def test_user_registration(self, mock_connect):
-        print("Yo")
+        mock_cursor = MagicMock()
+        mock_conn = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+
+        user_registration(
+            {'cid': 'abc', 'email': 'abc@chalmers.se', 'password': 'abc123'})
 
     @patch('psycopg2.connect')
     def test_sucessfull_log_in(self, mock_connect):
