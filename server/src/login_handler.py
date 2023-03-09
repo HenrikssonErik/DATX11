@@ -61,10 +61,7 @@ def user_registration(data: Request.form) -> \
 
     res_query: tuple[dict[str, str], Literal[200, 406]
                      ] = registration_query(cid, email, hashed_pass)
-
     res_object = (log_in(email, pwd)) if (res_query[1] == 200) else (res_query)
-
-    print(res_object)
 
     return res_object
 

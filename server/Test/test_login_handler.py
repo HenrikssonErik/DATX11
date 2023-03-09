@@ -38,13 +38,19 @@ class TestFileHandler(unittest.TestCase):
 
     @patch('psycopg2.connect')
     def test_user_registration(self, mock_connect):
-        mock_cursor = MagicMock()
-        mock_conn = MagicMock()
-        mock_connect.return_value = mock_conn
-        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+        with patch.object(bcrypt, 'gensalt') as mock_gensalt:
+            mock_gensalt.return_value = b'$2b$12$5OYDyM.lB5wBLwMhFJj42O'
+            salt = bcrypt.gensalt()
+            passphrase = memoryview(bcrypt.hashpw('abc123'.encode('utf8'),
+                                                  salt))
+            mock_cursor = MagicMock()
+            mock_conn = MagicMock()
+            mock_connect.return_value = mock_conn
+            mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+            mock_cursor.fetchone.return_value = [1, passphrase]
 
-        user_registration(
-            {'cid': 'abc', 'email': 'abc@chalmers.se', 'password': 'abc123'})
+            user_registration({'cid': 'abc', 'email': 'abc@chalmers.se',
+                               'password': 'abc123'})
 
     @patch('psycopg2.connect')
     def test_sucessfull_log_in(self, mock_connect):
