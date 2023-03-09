@@ -102,10 +102,10 @@ def log_in(email: str, password: str) -> tuple[str, Literal[200, 401]]:
 
     except Exception as e:
         print(e)
-        return "Wrong credentials", 401
+        return "Wrong Credentials", 401
 
 
-def create_token(id: int) -> tuple:
+def create_token(id: int) -> dict:
     data = {'iss': 'Hydrant',
             'id': id,
             'exp': datetime.utcnow() + timedelta(hours=1)

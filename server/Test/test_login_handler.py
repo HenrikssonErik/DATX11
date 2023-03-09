@@ -5,7 +5,8 @@ from unittest.mock import MagicMock, patch
 import bcrypt
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.login_handler import log_in, verify_token, create_token, createKey,check_data_input
+from src.login_handler import (log_in, verify_token, create_token,
+                               createKey, check_data_input)
 
 
 class TestFileHandler(unittest.TestCase):
@@ -49,3 +50,23 @@ class TestFileHandler(unittest.TestCase):
         result = log_in('test1.chalmers.se', 'pass')
         self.assertEqual(result[1], 200)
         self.assertTrue(result[0].get('Token').startswith('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'))
+
+    @patch('psycopg2.connect')
+    def test_unsucessfull_log_in(self, mock_connect):
+        # Set up the mock return value
+        salt = bcrypt.gensalt()
+        passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
+        mock_cursor = MagicMock()
+        mock_conn = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_cursor.fetchone.return_value = [1, passphrase]
+
+        result = log_in('test1.chalmers.se', 'pass1')
+        self.assertEqual(result[1], 401)
+        print(result[0])
+        self.assertEqual(result[0], ("Wrong Credentials"))
+
+    def test_create_and_verify_token(self):
+        token = create_token(2)
+        verify_token(token.get('Token'))
