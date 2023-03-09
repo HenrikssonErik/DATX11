@@ -4,7 +4,7 @@ import unittest
 from unittest import mock
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.login_handler import   # noqa: E402
+from src.login_handler import log_in, verify_token, create_token
 
 
 @mock.patch("psycopg2.connect")
