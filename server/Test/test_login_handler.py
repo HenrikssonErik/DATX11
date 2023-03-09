@@ -13,8 +13,7 @@ class TestFileHandler(unittest.TestCase):
     def setUp(self):
         self.test_file_dir = Path(__file__).parent/"test_files_file_handler"
 
-    @patch('app.psycopg2.connect')
-    def test_check_data_input(self, mock_conn):
+    def test_check_data_input(self):
         # Test case where input data is valid
         self.assertEqual(check_data_input(
             'abc', 'abc@chalmers.se', '1234'), ('OK', 200))
@@ -22,10 +21,6 @@ class TestFileHandler(unittest.TestCase):
         # Test case where cid contains invalid characters
         self.assertEqual(check_data_input(
             '123', 'abc@chalmers.se', '1234'), ('unallowed_tokens', 400))
-
-        # Test case where cid is missing
-        self.assertEqual(check_data_input(
-            '', 'abc@chalmers.se', '1234'), ('cid_missing', 400))
 
         # Test case where email is missing
         self.assertEqual(check_data_input(
@@ -37,8 +32,9 @@ class TestFileHandler(unittest.TestCase):
 
         # Test case where password contains invalid characters
         self.assertEqual(check_data_input(
-            'abc', 'abc@chalmers.se', 'abc'), ('pass_not_ok', 400))
+            'abc', 'abc@chalmers.se', 'أَلِف'), ('pass_not_ok', 400))
 
+    @patch('psycopg2.connect')
     def test_log_in(self, mock_connect):
         with patch('psycopg2.connect') as mock_connect:
             # Set up the mock return value

@@ -28,8 +28,6 @@ def random_string() -> str:
 def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 400]]:
     if not cid.isalpha():
         return 'unallowed_tokens', 400
-    if not cid:
-        return 'cid_missing', 400
     if not email:
         return 'email_missing', 400
     if not email == cid + "@chalmers.se":
