@@ -14,18 +14,23 @@ __SECRET_KEY: str = None
 
 
 def createKey():
+    """ Creates a secret key, should be called from APP.py at start
+      or login/registration will fail"""
     global __SECRET_KEY
     __SECRET_KEY = random_string()
 
 
 def random_string() -> str:
-    # length of key, with 8 chars it takes aproxiamtley 1 year to brute force, we use 40 chars
+    """Creates a random string of size 'length' to be used as a secret key
+    for encryption and singatures
+    For lenght reference: A string of 8 Chars takes aproximatly 1 year to brute force with bcryp-signatures."""
     length = 40
     letters_and_digits = string.ascii_lowercase + string.digits
     return ''.join(random.choice(letters_and_digits) for i in range(length))
 
 
-def check_data_input(cid: str, email: str, pwd: str) -> tuple[str, Literal[200, 400]]:
+def check_data_input(cid: str, email: str,
+                     pwd: str) -> tuple[str, Literal[200, 400]]:
     if not cid.isalpha():
         return 'unallowed_tokens', 400
     if not email:
@@ -88,7 +93,10 @@ def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
     return {'error': status}, res_code
 
 
-def log_in(email: str, password: str) -> tuple[dict[str, str], Literal[200, 401]]:
+def log_in(email: str, password: str) -> tuple[dict[str, str],
+                                               Literal[200, 401]]:
+    """Checks if the user exists in the database, if so it returns a
+    token that the user can use to verify itself"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -103,7 +111,6 @@ def log_in(email: str, password: str) -> tuple[dict[str, str], Literal[200, 401]
         conn.close()
         if not data:
             raise Exception("Wrong Credentials")
-    # use the line below to check for correct password, (password is from frontend, passphrase and salt i db)
         if (bcrypt.checkpw(password.encode('utf8'), passphrase)):
             token: dict[str, str] = create_token(id)
             return token, 200
@@ -116,6 +123,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str], Literal[200, 401]
 
 
 def create_token(id: int) -> dict[str, str]:
+    """Creates a token to verify a User that is valid for one hour."""
     data = {'iss': 'Hydrant',
             'id': id,
             'exp': datetime.utcnow() + timedelta(hours=1)
@@ -127,6 +135,8 @@ def create_token(id: int) -> dict[str, str]:
 
 
 def verify_token(token: str) -> int:
+    """Verifys if a token is issued by this system and if it is still valid.
+    Returns the User_id or an error message"""
     try:
         # Verify and decode the token
         decoded_token: dict = jwt.decode(token, __SECRET_KEY,
