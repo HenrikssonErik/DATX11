@@ -4,7 +4,7 @@ from typing import Literal
 from flask import jsonify, request, Request, Response
 import bcrypt
 # from werkzeug.security import gen_salt, generate_password_hash, check_password_hash
-from ..Database.connector import get_conn_string
+from .connector import get_conn_string
 import psycopg2
 import string
 import jwt
