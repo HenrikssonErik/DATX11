@@ -139,7 +139,7 @@ export class LoginComponent implements OnInit {
           };
           /* console.log(err.error.status); */
           const [errorMessage, errorTitle]: string[] =
-            response_to_toastr[err.error.status];
+            response_to_toastr[err.error.status.error];
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
