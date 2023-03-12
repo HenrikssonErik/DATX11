@@ -5,6 +5,11 @@ import {
   HttpClientModule,
   HTTP_INTERCEPTORS,
 } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpClientModule,
+  HTTP_INTERCEPTORS,
+} from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TestApiService } from './test.service';
@@ -23,8 +28,6 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
 import { LoginComponent } from './components/login/login.component';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { HomePageComponent } from './components/home-page/home-page.component';
-import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -41,8 +44,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     TestFeedbackCardComponent,
     SpinnerComponent,
     LoginComponent,
-    HomePageComponent,
-    PageNotFoundComponent,
   ],
   imports: [
     BrowserModule,
@@ -63,6 +64,11 @@ export function HttpLoaderFactory(http: HttpClient) {
   ],
   providers: [
     {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoadingInterceptor,
+      multi: true,
+    },
+  ],
       provide: HTTP_INTERCEPTORS,
       useClass: LoadingInterceptor,
       multi: true,
