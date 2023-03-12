@@ -1,0 +1,25 @@
+.dropdown-item:active {
+  background-color: #26734d;
+  color: whitesmoke;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+  text-decoration: underline;
+}
+
+.dropdown-menu {
+  background-color: #f5f5f5;
+}
+
+.selectedLanguage {
+  text-decoration: none;
+}
+
+.selectedLanguage:hover {
+  text-decoration: underline;
+}
