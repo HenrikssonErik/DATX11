@@ -12,10 +12,7 @@ import { TranslationService } from 'src/app/services/translation.service';
 export class FooterComponent implements OnInit {
   selectedLanguage: string = '';
   imagePath: string = '';
-  constructor(
-    private translateService: TranslationService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  constructor(private translateService: TranslationService) {}
 
   ngOnInit(): void {
     const lang: string = this.translateService.getLanguage();
@@ -37,8 +34,5 @@ export class FooterComponent implements OnInit {
       this.imagePath = 'en.png';
     }
     this.translateService.switchLanguage(lang);
-    this.cdr.detectChanges();
-
-    console.log(this.selectedLanguage);
   }
 }
