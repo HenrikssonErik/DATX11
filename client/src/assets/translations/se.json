@@ -26,17 +26,5 @@
   "Terms_and_Conditions": "vilkoren",
   "Hydrant_Sign_Up": "Hydrant Registrering",
   "Sign_Up_btn": "Registrera",
-  "Already_have_an_account": "Har du redan ett konto?",
-  "A_PLATFORM": "En kodtestningsplatform för studenter och lärare",
-  "BY_AUTHORS": "- Ett kandidatarbete 2023 av Alex, Alfred, Erik, Malte, Sebastian and Gabster",
-  "A_code_testing_platform_for_teachers_and_students": "A code testing platform for teachers and students",
-  "A_PLATFORM_TEXT": "Hydrant kan automatisera processen för kodtestning för lärare och elever. Vår plattform tillhandahåller ett lättanvänt gränssnitt för lärare att skapa och ladda upp uppgifter, inklusive enhetstester, som eleverna kan slutföra. Eleverna kan sedan skicka in sin kod, som automatiskt testas mot de uppladdade enhetstesten som ger omedelbar feedback och möjliggör en mer effektiv och produktiv inlärningsupplevelse.",
-  "Catching_and_preventing_errors_early": "Fånga och förhindra fel tidigt",
-  "Catch_And_Prevent_Text": "Genom att testa koden är det möjligt att fånga upp och förebygga fel tidigt i utvecklingsprocessen. Detta undviker behovet av att omarbeta koden och åtgärda fel senare.",
-  "Improving_code_quality_and_reliability": "Förbättra kodkvalitet och tillförlitlighet",
-  "Improving_code_quiality_and_reliability_text": "Genom att se till att koden testas ordentligt och fungerar som avsett kan du förbättra den övergripande kvaliteten och tillförlitligheten för din programvara.",
-  "Enhancing_maintainability_and_scalability": "Förbättra underhållbarhet och skalbarhet",
-  "Enhancing_maintainability_and_scalability_Text": "Genom att ha en uppsättning tester som täcker olika scenarier så kan du göra ändringar i din kod med större självförtroende och undvika att introducera nya buggar eller problem.",
-  "Get_started": "Kom igång",
-  "About": "Om"
+  "Already_have_an_account": "Har du redan ett konto?"
 }
