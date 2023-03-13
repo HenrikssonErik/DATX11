@@ -149,4 +149,3 @@ def verify_token(token: str) -> int:
         # If the token is invalid, raise an exception
         raise Exception('Invalid token')
 
-# TODO method to construct secret key
