@@ -82,8 +82,7 @@ def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
                 ))
                 status = 'OK'
                 res_code = 200
-            except Exception as e:
-                print("NOT HERE", e)
+            except psycopg2.IntegrityError:
                 status = 'already_registered'
                 res_code = 406
     conn.close()
