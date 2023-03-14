@@ -100,7 +100,7 @@ class TestFileHandler(unittest.TestCase):
         self.assertEqual(result, ({'error': 'already_registered'}, 406))
 
     @ patch('psycopg2.connect')
-    def test_sucessfull_log_in(self, mock_connect):
+    def test_sucessful_log_in(self, mock_connect):
         # Set up the mock return value
         salt = bcrypt.gensalt()
         passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
@@ -112,7 +112,7 @@ class TestFileHandler(unittest.TestCase):
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'))
 
     @ patch('psycopg2.connect')
-    def test_unsucessfull_log_in(self, mock_connect):
+    def test_unsucessful_log_in(self, mock_connect):
         # Set up the mock return value
         salt = bcrypt.gensalt()
         passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
