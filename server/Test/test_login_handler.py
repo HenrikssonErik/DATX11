@@ -1,4 +1,4 @@
-from src.login_handler import log_in, verify_token, create_token, create_key, \
+from src.login_handler import log_in, verify_and_get_token, create_token, create_key, \
     check_data_input, user_registration, registration_query
 import sys
 from pathlib import Path
@@ -125,4 +125,4 @@ class TestFileHandler(unittest.TestCase):
 
     def test_create_and_verify_token(self):
         token = create_token(2)
-        verify_token(token.get('Token'))
+        verify_and_get_token(token.get('Token'))

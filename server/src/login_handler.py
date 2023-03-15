@@ -143,7 +143,7 @@ def create_token(id: int) -> dict[str, str]:
     return {'Token': token}
 
 
-def verify_token(token: str) -> int:
+def verify_and_get_token(token: str) -> int:
     """Verifys if a token is issued by this system and if it is still valid.
     Returns the User_id or an error message"""
     try:
