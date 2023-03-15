@@ -22,7 +22,7 @@ def random_string() -> str:
     """Creates a random string of size 'length' to be used as a secret key
     for encryption and singatures
 
-    For lenght reference: A string of 8 Chars takes aproximatly 1 year to
+    For length reference: A string of 8 Chars takes aproximatly 1 year to
     brute force with bcryp-signatures."""
     length = 40
     letters_and_digits = string.ascii_lowercase + string.digits
@@ -31,6 +31,8 @@ def random_string() -> str:
 
 def check_data_input(cid: str, email: str,
                      pwd: str) -> tuple[str, Literal[200, 400]]:
+    """Validates the inputs from the frontend. If any of these checks are
+    not valid, return the appropriate error message and error code as a tuple."""
     if not cid.isalpha():
         return 'unallowed_tokens', 400
     if not email:
@@ -46,15 +48,20 @@ def check_data_input(cid: str, email: str,
 
 def user_registration(data: Request.form) -> \
         tuple[dict[str, str], Literal[200, 400, 401, 406]]:
+    """Registrates the user to the database, then logs in to the user. 
+    If success, return the token from log_in and success code.
+    If the user cannot be created, return error message and error code.
 
+    Creates a bcrypted password to be stored in the database to ensure
+    data security, since bcrypted passwords are difficult to brute force."""
     email: str = data['email']
     cid: str = data['cid']
     pwd: str = data['password']
 
-    invalid_data = check_data_input(cid, email, pwd)
+    data_check = check_data_input(cid, email, pwd)
 
-    if (invalid_data[1] != 200):
-        return {'error': invalid_data[0]}, invalid_data[1]
+    if (data_check[1] != 200):
+        return {'error': data_check[0]}, data_check[1]
 
     salt: bytes = bcrypt.gensalt()
     hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
@@ -68,6 +75,12 @@ def user_registration(data: Request.form) -> \
 
 def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
         tuple[dict[str, str], Literal[200, 406]]:
+    """Queries the database with the information given. 
+    If the unique key already is in the database, return error message
+    that the user is already registered. 
+
+    IntegrityError: https://www.psycopg.org/docs/errors.html Class 23.
+    Other exceptions or errors may be added continuously when needed."""
     conn = psycopg2.connect(get_conn_string())
     with conn:
         with conn.cursor() as cur:
@@ -147,4 +160,3 @@ def verify_token(token: str) -> int:
     except jwt.InvalidTokenError:
         # If the token is invalid, raise an exception
         raise Exception('Invalid token')
-
