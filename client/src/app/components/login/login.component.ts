@@ -65,8 +65,8 @@ export class LoginComponent implements OnInit {
       .subscribe({
         //TODO: save token and id
         next: (response: any) => {
-          if (response.body.token) {
-            document.cookie = `sessionToken=${response.body.token}
+          if (response.body.Token) {
+            document.cookie = `sessionToken=${response.body.Token}
           )}`;
           }
         },
@@ -107,9 +107,19 @@ export class LoginComponent implements OnInit {
       })
       .subscribe({
         next: (response: any) => {
-          this.toastr.success('Success!', 'User created!', {
-            closeButton: true,
-          });
+          try {
+            if (response.body.Token) {
+              console.log(response.body.Token);
+              document.cookie = `sessionToken=${response.body.Token}
+          )}`;
+
+              this.toastr.success('Success!', 'User created!', {
+                closeButton: true,
+              });
+            }
+          } catch {
+            throw new Error('unexpected_error');
+          }
         },
         error: (err) => {
           /* console.log(err.error.status); */

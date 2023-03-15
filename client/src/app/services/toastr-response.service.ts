@@ -20,6 +20,7 @@ const response_to_toastr: ResponseToToastr = {
     'Possible characters include A-Z, a-z, 0-9, and punctuations.',
     'You cannot use those characters in the password!',
   ],
+  unexpected_error: ['Something went wrong, try again!'],
 };
 
 @Injectable({

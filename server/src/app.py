@@ -35,9 +35,9 @@ def sign_up():
     response: tuple[str, Literal[200, 400, 401, 406]] =\
         user_registration(request.form)
 
-    sign_up_response = {}
-    sign_up_response.update({'status': response[0]})
-    res = make_response(sign_up_response, response[1])
+    # sign_up_response = {}
+    # sign_up_response.update({'status': response[0]})
+    res = make_response(response[0], response[1])
     print(response)
     return res
 
