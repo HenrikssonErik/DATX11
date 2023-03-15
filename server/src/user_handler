@@ -1,0 +1,22 @@
+from .connector import get_conn_string
+import psycopg2
+
+
+def get_courses(userId: int):
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT * FROM User_course_info
+                            WHERE userid = %s"""
+                cur.execute(query_data, (userId,))
+                data = cur.fetchall()
+                print(data)
+        conn.close()
+        if not data:
+            raise Exception("No courses for this user")
+
+    except Exception as e:
+        print(e)
+        return {'error': "No Courses Found"}, 401
