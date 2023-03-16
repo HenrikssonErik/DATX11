@@ -1,6 +1,11 @@
 from .connector import get_conn_string
 import psycopg2
+from enum import Enum
 
+class Role(Enum):
+    Admin = 'Admin'
+    Teacher = 'Teacher'
+    Student = 'Student'
 
 def get_courses(userId: int) -> list[dict[str, any]]:
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -27,7 +32,7 @@ def get_courses(userId: int) -> list[dict[str, any]]:
         return {'error': "No Courses Found"}, 401
 
 
-def get_course_group(userId, courseId) -> dict[str, str]:
+def get_course_group(userId: int, courseId: int) -> dict[str, str]:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -39,13 +44,33 @@ def get_course_group(userId, courseId) -> dict[str, str]:
                 cur.execute(query_data, (userId, courseId))
                 data = cur.fetchone()
         conn.close()
+
         if not data:
             raise Exception("No groups for this user")
+
         orderedData: dict = {}
-        for info in data:
-            orderedData.append({"groupid": data[0], "groupNumber": data[1]})
+        orderedData["groupid"] = data[0]
+        orderedData["groupNumber"] = data[1]
         return orderedData
 
     except Exception as e:
         print(e)
         return {'error': "No Groups Found"}, 401
+
+# TODO: fill in the blanks :)
+
+def add_user_to_group(userId: int, groupId: int):
+    # check user on course
+    # check user is student
+    # check group on course
+    # add to group
+
+
+def add_user_to_course(userId: int, courseId: int, userRole: Role):
+    # check user on course
+    # check group on courseä
+    # add to group
+
+
+def remove_user_from_group(userId: int, groupId: int):
+    #do the doings

@@ -20,7 +20,7 @@ def setup_mock_cursor(mock_connect) -> MagicMock:
     return mock_cursor
 
 
-class TestFileHandler(unittest.TestCase):
+class TestLoginHandler(unittest.TestCase):
 
     def setUp(self):
         self.test_file_dir = Path(__file__).parent/"test_files_file_handler"
