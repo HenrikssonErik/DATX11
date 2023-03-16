@@ -93,13 +93,13 @@ def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
                     email,
                     hashed_pass
                 ))
-                status = 'OK'
+                status = 'success'
                 res_code = 200
             except psycopg2.IntegrityError:
                 status = 'already_registered'
                 res_code = 406
     conn.close()
-    return {'error': status}, res_code
+    return {'status': status}, res_code
 
 
 def log_in(email: str, password: str) -> tuple[dict[str, str],

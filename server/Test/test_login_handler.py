@@ -78,7 +78,7 @@ class TestFileHandler(unittest.TestCase):
                 (cid, email, passphrase)
                 VALUES (%s, %s, %s);""", (cid, email, hashed_pass))
 
-        self.assertEqual(result, ({'error': 'OK'}, 200))
+        self.assertEqual(result, ({'status': 'success'}, 200))
 
     @patch('psycopg2.connect')
     def test_registration_query_unique_key_exception(self, mock_connect):
@@ -97,7 +97,7 @@ class TestFileHandler(unittest.TestCase):
                 (cid, email, passphrase)
                 VALUES (%s, %s, %s);""", (cid, email, hashed_pass))
 
-        self.assertEqual(result, ({'error': 'already_registered'}, 406))
+        self.assertEqual(result, ({'status': 'already_registered'}, 406))
 
     @ patch('psycopg2.connect')
     def test_sucessful_log_in(self, mock_connect):
