@@ -1,5 +1,5 @@
 from unittest import mock
-from src.user_handler import get_courses, get_course_group
+from src.user_handler import get_courses, get_group, add_user_to_group
 import sys
 from pathlib import Path
 import unittest
@@ -46,10 +46,14 @@ class TestUserHandler(unittest.TestCase):
 
         userId = 1
         courseId = 6
-        result = get_course_group(userId, courseId)
+        result = get_group(userId, courseId)
 
         mock_cursor.execute.assert_called_once_with("""SELECT groupid, groupnumber FROM
                                 user_group_course_info
                                 WHERE userid = %s and courseid = %s""",
                                                     (userId, courseId))
         self.assertEqual(result, {'groupid': 2, 'groupNumber': 1})
+
+    def test_add_user_to_group(self):
+        # add_user_to_group(1, 3)
+        print("testedy test")
