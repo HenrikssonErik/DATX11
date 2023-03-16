@@ -1,5 +1,5 @@
 from unittest import mock
-from src.user_handler import get_courses, get_group, add_user_to_group
+from src.user_handler import Role, get_courses, get_group, add_user_to_group, add_user_to_course
 import sys
 from pathlib import Path
 import unittest
@@ -55,5 +55,5 @@ class TestUserHandler(unittest.TestCase):
         self.assertEqual(result, {'groupid': 2, 'groupNumber': 1})
 
     def test_add_user_to_group(self):
-        # add_user_to_group(1, 3)
-        print("testedy test")
+        # add_user_to_course(1, 1, Role.Student)
+        print("heeh")

@@ -59,8 +59,6 @@ def get_group(userId: int, courseId: int) -> dict[str, str]:
         print(e)
         return {'status': "No Groups Found"}, 401
 
-# TODO: fill in the blanks :)
-
 
 def add_user_to_group(userId: int, groupId: int):
     # check user on course and group on the course
@@ -106,13 +104,44 @@ def __get_courseId_from_group(groupId) -> int:
         print(e)
         return {'status': "No Course to match the group"}, 401
 
+
 def add_user_to_course(userId: int, courseId: int, userRole: Role):
-    # check user on course
-    # check group on courseä
-    # add to group
-    print("heh")
+    # TODO: Maybe add som check so admin or course teacher only can add people
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """INSERT into userincourse values
+                                (%s, %s, %s)"""
+                cur.execute(query_data, [userId, courseId, userRole.name])
+        conn.close()
+
+    except Exception as e:
+        print(e)
+        return {'status': "Unable to add to course"}, 401
 
 
 def remove_user_from_group(userId: int, groupId: int):
-    # do the doings
-    print("heh")
+    # TODO: add some checks so not anyone can call this delete method
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """DELETE from useringroup
+                                WHERE userid = %S AND groupid = %s """
+                cur.execute(query_data, [userId, groupId])
+
+    except Exception as e:
+        print(e)
+        return {'status': "Could not remove from group"}, 401
+
+
+# TODO: fix these method
+def get_role_on_course(userId, courseId):
+    print("return the Role from here")
+
+
+def get_global_role(userId):
+    print("return global role pls")
