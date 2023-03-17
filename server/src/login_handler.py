@@ -61,7 +61,7 @@ def user_registration(data: Request.form) -> \
     data_check = check_data_input(cid, email, pwd)
 
     if (data_check[1] != 200):
-        return {'error': data_check[0]}, data_check[1]
+        return {'status': data_check[0]}, data_check[1]
 
     salt: bytes = bcrypt.gensalt()
     hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
@@ -128,7 +128,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
 
     except Exception as e:
         print(e)
-        return {'error': "Wrong Credentials"}, 401
+        return {'status': "Wrong Credentials"}, 401
 
 
 def create_token(id: int) -> dict[str, str]:
