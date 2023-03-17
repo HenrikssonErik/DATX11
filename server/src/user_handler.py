@@ -9,7 +9,7 @@ class Role(Enum):
     Student = 'Student'
 
 
-def get_courses(userId: int) -> list[dict[str, any]]:
+def get_courses_info(userId: int) -> list[dict[str, any]]:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -62,7 +62,7 @@ def get_group(userId: int, courseId: int) -> dict[str, str]:
 
 def add_user_to_group(userId: int, groupId: int):
     # check user on course and group on the course
-    user_courses = get_courses(userId)
+    user_courses = get_courses_info(userId)
     conn = psycopg2.connect(dsn=get_conn_string())
 
     course_id = __get_courseId_from_group(groupId)
@@ -106,7 +106,7 @@ def __get_courseId_from_group(groupId) -> int:
 
 
 def add_user_to_course(userId: int, courseId: int, userRole: Role):
-    # TODO: Maybe add som check so admin or course teacher only can add people
+    # TODO: Maybe add som check so admin or course teacher only can add people, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -123,7 +123,7 @@ def add_user_to_course(userId: int, courseId: int, userRole: Role):
 
 
 def remove_user_from_group(userId: int, groupId: int):
-    # TODO: add some checks so not anyone can call this delete method
+    # TODO: add some checks so not anyone can call this delete method, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -138,10 +138,26 @@ def remove_user_from_group(userId: int, groupId: int):
         return {'status': "Could not remove from group"}, 401
 
 
-# TODO: fix these method
-def get_role_on_course(userId, courseId):
-    print("return the Role from here")
+def is_teacher_on_course(user_id: int, course_id: int) -> bool:
+    courses = get_courses_info(user_id)
+    for course in courses:
+        if course['courseID'] == course_id \
+           and course['Role'] == Role.Teacher.name:
+            return True
+
+    return False
 
 
+def is_admin_on_course(user_id: int, course_id: int) -> bool:
+    courses = get_courses_info(user_id)
+    for course in courses:
+        if course['courseID'] == course_id \
+           and course['Role'] == Role.Admin.name:
+            return True
+
+    return False
+
+
+# TODO: include global role
 def get_global_role(userId):
     print("return global role pls")
