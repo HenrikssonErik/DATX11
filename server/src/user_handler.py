@@ -31,7 +31,7 @@ def get_courses_info(userId: int) -> list[dict[str, any]]:
 
     except Exception as e:
         print(e)
-        return {'status': "No Courses Found"}, 401
+        return {'status': "No Courses Found"}
 
 
 def get_group(userId: int, courseId: int) -> dict[str, str]:
@@ -57,15 +57,15 @@ def get_group(userId: int, courseId: int) -> dict[str, str]:
 
     except Exception as e:
         print(e)
-        return {'status': "No Groups Found"}, 401
+        return {'status': "No Groups Found"}
 
 
-def add_user_to_group(userId: int, groupId: int):
+def add_user_to_group(userId: int, groupId: int) -> None:
     # check user on course and group on the course
     user_courses = get_courses_info(userId)
     conn = psycopg2.connect(dsn=get_conn_string())
 
-    course_id = __get_courseId_from_group(groupId)
+    course_id = __get_course_id_from_group(groupId)
 
     # add to group
     try:
@@ -81,10 +81,10 @@ def add_user_to_group(userId: int, groupId: int):
 
     except Exception as e:
         print(e)
-        return {'status': "No Groups Found"}, 401
+        return {'status': "No Groups Found"}
 
 
-def __get_courseId_from_group(groupId) -> int:
+def __get_course_id_from_group(groupId) -> int:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -102,10 +102,10 @@ def __get_courseId_from_group(groupId) -> int:
 
     except Exception as e:
         print(e)
-        return {'status': "No Course to match the group"}, 401
+        return e
 
 
-def add_user_to_course(userId: int, courseId: int, userRole: Role):
+def add_user_to_course(userId: int, courseId: int, userRole: Role) -> None:
     # TODO: Maybe add som check so admin or course teacher only can add people, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -119,10 +119,10 @@ def add_user_to_course(userId: int, courseId: int, userRole: Role):
 
     except Exception as e:
         print(e)
-        return {'status': "Unable to add to course"}, 401
+        return {'status': "Unable to add to course"}
 
 
-def remove_user_from_group(userId: int, groupId: int):
+def remove_user_from_group(userId: int, groupId: int) -> None:
     # TODO: add some checks so not anyone can call this delete method, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -130,12 +130,12 @@ def remove_user_from_group(userId: int, groupId: int):
         with conn:
             with conn.cursor() as cur:
                 query_data = """DELETE from useringroup
-                                WHERE userid = %S AND groupid = %s """
+                                WHERE userid = %s AND groupid = %s """
                 cur.execute(query_data, [userId, groupId])
 
     except Exception as e:
         print(e)
-        return {'status': "Could not remove from group"}, 401
+        return {'status': "Could not remove from group"}
 
 
 def is_teacher_on_course(user_id: int, course_id: int) -> bool:

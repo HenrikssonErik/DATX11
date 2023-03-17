@@ -1,10 +1,12 @@
-from unittest import mock
-from src.user_handler import Role, get_courses_info, get_group, add_user_to_group, add_user_to_course
+
+from src.user_handler import Role, get_courses_info,\
+    get_group, add_user_to_course, remove_user_from_group,\
+    is_admin_on_course, is_teacher_on_course
 import sys
 from pathlib import Path
 import unittest
 from unittest.mock import MagicMock, patch
-from psycopg2 import IntegrityError
+
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
@@ -54,6 +56,79 @@ class TestUserHandler(unittest.TestCase):
                                                     (userId, courseId))
         self.assertEqual(result, {'groupid': 2, 'groupNumber': 1})
 
-    def test_add_user_to_group(self):
-        # add_user_to_course(1, 1, Role.Student)
-        print("heeh")
+    @patch('psycopg2.connect')
+    def test_add_user_to_course(self, mock_connect):
+        mock_cursor = setup_mock_cursor(mock_connect)
+        user_id = 1
+        course_id = 6
+        add_user_to_course(user_id, course_id, Role.Student)
+
+        mock_cursor.execute.assert_called_once_with("""INSERT into userincourse values
+                                (%s, %s, %s)""", [user_id, course_id, Role.Student.name])
+
+    @patch('psycopg2.connect')
+    def test_remove_user_from_group(self, mock_connect):
+        user_id = 1
+        group_id = 1
+        mock_cursor = setup_mock_cursor(mock_connect)
+        remove_user_from_group(user_id, group_id)
+
+        mock_cursor.execute.assert_called_once_with("""DELETE from useringroup
+                                WHERE userid = %s AND groupid = %s """,
+                                                    [user_id, group_id])
+
+    @patch('src.user_handler.get_courses_info')
+    def test_is_admin_on_course(self, mock_user_courses):
+        user_id = 1
+        course_id = 1
+        mock_user_courses.return_value = [{'Role': 'Admin', 'courseID': 1,
+                                           'Course': 'datx12',
+                                           'Year': 2, 'StudyPeriod': 2023},
+                                          {'Role': 'Student', 'courseID': 2,
+                                           'Course': 'datx11',
+                                           'Year': 4, 'StudyPeriod': 2023}]
+        res: bool = is_admin_on_course(user_id, course_id)
+        mock_user_courses.assert_called_once_with(user_id)
+        self.assertTrue(res)
+
+    @patch('src.user_handler.get_courses_info')
+    def test_is_not_admin_on_course(self, mock_user_courses):
+        user_id = 1
+        course_id = 1
+        mock_user_courses.return_value = [{'Role': 'Teacher', 'courseID': 1,
+                                           'Course': 'datx12',
+                                           'Year': 2, 'StudyPeriod': 2023},
+                                          {'Role': 'Student', 'courseID': 2,
+                                           'Course': 'datx11',
+                                           'Year': 4, 'StudyPeriod': 2023}]
+        res: bool = is_admin_on_course(user_id, course_id)
+        mock_user_courses.assert_called_once_with(user_id)
+        self.assertFalse(res)
+
+    @patch('src.user_handler.get_courses_info')
+    def test_is_Teacher_on_course(self, mock_user_courses):
+        user_id = 1
+        course_id = 1
+        mock_user_courses.return_value = [{'Role': 'Teacher', 'courseID': 1,
+                                           'Course': 'datx12',
+                                           'Year': 2, 'StudyPeriod': 2023},
+                                          {'Role': 'Student', 'courseID': 2,
+                                           'Course': 'datx11',
+                                           'Year': 4, 'StudyPeriod': 2023}]
+        res: bool = is_teacher_on_course(user_id, course_id)
+        mock_user_courses.assert_called_once_with(user_id)
+        self.assertTrue(res)
+
+    @patch('src.user_handler.get_courses_info')
+    def test_is_not_teacher_on_course(self, mock_user_courses):
+        user_id = 1
+        course_id = 1
+        mock_user_courses.return_value = [{'Role': 'Student', 'courseID': 1,
+                                           'Course': 'datx12',
+                                           'Year': 2, 'StudyPeriod': 2023},
+                                          {'Role': 'Student', 'courseID': 2,
+                                           'Course': 'datx11',
+                                           'Year': 4, 'StudyPeriod': 2023}]
+        res: bool = is_teacher_on_course(user_id, course_id)
+        mock_user_courses.assert_called_once_with(user_id)
+        self.assertFalse(res)
