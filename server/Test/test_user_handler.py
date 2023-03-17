@@ -1,5 +1,5 @@
 from unittest import mock
-from src.user_handler import Role, get_courses, get_group, add_user_to_group, add_user_to_course
+from src.user_handler import Role, get_courses_info, get_group, add_user_to_group, add_user_to_course
 import sys
 from pathlib import Path
 import unittest
@@ -23,13 +23,13 @@ class TestUserHandler(unittest.TestCase):
         self.test_file_dir = Path(__file__).parent/"test_files_user_handler"
 
     @patch('psycopg2.connect')
-    def test_get_user_courses(self, mock_connect):
+    def test_get_user_courses_info(self, mock_connect):
 
         mock_cursor = setup_mock_cursor(mock_connect)
         mock_cursor.fetchall.return_value = [(1, 'Admin', 1, 'datx12', 2, 2023), (1, 'Student', 2, 'datx11', 4, 2023)]
 
         userId = 1
-        result = get_courses(userId)
+        result = get_courses_info(userId)
         mock_cursor.execute.assert_called_once_with("""SELECT * FROM User_course_info
                             WHERE userid = %s""", (userId,))
         self.assertEqual(
