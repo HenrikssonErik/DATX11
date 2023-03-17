@@ -67,8 +67,8 @@ CREATE TABLE UserInGroup (
 	userId INTEGER,
 	groupId INTEGER,
 	PRIMARY KEY (userId, groupId),
-	FOREIGN KEY (groupId) REFERENCES Groups(groupId),
-	FOREIGN KEY (userId) REFERENCES UserData(userId)
+	FOREIGN KEY (groupId) REFERENCES Groups(groupId) ON DELETE CASCADE,
+	FOREIGN KEY (userId) REFERENCES UserData(userId) ON DELETE CASCADE
 );
 
 
@@ -77,8 +77,8 @@ CREATE TABLE UserInCourse (
 	courseId INTEGER,
 	userRole TEXT NOT NULL CHECK (userRole IN ('Admin', 'Teacher', 'Student')),
 	PRIMARY KEY (userId, courseId),
-	FOREIGN KEY (courseId) REFERENCES Courses(courseId),
-	FOREIGN KEY (userId) REFERENCES UserData(userId)
+	FOREIGN KEY (courseId) REFERENCES Courses(courseId) ON DELETE CASCADE,
+	FOREIGN KEY (userId) REFERENCES UserData(userId) ON DELETE CASCADE
 );
 
 --View for user and course data can be called for course inf from specific user:

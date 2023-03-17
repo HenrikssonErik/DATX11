@@ -32,7 +32,8 @@ def random_string() -> str:
 def check_data_input(cid: str, email: str,
                      pwd: str) -> tuple[str, Literal[200, 400]]:
     """Validates the inputs from the frontend. If any of these checks are
-    not valid, return the appropriate error message and error code as a tuple."""
+    not valid, return the appropriate error message and error code as a
+    tuple."""
     if not cid.isalpha():
         return 'unallowed_tokens', 400
     if not email:
@@ -48,7 +49,7 @@ def check_data_input(cid: str, email: str,
 
 def user_registration(data: Request.form) -> \
         tuple[dict[str, str], Literal[200, 400, 401, 406]]:
-    """Registrates the user to the database, then logs in to the user. 
+    """Registrates the user to the database, then logs in to the user.
     If success, return the token from log_in and success code.
     If the user cannot be created, return error message and error code.
 
@@ -61,7 +62,7 @@ def user_registration(data: Request.form) -> \
     data_check = check_data_input(cid, email, pwd)
 
     if (data_check[1] != 200):
-        return {'error': data_check[0]}, data_check[1]
+        return {'status': data_check[0]}, data_check[1]
 
     salt: bytes = bcrypt.gensalt()
     hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
@@ -75,9 +76,9 @@ def user_registration(data: Request.form) -> \
 
 def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
         tuple[dict[str, str], Literal[200, 406]]:
-    """Queries the database with the information given. 
+    """Queries the database with the information given.
     If the unique key already is in the database, return error message
-    that the user is already registered. 
+    that the user is already registered.
 
     IntegrityError: https://www.psycopg.org/docs/errors.html Class 23.
     Other exceptions or errors may be added continuously when needed."""
@@ -93,13 +94,13 @@ def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
                     email,
                     hashed_pass
                 ))
-                status = 'OK'
+                status = 'success'
                 res_code = 200
             except psycopg2.IntegrityError:
                 status = 'already_registered'
                 res_code = 406
     conn.close()
-    return {'error': status}, res_code
+    return {'status': status}, res_code
 
 
 def log_in(email: str, password: str) -> tuple[dict[str, str],
@@ -128,7 +129,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
 
     except Exception as e:
         print(e)
-        return {'error': "Wrong Credentials"}, 401
+        return {'status': "wrong_credentials"}, 401
 
 
 def create_token(id: int) -> dict[str, str]:

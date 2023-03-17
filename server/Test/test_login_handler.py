@@ -1,5 +1,5 @@
-from src.login_handler import log_in, verify_and_get_token, create_token, create_key, \
-    check_data_input, user_registration, registration_query
+from src.login_handler import log_in, verify_and_get_token, create_token, \
+    create_key, check_data_input, user_registration, registration_query
 import sys
 from pathlib import Path
 import unittest
@@ -12,6 +12,8 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
+    """Mocks the cursor to the mocked connection, which executes the sql query
+    to the mock connection."""
     mock_cursor = MagicMock()
     mock_conn = MagicMock()
     mock_connect.return_value = mock_conn
@@ -78,7 +80,7 @@ class TestLoginHandler(unittest.TestCase):
                 (cid, email, passphrase)
                 VALUES (%s, %s, %s);""", (cid, email, hashed_pass))
 
-        self.assertEqual(result, ({'error': 'OK'}, 200))
+        self.assertEqual(result, ({'status': 'success'}, 200))
 
     @patch('psycopg2.connect')
     def test_registration_query_unique_key_exception(self, mock_connect):
@@ -97,7 +99,7 @@ class TestLoginHandler(unittest.TestCase):
                 (cid, email, passphrase)
                 VALUES (%s, %s, %s);""", (cid, email, hashed_pass))
 
-        self.assertEqual(result, ({'error': 'already_registered'}, 406))
+        self.assertEqual(result, ({'status': 'already_registered'}, 406))
 
     @ patch('psycopg2.connect')
     def test_sucessful_log_in(self, mock_connect):
@@ -121,7 +123,7 @@ class TestLoginHandler(unittest.TestCase):
 
         result = log_in('test1.chalmers.se', 'pass1')
         self.assertEqual(result[1], 401)
-        self.assertEqual(result[0].get('error'), ("Wrong Credentials"))
+        self.assertEqual(result[0].get('status'), ("wrong_credentials"))
 
     def test_create_and_verify_token(self):
         token = create_token(2)

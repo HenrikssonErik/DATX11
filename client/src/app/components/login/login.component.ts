@@ -56,7 +56,6 @@ export class LoginComponent implements OnInit {
     const formData = new FormData();
     formData.append('email', this.loginForm.get('email')?.value);
     formData.append('password', this.loginForm.get('password')!.value);
-    //console.log(formData.get('password'));
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/` + 'login', formData, {
@@ -66,9 +65,22 @@ export class LoginComponent implements OnInit {
         //TODO: save token and id
         next: (response: any) => {
           if (response.body.Token) {
-            document.cookie = `sessionToken=${response.body.Token}
-          )}`;
+            const expirationDate = new Date();
+            expirationDate.setTime(
+              expirationDate.getTime() + 2 * 60 * 60 * 1000
+            ); // 2 hours from now
+            document.cookie = `sessionToken=${
+              response.body.Token
+            }; expires=${expirationDate.toUTCString()}; path=/`;
           }
+        },
+        error: (err) => {
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
         },
       });
 
@@ -86,11 +98,6 @@ export class LoginComponent implements OnInit {
 
     console.log(this.signUpForm);
 
-    /*const hashedpassword = this.hashPassword(
-      this.signUpForm.get('signUpPassword')!.value,
-      this.signUpForm.get('signUpemail')!.value
-    ); */
-
     const formData = new FormData();
     formData.append('cid', this.signUpForm.get('cid')!.value);
     //TODO: Fult som fan att concatenatea här men idk. Gör väl inget
@@ -99,7 +106,6 @@ export class LoginComponent implements OnInit {
       this.signUpForm.get('signUpemail')!.value + '@chalmers.se'
     );
     formData.append('password', this.signUpForm.get('signUpPassword')!.value);
-    //console.log(formData.get('password'));
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/` + 'signUp', formData, {
@@ -109,21 +115,24 @@ export class LoginComponent implements OnInit {
         next: (response: any) => {
           try {
             if (response.body.Token) {
-              console.log(response.body.Token);
-              document.cookie = `sessionToken=${response.body.Token}
-          )}`;
-
-              this.toastr.success('Success!', 'User created!', {
-                closeButton: true,
-              });
+              const expirationDate = new Date();
+              expirationDate.setTime(
+                expirationDate.getTime() + 2 * 60 * 60 * 1000
+              ); // 2 hours from now
+              document.cookie = `sessionToken=${
+                response.body.Token
+              }; expires=${expirationDate.toUTCString()}; path=/`;
             }
+
+            this.toastr.success('Success!', 'User created!', {
+              closeButton: true,
+            });
           } catch {
             throw new Error('unexpected_error');
           }
         },
         error: (err) => {
-          /* console.log(err.error.status); */
-          let statusMsg = err.error.status.error;
+          let statusMsg = err.error.status;
           const [errorMessage, errorTitle]: string[] =
             this.toastrResponse.getToastrRepsonse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
@@ -152,11 +161,6 @@ export class LoginComponent implements OnInit {
       form.style.transform = 'rotateY(0deg)';
     }
   }
-
-  /*hashPassword(password: string, email: string): string {
-    const has h: string = this.bcrypt.hashSync(password, 10);
-    return hash;
-  } */
 
   onInputFocus(input: string, form: FormGroup): void {
     const control = form.get(input);
