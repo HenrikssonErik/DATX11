@@ -1,5 +1,5 @@
-from src.login_handler import log_in, verify_and_get_token, create_token, create_key, \
-    check_data_input, user_registration, registration_query
+from src.login_handler import log_in, verify_and_get_token, create_token, \
+    create_key, check_data_input, user_registration, registration_query
 import sys
 from pathlib import Path
 import unittest
