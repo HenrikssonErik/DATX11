@@ -123,7 +123,7 @@ class TestFileHandler(unittest.TestCase):
 
         result = log_in('test1.chalmers.se', 'pass1')
         self.assertEqual(result[1], 401)
-        self.assertEqual(result[0].get('error'), ("Wrong Credentials"))
+        self.assertEqual(result[0].get('status'), ("wrong_credentials"))
 
     def test_create_and_verify_token(self):
         token = create_token(2)
