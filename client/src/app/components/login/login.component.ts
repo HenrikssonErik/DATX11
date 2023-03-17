@@ -66,8 +66,13 @@ export class LoginComponent implements OnInit {
         //TODO: save token and id
         next: (response: any) => {
           if (response.body.Token) {
-            document.cookie = `sessionToken=${response.body.Token}
-          )}`;
+            const expirationDate = new Date();
+            expirationDate.setTime(
+              expirationDate.getTime() + 2 * 60 * 60 * 1000
+            ); // 2 hours from now
+            document.cookie = `sessionToken=${
+              response.body.Token
+            }; expires=${expirationDate.toUTCString()}; path=/`;
           }
         },
       });
@@ -109,14 +114,18 @@ export class LoginComponent implements OnInit {
         next: (response: any) => {
           try {
             if (response.body.Token) {
-              console.log(response.body.Token);
-              document.cookie = `sessionToken=${response.body.Token}
-          )}`;
-
-              this.toastr.success('Success!', 'User created!', {
-                closeButton: true,
-              });
+              const expirationDate = new Date();
+              expirationDate.setTime(
+                expirationDate.getTime() + 2 * 60 * 60 * 1000
+              ); // 2 hours from now
+              document.cookie = `sessionToken=${
+                response.body.Token
+              }; expires=${expirationDate.toUTCString()}; path=/`;
             }
+
+            this.toastr.success('Success!', 'User created!', {
+              closeButton: true,
+            });
           } catch {
             throw new Error('unexpected_error');
           }

@@ -38,7 +38,6 @@ def sign_up():
     # sign_up_response = {}
     # sign_up_response.update({'status': response[0]})
     res = make_response(response[0], response[1])
-    print(response)
     return res
 
 
