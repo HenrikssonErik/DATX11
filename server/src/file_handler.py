@@ -229,7 +229,7 @@ def get_assignment_files_from_database(
                         WHERE assignmentfiles.filename   = %s
                         AND   assignmentfiles.groupid    = %s
                         AND   assignmentfiles.courseid   = %s
-                        AND   assignmentfiles.assignment = %s 
+                        AND   assignmentfiles.assignment = %s
                         """
 
             cur.execute(query_data, (file_name, group_id, course, assignment))

@@ -1,7 +1,7 @@
 
 
 from typing import Literal
-from flask import Flask, Response, jsonify, make_response, request, send_file
+from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
