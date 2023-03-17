@@ -98,11 +98,6 @@ export class LoginComponent implements OnInit {
 
     console.log(this.signUpForm);
 
-    /*const hashedpassword = this.hashPassword(
-      this.signUpForm.get('signUpPassword')!.value,
-      this.signUpForm.get('signUpemail')!.value
-    ); */
-
     const formData = new FormData();
     formData.append('cid', this.signUpForm.get('cid')!.value);
     //TODO: Fult som fan att concatenatea här men idk. Gör väl inget
@@ -166,11 +161,6 @@ export class LoginComponent implements OnInit {
       form.style.transform = 'rotateY(0deg)';
     }
   }
-
-  /*hashPassword(password: string, email: string): string {
-    const has h: string = this.bcrypt.hashSync(password, 10);
-    return hash;
-  } */
 
   onInputFocus(input: string, form: FormGroup): void {
     const control = form.get(input);

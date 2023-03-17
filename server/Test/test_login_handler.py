@@ -12,6 +12,8 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
+    """Mocks the cursor to the mocked connection, which executes the sql query
+    to the mock connection."""
     mock_cursor = MagicMock()
     mock_conn = MagicMock()
     mock_connect.return_value = mock_conn
