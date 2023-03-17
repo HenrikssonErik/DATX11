@@ -128,7 +128,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
 
     except Exception as e:
         print(e)
-        return {'status': "Wrong Credentials"}, 401
+        return {'status': "wrong_credentials"}, 401
 
 
 def create_token(id: int) -> dict[str, str]:
