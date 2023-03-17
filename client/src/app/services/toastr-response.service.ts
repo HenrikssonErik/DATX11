@@ -21,6 +21,7 @@ const response_to_toastr: ResponseToToastr = {
     'You cannot use those characters in the password!',
   ],
   unexpected_error: ['Something went wrong, try again!'],
+  wrong_credentials: ['Did you mistype your password?', 'Could not log in'],
 };
 
 @Injectable({

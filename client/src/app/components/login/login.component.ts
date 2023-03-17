@@ -56,7 +56,6 @@ export class LoginComponent implements OnInit {
     const formData = new FormData();
     formData.append('email', this.loginForm.get('email')?.value);
     formData.append('password', this.loginForm.get('password')!.value);
-    //console.log(formData.get('password'));
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/` + 'login', formData, {
@@ -74,6 +73,14 @@ export class LoginComponent implements OnInit {
               response.body.Token
             }; expires=${expirationDate.toUTCString()}; path=/`;
           }
+        },
+        error: (err) => {
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
         },
       });
 
@@ -104,7 +111,6 @@ export class LoginComponent implements OnInit {
       this.signUpForm.get('signUpemail')!.value + '@chalmers.se'
     );
     formData.append('password', this.signUpForm.get('signUpPassword')!.value);
-    //console.log(formData.get('password'));
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/` + 'signUp', formData, {
@@ -131,8 +137,7 @@ export class LoginComponent implements OnInit {
           }
         },
         error: (err) => {
-          /* console.log(err.error.status); */
-          let statusMsg = err.error.status.error;
+          let statusMsg = err.error.status;
           const [errorMessage, errorTitle]: string[] =
             this.toastrResponse.getToastrRepsonse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
