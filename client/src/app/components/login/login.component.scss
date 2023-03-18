@@ -61,7 +61,7 @@ button i:hover {
 }
 
 /* NO IDEA WHY THIS IS NEEDDE BUT IT IS  */
-.passwordInput:not(.has-validation)
+.input-group:not(.has-validation)
   > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(
     .form-floating
   ) {
@@ -124,6 +124,7 @@ span {
 .flip-card {
   width: 400px;
   height: 100%;
+  perspective: 1000px;
   perspective: 1000px;
 }
 
