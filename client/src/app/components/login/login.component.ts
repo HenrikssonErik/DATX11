@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
     formData.append('password', this.loginForm.get('password')!.value);
 
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + 'login', formData, {
+      .post<HttpResponse<any>>(`${API_URL}/login`, formData, {
         observe: 'response',
       })
       .subscribe({
@@ -108,7 +108,7 @@ export class LoginComponent implements OnInit {
     }
 
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + 'signUp', formData, {
+      .post<HttpResponse<any>>(`${API_URL}/signUp`, formData, {
         observe: 'response',
       })
       .subscribe({
