@@ -31,19 +31,29 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initializeLoginForm();
+    this.initializeSignUpForm();
+    this.enableTooltips();
+  }
+
+  private initializeLoginForm(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       rememberMe: [false],
     });
+  }
 
+  private initializeSignUpForm(): void {
     this.signUpForm = this.fb.group({
       cid: ['', [Validators.required]],
-      signUpemail: [''],
+      signUpEmail: [''],
       signUpPassword: ['', [Validators.required]],
       termsAndCon: ['', [Validators.required]],
     });
+  }
 
+  private enableTooltips(): void {
     this.tooltipEnabler.enableTooltip();
   }
 
@@ -54,8 +64,16 @@ export class LoginComponent implements OnInit {
     }
 
     const formData = new FormData();
-    formData.append('email', this.loginForm.get('email')?.value);
-    formData.append('password', this.loginForm.get('password')!.value);
+    const email = this.loginForm.get('email');
+    const password = this.loginForm.get('password');
+
+    if (email) {
+      formData.append('email', email.value);
+    }
+
+    if (password) {
+      formData.append('password', password.value);
+    }
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/login`, formData, {
@@ -97,7 +115,7 @@ export class LoginComponent implements OnInit {
       formData.append('cid', cid.value);
     }
 
-    const email = this.signUpForm.get('signUpemail');
+    const email = this.signUpForm.get('signUpEmail');
     if (email) {
       formData.append('email', `${email.value}@chalmers.se`);
     }
@@ -142,20 +160,6 @@ export class LoginComponent implements OnInit {
       });
 
     this.signUpSuccess = true;
-  }
-
-  flipToSignUp() {
-    const form = document.getElementById('flip-card-inner');
-    if (form) {
-      form.style.transform = 'rotateY(180deg)';
-    }
-  }
-
-  flipToLogin() {
-    const form = document.getElementById('flip-card-inner');
-    if (form) {
-      form.style.transform = 'rotateY(0deg)';
-    }
   }
 
   flipTo(form: string) {
