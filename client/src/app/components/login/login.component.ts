@@ -162,6 +162,18 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  flipTo(form: string) {
+    const side = document.getElementById('flip-card-inner');
+    if (side) {
+      if (form == 'signUp') {
+        side.style.transform = 'rotateY(180deg)';
+      }
+      if (form == 'login') {
+        side.style.transform = 'rotateY(0deg)';
+      }
+    }
+  }
+
   onInputFocus(input: string, form: FormGroup): void {
     const control = form.get(input);
 
@@ -169,16 +181,10 @@ export class LoginComponent implements OnInit {
       const isValid = control.valid;
       const isInvalid = control.invalid && (control.dirty || control.touched);
       const el = document.getElementById(input);
-      if (isValid) {
-        el?.classList.add('success');
-        el?.classList.remove('error');
-      } else if (isInvalid) {
-        el?.classList.add('error');
-        el?.classList.remove('success');
-      } else {
-        el?.classList.remove('success');
-        el?.classList.remove('error');
-      }
+
+      el?.classList.toggle('success', isValid);
+      el?.classList.toggle('error', isInvalid);
+      el?.classList.toggle('success', !isInvalid && !isValid);
     }
   }
 }
