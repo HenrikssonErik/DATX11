@@ -83,8 +83,6 @@ export class LoginComponent implements OnInit {
           });
         },
       });
-
-    //TODO: this.success = true;
   }
 
   onSubmitSignUp(): void {
@@ -93,19 +91,21 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    const cid = this.signUpForm.get('cid')?.value;
-    this.signUpForm.get('signUpemail')?.setValue(cid);
-
-    console.log(this.signUpForm);
-
     const formData = new FormData();
-    formData.append('cid', this.signUpForm.get('cid')!.value);
-    //TODO: Fult som fan att concatenatea här men idk. Gör väl inget
-    formData.append(
-      'email',
-      this.signUpForm.get('signUpemail')!.value + '@chalmers.se'
-    );
-    formData.append('password', this.signUpForm.get('signUpPassword')!.value);
+    const cid = this.signUpForm.get('cid');
+    if (cid) {
+      formData.append('cid', cid.value);
+    }
+
+    const email = this.signUpForm.get('signUpemail');
+    if (email) {
+      formData.append('email', email.value + '@chalmers.se');
+    }
+
+    const password = this.signUpForm.get('signUpPassword');
+    if (password) {
+      formData.append('password', password.value);
+    }
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/` + 'signUp', formData, {
