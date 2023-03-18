@@ -141,10 +141,6 @@ export class LoginComponent implements OnInit {
         },
       });
 
-    // Logic to submit the new user creation
-
-    // TODO: Show visual feedback to user that account creation was successfull.
-
     this.signUpSuccess = true;
   }
 
