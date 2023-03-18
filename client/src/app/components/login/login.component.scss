@@ -61,7 +61,7 @@ button i:hover {
 }
 
 /* NO IDEA WHY THIS IS NEEDDE BUT IT IS  */
-.input-group:not(.has-validation)
+.passwordInput:not(.has-validation)
   > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(
     .form-floating
   ) {
