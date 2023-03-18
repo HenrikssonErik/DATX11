@@ -99,7 +99,7 @@ export class LoginComponent implements OnInit {
 
     const email = this.signUpForm.get('signUpemail');
     if (email) {
-      formData.append('email', email.value + '@chalmers.se');
+      formData.append('email', `${email.value}@chalmers.se`);
     }
 
     const password = this.signUpForm.get('signUpPassword');
