@@ -64,22 +64,35 @@
               <label for="signUpPassword" class="text-muted" translate
                 >Password</label
               >
-              <input
-                [ngClass]="{
-                  success: signUpForm.get('signUpPassword')?.valid,
-                  error:
-                    signUpForm.get('signUpPassword')?.invalid &&
-                    (signUpForm.get('signUpPassword')?.dirty ||
-                      signUpForm.get('signUpPassword')?.touched)
-                }"
-                type="password"
-                formControlName="signUpPassword"
-                class="form-control focus-border"
-                id="signUpPassword"
-                placeholder="{{ 'Password' | translate }}"
-                (focus)="onInputFocus('signUpPassword', signUpForm)"
-                required
-              />
+              <div class="input-group">
+                <input
+                  [ngClass]="{
+                    success: signUpForm.get('signUpPassword')?.valid,
+                    error:
+                      signUpForm.get('signUpPassword')?.invalid &&
+                      (signUpForm.get('signUpPassword')?.dirty ||
+                        signUpForm.get('signUpPassword')?.touched)
+                  }"
+                  type="password"
+                  maxlength="33"
+                  formControlName="signUpPassword"
+                  class="form-control focus-border"
+                  id="signUpPassword"
+                  placeholder="{{ 'Password' | translate }}"
+                  (focus)="onInputFocus('signUpPassword', signUpForm)"
+                  required
+                />
+                <button>
+                  <i
+                    class="fa-regular fa"
+                    [ngClass]="{
+                      'fa-eye': !passwordVisible,
+                      'fa-eye-slash': passwordVisible
+                    }"
+                    (click)="showPassword('signUpPassword')"
+                  ></i>
+                </button>
+              </div>
               <!--  <div class="error-message" *ngIf="signUpForm.get('password')?.invalid && (signUpForm.get('password')?.dirty || signUpForm.get('password')?.touched)">
                 Please enter a password.
               </div> -->
@@ -127,8 +140,6 @@
                 >
               </p>
             </div>
-            <!--   <h2 class="signUpHorizontal"><span>Or</span></h2>
-            <button type="button" (click)="flipToLogin()" class="btn btn-secondary btn-block mt-2 w-100">Go Back to Login</button> -->
           </form>
         </div>
       </div>
@@ -165,22 +176,35 @@
               <label for="password" class="text-muted" translate
                 >Password</label
               >
-              <input
-                [ngClass]="{
-                  success: loginForm.get('password')?.valid,
-                  error:
-                    loginForm.get('password')?.invalid &&
-                    (loginForm.get('password')?.dirty ||
-                      loginForm.get('password')?.touched)
-                }"
-                type="password"
-                formControlName="password"
-                class="form-control focus-border"
-                id="password"
-                placeholder="{{ 'Password' | translate }}"
-                (focus)="onInputFocus('password', loginForm)"
-                required
-              />
+              <div class="input-group">
+                <input
+                  [ngClass]="{
+                    success: loginForm.get('password')?.valid,
+                    error:
+                      loginForm.get('password')?.invalid &&
+                      (loginForm.get('password')?.dirty ||
+                        loginForm.get('password')?.touched)
+                  }"
+                  type="password"
+                  maxlength="33"
+                  formControlName="password"
+                  class="form-control focus-border"
+                  id="password"
+                  placeholder="{{ 'Password' | translate }}"
+                  (focus)="onInputFocus('password', loginForm)"
+                  required
+                />
+                <button>
+                  <i
+                    class="fa-regular fa"
+                    [ngClass]="{
+                      'fa-eye': !passwordVisible,
+                      'fa-eye-slash': passwordVisible
+                    }"
+                    (click)="showPassword('password')"
+                  ></i>
+                </button>
+              </div>
               <!--  <div class="error-message" *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
                 Please enter a password.
               </div> -->
