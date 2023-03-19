@@ -9,7 +9,8 @@ class Role(Enum):
     Student = 'Student'
 
 
-def get_courses_info(userId: int) -> list[dict[str, any]]:
+def get_courses_info(user_id: int) -> list[dict[str, any]]:
+    """Returns an array with information on Courses associated to the userId"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -17,7 +18,7 @@ def get_courses_info(userId: int) -> list[dict[str, any]]:
             with conn.cursor() as cur:
                 query_data = """SELECT * FROM User_course_info
                             WHERE userid = %s"""
-                cur.execute(query_data, (userId,))
+                cur.execute(query_data, (user_id,))
                 data = cur.fetchall()
         conn.close()
         if not data:
@@ -34,7 +35,9 @@ def get_courses_info(userId: int) -> list[dict[str, any]]:
         return {'status': "No Courses Found"}
 
 
-def get_group(userId: int, courseId: int) -> dict[str, str]:
+def get_group(user_id: int, course_id: int) -> dict[str, str]:
+    """Returns group ID and group number associated with the users group
+        in the specified course"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -43,7 +46,7 @@ def get_group(userId: int, courseId: int) -> dict[str, str]:
                 query_data = """SELECT groupid, groupnumber FROM
                                 user_group_course_info
                                 WHERE userid = %s and courseid = %s"""
-                cur.execute(query_data, (userId, courseId))
+                cur.execute(query_data, (user_id, course_id))
                 data = cur.fetchone()
         conn.close()
 
@@ -51,7 +54,7 @@ def get_group(userId: int, courseId: int) -> dict[str, str]:
             raise Exception("No groups for this user")
 
         orderedData: dict = {}
-        orderedData["groupid"] = data[0]
+        orderedData["groupId"] = data[0]
         orderedData["groupNumber"] = data[1]
         return orderedData
 
@@ -60,12 +63,12 @@ def get_group(userId: int, courseId: int) -> dict[str, str]:
         return {'status': "No Groups Found"}
 
 
-def add_user_to_group(userId: int, groupId: int) -> None:
+def add_user_to_group(user_id: int, group_id: int) -> None:
     # check user on course and group on the course
-    user_courses = get_courses_info(userId)
+    user_courses = get_courses_info(user_id)
     conn = psycopg2.connect(dsn=get_conn_string())
 
-    course_id = __get_course_id_from_group(groupId)
+    course_id = __get_course_id_from_group(group_id)
 
     # add to group
     try:
@@ -76,7 +79,7 @@ def add_user_to_group(userId: int, groupId: int) -> None:
                     with conn.cursor() as cur:
                         query_data = """INSERT into useringroup VALUES
                                        (%s, %s)"""
-                        cur.execute(query_data, [userId, groupId])
+                        cur.execute(query_data, [user_id, group_id])
                 conn.close()
 
     except Exception as e:
@@ -84,7 +87,7 @@ def add_user_to_group(userId: int, groupId: int) -> None:
         return {'status': "No Groups Found"}
 
 
-def __get_course_id_from_group(groupId) -> int:
+def __get_course_id_from_group(group_id) -> int:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -92,8 +95,8 @@ def __get_course_id_from_group(groupId) -> int:
             with conn.cursor() as cur:
                 query_data = """SELECT course FROM
                                 groups
-                                WHERE groupid = %s """
-                cur.execute(query_data, [groupId])
+                                WHERE group_id = %s """
+                cur.execute(query_data, [group_id])
                 data = cur.fetchone()
 
         if not data:
@@ -105,7 +108,7 @@ def __get_course_id_from_group(groupId) -> int:
         return e
 
 
-def add_user_to_course(userId: int, courseId: int, userRole: Role) -> None:
+def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
     # TODO: Maybe add som check so admin or course teacher only can add people, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -114,7 +117,7 @@ def add_user_to_course(userId: int, courseId: int, userRole: Role) -> None:
             with conn.cursor() as cur:
                 query_data = """INSERT into userincourse values
                                 (%s, %s, %s)"""
-                cur.execute(query_data, [userId, courseId, userRole.name])
+                cur.execute(query_data, [user_id, course_id, user_role.name])
         conn.close()
 
     except Exception as e:
@@ -122,7 +125,7 @@ def add_user_to_course(userId: int, courseId: int, userRole: Role) -> None:
         return {'status': "Unable to add to course"}
 
 
-def remove_user_from_group(userId: int, groupId: int) -> None:
+def remove_user_from_group(user_id: int, group_id: int) -> None:
     # TODO: add some checks so not anyone can call this delete method, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -131,7 +134,7 @@ def remove_user_from_group(userId: int, groupId: int) -> None:
             with conn.cursor() as cur:
                 query_data = """DELETE from useringroup
                                 WHERE userid = %s AND groupid = %s """
-                cur.execute(query_data, [userId, groupId])
+                cur.execute(query_data, [user_id, group_id])
 
     except Exception as e:
         print(e)
