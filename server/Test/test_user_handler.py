@@ -41,7 +41,7 @@ class TestUserHandler(unittest.TestCase):
                      'Year': 4, 'StudyPeriod': 2023}])
 
     @patch('psycopg2.connect')
-    def test_get_user_group_from_courses(self, mock_connect):
+    def test_get_group(self, mock_connect):
 
         mock_cursor = setup_mock_cursor(mock_connect)
         mock_cursor.fetchone.return_value = (2, 1)
