@@ -30,10 +30,10 @@ class TestUserHandler(unittest.TestCase):
         mock_cursor = setup_mock_cursor(mock_connect)
         mock_cursor.fetchall.return_value = [(1, 'Admin', 1, 'datx12', 2, 2023), (1, 'Student', 2, 'datx11', 4, 2023)]
 
-        userId = 1
-        result = get_courses_info(userId)
+        user_id = 1
+        result = get_courses_info(user_id)
         mock_cursor.execute.assert_called_once_with("""SELECT * FROM User_course_info
-                            WHERE userid = %s""", (userId,))
+                            WHERE userid = %s""", (user_id,))
         self.assertEqual(
             result, [{'Role': 'Admin', 'courseID': 1, 'Course': 'datx12',
                       'Year': 2, 'StudyPeriod': 2023},
@@ -46,15 +46,15 @@ class TestUserHandler(unittest.TestCase):
         mock_cursor = setup_mock_cursor(mock_connect)
         mock_cursor.fetchone.return_value = (2, 1)
 
-        userId = 1
-        courseId = 6
-        result = get_group(userId, courseId)
+        user_id = 1
+        course_id = 6
+        result = get_group(user_id, course_id)
 
         mock_cursor.execute.assert_called_once_with("""SELECT groupid, groupnumber FROM
                                 user_group_course_info
                                 WHERE userid = %s and courseid = %s""",
-                                                    (userId, courseId))
-        self.assertEqual(result, {'groupid': 2, 'groupNumber': 1})
+                                                    (user_id, course_id))
+        self.assertEqual(result, {'groupId': 2, 'groupNumber': 1})
 
     @patch('psycopg2.connect')
     def test_add_user_to_course(self, mock_connect):

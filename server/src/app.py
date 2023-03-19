@@ -97,14 +97,32 @@ def get_files():
 
 @app.route('/getCourses', methods=['GET'])
 def getCourses():
+    """Returns an array of all Courses a user is associated with together with
+       the following information: Role, CourseID, Course (abbriviation),
+       Year, StudyPeriod
+       Requires a token to be sent as a cookie with the request"""
     token = request.cookies.get('Token')
     user_id = verify_and_get_token(token)
 
     if (user_id):
         info = get_courses_info(user_id)
         res = make_response(jsonify(info), 200)
-        res.status_code = 200
         return res
+
+    else:
+        return make_response('', 401)
+
+
+@app.route('getGroup', methods=['GET'])
+def getGroup():
+    """Takes a Token as cookie, and a course_id.
+    Returns the group_id and group_number"""
+    token = request.cookies.get('Token')
+    user_id = verify_and_get_token(token)
+    if (user_id):
+        course = request.args.get('Course')
+        group = get_group(user_id, course)
+        return make_response(jsonify(group, 200))
 
     else:
         return make_response('', 401)
