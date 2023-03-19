@@ -5,7 +5,8 @@ from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
-from .login_handler import user_registration, log_in, create_key
+from .login_handler import user_registration, log_in, create_key, verify_and_get_token
+from user_handler import *
 from .podman.podman_runner import init_images
 
 # creating the Flask application
@@ -91,3 +92,18 @@ def get_files():
                .format(filename)}
     res.headers = headers
     return res
+
+
+@app.route('/getCourses', methods=['GET'])
+def getCourses():
+    token = request.cookies.get('Token')
+    user_id = verify_and_get_token(token)
+
+    if (user_id):
+        info = get_courses_info(user_id)
+        res = make_response(jsonify(info), 200)
+        res.status_code = 200
+        return res
+
+    else:
+        return make_response('', 401)
