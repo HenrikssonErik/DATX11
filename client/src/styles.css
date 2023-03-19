@@ -7,3 +7,13 @@ body {
   overflow-x: hidden !important;
   background-color: #f5f5f5 !important;
 }
+
+.btn-primary {
+  background-color: #26734d !important;
+  border-color: #26734d !important;
+}
+
+.btn-primary:hover {
+  background-color: #216b42 !important;
+  border-color: #216b42 !important;
+}
