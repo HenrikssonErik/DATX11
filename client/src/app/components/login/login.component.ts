@@ -16,10 +16,6 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup = new FormGroup({});
   signUpForm: FormGroup = new FormGroup({});
   submitFailed: boolean = false;
-  success: boolean = false;
-  signUpFailed: boolean = false;
-  signUpSuccess: boolean = false;
-  bcrypt = require('bcryptjs');
   cid: string = '';
 
   constructor(
@@ -102,7 +98,6 @@ export class LoginComponent implements OnInit {
 
   onSubmitSignUp(): void {
     if (this.signUpForm.invalid) {
-      this.signUpFailed = true;
       return;
     }
 
@@ -152,8 +147,6 @@ export class LoginComponent implements OnInit {
           });
         },
       });
-
-    this.signUpSuccess = true;
   }
 
   flipTo(form: string) {
