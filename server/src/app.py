@@ -5,7 +5,7 @@ from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
-from .login_handler import user_registration, log_in, create_key, verify_and_get_token
+from .login_handler import user_registration, log_in, create_key, verify_and_get_id
 from .user_handler import *
 
 # creating the Flask application
@@ -96,11 +96,12 @@ def getCourses():
        Year, StudyPeriod
        Requires a token to be sent as a cookie with the request"""
     token = request.cookies.get('Token')
-    user_id = verify_and_get_token(token)
+    user_id = verify_and_get_id(token)
 
     if (user_id):
-        info = get_courses_info(user_id)
-        res = make_response(jsonify(info), 200)
+        email = {'email': get_user_email(user_id)}
+        course_info = get_courses_info(user_id)
+        res = make_response(jsonify(email, course_info), 200)
         return res
 
     else:
@@ -110,9 +111,9 @@ def getCourses():
 @app.route('/getGroup', methods=['GET'])
 def getGroup():
     """Takes a Token as cookie, and a course_id.
-    Returns the group_id and group_number"""
+    Returns the group_id, group_number and cid of members"""
     token = request.cookies.get('Token')
-    user_id = verify_and_get_token(token)
+    user_id = verify_and_get_id(token)
     if (user_id):
         course = request.args.get('Course')
         group = get_group(user_id, course)
@@ -122,4 +123,15 @@ def getGroup():
         return make_response('', 401)
 
 
-@app.route('/')
+@app.route('/addToCourse', methods=['POST'])
+def nextRoute():
+    token = request.cookies.get('Token')
+    request_user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course_id = data['Course']
+    user_to_add = data['User']
+
+    if (check_admin_or_course_teacher(request_user_id, course_id)):
+        add_user_to_course(user_to_add, course_id)
+
+    return make_response("", 200)

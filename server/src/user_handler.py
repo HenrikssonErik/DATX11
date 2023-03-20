@@ -9,6 +9,49 @@ class Role(Enum):
     Student = 'Student'
 
 
+def get_assignments(course_id: int) -> dict:
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT assignment FROM assignments
+                            WHERE courseid = %s"""
+                cur.execute(query_data, [course_id])
+                data = cur.fetchall()
+        conn.close()
+        if not data:
+            raise Exception("No courses for this user")
+        #orderedData: dict[str, list] = []
+        #orderedData.append({"Assignments": data})
+        return data
+
+    except Exception as e:
+        print(e)
+        return {'status': "No Courses Found"}
+
+
+def get_user_email(user_id: int) -> str:
+    """Returns an array with information on the user to the userId"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT email FROM Userdata
+                            WHERE userid = %s"""
+                cur.execute(query_data, (user_id,))
+                data = cur.fetchone()
+        conn.close()
+        if not data:
+            raise Exception("No such user")
+        return data[0]
+
+    except Exception as e:
+        print(e)
+        return {'status': "No User Found"}
+
+
 def get_courses_info(user_id: int) -> list[dict[str, any]]:
     """Returns an array with information on Courses associated to the userId"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -27,7 +70,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         for info in data:
             orderedData.append({"Role": info[1], "courseID": info[2],
                                 "Course": info[3], "Year": info[4],
-                                "StudyPeriod": info[5]})
+                                "StudyPeriod": info[5], 'Assignments': get_assignments(info[2])})
         return orderedData
 
     except Exception as e:
@@ -56,7 +99,9 @@ def get_group(user_id: int, course_id: int) -> dict[str, str|list]:
         orderedData: dict = {}
         orderedData["groupId"] = data[0]
         orderedData["groupNumber"] = data[1]
-        orderedData["groupMembers"] = __get_group_members
+        group_members = __get_group_members()
+        print(group_members)
+        orderedData["groupMembers"] = group_members
         return orderedData
 
     except Exception as e:
@@ -85,6 +130,7 @@ def __get_group_members(group_id: int) -> list:
     except Exception as e:
         print(e)
         return {'status': "no_group_members"}
+
 
 def add_user_to_group(user_id: int, group_id: int) -> None:
     # check user on course and group on the course
@@ -185,7 +231,7 @@ def is_admin_on_course(user_id: int, course_id: int) -> bool:
 
 
 # TODO: include global role
-def get_global_role(user_id):
+def get_global_role(user_id) -> str:
     """Checks the gobal role for the user.
         Returns a string"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -208,4 +254,11 @@ def get_global_role(user_id):
         return {'status': "No User Found"}
 
 
-# TODO: add security checks, Course handler -> create/delete course, assignments, edit assignment details,
+def check_admin_or_course_teacher(user_id: int, course_id: int):
+    course_administrator: bool = is_admin_on_course(user_id, course_id) or \
+                            is_teacher_on_course(user_id, course_id)
+    global_admin: bool = get_global_role(user_id) == Role.Admin.name
+
+    return course_administrator or global_admin
+
+# Course handler -> create/delete course, assignments, edit assignment details,
