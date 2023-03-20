@@ -7,6 +7,7 @@ import psycopg2
 import string
 import jwt
 import random
+from .call_ldap import check_against_ldap
 
 __SECRET_KEY: str = None
 
@@ -44,8 +45,9 @@ def check_data_input(cid: str, email: str,
                              string.punctuation)
     if not set(pwd) <= allowed_characters:
         return "pass_not_ok", 400
+    if not check_against_ldap(cid):
+        return "cid_does_not_exist", 400
     return "OK", 200
-
 
 def user_registration(data: Request.form) -> \
         tuple[dict[str, str], Literal[200, 400, 401, 406]]:
