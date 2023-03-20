@@ -6,7 +6,7 @@ from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
 from .login_handler import user_registration, log_in, create_key, verify_and_get_token
-from user_handler import *
+from .user_handler import *
 
 # creating the Flask application
 app = Flask(__name__)
@@ -107,7 +107,7 @@ def getCourses():
         return make_response('', 401)
 
 
-@app.route('getGroup', methods=['GET'])
+@app.route('/getGroup', methods=['GET'])
 def getGroup():
     """Takes a Token as cookie, and a course_id.
     Returns the group_id and group_number"""
