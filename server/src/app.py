@@ -126,3 +126,17 @@ def getGroup():
 
     else:
         return make_response('', 401)
+
+# TODO: check this
+@app.route('/addToCourse', methods=['POST'])
+def addToCourse():
+    token = request.cookies.get('Token')
+    request_user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course_id = data['Course']
+    user_to_add = data['User']
+
+    if (check_admin_or_course_teacher(request_user_id, course_id)):
+        add_user_to_course(user_to_add, course_id)
+
+    return make_response("", 200)
