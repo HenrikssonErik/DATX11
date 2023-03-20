@@ -1,0 +1,53 @@
+.nameText {
+  font-size: 12px;
+  margin: 0;
+}
+
+.numberText {
+  margin: 0;
+  font-size: 20px;
+}
+
+.iconRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coursesIcon {
+  font-size: 25px;
+}
+
+.rightBorder {
+  border-right: 1px solid #6c757d;
+}
+
+.leftBorder {
+  border-left: 1px solid #6c757d;
+}
+
+.topBorder {
+  border-top: 1px solid #6c757d;
+}
+
+.bottomBorder {
+  border-bottom: 1px solid #6c757d;
+}
+
+.recentEvents {
+  min-height: 700px;
+}
+
+.nothingNew {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b0bec5;
+}
+
+.noDeadLines {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b0bec5;
+}

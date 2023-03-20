@@ -38,5 +38,7 @@
   "Enhancing_maintainability_and_scalability": "Förbättra underhållbarhet och skalbarhet",
   "Enhancing_maintainability_and_scalability_Text": "Genom att ha en uppsättning tester som täcker olika scenarier så kan du göra ändringar i din kod med större självförtroende och undvika att introducera nya buggar eller problem.",
   "Get_started": "Kom igång",
-  "About": "Om"
+  "About": "Om",
+  "Nothing_new": "Inget Nytt",
+  "No_deadlines": "Inga tidsfrister, illgött ju!"
 }

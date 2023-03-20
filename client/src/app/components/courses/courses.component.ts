@@ -8,16 +8,24 @@ import { API_URL } from 'src/environments/environment';
   styleUrls: ['./courses.component.scss'],
 })
 export class CoursesComponent implements OnInit {
+  courses: any;
+  events = [];
+  deadlines = [];
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.getCourses();
+  }
+
+  getCourses() {
     const cookie = this.replaceSessionToken(document.cookie);
-    console.log(cookie);
 
     let headers = new HttpHeaders();
     headers = headers.append('Cookies', cookie);
     this.http.get(`${API_URL}/getCourses`, { headers }).subscribe((res) => {
-      console.log(res);
+      this.courses = res;
+      console.log(this.courses);
     });
   }
 
