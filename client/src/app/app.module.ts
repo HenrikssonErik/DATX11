@@ -31,6 +31,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HomePageComponent } from './components/home-page/home-page.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { CoursesComponent } from './components/courses/courses.component';
+import { MatTabsModule } from '@angular/material/tabs';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -60,6 +61,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
     ReactiveFormsModule,
+    MatTabsModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -68,6 +70,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       },
     }),
   ],
+  exports: [MatTabsModule],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
