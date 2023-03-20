@@ -30,6 +30,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HomePageComponent } from './components/home-page/home-page.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import { CoursesComponent } from './components/courses/courses.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -48,6 +49,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     LoginComponent,
     HomePageComponent,
     PageNotFoundComponent,
+    CoursesComponent,
   ],
   imports: [
     BrowserModule,

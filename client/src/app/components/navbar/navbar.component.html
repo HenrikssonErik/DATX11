@@ -8,32 +8,26 @@
     <div id="mainListDiv" class="main_list">
       <ul class="navlinks">
         <!-- TODO: Use routerLinkActive and [routerLink] when the links becomes active -->
-        <li><a href="#" class="text-muted" translate>Courses</a></li>
+        <li>
+          <a
+            routerLink="/courses"
+            routerLinkActive="active-link"
+            class="text-muted navbarLink"
+            translate
+            >Courses</a
+          >
+        </li>
         <li><a href="#" class="text-muted" translate>Assignments</a></li>
         <li><a href="#" class="text-muted" translate>My_Page</a></li>
-        <li><a href="/login" class="text-muted" translate>Login</a></li>
-        <!--       <li class="nav-item dropdown">
-      
+        <li>
           <a
-            class="text-muted"
-            type="button"
-            id="dropdownMenuButton"
-            data-bs-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
+            routerLink="/login"
+            routerLinkActive="active-link"
+            class="text-muted navbarLink"
+            translate
+            >Login</a
           >
-            <i class="fa-solid fa-globe"></i>
-          </a>
-         
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="#"
-              ><img src="assets/se.png" width="35px" alt="lang" />Swedish</a
-            >
-            <a class="dropdown-item" href="#"
-              ><img src="assets/en.png" width="35px" alt="lang" />English</a
-            >
-          </div>
-        </li> -->
+        </li>
       </ul>
     </div>
     <span class="navTrigger">
@@ -44,9 +38,3 @@
   </div>
 </nav>
 <div style="height: 80px"></div>
-
-<!--TODO: add witch language is active-->
-
-<div style="height: 80px"></div>
-
-<!--TODO: add witch language is active-->
