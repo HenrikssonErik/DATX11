@@ -180,7 +180,7 @@ export class FileUploadComponent {
         error: (err) => {
           this.toastr.error(
             err.error.number_of_files,
-            'Soemething went wrong!',
+            'Something went wrong!',
             {
               closeButton: true,
             }

@@ -46,11 +46,12 @@ CREATE Table TestFiles (
 CREATE TABLE UserEmail (email TEXT PRIMARY KEY CONSTRAINT proper_email CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'));
 
 CREATE TABLE UserData (
-	cid TEXT,
-	email TEXT,
-	passphrase TEXT,
-	PRIMARY KEY (cid),
-	FOREIGN KEY (email) REFERENCES userEmail(email)
+	userId SERIAL,
+	cid TEXT UNIQUE,
+	email TEXT NOT NULL,
+	passphrase BYTEA NOT NULL,
+	PRIMARY KEY (userId),
+	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
 
 CREATE TABLE Groups (
@@ -63,9 +64,36 @@ CREATE TABLE Groups (
 );
 
 CREATE TABLE UserInGroup (
-	userCID TEXT,
+	userId INTEGER,
 	groupId INTEGER,
-	PRIMARY KEY (userCID, groupId),
-	FOREIGN KEY (groupId) REFERENCES Groups(groupId),
-	FOREIGN KEY (userCID) REFERENCES UserData(cid)
+	PRIMARY KEY (userId, groupId),
+	FOREIGN KEY (groupId) REFERENCES Groups(groupId) ON DELETE CASCADE,
+	FOREIGN KEY (userId) REFERENCES UserData(userId) ON DELETE CASCADE
 );
+
+
+CREATE TABLE UserInCourse (
+	userId INTEGER,
+	courseId INTEGER,
+	userRole TEXT NOT NULL CHECK (userRole IN ('Admin', 'Teacher', 'Student')),
+	PRIMARY KEY (userId, courseId),
+	FOREIGN KEY (courseId) REFERENCES Courses(courseId) ON DELETE CASCADE,
+	FOREIGN KEY (userId) REFERENCES UserData(userId) ON DELETE CASCADE
+);
+
+--View for user and course data can be called for course inf from specific user:
+--To Call do: select * from user_course_info where userId = 'id int';
+
+CREATE OR REPLACE VIEW user_course_info AS
+SELECT uic.userId, uic.userRole, c.courseId, c.Course, c.TeachingPeriod, c.CourseYear
+FROM UserInCourse uic
+JOIN Courses c ON uic.courseId = c.CourseId;
+
+
+--This view shows user and its courses with corresponding groups. Useful to get group info if user and course id is known
+
+CREATE OR REPLACE VIEW user_group_course_info AS
+SELECT uig.userId, uig.groupId, g.groupNumber, g.course as courseId, c.Course, c.courseyear, c.teachingperiod
+FROM UserInGroup uig
+JOIN Groups g ON uig.groupId = g.groupId
+JOIN Courses c ON g.course = c.CourseId;

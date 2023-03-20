@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { TestApiService } from './test.service';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { DndDirective } from './directives/dnd.directive';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
@@ -16,10 +16,11 @@ import { TestFeedbackComponent } from './components/test-feedback/test-feedback.
 import { TestFeedbackCardComponent } from './components/test-feedback-card/test-feedback-card.component';
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
+import { LoginComponent } from './components/login/login.component';
 
 @NgModule({
-  declarations: [AppComponent, FileUploadComponent, DndDirective, NavbarComponent, FooterComponent, TestFeedbackComponent, TestFeedbackCardComponent, SpinnerComponent],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule, FormsModule, CommonModule, BrowserAnimationsModule, ToastrModule.forRoot()],
+  declarations: [AppComponent, FileUploadComponent, DndDirective, NavbarComponent, FooterComponent, TestFeedbackComponent, TestFeedbackCardComponent, SpinnerComponent, LoginComponent],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, FormsModule, CommonModule, BrowserAnimationsModule, ToastrModule.forRoot(), ReactiveFormsModule],
   providers: [
     {
       provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true
