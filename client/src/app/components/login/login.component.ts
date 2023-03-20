@@ -17,6 +17,7 @@ export class LoginComponent implements OnInit {
   signUpForm: FormGroup = new FormGroup({});
   submitFailed: boolean = false;
   cid: string = '';
+  passwordVisible: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -94,6 +95,20 @@ export class LoginComponent implements OnInit {
           });
         },
       });
+  }
+
+  public showPassword(inputForm: string) {
+    this.passwordVisible = !this.passwordVisible;
+    let obj = document.getElementById(inputForm) as HTMLInputElement;
+    if (this.passwordVisible) {
+      if (obj != null) {
+        obj.type = 'text';
+      }
+    } else {
+      if (obj != null) {
+        obj.type = 'password';
+      }
+    }
   }
 
   onSubmitSignUp(): void {

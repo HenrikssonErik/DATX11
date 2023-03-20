@@ -22,6 +22,10 @@ const response_to_toastr: ResponseToToastr = {
   ],
   unexpected_error: ['Something went wrong, try again!'],
   wrong_credentials: ['Did you mistype your password?', 'Could not log in'],
+  cid_does_not_exist: [
+    'CID is not correct.',
+    'CID is not correct.'
+  ]
 };
 
 @Injectable({
