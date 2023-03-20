@@ -16,10 +16,6 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup = new FormGroup({});
   signUpForm: FormGroup = new FormGroup({});
   submitFailed: boolean = false;
-  success: boolean = false;
-  signUpFailed: boolean = false;
-  signUpSuccess: boolean = false;
-  bcrypt = require('bcryptjs');
   cid: string = '';
 
   constructor(
@@ -31,19 +27,29 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initializeLoginForm();
+    this.initializeSignUpForm();
+    this.enableTooltips();
+  }
+
+  private initializeLoginForm(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       rememberMe: [false],
     });
+  }
 
+  private initializeSignUpForm(): void {
     this.signUpForm = this.fb.group({
       cid: ['', [Validators.required]],
-      signUpemail: [''],
+      signUpEmail: [''],
       signUpPassword: ['', [Validators.required]],
       termsAndCon: ['', [Validators.required]],
     });
+  }
 
+  private enableTooltips(): void {
     this.tooltipEnabler.enableTooltip();
   }
 
@@ -54,21 +60,26 @@ export class LoginComponent implements OnInit {
     }
 
     const formData = new FormData();
-    formData.append('email', this.loginForm.get('email')?.value);
-    formData.append('password', this.loginForm.get('password')!.value);
+    const email = this.loginForm.get('email');
+    const password = this.loginForm.get('password');
+
+    if (email) {
+      formData.append('email', email.value);
+    }
+
+    if (password) {
+      formData.append('password', password.value);
+    }
 
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + 'login', formData, {
+      .post<HttpResponse<any>>(`${API_URL}/login`, formData, {
         observe: 'response',
       })
       .subscribe({
         //TODO: save token and id
         next: (response: any) => {
           if (response.body.Token) {
-            const expirationDate = new Date();
-            expirationDate.setTime(
-              expirationDate.getTime() + 2 * 60 * 60 * 1000
-            ); // 2 hours from now
+            const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
             document.cookie = `sessionToken=${
               response.body.Token
             }; expires=${expirationDate.toUTCString()}; path=/`;
@@ -83,50 +94,38 @@ export class LoginComponent implements OnInit {
           });
         },
       });
-
-    //TODO: this.success = true;
   }
 
   onSubmitSignUp(): void {
     if (this.signUpForm.invalid) {
-      this.signUpFailed = true;
       return;
     }
 
-    const cid = this.signUpForm.get('cid')?.value;
-    this.signUpForm.get('signUpemail')?.setValue(cid);
-
-    console.log(this.signUpForm);
-
     const formData = new FormData();
-    formData.append('cid', this.signUpForm.get('cid')!.value);
-    //TODO: Fult som fan att concatenatea här men idk. Gör väl inget
-    formData.append(
-      'email',
-      this.signUpForm.get('signUpemail')!.value + '@chalmers.se'
-    );
-    formData.append('password', this.signUpForm.get('signUpPassword')!.value);
+    const cid = this.signUpForm.get('cid');
+    if (cid) {
+      formData.append('cid', cid.value);
+      formData.append('email', `${cid.value}@chalmers.se`);
+    }
+
+    const password = this.signUpForm.get('signUpPassword');
+    if (password) {
+      formData.append('password', password.value);
+    }
 
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + 'signUp', formData, {
+      .post<HttpResponse<any>>(`${API_URL}/signUp`, formData, {
         observe: 'response',
       })
       .subscribe({
         next: (response: any) => {
           try {
             if (response.body.Token) {
-              const expirationDate = new Date();
-              expirationDate.setTime(
-                expirationDate.getTime() + 2 * 60 * 60 * 1000
-              ); // 2 hours from now
+              const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
               document.cookie = `sessionToken=${
                 response.body.Token
               }; expires=${expirationDate.toUTCString()}; path=/`;
             }
-
-            this.toastr.success('Success!', 'User created!', {
-              closeButton: true,
-            });
           } catch {
             throw new Error('unexpected_error');
           }
@@ -139,26 +138,23 @@ export class LoginComponent implements OnInit {
             closeButton: true,
           });
         },
+        complete: () => {
+          this.toastr.success('Success!', 'User created!', {
+            closeButton: true,
+          });
+        },
       });
-
-    // Logic to submit the new user creation
-
-    // TODO: Show visual feedback to user that account creation was successfull.
-
-    this.signUpSuccess = true;
   }
 
-  flipToSignUp() {
-    const form = document.getElementById('flip-card-inner');
-    if (form) {
-      form.style.transform = 'rotateY(180deg)';
-    }
-  }
-
-  flipToLogin() {
-    const form = document.getElementById('flip-card-inner');
-    if (form) {
-      form.style.transform = 'rotateY(0deg)';
+  flipTo(form: string) {
+    const side = document.getElementById('flip-card-inner');
+    if (side) {
+      if (form == 'signUp') {
+        side.style.transform = 'rotateY(180deg)';
+      }
+      if (form == 'login') {
+        side.style.transform = 'rotateY(0deg)';
+      }
     }
   }
 
@@ -169,16 +165,10 @@ export class LoginComponent implements OnInit {
       const isValid = control.valid;
       const isInvalid = control.invalid && (control.dirty || control.touched);
       const el = document.getElementById(input);
-      if (isValid) {
-        el?.classList.add('success');
-        el?.classList.remove('error');
-      } else if (isInvalid) {
-        el?.classList.add('error');
-        el?.classList.remove('success');
-      } else {
-        el?.classList.remove('success');
-        el?.classList.remove('error');
-      }
+
+      el?.classList.toggle('success', isValid);
+      el?.classList.toggle('error', isInvalid);
+      el?.classList.toggle('success', !isInvalid && !isValid);
     }
   }
 }

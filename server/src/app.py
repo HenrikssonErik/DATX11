@@ -16,12 +16,6 @@ CORS(app)
 create_key()
 
 
-# useless in the future, TODO: Remove along with front end button
-@app.route('/test', methods=['GET'])
-def test_get():
-    return jsonify("hello")
-
-
 @app.route('/login', methods=['POST'])
 def login():
     password: str = request.form['password']

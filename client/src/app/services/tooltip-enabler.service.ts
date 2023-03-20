@@ -9,22 +9,20 @@ export class TooltipEnablerService {
   private tooltipList = new Array<any>();
 
   enableTooltip() {
-    const tooltipTriggerList = [].slice.call(
+    const tooltipTriggerList = Array.from(
       document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    );
+    ) as Element[];
     const tooltipListNewTooltips = tooltipTriggerList.map(
-      (tooltipTriggerEl) => {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-      }
+      (tooltipTriggerEl) =>
+        new bootstrap.Tooltip(tooltipTriggerEl as HTMLElement)
     );
     this.tooltipList.push(...tooltipListNewTooltips);
   }
 
   hideAllTooltips() {
-    this.tooltipList;
     for (const tooltip of this.tooltipList) {
       tooltip.dispose();
     }
-    this.tooltipList = new Array<any>();
+    this.tooltipList = [];
   }
 }
