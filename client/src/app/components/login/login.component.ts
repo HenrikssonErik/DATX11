@@ -31,19 +31,29 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initializeLoginForm();
+    this.initializeSignUpForm();
+    this.enableTooltips();
+  }
+
+  private initializeLoginForm(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       rememberMe: [false],
     });
+  }
 
+  private initializeSignUpForm(): void {
     this.signUpForm = this.fb.group({
       cid: ['', [Validators.required]],
-      signUpemail: [''],
+      signUpEmail: [''],
       signUpPassword: ['', [Validators.required]],
       termsAndCon: ['', [Validators.required]],
     });
+  }
 
+  private enableTooltips(): void {
     this.tooltipEnabler.enableTooltip();
   }
 
@@ -54,11 +64,19 @@ export class LoginComponent implements OnInit {
     }
 
     const formData = new FormData();
-    formData.append('email', this.loginForm.get('email')?.value);
-    formData.append('password', this.loginForm.get('password')!.value);
+    const email = this.loginForm.get('email');
+    const password = this.loginForm.get('password');
+
+    if (email) {
+      formData.append('email', email.value);
+    }
+
+    if (password) {
+      formData.append('password', password.value);
+    }
 
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + 'login', formData, {
+      .post<HttpResponse<any>>(`${API_URL}/login`, formData, {
         observe: 'response',
       })
       .subscribe({
@@ -80,8 +98,6 @@ export class LoginComponent implements OnInit {
           });
         },
       });
-
-    //TODO: this.success = true;
   }
 
   onSubmitSignUp(): void {
@@ -90,22 +106,24 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    const cid = this.signUpForm.get('cid')?.value;
-    this.signUpForm.get('signUpemail')?.setValue(cid);
-
-    console.log(this.signUpForm);
-
     const formData = new FormData();
-    formData.append('cid', this.signUpForm.get('cid')!.value);
-    //TODO: Fult som fan att concatenatea här men idk. Gör väl inget
-    formData.append(
-      'email',
-      this.signUpForm.get('signUpemail')!.value + '@chalmers.se'
-    );
-    formData.append('password', this.signUpForm.get('signUpPassword')!.value);
+    const cid = this.signUpForm.get('cid');
+    if (cid) {
+      formData.append('cid', cid.value);
+    }
+
+    const email = this.signUpForm.get('signUpEmail');
+    if (email) {
+      formData.append('email', `${email.value}@chalmers.se`);
+    }
+
+    const password = this.signUpForm.get('signUpPassword');
+    if (password) {
+      formData.append('password', password.value);
+    }
 
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + 'signUp', formData, {
+      .post<HttpResponse<any>>(`${API_URL}/signUp`, formData, {
         observe: 'response',
       })
       .subscribe({
@@ -135,24 +153,18 @@ export class LoginComponent implements OnInit {
         },
       });
 
-    // Logic to submit the new user creation
-
-    // TODO: Show visual feedback to user that account creation was successfull.
-
     this.signUpSuccess = true;
   }
 
-  flipToSignUp() {
-    const form = document.getElementById('flip-card-inner');
-    if (form) {
-      form.style.transform = 'rotateY(180deg)';
-    }
-  }
-
-  flipToLogin() {
-    const form = document.getElementById('flip-card-inner');
-    if (form) {
-      form.style.transform = 'rotateY(0deg)';
+  flipTo(form: string) {
+    const side = document.getElementById('flip-card-inner');
+    if (side) {
+      if (form == 'signUp') {
+        side.style.transform = 'rotateY(180deg)';
+      }
+      if (form == 'login') {
+        side.style.transform = 'rotateY(0deg)';
+      }
     }
   }
 
@@ -163,16 +175,10 @@ export class LoginComponent implements OnInit {
       const isValid = control.valid;
       const isInvalid = control.invalid && (control.dirty || control.touched);
       const el = document.getElementById(input);
-      if (isValid) {
-        el?.classList.add('success');
-        el?.classList.remove('error');
-      } else if (isInvalid) {
-        el?.classList.add('error');
-        el?.classList.remove('success');
-      } else {
-        el?.classList.remove('success');
-        el?.classList.remove('error');
-      }
+
+      el?.classList.toggle('success', isValid);
+      el?.classList.toggle('error', isInvalid);
+      el?.classList.toggle('success', !isInvalid && !isValid);
     }
   }
 }
