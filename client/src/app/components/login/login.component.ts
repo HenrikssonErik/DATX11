@@ -105,11 +105,7 @@ export class LoginComponent implements OnInit {
     const cid = this.signUpForm.get('cid');
     if (cid) {
       formData.append('cid', cid.value);
-    }
-
-    const email = this.signUpForm.get('signUpEmail');
-    if (email) {
-      formData.append('email', `${email.value}@chalmers.se`);
+      formData.append('email', `${cid.value}@chalmers.se`);
     }
 
     const password = this.signUpForm.get('signUpPassword');
@@ -130,10 +126,6 @@ export class LoginComponent implements OnInit {
                 response.body.Token
               }; expires=${expirationDate.toUTCString()}; path=/`;
             }
-
-            this.toastr.success('Success!', 'User created!', {
-              closeButton: true,
-            });
           } catch {
             throw new Error('unexpected_error');
           }
@@ -143,6 +135,11 @@ export class LoginComponent implements OnInit {
           const [errorMessage, errorTitle]: string[] =
             this.toastrResponse.getToastrRepsonse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+        complete: () => {
+          this.toastr.success('Success!', 'User created!', {
             closeButton: true,
           });
         },
