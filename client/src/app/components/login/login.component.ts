@@ -1,6 +1,6 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ToastrResponseService } from 'src/app/services/toastr-response.service';
@@ -14,14 +14,14 @@ import { API_URL } from 'src/environments/environment';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup = new FormGroup({});
-  signUpForm: FormGroup = new FormGroup({});
+  loginForm: UntypedFormGroup = new UntypedFormGroup({});
+  signUpForm: UntypedFormGroup = new UntypedFormGroup({});
   submitFailed: boolean = false;
   cid: string = '';
   passwordVisible: boolean = false;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private http: HttpClient,
     private toastr: ToastrService,
     private tooltipEnabler: TooltipEnablerService,
@@ -182,7 +182,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  onInputFocus(input: string, form: FormGroup): void {
+  onInputFocus(input: string, form: UntypedFormGroup): void {
     const control = form.get(input);
 
     if (control) {
