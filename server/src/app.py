@@ -100,7 +100,17 @@ def getCourses():
        the following information: Role, CourseID, Course (abbriviation),
        Year, StudyPeriod
        Requires a token to be sent as a cookie with the request"""
-    token = request.cookies.get('Token')
+    tokenFull = request.headers.get('Cookies')
+    if tokenFull:
+        token = tokenFull.split('=')[1]
+
+    #token = request.headers['Cookies'].get("Token")
+  
+    print(token)
+    #print(token)
+    #cookie_header = request.headers.get('Cookies')
+    #print(cookie_header)
+
     user_id = verify_and_get_id(token)
 
     if (user_id):
