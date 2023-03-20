@@ -164,3 +164,6 @@ def is_admin_on_course(user_id: int, course_id: int) -> bool:
 # TODO: include global role
 def get_global_role(userId):
     print("return global role pls")
+
+
+# TODO: add security checks, Course handler -> create/delete course, assignments, edit assignment details,

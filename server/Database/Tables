@@ -7,6 +7,9 @@ CREATE Table AssignmentFiles (
 		FileName TEXT NOT NULL,
 		FileData BYTEA NOT NULL, 
 		FileType TEXT NOT NULL,
+		--Add feedback as JSON, Fail/Pass
+		--Feedback JSON,
+		--Grade TEXT CHECK Grade IN ('Fail', 'Pass')
 		PRIMARY KEY(GroupId,CourseId, Assignment, FileName),
 		CONSTRAINT fk_assignment
 		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),
@@ -50,6 +53,7 @@ CREATE TABLE UserData (
 	cid TEXT UNIQUE,
 	email TEXT NOT NULL,
 	passphrase BYTEA NOT NULL,
+	--globalRole TEXT NOT NUll CHECK globalRole IN ('Admin', 'Teacher', 'Student')
 	PRIMARY KEY (userId),
 	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
