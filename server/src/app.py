@@ -122,9 +122,9 @@ def getGroup():
     else:
         return make_response('', 401)
 
-
+# TODO: check this
 @app.route('/addToCourse', methods=['POST'])
-def nextRoute():
+def addToCourse():
     token = request.cookies.get('Token')
     request_user_id = verify_and_get_id(token)
     data = request.get_json()

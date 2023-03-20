@@ -22,8 +22,8 @@ def get_assignments(course_id: int) -> dict:
         conn.close()
         if not data:
             raise Exception("No courses for this user")
-        #orderedData: dict[str, list] = []
-        #orderedData.append({"Assignments": data})
+        # orderedData: dict[str, list] = []
+        # orderedData.append({"Assignments": data})
         return data
 
     except Exception as e:
@@ -78,7 +78,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         return {'status': "No Courses Found"}
 
 
-def get_group(user_id: int, course_id: int) -> dict[str, str|list]:
+def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
     """Returns group ID and group number associated with the users group
         in the specified course"""
     conn = psycopg2.connect(dsn=get_conn_string())
