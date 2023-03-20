@@ -1,20 +1,27 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UploadFileConfigService } from './services/upload-test-file-config.service';
 import { UploadUnitTestConfigService } from './services/upload-unit-test-config.service';
 import { API_URL } from 'src/environments/environment';
+import { TranslationService } from './services/translation.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(
     public uploadTestFile: UploadFileConfigService,
     public uploadUnitTestFile: UploadUnitTestConfigService,
-    private http: HttpClient
+    private http: HttpClient,
+    private translationService: TranslationService
   ) {}
+
+  ngOnInit(): void {
+    const language: string = this.translationService.getLanguage();
+    this.translationService.setLanguage(language);
+  }
 
   getTemplateFile() {
     // TODO: Temporarily do a get request here and retrieve the file.
