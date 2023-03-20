@@ -53,7 +53,7 @@ CREATE TABLE UserData (
 	cid TEXT UNIQUE,
 	email TEXT NOT NULL,
 	passphrase BYTEA NOT NULL,
-	--globalRole TEXT NOT NUll CHECK globalRole IN ('Admin', 'Teacher', 'Student')
+	globalRole TEXT NOT NUll CHECK (globalRole IN ('Admin', 'Teacher', 'Student')),
 	PRIMARY KEY (userId),
 	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
