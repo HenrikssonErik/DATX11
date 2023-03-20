@@ -35,7 +35,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         return {'status': "No Courses Found"}
 
 
-def get_group(user_id: int, course_id: int) -> dict[str, str]:
+def get_group(user_id: int, course_id: int) -> dict[str, str|list]:
     """Returns group ID and group number associated with the users group
         in the specified course"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -51,17 +51,40 @@ def get_group(user_id: int, course_id: int) -> dict[str, str]:
         conn.close()
 
         if not data:
-            raise Exception("No groups for this user")
+            raise Exception("No group for this user")
 
         orderedData: dict = {}
         orderedData["groupId"] = data[0]
         orderedData["groupNumber"] = data[1]
+        orderedData["groupMembers"] = __get_group_members
         return orderedData
 
     except Exception as e:
         print(e)
-        return {'status': "No Groups Found"}
+        return {'status': "No Group Found"}
 
+
+def __get_group_members(group_id: int) -> list:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT cid FROM usergroupinfo
+                            WHERE groupid = %s"""
+                cur.execute(query_data, [group_id])
+                data = cur.fetchall()
+        conn.close()
+        if not data:
+            raise Exception("No group members")
+        userlist = []
+
+        for user in data:
+            userlist.append(user[0])
+        return userlist
+
+    except Exception as e:
+        print(e)
+        return {'status': "no_group_members"}
 
 def add_user_to_group(user_id: int, group_id: int) -> None:
     # check user on course and group on the course
@@ -162,8 +185,27 @@ def is_admin_on_course(user_id: int, course_id: int) -> bool:
 
 
 # TODO: include global role
-def get_global_role(userId):
-    print("return global role pls")
+def get_global_role(user_id):
+    """Checks the gobal role for the user.
+        Returns a string"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT globalrole FROM userdata
+                            WHERE userid = %s"""
+                cur.execute(query_data, [user_id])
+                data = cur.fetchone()
+        conn.close()
+        if not data:
+            raise Exception("No such user")
+
+        return data[0]
+
+    except Exception as e:
+        print(e)
+        return {'status': "No User Found"}
 
 
 # TODO: add security checks, Course handler -> create/delete course, assignments, edit assignment details,
