@@ -120,6 +120,3 @@ def getGroup():
 
     else:
         return make_response('', 401)
-
-
-@app.route('/')
