@@ -65,10 +65,7 @@ export class LoginComponent implements OnInit {
         //TODO: save token and id
         next: (response: any) => {
           if (response.body.Token) {
-            const expirationDate = new Date();
-            expirationDate.setTime(
-              expirationDate.getTime() + 2 * 60 * 60 * 1000
-            ); // 2 hours from now
+            const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
             document.cookie = `sessionToken=${
               response.body.Token
             }; expires=${expirationDate.toUTCString()}; path=/`;
@@ -115,10 +112,7 @@ export class LoginComponent implements OnInit {
         next: (response: any) => {
           try {
             if (response.body.Token) {
-              const expirationDate = new Date();
-              expirationDate.setTime(
-                expirationDate.getTime() + 2 * 60 * 60 * 1000
-              ); // 2 hours from now
+              const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
               document.cookie = `sessionToken=${
                 response.body.Token
               }; expires=${expirationDate.toUTCString()}; path=/`;
