@@ -53,7 +53,7 @@ CREATE TABLE UserData (
 	cid TEXT UNIQUE,
 	email TEXT NOT NULL,
 	passphrase BYTEA NOT NULL,
-	globalRole TEXT NOT NUll CHECK (globalRole IN ('Admin', 'Teacher', 'Student')),
+	--globalRole TEXT NOT NUll CHECK (globalRole IN ('Admin', 'Teacher', 'Student')),
 	PRIMARY KEY (userId),
 	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
@@ -101,3 +101,11 @@ SELECT uig.userId, uig.groupId, g.groupNumber, g.course as courseId, c.Course, c
 FROM UserInGroup uig
 JOIN Groups g ON uig.groupId = g.groupId
 JOIN Courses c ON g.course = c.CourseId;
+
+
+--This view shows all user and group information, eg. used to get all groupmember cids from your group 
+CREATE VIEW UserGroupInfo AS
+SELECT UserData.userId, UserData.cid, UserInGroup.groupId, Groups.groupNumber
+FROM UserData
+JOIN UserInGroup ON UserData.userId = UserInGroup.userId
+JOIN Groups ON UserInGroup.groupId = Groups.groupId;

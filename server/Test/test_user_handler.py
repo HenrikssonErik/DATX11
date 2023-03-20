@@ -1,7 +1,6 @@
 
-from src.user_handler import Role, get_courses_info,\
-    get_group, add_user_to_course, remove_user_from_group,\
-    is_admin_on_course, is_teacher_on_course
+from src.user_handler import *
+import src.user_handler as user_handler
 import sys
 from pathlib import Path
 import unittest
@@ -42,19 +41,20 @@ class TestUserHandler(unittest.TestCase):
 
     @patch('psycopg2.connect')
     def test_get_group(self, mock_connect):
+        with patch.object(user_handler, '__get_group_members') as mock_groups:
+            mock_cursor = setup_mock_cursor(mock_connect)
+            mock_cursor.fetchone.return_value = (2, 1)
+            mock_groups.return_value = ['alebru']
+            mock_groups.return_value = list(mock_groups.return_value)
+            user_id = 1
+            course_id = 6
+            result = get_group(user_id, course_id)
 
-        mock_cursor = setup_mock_cursor(mock_connect)
-        mock_cursor.fetchone.return_value = (2, 1)
-
-        user_id = 1
-        course_id = 6
-        result = get_group(user_id, course_id)
-
-        mock_cursor.execute.assert_called_once_with("""SELECT groupid, groupnumber FROM
+            mock_cursor.execute.assert_called_once_with("""SELECT groupid, groupnumber FROM
                                 user_group_course_info
                                 WHERE userid = %s and courseid = %s""",
-                                                    (user_id, course_id))
-        self.assertEqual(result, {'groupId': 2, 'groupNumber': 1})
+                                                        (user_id, course_id))
+            self.assertEqual(result, {'groupId': 2, 'groupNumber': 1, 'groupMembers': []})
 
     @patch('psycopg2.connect')
     def test_add_user_to_course(self, mock_connect):
