@@ -1,12 +1,8 @@
-import os
+from pathlib import Path
 
 
 def get_conn_string() -> str:
-    file_path = os.path.join(
-        os.path.dirname(
-            os.path.abspath(
-                __file__)),
-        'connection_config.txt')
+    file_path = Path(__file__).absolute().parent / "connection_config.txt"
     with open(file_path, 'r') as file:
         conn_str = file.readline()
     return conn_str
