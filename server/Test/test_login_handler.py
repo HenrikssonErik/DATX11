@@ -1,4 +1,4 @@
-from src.login_handler import log_in, verify_and_get_token, create_token, \
+from src.login_handler import log_in, verify_and_get_id, create_token, \
     create_key, check_data_input, user_registration, registration_query
 import sys
 from pathlib import Path
@@ -125,6 +125,6 @@ class TestLoginHandler(unittest.TestCase):
         self.assertEqual(result[1], 401)
         self.assertEqual(result[0].get('status'), ("wrong_credentials"))
 
-    def test_create_and_verify_token(self):
+    def test_create_and_verify_id(self):
         token = create_token(2)
-        verify_and_get_token(token.get('Token'))
+        verify_and_get_id(token.get('Token'))

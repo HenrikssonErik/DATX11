@@ -1,5 +1,4 @@
 
-from src.user_handler import *
 import src.user_handler as user_handler
 import sys
 from pathlib import Path
@@ -25,53 +24,53 @@ class TestUserHandler(unittest.TestCase):
 
     @patch('psycopg2.connect')
     def test_get_user_courses_info(self, mock_connect):
+        with patch.object(user_handler, 'get_assignments') as mock_assignments:
+            mock_assignments.return_value = []
+            mock_cursor = setup_mock_cursor(mock_connect)
+            mock_cursor.fetchall.return_value = [(1, 'Admin', 1, 'datx12', 2, 2023), (1, 'Student', 2, 'datx11', 4, 2023)]
 
-        mock_cursor = setup_mock_cursor(mock_connect)
-        mock_cursor.fetchall.return_value = [(1, 'Admin', 1, 'datx12', 2, 2023), (1, 'Student', 2, 'datx11', 4, 2023)]
-
-        user_id = 1
-        result = get_courses_info(user_id)
-        mock_cursor.execute.assert_called_once_with("""SELECT * FROM User_course_info
+            user_id = 1
+            result = user_handler.get_courses_info(user_id)
+            mock_cursor.execute.assert_called_once_with("""SELECT * FROM User_course_info
                             WHERE userid = %s""", (user_id,))
-        self.assertEqual(
-            result, [{'Role': 'Admin', 'courseID': 1, 'Course': 'datx12',
-                      'Year': 2, 'StudyPeriod': 2023},
+            self.assertEqual(
+                result, [{'Role': 'Admin', 'courseID': 1, 'Course': 'datx12',
+                      'Year': 2, 'StudyPeriod': 2023, 'Assignments': []},
                      {'Role': 'Student', 'courseID': 2, 'Course': 'datx11',
-                     'Year': 4, 'StudyPeriod': 2023}])
+                     'Year': 4, 'StudyPeriod': 2023, 'Assignments': []}, ])
 
     @patch('psycopg2.connect')
     def test_get_group(self, mock_connect):
         with patch.object(user_handler, '__get_group_members') as mock_groups:
             mock_cursor = setup_mock_cursor(mock_connect)
             mock_cursor.fetchone.return_value = (2, 1)
-            mock_groups.return_value = ['alebru']
-            mock_groups.return_value = list(mock_groups.return_value)
+            mock_groups.return_value = ['alebru']     
             user_id = 1
             course_id = 6
-            result = get_group(user_id, course_id)
+            result = user_handler.get_group(user_id, course_id)
 
             mock_cursor.execute.assert_called_once_with("""SELECT groupid, groupnumber FROM
                                 user_group_course_info
                                 WHERE userid = %s and courseid = %s""",
                                                         (user_id, course_id))
-            self.assertEqual(result, {'groupId': 2, 'groupNumber': 1, 'groupMembers': []})
+            self.assertEqual(result, {'groupId': 2, 'groupNumber': 1, 'groupMembers': ['alebru']})
 
     @patch('psycopg2.connect')
     def test_add_user_to_course(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
         user_id = 1
         course_id = 6
-        add_user_to_course(user_id, course_id, Role.Student)
+        user_handler.add_user_to_course(user_id, course_id, user_handler.Role.Student)
 
         mock_cursor.execute.assert_called_once_with("""INSERT into userincourse values
-                                (%s, %s, %s)""", [user_id, course_id, Role.Student.name])
+                                (%s, %s, %s)""", [user_id, course_id, user_handler.Role.Student.name])
 
     @patch('psycopg2.connect')
     def test_remove_user_from_group(self, mock_connect):
         user_id = 1
         group_id = 1
         mock_cursor = setup_mock_cursor(mock_connect)
-        remove_user_from_group(user_id, group_id)
+        user_handler.remove_user_from_group(user_id, group_id)
 
         mock_cursor.execute.assert_called_once_with("""DELETE from useringroup
                                 WHERE userid = %s AND groupid = %s """,
@@ -87,7 +86,7 @@ class TestUserHandler(unittest.TestCase):
                                           {'Role': 'Student', 'courseID': 2,
                                            'Course': 'datx11',
                                            'Year': 4, 'StudyPeriod': 2023}]
-        res: bool = is_admin_on_course(user_id, course_id)
+        res: bool = user_handler.is_admin_on_course(user_id, course_id)
         mock_user_courses.assert_called_once_with(user_id)
         self.assertTrue(res)
 
@@ -101,7 +100,7 @@ class TestUserHandler(unittest.TestCase):
                                           {'Role': 'Student', 'courseID': 2,
                                            'Course': 'datx11',
                                            'Year': 4, 'StudyPeriod': 2023}]
-        res: bool = is_admin_on_course(user_id, course_id)
+        res: bool = user_handler.is_admin_on_course(user_id, course_id)
         mock_user_courses.assert_called_once_with(user_id)
         self.assertFalse(res)
 
@@ -115,7 +114,7 @@ class TestUserHandler(unittest.TestCase):
                                           {'Role': 'Student', 'courseID': 2,
                                            'Course': 'datx11',
                                            'Year': 4, 'StudyPeriod': 2023}]
-        res: bool = is_teacher_on_course(user_id, course_id)
+        res: bool = user_handler.is_teacher_on_course(user_id, course_id)
         mock_user_courses.assert_called_once_with(user_id)
         self.assertTrue(res)
 
@@ -129,6 +128,6 @@ class TestUserHandler(unittest.TestCase):
                                           {'Role': 'Student', 'courseID': 2,
                                            'Course': 'datx11',
                                            'Year': 4, 'StudyPeriod': 2023}]
-        res: bool = is_teacher_on_course(user_id, course_id)
+        res: bool = user_handler.is_teacher_on_course(user_id, course_id)
         mock_user_courses.assert_called_once_with(user_id)
         self.assertFalse(res)
