@@ -1,6 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ToastrResponseService } from 'src/app/services/toastr-response.service';
 import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
@@ -24,7 +25,8 @@ export class LoginComponent implements OnInit {
     private http: HttpClient,
     private toastr: ToastrService,
     private tooltipEnabler: TooltipEnablerService,
-    private toastrResponse: ToastrResponseService
+    private toastrResponse: ToastrResponseService,
+    public router: Router
   ) {}
 
   ngOnInit(): void {
@@ -79,11 +81,15 @@ export class LoginComponent implements OnInit {
       .subscribe({
         //TODO: save token and id
         next: (response: any) => {
-          if (response.body.Token) {
-            const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
-            document.cookie = `sessionToken=${
-              response.body.Token
-            }; expires=${expirationDate.toUTCString()}; path=/`;
+          try {
+            if (response.body.Token) {
+              const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
+              document.cookie = `sessionToken=${
+                response.body.Token
+              }; expires=${expirationDate.toUTCString()}; path=/`;
+            }
+          } catch {
+            throw new Error('unexpected_error');
           }
         },
         error: (err) => {
@@ -93,6 +99,9 @@ export class LoginComponent implements OnInit {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+        },
+        complete: () => {
+          this.router.navigate(['/courses']);
         },
       });
   }
