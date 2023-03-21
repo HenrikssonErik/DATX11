@@ -180,7 +180,6 @@ def __get_course_id_from_group(group_id) -> int:
 def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
     # TODO: Maybe add som check so admin or course teacher only can add people, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
-    print("addin user")
     try:
         with conn:
             with conn.cursor() as cur:
@@ -191,7 +190,22 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
 
     except Exception as e:
         print(e)
-        return {'status': "Unable to add to course"}
+        return e
+
+
+def remove_user_from_course(user_id: int, course_id) -> None:
+    """Remove a User from the course"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """Delete from userincourse where userid = %s AND courseid = %s"""
+                cur.execute(query_data, [user_id, course_id])
+        conn.close()
+
+    except Exception as e:
+        print(e)
+        return (e)
 
 
 def remove_user_from_group(user_id: int, group_id: int) -> None:

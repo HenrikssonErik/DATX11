@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { API_URL } from 'src/environments/environment';
 
@@ -14,19 +14,11 @@ export class CoursesComponent implements OnInit {
     const cookie = this.replaceSessionToken(document.cookie);
     console.log(cookie);
 
-    const data = {
-      Group: 3,
-      User: 32,
-      Course: 6,
-    };
-
     let headers = new HttpHeaders();
     headers = headers.append('Cookies', cookie);
-    this.http
-      .post(`${API_URL}/removeFromGroup`, data, { headers })
-      .subscribe((res) => {
-        console.log(res);
-      });
+    this.http.get(`${API_URL}/getCourses`, { headers }).subscribe((res) => {
+      console.log(res);
+    });
   }
 
   replaceSessionToken(inputString: string): string {
