@@ -9,7 +9,7 @@ class Role(Enum):
     Student = 'Student'
 
 
-def get_assignments(course_id: int) -> dict:
+def get_assignments(course_id: int) -> tuple:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -21,7 +21,7 @@ def get_assignments(course_id: int) -> dict:
                 data = cur.fetchall()
         conn.close()
         if not data:
-            raise Exception("No courses for this user")
+            return []
         # orderedData: dict[str, list] = []
         # orderedData.append({"Assignments": data})
         return data

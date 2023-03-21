@@ -5,7 +5,8 @@ from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
-from .login_handler import user_registration, log_in, create_key, verify_and_get_id
+from .login_handler import user_registration, log_in, create_key,\
+                            verify_and_get_id
 from .user_handler import *
 from .podman.podman_runner import init_images
 
@@ -18,6 +19,13 @@ CORS(app)
 # creating private key for signing tokens
 create_key()
 
+
+def extract_token(request) -> str:
+    cookies = request.headers.get('Cookies')
+    if cookies:
+        token = cookies.split('Token=')[1]
+        return token
+    return ""
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -100,16 +108,7 @@ def getCourses():
        the following information: Role, CourseID, Course (abbriviation),
        Year, StudyPeriod
        Requires a token to be sent as a cookie with the request"""
-    tokenFull = request.headers.get('Cookies')
-    if tokenFull:
-        token = tokenFull.split('=')[1]
-
-    #token = request.headers['Cookies'].get("Token")
-  
-    print(token)
-    #print(token)
-    #cookie_header = request.headers.get('Cookies')
-    #print(cookie_header)
+    token = extract_token(request)
 
     user_id = verify_and_get_id(token)
 
