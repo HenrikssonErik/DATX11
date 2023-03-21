@@ -1,20 +1,27 @@
 
 
 from typing import Literal
-from flask import Flask, jsonify, make_response, request, send_file
+from flask import Flask, jsonify, make_response, request, send_file, url_for
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
 from .login_handler import user_registration, log_in, create_key,\
-                            verify_and_get_id
+    verify_and_get_id
 from . import user_handler
 from . import course_handler
+from flask_mail import Mail, Message
 from .podman.podman_runner import init_images
 
 # creating the Flask application
 app = Flask(__name__)
-
 CORS(app)
+mail = Mail(app)
+
+app.config.from_pyfile('mailconfig.cfg')
+
+mail = Mail(app)
+
+
 # init basic image
 # init_images()
 # creating private key for signing tokens
@@ -45,10 +52,32 @@ def sign_up():
     response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
         user_registration(request.form)
 
-    # sign_up_response = {}
-    # sign_up_response.update({'status': response[0]})
+    if (response[1] == 200):
+        send_verification_email(
+            request.form['email'], response[0])
     res = make_response(response[0], response[1])
+
     return res
+
+
+@app.route('/verify_email/<token>')
+def verify_email(token):
+    return '<h1>The token works!</h1>'
+
+
+def send_verification_email(to: str, token: dict) -> None:
+
+    msg = Message('Verification Email for Hydrant',
+                  sender='temphydrant@gmail.com', recipients=[to])
+
+    link = url_for('verify_email', token=token, _external=True)
+
+    msg.html = """
+    <h2>Thank you for using Hydrant!</h2>
+    <p>Here is your verification <a href="{link}">link.</a></p>
+    """.format(link=link)
+
+    mail.send(msg)
 
 
 @app.route('/files', methods=['POST'])
