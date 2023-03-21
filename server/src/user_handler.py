@@ -65,7 +65,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
                 data = cur.fetchall()
         conn.close()
         if not data:
-            raise Exception("No courses for this user")
+            return []
         orderedData: list[dict[str, any]] = []
         for info in data:
             orderedData.append({"Role": info[1], "courseID": info[2],
@@ -75,7 +75,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
 
     except Exception as e:
         print(e)
-        return {'status': "No Courses Found"}
+        return [{'status': "No Courses Found"}]
 
 
 def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
@@ -153,7 +153,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
 
     except Exception as e:
         print(e)
-        return {'status': "No Groups Found"}
+        return {'status': e.args}
 
 
 def __get_course_id_from_group(group_id) -> int:
@@ -164,7 +164,7 @@ def __get_course_id_from_group(group_id) -> int:
             with conn.cursor() as cur:
                 query_data = """SELECT course FROM
                                 groups
-                                WHERE group_id = %s """
+                                WHERE groupid = %s """
                 cur.execute(query_data, [group_id])
                 data = cur.fetchone()
 
@@ -230,7 +230,6 @@ def is_admin_on_course(user_id: int, course_id: int) -> bool:
     return False
 
 
-
 def get_global_role(user_id) -> str:
     """Checks the gobal role for the user.
         Returns a string"""
@@ -252,6 +251,7 @@ def get_global_role(user_id) -> str:
     except Exception as e:
         print(e)
         return {'status': "No User Found"}
+
 
 # TODO: include global admin when implemented
 def check_admin_or_course_teacher(user_id: int, course_id: int):
