@@ -69,8 +69,6 @@ def send_verification_email(to: str, token: dict) -> None:
 
     link = url_for('verify_email', token=token, _external=True)
 
-    msg.html = Message
-
     msg.html = render_template("emailTemplate.html", link=link)
 
     mail.send(msg)
