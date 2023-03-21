@@ -182,5 +182,17 @@ def addToCourse():
             return make_response("", 200)
     return make_response("", 401)
 
+@app.route('/removeFromCourse', methods=['POST'])
+def removeFromCourse():
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course_id = data['Course']
+    user_to_remove = data['User']
+
+    if (check_admin_or_course_teacher(request_user_id, course_id)):
+            remove_user_from_course(user_to_remove, course_id)
+            return make_response("", 200)
+    return make_response("", 401)
 
 # TODO: remvoe from course
