@@ -15,15 +15,15 @@ export class CoursesComponent implements OnInit {
     console.log(cookie);
 
     const data = {
-      Group: 2,
-      User: 1,
-      Course: 2,
+      Group: 3,
+      User: 32,
+      Course: 6,
     };
 
     let headers = new HttpHeaders();
     headers = headers.append('Cookies', cookie);
     this.http
-      .post(`${API_URL}/addToGroup`, data, { headers })
+      .post(`${API_URL}/removeFromGroup`, data, { headers })
       .subscribe((res) => {
         console.log(res);
       });
