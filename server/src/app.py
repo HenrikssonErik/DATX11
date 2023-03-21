@@ -1,7 +1,7 @@
 
 
 from typing import Literal
-from flask import Flask, jsonify, make_response, request, send_file, url_for
+from flask import Flask, jsonify, make_response, render_template, request, send_file, url_for
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
@@ -69,10 +69,9 @@ def send_verification_email(to: str, token: dict) -> None:
 
     link = url_for('verify_email', token=token, _external=True)
 
-    msg.html = """
-    <h2>Thank you for using Hydrant!</h2>
-    <p>Here is your verification <a href="{link}">link.</a></p>
-    """.format(link=link)
+    msg.html = Message
+
+    msg.html = render_template("emailTemplate.html", link=link)
 
     mail.send(msg)
 
