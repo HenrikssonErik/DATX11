@@ -218,7 +218,7 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
                 query_data = """DELETE from useringroup
                                 WHERE userid = %s AND groupid = %s """
                 cur.execute(query_data, [user_id, group_id])
-
+            conn.close()
     except Exception as e:
         print(e)
         return {'status': "Could not remove from group"}
@@ -256,7 +256,7 @@ def get_global_role(user_id) -> str:
                             WHERE userid = %s"""
                 cur.execute(query_data, [user_id])
                 data = cur.fetchone()
-        conn.close()
+            conn.close()
         if not data:
             raise Exception("No such user")
 
@@ -274,5 +274,3 @@ def check_admin_or_course_teacher(user_id: int, course_id: int):
     # global_admin: bool = get_global_role(user_id) == Role.Admin.name
 
     return course_administrator # or global_admin
-
-# Course handler -> create/delete course, assignments, edit assignment details,

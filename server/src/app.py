@@ -8,6 +8,7 @@ from .file_handler import handle_files, \
 from .login_handler import user_registration, log_in, create_key,\
                             verify_and_get_id
 from .user_handler import *
+from .course_handler import *
 
 # creating the Flask application
 app = Flask(__name__)
@@ -69,7 +70,6 @@ def post_tests():
     return make_response(jsonify(res[0]), res[1])
 
 
-# should be a post further on
 @app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
     """
@@ -138,7 +138,7 @@ def addToGroup():
     request_user = verify_and_get_id(token)
     data = request.get_json()
     user_to_add: int = data['User']
-    group_id = data['Group']
+    group_id:int = data['Group']
     course_id = data['Course']
 
     if(check_admin_or_course_teacher(request_user, course_id) or
@@ -163,19 +163,21 @@ def removeFromGroup():
         return make_response("", 200)
     return make_response ("", 401)
 
+
 @app.route('/addToCourse', methods=['POST'])
 def addToCourse():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
-    course_id = data['Course']
-    user_to_add = data['User']
+    course_id: int = data['Course']
+    user_to_add: int = data['User']
     role = data['Role']
 
     if (check_admin_or_course_teacher(request_user_id, course_id)):
             add_user_to_course(user_to_add, course_id, role)
             return make_response("", 200)
     return make_response("", 401)
+
 
 @app.route('/removeFromCourse', methods=['POST'])
 def removeFromCourse():
@@ -190,4 +192,30 @@ def removeFromCourse():
             return make_response("", 200)
     return make_response("", 401)
 
-# TODO: remvoe from course
+
+# TODO: wont work until global role is implemented
+# HAVE NOT BEEN TESTED YET
+@app.route('/createCourse', methods=['POST'])
+def createCourse():
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course: str = data['Course']
+    year: int = data['Year']
+    lp: int = data['TeachingPeriod']
+    groups: int = data['Groups']
+    role = get_global_role(request_user_id)
+
+    if (role == "Admin" or role == "Teacher"):
+        course_id = create_course(course, year, lp)
+
+        if (type(course_id) == tuple):
+            return make_response(jsonify(course_id[0]), course_id[1])
+        else:
+            add_groups_to_course(groups, course_id)
+            add_user_to_course(request_user_id, course_id, Role.Admin)
+            return make_response(jsonify('Course Created'), 200)
+    else:
+        return make_response("Not allowed to create course", 401)
+
+# TODO: remove course, getUser lists? (to add people), change user role, create assignment, edit assignment desc
