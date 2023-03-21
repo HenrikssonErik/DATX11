@@ -14,11 +14,19 @@ export class CoursesComponent implements OnInit {
     const cookie = this.replaceSessionToken(document.cookie);
     console.log(cookie);
 
+    const data = {
+      Group: 2,
+      User: 1,
+      Course: 2,
+    };
+
     let headers = new HttpHeaders();
     headers = headers.append('Cookies', cookie);
-    this.http.get(`${API_URL}/getCourses`, { headers }).subscribe((res) => {
-      console.log(res);
-    });
+    this.http
+      .post(`${API_URL}/addToGroup`, data, { headers })
+      .subscribe((res) => {
+        console.log(res);
+      });
   }
 
   replaceSessionToken(inputString: string): string {

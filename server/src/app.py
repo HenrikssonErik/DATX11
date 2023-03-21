@@ -136,6 +136,23 @@ def getGroup():
     else:
         return make_response('', 401)
 
+@app.route('/addToGroup', methods=['POST'])
+def addToGroup():
+    token = extract_token(request)
+    request_user = verify_and_get_id(token)
+    data = request.get_json()
+    user_to_add: int = data['User']
+    group_id = data['Group']
+    course_id = data['Course']
+    print(type(user_to_add))
+    print(type(request_user))
+
+    if(check_admin_or_course_teacher(request_user, course_id) or request_user == user_to_add):
+        add_user_to_group(user_to_add, group_id)
+        return make_response("", 200)
+    return make_response ("", 401)
+
+
 # TODO: check this
 @app.route('/addToCourse', methods=['POST'])
 def addToCourse():
