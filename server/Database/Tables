@@ -23,7 +23,7 @@ CREATE Table Courses (
 	Course Char(6) NOT NULL,
 	TeachingPeriod INTEGER,
 	CourseYear INTEGER,
-	CHECK (teachingPeriod BETWEEN 1 AND 4),
+	CHECK (teachingPeriod BETWEEN 1 AND 5),
 	UNIQUE ( Course, teachingPeriod, CourseYear)
 );
 
@@ -104,7 +104,7 @@ JOIN Courses c ON g.course = c.CourseId;
 
 
 --This view shows all user and group information, eg. used to get all groupmember cids from your group 
-CREATE VIEW UserGroupInfo AS
+CREATE OR REPLACE VIEW UserGroupInfo AS
 SELECT UserData.userId, UserData.cid, UserInGroup.groupId, Groups.groupNumber
 FROM UserData
 JOIN UserInGroup ON UserData.userId = UserInGroup.userId
