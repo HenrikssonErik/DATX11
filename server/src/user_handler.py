@@ -180,13 +180,13 @@ def __get_course_id_from_group(group_id) -> int:
 def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
     # TODO: Maybe add som check so admin or course teacher only can add people, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
-
+    print("addin user")
     try:
         with conn:
             with conn.cursor() as cur:
                 query_data = """INSERT into userincourse values
                                 (%s, %s, %s)"""
-                cur.execute(query_data, [user_id, course_id, user_role.name])
+                cur.execute(query_data, [user_id, course_id, user_role])
         conn.close()
 
     except Exception as e:
@@ -230,7 +230,7 @@ def is_admin_on_course(user_id: int, course_id: int) -> bool:
     return False
 
 
-# TODO: include global role
+
 def get_global_role(user_id) -> str:
     """Checks the gobal role for the user.
         Returns a string"""
@@ -253,12 +253,12 @@ def get_global_role(user_id) -> str:
         print(e)
         return {'status': "No User Found"}
 
-
+# TODO: include global admin when implemented
 def check_admin_or_course_teacher(user_id: int, course_id: int):
     course_administrator: bool = is_admin_on_course(user_id, course_id) or \
                             is_teacher_on_course(user_id, course_id)
-    global_admin: bool = get_global_role(user_id) == Role.Admin.name
+    # global_admin: bool = get_global_role(user_id) == Role.Admin.name
 
-    return course_administrator or global_admin
+    return course_administrator # or global_admin
 
 # Course handler -> create/delete course, assignments, edit assignment details,
