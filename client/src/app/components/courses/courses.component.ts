@@ -11,15 +11,22 @@ export class CoursesComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-   
     const cookie = this.replaceSessionToken(document.cookie);
-    console.log(cookie)
-  
+    console.log(cookie);
+
+    const data = {
+      Course: 5,
+      User: 32,
+      Role: 'Student',
+    };
+
     let headers = new HttpHeaders();
     headers = headers.append('Cookies', cookie);
-    this.http.get(`${API_URL}/getCourses`, { headers }).subscribe((res) => {
-      console.log(res);
-    });
+    this.http
+      .post(`${API_URL}/addToCourse`, data, { headers })
+      .subscribe((res) => {
+        console.log(res);
+      });
   }
 
   replaceSessionToken(inputString: string): string {
