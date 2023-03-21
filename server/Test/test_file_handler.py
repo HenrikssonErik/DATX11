@@ -4,10 +4,9 @@ import unittest
 from unittest import mock
 from werkzeug.datastructures import FileStorage
 from io import BytesIO
-
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.file_handler import handle_files, handle_test_file, \
-                             run_unit_tests_in_container  # noqa: E402
+
+from src.file_handler import handle_files, handle_test_file  # noqa: E402
 
 
 @mock.patch("psycopg2.connect")
@@ -91,12 +90,6 @@ class TestFileHandler(unittest.TestCase):
         files.append(file2)
         self.assertEqual(handle_test_file(files)[1], 200)
     # add test for send in unittest
-
-
-class TestFileHandl(unittest.TestCase):
-    def test_container(self):
-        self.assertEqual(1, 1)
-        run_unit_tests_in_container(2, 2, 2)
 
 
 if __name__ == '__main__':
