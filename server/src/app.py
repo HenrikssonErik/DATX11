@@ -126,12 +126,12 @@ def getCourses():
 def getGroup():
     """Takes a Token as cookie, and a course_id.
     Returns the group_id, group_number and cid of members"""
-    token = request.cookies.get('Token')
+    token = extract_token(request)
     user_id = verify_and_get_id(token)
     if (user_id):
         course = request.args.get('Course')
         group = get_group(user_id, course)
-        return make_response(jsonify(group, 200))
+        return make_response(jsonify(group), 200)
 
     else:
         return make_response('', 401)
@@ -139,7 +139,7 @@ def getGroup():
 # TODO: check this
 @app.route('/addToCourse', methods=['POST'])
 def addToCourse():
-    token = request.cookies.get('Token')
+    token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
     course_id = data['Course']
