@@ -1,16 +1,35 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { TranslationService } from 'src/app/services/translation.service';
 
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss']
+  styleUrls: ['./footer.component.scss'],
 })
-export class FooterComponent  {
+export class FooterComponent implements OnInit {
+  selectedLanguage: string = '';
+  imagePath: string = '';
+  constructor(private translateService: TranslationService) {}
 
- 
+  ngOnInit(): void {
+    const lang: string = this.translateService.getLanguage();
+    if (lang == 'se') {
+      this.selectedLanguage = 'Swedish';
+      this.imagePath = 'se.png';
+    } else {
+      this.selectedLanguage = 'English';
+      this.imagePath = 'en.png';
+    }
+  }
 
-  constructor() { }
-
-
-
+  changeLanguage(lang: string) {
+    if (lang == 'se') {
+      this.selectedLanguage = 'Swedish';
+      this.imagePath = 'se.png';
+    } else {
+      this.selectedLanguage = 'English';
+      this.imagePath = 'en.png';
+    }
+    this.translateService.switchLanguage(lang);
+  }
 }

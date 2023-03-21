@@ -65,12 +65,12 @@ class TestFileHandler(unittest.TestCase):
     def test_send_pep8_checks_results(self, mock_connect):
         with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
             file = FileStorage(BytesIO(fp.read()), filename="PythonFile.py")
-    
+
         respons = handle_files([file])
         self.assertEqual(respons[2], 200)
         self.assertEqual(respons[0][0]["PEP8_results"].count("F401"), 2)
         self.assertEqual(respons[0][0]["PEP8_results"].count("E401"), 1)
-        
+
     def test_send_py_test_file(self, mock_connect):
         with open(self.test_file_dir/"PythonFile.py", "rb") as fp:
             file = FileStorage(BytesIO(fp.read()), filename="PythonFile.py")

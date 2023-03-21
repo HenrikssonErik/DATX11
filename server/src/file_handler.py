@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from .podman.podman_runner import gen_requirements, run_container, build_image
 import shutil
+from .connector import get_conn_string
 
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
@@ -147,8 +148,7 @@ def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
     remove_existing_test_file(file.filename, course_id, assignment)
     binary = psycopg2.Binary(file.stream.read())
 
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
-                            user="postgres", password="BorasSuger-1")
+    conn = psycopg2.connect(dsn=get_conn_string())
 
     with conn:
         with conn.cursor() as cur:
@@ -164,8 +164,7 @@ def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
 def remove_existing_assignment(file_name: str, group_id: int, course_id: int,
                                assignment: int):
 
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
-                            user="postgres", password="BorasSuger-1")
+    conn = psycopg2.connect(dsn=get_conn_string())
 
     with conn:
         with conn.cursor() as cur:
@@ -189,8 +188,7 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
     remove_existing_assignment(file_name, group_id, course_id, assignment)
     binary = psycopg2.Binary(file_data)
 
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
-                            user="postgres", password="BorasSuger-1")
+    conn = psycopg2.connect(dsn=get_conn_string())
 
     file_type = file_name.rsplit('.', 1)[1].lower()
     with conn:
@@ -212,8 +210,7 @@ def remove_existing_test_file(
 ):
     """Removes file from testFile table in the database"""
 
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
-                            user="postgres", password="BorasSuger-1")
+    conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
             query_data = """DELETE FROM TestFiles
@@ -233,8 +230,7 @@ def get_assignment_files_from_database(
 ):
     """Retrieves file from database"""
 
-    conn = psycopg2.connect(host="95.80.39.50", port="5432", dbname="hydrant",
-                            user="postgres", password="BorasSuger-1")
+    conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
             query_data = """SELECT FileData FROM AssignmentFiles
