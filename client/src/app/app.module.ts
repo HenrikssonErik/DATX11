@@ -12,7 +12,6 @@ import {
 } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TestApiService } from './test.service';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { DndDirective } from './directives/dnd.directive';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
