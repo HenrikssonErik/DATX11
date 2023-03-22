@@ -23,6 +23,7 @@
         border: 0;
       }
       .wrapper {
+        padding-top: 60px;
         width: 100%;
         table-layout: fixed;
         background-color: #cccccc;
@@ -39,8 +40,23 @@
       .hydrantTitle {
         color: #6c757d !important;
         font-weight: 700 !important;
-        padding-top: 0.25rem;
-        font-size: 29px;
+        padding-top: 0.25rem !important;
+        font-size: 29px !important;
+        padding-left: 2rem !important;
+      }
+      .mailBody {
+        margin-left: 2rem;
+        margin-top: -1.5rem;
+      }
+      .mailSvg {
+        margin-bottom: 2rem;
+      }
+      a:link {
+        background-color: transparent;
+        color: #26734d;
+      }
+      .notYouText {
+        opacity: 0.8;
       }
     </style>
   </head>
@@ -48,9 +64,7 @@
     <center class="wrapper">
       <table class="main" width="100%">
         <!-- TOP BORDER -->
-        <!-- <tr>
-          <td height="8px" style="background-color: #171a1b"></td>
-        </tr> -->
+
         <!-- LOGO SECTION -->
         <tr>
           <td>
@@ -60,21 +74,51 @@
                   <table class="column">
                     <tr>
                       <td>
-                        <h2 class="hydrantTitle">HYDRANT</h2>
+                        <h2
+                          class="hydrantTitle"
+                          style="
+                            color: #6c757d;
+                            font-weight: 700;
+                            margin-top: 25;
+                            font-size: 34;
+                            margin-left: 18;
+                          "
+                        >
+                          HYDRANT
+                        </h2>
                       </td>
                     </tr>
                   </table>
                 </td>
               </tr>
             </table>
+
+            <div class="mailBody" style="margin-left: 20; margin-top: -15rem">
+              <h3>This is a Hydrant verification email</h3>
+              <h4 style="margin-top: 1">
+                To verify your Hydrant account, click the
+                <a href="{{link}}">verification link</a>
+              </h4>
+              <h5 class="notYouText" style="margin-left: 1; opacity: 0.8">
+                Is this not you? Dont click the verification link!
+              </h5>
+            </div>
+
+            <tr>
+              <td>
+                <center>
+                  <img
+                    src="https://i.ibb.co/cwGcsC5/undraw-Mail-sent-re-0ofv.png"
+                    class="mailSvg"
+                    width="300"
+                    alt="Email_img"
+                  />
+                </center>
+              </td>
+            </tr>
           </td>
         </tr>
 
-        <h3>Hydrant verification email</h3>
-        <h4>
-          To verify your Hydrant account, click the
-          <a href="{{link}}">verification link</a>
-        </h4>
         <!-- BANNER IMAGE -->
 
         <!-- THREE COLUMN SECTION -->
