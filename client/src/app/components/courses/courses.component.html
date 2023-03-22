@@ -1,68 +1,68 @@
-<div class="container text-muted">
+<div class="container text-muted mt-4">
   <div class="row flex-wrap">
-    <div class="col-md-2 col-12" style="border-right: 1px solid grey">
+    <div class="col-md-3 col-12 rightBorder">
       <div class="row">
-        <div>
-          <h2 style="margin-top: 20px">Maltec</h2>
+        <div class="col-12">
+          <h3 class="mt-3">Maltec</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <p>{{ courses[0].email }}</p>
+        </div>
+      </div>
+
+      <div class="row bottomBorder">
+        <div class="col-6">
+          <div class="row mb-4">
+            <div class="col-6 iconRow" style="padding: 0">
+              <i class="coursesIcon fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="col-6" style="padding: 0">
+              <p class="numberText">{{ courses[1].length }}</p>
+              <td><p class="nameText" translate>Courses</p></td>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="row">
+            <div class="col-6 iconRow" style="padding: 0">
+              <i class="coursesIcon fa-solid fa-code"></i>
+            </div>
+            <div class="col-6" style="padding: 0">
+              <p class="numberText">11</p>
+              <td><p class="nameText" translate>Labs</p></td>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <h4 class="mt-3">Coming Up</h4>
+          <div *ngIf="deadlines.length == 0">
+            <p class="noDeadLines mt-5" translate>No_deadlines</p>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-md-7 col-12 d-flex justify-content-center">
-      <div class="card text-bg-success mb-3" style="width: 15rem">
-        <div class="card-header">Header</div>
-        <div class="card-body">
-          <h5 class="card-title">Success card title</h5>
-          <p class="card-text">
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
-          </p>
-        </div>
-      </div>
-      <div class="card text-bg-success mb-3" style="width: 15rem">
-        <div class="card-header">Header</div>
-        <div class="card-body">
-          <h5 class="card-title">Success card title</h5>
-          <p class="card-text">
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
-          </p>
-        </div>
-      </div>
-      <div class="card text-bg-success mb-3" style="width: 15rem">
-        <div class="card-header">Header</div>
-        <div class="card-body">
-          <h5 class="card-title">Success card title</h5>
-          <p class="card-text">
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
-          </p>
-        </div>
-      </div>
-      <div class="card text-bg-success mb-3" style="width: 15rem">
-        <div class="card-header">Header</div>
-        <div class="card-body">
-          <h5 class="card-title">Success card title</h5>
-          <p class="card-text">
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
-          </p>
-        </div>
-      </div>
-      <div class="card text-bg-success mb-3" style="width: 15rem">
-        <div class="card-header">Header</div>
-        <div class="card-body">
-          <h5 class="card-title">Success card title</h5>
-          <p class="card-text">
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
-          </p>
-        </div>
-      </div>
+    <div class="col-md-7 col-12">
+      <mat-tab-group animationDuration="0ms">
+        <mat-tab label="In progress">Content 1</mat-tab>
+        <mat-tab label="Completed">Content 2</mat-tab>
+      </mat-tab-group>
     </div>
 
     <div
-      class="col-md-3 col-12 d-flex justify-content-center"
-      style="border-left: 1px solid grey"
-    ></div>
+      class="col-md-2 col-12 d-flex justify-content-center leftBorder recentEvents"
+    >
+      <div class="row">
+        <div class="col-12">
+          <h4 class="mt-3">Recent Events</h4>
+          <div *ngIf="events.length == 0">
+            <p class="nothingNew mt-5" translate>Nothing_new</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
