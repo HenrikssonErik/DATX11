@@ -31,14 +31,14 @@ def get_assignments(course_id: int) -> tuple:
         return {'status': "No Courses Found"}
 
 
-def get_user_info(user_id: int) -> dict:
+def get_user(user_id: int) -> dict:
     """Returns a dict with information on the user to the userId"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT (cid, email) FROM Userdata
+                query_data = """SELECT cid, email FROM Userdata
                             WHERE userid = %s"""
                 cur.execute(query_data, (user_id,))
                 data = cur.fetchone()
