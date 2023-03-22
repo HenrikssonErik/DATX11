@@ -34,6 +34,7 @@ def random_string() -> str:
 
 
 def check_data_input(cid: str, email: str, pwd: str,
+def check_data_input(cid: str, email: str, pwd: str,
                      user_exists: bool) -> tuple[str, Literal[200, 400]]:
     """Validates the inputs from the frontend. If any of these checks are
     not valid, return the appropriate error message and error code as a
@@ -128,19 +129,23 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT userId, passphrase, globalrole
-                                FROM UserData
-                                WHERE userdata.email = %s"""
+                query_data = """SELECT userId, passphrase, globalrole, verified
+                            FROM UserData
+                            WHERE userdata.email = %s"""
                 cur.execute(query_data, (email,))
                 data = cur.fetchone()
                 id = data[0]
                 passphrase: bytes = data[1].tobytes()
+                verified = data[2]
+
         conn.close()
         if not data:
             raise Exception("Wrong Credentials")
         if (bcrypt.checkpw(password.encode('utf8'), passphrase)):
             return_dict: dict[str, str] = {"Token": create_token(id)}
             return_dict['GlobalRole'] = data[2]
+            if not verified:
+                return {'status': 'not_verified'}, 401
             return return_dict, 200
         else:
             raise Exception("Wrong Credentials")
@@ -152,61 +157,71 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
 
 def create_verification_token(cid: str) -> dict[str, str]:
     """Creates a token to verify a User that is valid for one hour."""
-    data = {'iss': 'Hydrant',
-            'cid': cid,
-            'exp': datetime.utcnow() + timedelta(hours=1)
-            }
+    data = {
+        'iss': 'Hydrant',
+        'cid': cid,
+        'exp': datetime.utcnow() + timedelta(hours=1)
+    }
     # generate secret key, set exp-time
 
     token = jwt.encode(payload=data, key=__SECRET_KEY)
     return {'Token': token}
 
 
-def verify_user_from_email_verification(token: str) -> str:
+def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
+                                                             Literal[200]]:
     """Verifys if a token is issued by this system and if it is still valid.
     Returns the User_id or an error message"""
     try:
-        print(__SECRET_KEY)
+        # print(__SECRET_KEY)
         # Verify and decode the token
         decoded_token: dict = jwt.decode(token, __SECRET_KEY,
                                          algorithms=['HS256'])
         cid: str = decoded_token['cid']
         verify_user_in_db(cid)
         # If decoding was successful, return the user id
-        return "ok"
+        print("FRÅN VERIFY_USER_FROM_EMAIL_VERIFICATION\n")
+
+        return {'status': 'success'}, 200
 
     except jwt.ExpiredSignatureError:
         # If the token has expired, raise an exception
+        print("ERROR FRÅN EXPIRED SIGNATURE\n")
+
         raise Exception('Invalid token')
 
     except jwt.InvalidTokenError:
         # If the token is invalid, raise an exception
+        print("ERROR FRÅN INVALID TOKEN\n")
+
         raise Exception('Invalid token')
 
 
-def verify_user_in_db(cid: str):
+def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406]]:
     conn = psycopg2.connect(get_conn_string())
     with conn:
         with conn.cursor() as cur:
             try:
-                query = """UPDATE INTO UserData
-                (cid, email, passphrase)
-                VALUES (%s, %s, %s);"""
-                res = cur.execute(query, (
+                query = """UPDATE UserData
+                SET verified = TRUE
+                WHERE cid = %s"""
+                cur.execute(query, (
                     cid,
-                    email,
-                    hashed_pass
                 ))
-                print("\n\n\n", res, "\n\n\n")
                 status = 'success'
                 res_code = 200
-            except psycopg2.IntegrityError:
+                print("FRÅN VERIFY USER IN DB \n")
+
+            except:
+                print("ERROR FRÅN VERIFY USER IN DB\n")
                 status = 'already_registered'
                 res_code = 406
+
     conn.close()
+    return {'status': status}, res_code
 
 
-def create_token(id: int) -> dict[str, str]:
+def create_token(id: int) -> str:
     """Creates a token to verify a User that is valid for one hour."""
     data = {'iss': 'Hydrant',
             'id': id,
