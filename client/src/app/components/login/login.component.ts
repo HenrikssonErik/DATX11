@@ -1,6 +1,10 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ToastrResponseService } from 'src/app/services/toastr-response.service';
@@ -84,7 +88,7 @@ export class LoginComponent implements OnInit {
           try {
             if (response.body.Token) {
               const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
-              document.cookie = `sessionToken=${
+              document.cookie = `Token=${
                 response.body.Token
               }; expires=${expirationDate.toUTCString()}; path=/`;
             }
@@ -146,7 +150,7 @@ export class LoginComponent implements OnInit {
           try {
             if (response.body.Token) {
               const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
-              document.cookie = `sessionToken=${
+              document.cookie = `Token=${
                 response.body.Token
               }; expires=${expirationDate.toUTCString()}; path=/`;
             }
