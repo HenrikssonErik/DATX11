@@ -7,7 +7,6 @@ CREATE Table AssignmentFiles (
 		FileName TEXT NOT NULL,
 		FileData BYTEA NOT NULL, 
 		FileType TEXT NOT NULL,
-		--Add feedback as JSON, Fail/Pass
 		--Feedback JSON,
 		--Grade TEXT CHECK Grade IN ('Fail', 'Pass')
 		PRIMARY KEY(GroupId,CourseId, Assignment, FileName),
