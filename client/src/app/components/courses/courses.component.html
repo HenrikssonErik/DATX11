@@ -3,12 +3,12 @@
     <div class="col-md-3 col-12 rightBorder">
       <div class="row">
         <div class="col-12">
-          <h3 class="mt-3">Maltec</h3>
+          <h3 class="mt-3" *ngIf="user">{{ user.cid }}</h3>
         </div>
       </div>
       <div class="row">
         <div class="col-12">
-          <p>maltec@chalmers.se</p>
+          <p *ngIf="user">{{ user.email }}</p>
         </div>
       </div>
 
@@ -19,8 +19,10 @@
               <i class="coursesIcon fa-solid fa-graduation-cap"></i>
             </div>
             <div class="col-6" style="padding: 0">
-              <p class="numberText">0</p>
-              <td><p class="nameText" translate>Courses</p></td>
+              <p class="numberText" *ngIf="courses">
+                {{ courses.length }}
+              </p>
+              <p class="nameText" translate>Courses</p>
             </div>
           </div>
         </div>
@@ -30,7 +32,7 @@
               <i class="coursesIcon fa-solid fa-code"></i>
             </div>
             <div class="col-6" style="padding: 0">
-              <p class="numberText">11</p>
+              <p class="numberText">99</p>
               <td><p class="nameText" translate>Labs</p></td>
             </div>
           </div>
@@ -58,7 +60,7 @@
             aria-controls="current-tab-pane"
             aria-selected="true"
           >
-            Current
+            Current Courses
           </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -78,15 +80,15 @@
         <li class="nav-item" role="presentation">
           <button
             class="nav-link me-4"
-            id="contact-tab"
+            id="completed-tab"
             data-bs-toggle="tab"
-            data-bs-target="#contact-tab-pane"
+            data-bs-target="#completed-tab-pane"
             type="button"
             role="tab"
-            aria-controls="contact-tab-pane"
+            aria-controls="completed-tab-pane"
             aria-selected="false"
           >
-            Contact
+            Completed
           </button>
         </li>
       </ul>
@@ -98,7 +100,12 @@
           aria-labelledby="current-tab"
           tabindex="0"
         >
-          <p>Test 1</p>
+          <div class="mt-3">
+            <app-course
+              [data]="course"
+              *ngFor="let course of courses"
+            ></app-course>
+          </div>
         </div>
         <div
           class="tab-pane fade"
@@ -107,18 +114,24 @@
           aria-labelledby="upcoming-tab"
           tabindex="0"
         >
-          <p>Test 2</p>
+          <p>
+            Here we should see courses with a startdate later than today's date.
+          </p>
         </div>
         <div
           class="tab-pane fade"
-          id="contact-tab-pane"
+          id="completed-tab-pane"
           role="tabpanel"
-          aria-labelledby="contact-tab"
+          aria-labelledby="completed-tab"
           tabindex="0"
         >
-          <p>Test 3</p>
+          <p>
+            Here we should see courses that has a end date less than todays date
+          </p>
         </div>
       </div>
+
+      <h4 style="margin-top: 300px">Statistics</h4>
     </div>
 
     <div
