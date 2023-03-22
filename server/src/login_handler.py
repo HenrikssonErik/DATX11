@@ -17,6 +17,7 @@ def create_key():
       or login/registration will fail"""
     global __SECRET_KEY
     __SECRET_KEY = random_string()
+    print(__SECRET_KEY)
 
 
 def random_string() -> str:
@@ -25,9 +26,13 @@ def random_string() -> str:
 
     For length reference: A string of 8 Chars takes aproximatly 1 year to
     brute force with bcryp-signatures."""
-    length = 40
-    letters_and_digits = string.ascii_lowercase + string.digits
-    return ''.join(random.choice(letters_and_digits) for i in range(length))
+    bit_length = 320
+    # Generate a list of 286 random bits (0 or 1)
+    bitlist = [random.choice([0, 1]) for _ in range(bit_length)]
+    # Convert the list of bits to a string
+    bitstring = ''.join(str(bit) for bit in bitlist)
+    return bitstring
+    
 
 
 def check_data_input(cid: str, email: str,
