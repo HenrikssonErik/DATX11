@@ -11,6 +11,7 @@ from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
     verify_user_from_email_verification
 from flask_mail import Mail, Message
+import jwt
 
 # creating the Flask application
 app = Flask(__name__)
@@ -63,13 +64,15 @@ def sign_up():
 @app.route('/verify_email/<token>')
 def verify_email(token):
     try:
-        token_valid = verify_user_from_email_verification(token)
-        print(token_valid)
-    except Exception as e:
-        print(e)
-
-    return '<h1>The token: {thisToken} works!</h1>'\
-        .format(thisToken=token)
+        verify_user_from_email_verification(token)
+        return '<h1>The token: {thisToken} works!</h1>'\
+            .format(thisToken=token)
+    except jwt.ExpiredSignatureError:
+        return '<h1>The token: {thisToken} has timed out!</h1>'\
+            .format(thisToken=token)
+    except jwt.InvalidTokenError:
+        return '<h1>The token: {thisToken} does not work (uncaught)!</h1>'\
+            .format(thisToken=token)
 
 
 def send_verification_email(to: str, token_dict: dict) -> None:
