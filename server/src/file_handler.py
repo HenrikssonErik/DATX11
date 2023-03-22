@@ -14,8 +14,8 @@ __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
 
 __allowed_filenames = {"Test1.pdf", "test2.txt",
-                       "1ha1.py", "PythonFile.py", "my_test_file.py",
-                       "my_test_file_demo.py"}
+                       "1ha1.py", "PythonFile.py", "my_testfile.py",
+                       "my_test_file_demo.py", "test_1_demo.py"}
 __nr_of_files = 1
 
 # for DB, should be recieved from frontend(?) later on
@@ -103,12 +103,11 @@ def save_to_temp_and_database(
             if file_path.suffix == ".py":
                 f_name = pep8_test_dir/file_path.name
                 f_name.write_bytes(file_path.read_bytes())
-
                 pep8_result = general_tests.pep8_check(
                     pep8_test_dir,
                     filename_patterns=["./" + str(file_path.name)]
                 )
-
+            print(f"Got here: {pep8_result}")
             response_items[count].update({"PEP8_results": pep8_result})
 
 
@@ -335,11 +334,16 @@ def run_unit_tests_in_container(
     files.extend(get_all_assignment_files_from_db(courseid, assignment,
                                                   group_id))
     for (name, data) in files:
-        print(name)
         with open(path/name, "wb") as f:
             f.write(data.read())
-    gen_requirements(str(path))
-    build_image("podman_test_executer", str(path.parent))
-    json_feedback = run_container("podman_test_executer", str(path))
+    is_empty = gen_requirements(str(path))
+    print(f"is_empty={is_empty}")
+    if (is_empty):
+        json_feedback = run_container("default", str(path), is_empty)
+
+    else:
+        build_image("podman_test_executer", str(path.parent))
+        json_feedback = run_container("podman_test_executer",
+                                      str(path), is_empty)
     shutil.rmtree(str(path))
     return json_feedback

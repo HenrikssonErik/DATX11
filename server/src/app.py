@@ -6,11 +6,14 @@ from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
 from .login_handler import user_registration, log_in, create_key
+from .podman.podman_runner import init_images
 
 # creating the Flask application
 app = Flask(__name__)
 
 CORS(app)
+# init basic image
+init_images()
 # creating private key for signing tokens
 create_key()
 

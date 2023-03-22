@@ -1,7 +1,5 @@
 FROM python:3.11
 
-COPY temp/requirements.txt /req/
-RUN pip install -r /req/requirements.txt
 ADD podman_test_executer.py .
 
 RUN mkdir /DATX11/

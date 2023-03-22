@@ -1,15 +1,26 @@
 import subprocess
-# from pathlib import Path
+import os
+from pathlib import Path
+__cached_images = {"default"}
 
 
-def gen_requirements(path: str):
+def init_images(): 
+    print("Got here ")
+    cmd = ["podman", "build", "-t", "default",
+           "-f", "Containerfile.basic", Path(__file__).absolute().parent]
+    subprocess.run(cmd)
+
+
+def gen_requirements(path: str) -> bool:
     """
     Generates a requirements.txt in a given path
     --Parameters--
     path: Absolute path for directory
+    Returns true if no dependencies are needed
     """
     cmd = ["pipreqs", "--force", path]
     subprocess.run(cmd)
+    return os.stat(f"{path}/requirements.txt").st_size == 1
 
 
 def copy_files(path: str, container_id: str):
@@ -30,7 +41,8 @@ def build_image(image_name: str, directory: str):
     alias: alias for the built image
     directory: Directory of the dockerfile, "." for current dir
     """
-    subprocess.run(["podman", "build", "-t", image_name, directory])
+    subprocess.run(["podman", "build", "-t", image_name, "-f",
+                    "Containerfile.general", directory])
 
 
 def create_container(image_name: str) -> str:
@@ -43,7 +55,7 @@ def create_container(image_name: str) -> str:
     return id
 
 
-def run_container(image_name: str, test_dir: str) -> str:
+def run_container(image_name: str, test_dir: str, is_empty: bool) -> str:
     """
     Creates and runs container but not started container and returns
     feedback from tests. Deletes image when feedback been received.
@@ -59,5 +71,11 @@ def run_container(image_name: str, test_dir: str) -> str:
     proc = subprocess.run(["podman", "start", "--attach", id],
                           text=True, capture_output=True)
     json_feedback = proc.stdout
-    subprocess.run(["podman", "rmi", "-f", image_name])
+    if (not is_empty):
+        cmd = ["podman", "rmi", "-f", image_name]
+        print("Deleting Image")
+    else:
+        print("Deleting container")
+        cmd = ["podman", "rm", "-f", id]
+    subprocess.run(cmd)
     return json_feedback
