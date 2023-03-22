@@ -203,13 +203,13 @@ def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
         # If the token has expired, raise an exception
         print("ERROR FRÅN EXPIRED SIGNATURE\n")
 
-        raise Exception('Invalid token')
+        raise jwt.ExpiredSignatureError('Expired token')
 
     except jwt.InvalidTokenError:
         # If the token is invalid, raise an exception
         print("ERROR FRÅN INVALID TOKEN\n")
 
-        raise Exception('Invalid token')
+        raise jwt.InvalidTokenError('Invalid token')
 
 
 def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406]]:
