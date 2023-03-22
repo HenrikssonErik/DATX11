@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user-service.service';
 import { API_URL } from 'src/environments/environment';
 
@@ -16,16 +17,8 @@ export class CoursesComponent implements OnInit {
   constructor(private http: HttpClient, private userService: UserService) {}
 
   ngOnInit(): void {
-    //this.getCourses();
-
-    this.userService.getUserData();
-  }
-
-  getCourses() {
-    let headers = new HttpHeaders();
-    headers = headers.append('Cookies', document.cookie);
-    this.http.get(`${API_URL}/getCourses`, { headers }).subscribe((res) => {
-      this.courses = res;
+    this.userService.getUserData().subscribe((res: User) => {
+      console.log(res);
     });
   }
 }
