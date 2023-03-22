@@ -31,6 +31,7 @@ import { HomePageComponent } from './components/home-page/home-page.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { CoursesComponent } from './components/courses/courses.component';
 import { MatTabsModule } from '@angular/material/tabs';
+import { CourseComponent } from './components/course/course.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -50,6 +51,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     HomePageComponent,
     PageNotFoundComponent,
     CoursesComponent,
+    CourseComponent,
   ],
   imports: [
     BrowserModule,
