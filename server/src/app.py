@@ -102,7 +102,7 @@ def get_user_info():
     user_id = verify_and_get_id(token)
 
     if (user_id):
-        user_info = get_user_info(user_id)
+        user_info = get_user(user_id)
         return make_response(jsonify(user_info), 200)
     else:
         return make_response("", 401)
