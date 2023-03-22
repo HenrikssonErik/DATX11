@@ -8,7 +8,7 @@
       </div>
       <div class="row">
         <div class="col-12">
-          <p>{{ courses[0].email }}</p>
+          <p *ngIf="courses">{{ courses[0].email }}</p>
         </div>
       </div>
 
@@ -19,7 +19,9 @@
               <i class="coursesIcon fa-solid fa-graduation-cap"></i>
             </div>
             <div class="col-6" style="padding: 0">
-              <p class="numberText">{{ courses[1].length }}</p>
+              <p class="numberText" *ngIf="courses">
+                {{ courses[1].length || "0" }}
+              </p>
               <td><p class="nameText" translate>Courses</p></td>
             </div>
           </div>
@@ -49,6 +51,7 @@
       <mat-tab-group animationDuration="0ms">
         <mat-tab label="In progress">Content 1</mat-tab>
         <mat-tab label="Completed">Content 2</mat-tab>
+        <mat-tab label="Upcoming"></mat-tab>
       </mat-tab-group>
     </div>
 
