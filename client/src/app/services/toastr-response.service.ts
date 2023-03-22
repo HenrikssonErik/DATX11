@@ -24,6 +24,10 @@ const response_to_toastr: ResponseToToastr = {
   wrong_credentials: ['Did you mistype your password?', 'Could not log in'],
   cid_does_not_exist: ['CID is not correct.', 'CID is not correct.'],
   course_exists: ['This course already exists'],
+  not_verified: [
+    'Check your email to verify',
+    'You have not verified your account yet!',
+  ],
 };
 
 @Injectable({
