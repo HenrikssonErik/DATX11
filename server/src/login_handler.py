@@ -13,14 +13,17 @@ __SECRET_KEY: str = None
 
 
 def create_key():
-    """ Creates a secret key, should be called from APP.py at start
-      or login/registration will fail"""
+    """
+    Creates a secret key, should be called from APP.py at start
+    or login/registration will fail
+    """
     global __SECRET_KEY
     __SECRET_KEY = random_string()
 
 
 def random_string() -> str:
-    """Creates a random string of size 'length' to be used as a secret key
+    """
+    Creates a random string of size 'length' to be used as a secret key
     for encryption and singatures
 
     For length reference: A string of 8 Chars takes aproximatly 1 year to
@@ -37,7 +40,8 @@ def check_data_input(cid: str, email: str, pwd: str,
                      user_exists: bool) -> tuple[str, Literal[200, 400]]:
     """Validates the inputs from the frontend. If any of these checks are
     not valid, return the appropriate error message and error code as a
-    tuple."""
+    tuple.
+    """
     if not cid.isalpha():
         return 'unallowed_tokens', 400
     if not email:
@@ -55,12 +59,14 @@ def check_data_input(cid: str, email: str, pwd: str,
 
 def user_registration(data: Request.form) -> \
         tuple[dict[str, str], Literal[200, 400, 401, 406]]:
-    """Registrates the user to the database, then logs in to the user.
+    """
+    Registrates the user to the database, then logs in to the user.
     If success, return the token from log_in and success code.
     If the user cannot be created, return error message and error code.
 
     Creates a bcrypted password to be stored in the database to ensure
-    data security, since bcrypted passwords are difficult to brute force."""
+    data security, since bcrypted passwords are difficult to brute force.
+    """
     email: str = data['email']
     cid: str = data['cid']
     pwd: str = data['password']
@@ -124,8 +130,10 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
 
 def log_in(email: str, password: str) -> tuple[dict[str, str],
                                                Literal[200, 401]]:
-    """Checks if the user exists in the database, if so it returns a
-    token that the user can use to verify itself"""
+    """
+    Checks if the user exists in the database, if so it returns a
+    token that the user can use to verify itself
+    """
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -158,7 +166,9 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
 
 
 def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
-    """Creates a token to verify a User that is valid for one hour."""
+    """
+    Creates a token to verify a User that is valid for one hour.
+    """
     data = {
         'iss': 'Hydrant',
         'cid': cid,
@@ -172,8 +182,10 @@ def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
 
 def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
                                                              Literal[200]]:
-    """Verifys if a token is issued by this system and if it is still valid.
-    Returns the User_id or an error message"""
+    """
+    Verifys if a token is issued by this system and if it is still valid.
+    Returns the User_id or an error message
+    """
     try:
         # print(__SECRET_KEY)
         # Verify and decode the token
@@ -214,7 +226,8 @@ def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406]]:
                 res_code = 200
                 print("FRÅN VERIFY USER IN DB \n")
 
-            except:
+            except Exception as e:
+                print(e)
                 print("ERROR FRÅN VERIFY USER IN DB\n")
                 status = 'no_user_to_verify'
                 res_code = 406
@@ -224,7 +237,9 @@ def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406]]:
 
 
 def create_token(id: int) -> str:
-    """Creates a token to verify a User that is valid for one hour."""
+    """
+    Creates a token to verify a User that is valid for one hour.
+    """
     data = {'iss': 'Hydrant',
             'id': id,
             'exp': datetime.utcnow() + timedelta(hours=2)
@@ -234,9 +249,12 @@ def create_token(id: int) -> str:
     return token
 
 
-def verify_and_get_id(token: str) -> int:
-    """Verifys if a token is issued by this system and if it is still valid.
-    Returns the User_id or an error message"""
+def verify_and_get_token(token: str) -> int:
+    """
+    Verifys if a token is issued by this system and if it is still valid.
+    Returns the User_id or an error message
+    """
+
     try:
         # Verify and decode the token
         decoded_token: dict = jwt.decode(token, __SECRET_KEY,
