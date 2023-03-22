@@ -1,14 +1,15 @@
 
 
 from typing import Literal
-from flask import Flask, jsonify, make_response, render_template, request, send_file, url_for
+from flask import Flask, jsonify, make_response, render_template, request, \
+    send_file, url_for
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
-from .login_handler import user_registration, log_in, create_key,\
-    verify_and_get_id
 from . import user_handler
 from . import course_handler
+from .login_handler import user_registration, log_in, create_key, \
+    verify_user_from_email_verification
 from flask_mail import Mail, Message
 
 # creating the Flask application
@@ -52,17 +53,28 @@ def sign_up():
     if (response[1] == 200):
         send_verification_email(
             request.form['email'], response[0])
-    res = make_response(response[0], response[1])
+        res = make_response({'status': 'success'}, response[1])
+    else:
+        res = make_response(response[0], response[1])
 
     return res
 
 
 @app.route('/verify_email/<token>')
 def verify_email(token):
-    return '<h1>The token works!</h1>'
+    try:
+        token_valid = verify_user_from_email_verification(token)
+        print(token_valid)
+    except Exception as e:
+        print(e)
+
+    return '<h1>The token: {thisToken} works!</h1>'\
+        .format(thisToken=token)
 
 
-def send_verification_email(to: str, token: dict) -> None:
+def send_verification_email(to: str, token_dict: dict) -> None:
+
+    token: str = token_dict.get('Token')
 
     msg = Message('Verification Email for Hydrant',
                   sender='temphydrant@gmail.com', recipients=[to])
@@ -76,7 +88,6 @@ def send_verification_email(to: str, token: dict) -> None:
 
 @app.route('/files', methods=['POST'])
 def post_files():
-
     files = request.files.getlist('files')
 
     if not files:

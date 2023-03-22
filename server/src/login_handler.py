@@ -149,7 +149,63 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         return {'status': "wrong_credentials"}, 401
 
 
-def create_token(id: int) -> str:
+def create_verification_token(cid: str) -> dict[str, str]:
+    """Creates a token to verify a User that is valid for one hour."""
+    data = {'iss': 'Hydrant',
+            'cid': cid,
+            'exp': datetime.utcnow() + timedelta(hours=1)
+            }
+    # generate secret key, set exp-time
+
+    token = jwt.encode(payload=data, key=__SECRET_KEY)
+    return {'Token': token}
+
+
+def verify_user_from_email_verification(token: str) -> str:
+    """Verifys if a token is issued by this system and if it is still valid.
+    Returns the User_id or an error message"""
+    try:
+        print(__SECRET_KEY)
+        # Verify and decode the token
+        decoded_token: dict = jwt.decode(token, __SECRET_KEY,
+                                         algorithms=['HS256'])
+        cid: str = decoded_token['cid']
+        verify_user_in_db(cid)
+        # If decoding was successful, return the user id
+        return "ok"
+
+    except jwt.ExpiredSignatureError:
+        # If the token has expired, raise an exception
+        raise Exception('Invalid token')
+
+    except jwt.InvalidTokenError:
+        # If the token is invalid, raise an exception
+        raise Exception('Invalid token')
+
+
+def verify_user_in_db(cid: str):
+    conn = psycopg2.connect(get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            try:
+                query = """UPDATE INTO UserData
+                (cid, email, passphrase)
+                VALUES (%s, %s, %s);"""
+                res = cur.execute(query, (
+                    cid,
+                    email,
+                    hashed_pass
+                ))
+                print("\n\n\n", res, "\n\n\n")
+                status = 'success'
+                res_code = 200
+            except psycopg2.IntegrityError:
+                status = 'already_registered'
+                res_code = 406
+    conn.close()
+
+
+def create_token(id: int) -> dict[str, str]:
     """Creates a token to verify a User that is valid for one hour."""
     data = {'iss': 'Hydrant',
             'id': id,
