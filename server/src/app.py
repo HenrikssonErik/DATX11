@@ -113,9 +113,10 @@ def getCourses():
     user_id = verify_and_get_id(token)
 
     if (user_id):
-        email = {'email': get_user_email(user_id)}
-        course_info = get_courses_info(user_id)
-        res = make_response(jsonify(email, course_info), 200)
+        course_info: dict = {}
+        course_info['Email'] = get_user_email(user_id)
+        course_info['Course Info'] = get_courses_info(user_id)
+        res = make_response(jsonify(course_info), 200)
         return res
 
     else:
