@@ -83,7 +83,8 @@ def user_registration(data: Request.form) -> \
     res_query: tuple[dict[str, str], Literal[200, 406]
                      ] = registration_query(cid, email, hashed_pass,
                                             role[0], role[1])
-    res_object = (log_in(email, pwd)) if (res_query[1] == 200) else (res_query)
+    res_object = (create_verification_token(cid)) if (
+        res_query[1] == 200) else (res_query)
 
     return res_object
 
@@ -91,12 +92,14 @@ def user_registration(data: Request.form) -> \
 def registration_query(cid: str, email: str, hashed_pass: bytes,
                        role: str, name: str) -> \
         tuple[dict[str, str], Literal[200, 406]]:
-    """Queries the database with the information given.
+    """
+    Queries the database with the information given.
     If the unique key already is in the database, return error message
     that the user is already registered.
 
     IntegrityError: https://www.psycopg.org/docs/errors.html Class 23.
-    Other exceptions or errors may be added continuously when needed."""
+    Other exceptions or errors may be added continuously when needed.
+    """
     conn = psycopg2.connect(get_conn_string())
     with conn:
         with conn.cursor() as cur:
@@ -155,7 +158,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         return {'status': "wrong_credentials"}, 401
 
 
-def create_verification_token(cid: str) -> dict[str, str]:
+def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
     """Creates a token to verify a User that is valid for one hour."""
     data = {
         'iss': 'Hydrant',
@@ -165,7 +168,7 @@ def create_verification_token(cid: str) -> dict[str, str]:
     # generate secret key, set exp-time
 
     token = jwt.encode(payload=data, key=__SECRET_KEY)
-    return {'Token': token}
+    return {'Token': token}, 200
 
 
 def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
@@ -214,7 +217,7 @@ def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406]]:
 
             except:
                 print("ERROR FRÅN VERIFY USER IN DB\n")
-                status = 'already_registered'
+                status = 'no_user_to_verify'
                 res_code = 406
 
     conn.close()
