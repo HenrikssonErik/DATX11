@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { UserService } from 'src/app/services/user-service.service';
 import { API_URL } from 'src/environments/environment';
 
 @Component({
@@ -12,26 +13,19 @@ export class CoursesComponent implements OnInit {
   events = [];
   deadlines = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private userService: UserService) {}
 
   ngOnInit(): void {
-    this.getCourses();
+    //this.getCourses();
+
+    this.userService.getUserData();
   }
 
   getCourses() {
-    const cookie = this.replaceSessionToken(document.cookie);
-
     let headers = new HttpHeaders();
-    headers = headers.append('Cookies', cookie);
+    headers = headers.append('Cookies', document.cookie);
     this.http.get(`${API_URL}/getCourses`, { headers }).subscribe((res) => {
       this.courses = res;
-      console.log(this.courses);
     });
-  }
-
-  replaceSessionToken(inputString: string): string {
-    const splitString = inputString.split('=');
-    const newString = `Token=${splitString[1]}`;
-    return newString;
   }
 }
