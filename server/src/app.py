@@ -96,6 +96,17 @@ def get_files():
     res.headers = headers
     return res
 
+@app.route('/getUserInfo', methods=['GET'])
+def get_user_info():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+
+    if (user_id):
+        user_info = get_user_info(user_id)
+        return make_response(jsonify(user_info), 200)
+    else:
+        return make_response("", 401)
+
 
 @app.route('/getCourses', methods=['GET'])
 def getCourses():
@@ -104,13 +115,11 @@ def getCourses():
        Year, StudyPeriod
        Requires a token to be sent as a cookie with the request"""
     token = extract_token(request)
-
     user_id = verify_and_get_id(token)
 
     if (user_id):
         course_info: dict = {}
-        course_info['Email'] = get_user_email(user_id)
-        course_info['CourseInfo'] = get_courses_info(user_id)
+        course_info['Courses'] = get_courses_info(user_id)
         res = make_response(jsonify(course_info), 200)
         return res
 
