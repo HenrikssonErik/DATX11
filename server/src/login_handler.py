@@ -153,9 +153,8 @@ def create_token(id: int) -> dict[str, str]:
     """Creates a token to verify a User that is valid for one hour."""
     data = {'iss': 'Hydrant',
             'id': id,
-            'exp': datetime.utcnow() + timedelta(hours=1)
+            'exp': datetime.utcnow() + timedelta(hours=2)
             }
-    # generate secret key, set exp-time
 
     token = jwt.encode(payload=data, key=__SECRET_KEY)
     return {'Token': token}
