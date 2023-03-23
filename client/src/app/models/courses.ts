@@ -3,11 +3,16 @@ export interface Courses {
 }
 
 export interface Course {
-  Assignments: any[]; // change "any" when we know how it will look
+  Assignments: Assignment[]; // change "any" when we know how it will look
   Course: string;
   CourseName: string;
   Role: string;
   StudyPeriod: number;
   Year: number;
   courseID: number;
+}
+
+export interface Assignment {
+  AssignmentNr: number;
+  DueDate: Date;
 }
