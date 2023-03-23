@@ -128,7 +128,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT userId, passphrase FROM UserData
+                query_data = """SELECT userId, passphrase, globalrole FROM UserData
                             WHERE userdata.email = %s"""
                 cur.execute(query_data, (email,))
                 data = cur.fetchone()
@@ -138,8 +138,9 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         if not data:
             raise Exception("Wrong Credentials")
         if (bcrypt.checkpw(password.encode('utf8'), passphrase)):
-            token: dict[str, str] = create_token(id)
-            return token, 200
+            returnDict: dict[str, str] = create_token(id)
+            returnDict['GlobalRole'] = data[2]
+            return returnDict, 200
         else:
             raise Exception("Wrong Credentials")
 
