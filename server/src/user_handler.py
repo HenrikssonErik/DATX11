@@ -46,14 +46,14 @@ def get_user(user_id: int) -> dict:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT cid, email FROM Userdata
+                query_data = """SELECT cid, email, fullname FROM Userdata
                             WHERE userid = %s"""
                 cur.execute(query_data, (user_id,))
                 data = cur.fetchone()
         conn.close()
         if not data:
             raise Exception("No such user")
-        return {'cid': data[0], 'email': data[1]}
+        return {'cid': data[0], 'email': data[1], 'fullname': data[2]}
 
     except Exception as e:
         print(e)
