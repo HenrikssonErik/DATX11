@@ -13,6 +13,6 @@ export class UserService {
   getUserData(): Observable<any> {
     let headers: HttpHeaders = new HttpHeaders();
     headers = headers.append('Cookies', document.cookie);
-    return this.http.get(`${API_URL}/getUserInfo`, { headers });
+    return this.http.get<User>(`${API_URL}/getUserInfo`, { headers });
   }
 }

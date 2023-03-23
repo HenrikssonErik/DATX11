@@ -119,7 +119,7 @@ def getCourses():
 
     if (user_id):
         course_info: dict = {}
-        course_info['Courses'] = get_courses_info(user_id)
+        course_info['courses'] = get_courses_info(user_id)
         res = make_response(jsonify(course_info), 200)
         return res
 

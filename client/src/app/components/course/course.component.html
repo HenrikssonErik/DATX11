@@ -1,0 +1,33 @@
+<div class="card" [style.background-color]="primaryColor">
+  <div class="header">
+    <h3><i class="fa fa-chalkboard-user courseIcon"></i></h3>
+    <div class="dropdown">
+      <a
+        class="dropdown text-muted selectedItem"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        <span
+          ><h5><i class="fa-solid fa-ellipsis-vertical courseIcon"></i></h5
+        ></span>
+      </a>
+      <ul class="dropdown-menu">
+        <li *ngFor="let color of cardColors">
+          <a
+            class="dropdown-item text-muted ml-2"
+            (click)="changeCardColor(color)"
+            ><div class="color-box" [style.backgroundColor]="color.value"></div>
+            <span>{{ color.name }}</span></a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+  <p *ngIf="data" class="roleText">{{ data.Role }}</p>
+  <p *ngIf="data" class="courseText">Datakommunikation - {{ data.Course }}</p>
+  <div class="progress-bar-container" [style.background-color]="secondaryColor">
+    <div class="progress-bar"></div>
+    <div class="progress-text">13/16</div>
+  </div>
+</div>

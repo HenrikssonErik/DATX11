@@ -1,5 +1,5 @@
 export interface Courses {
-  Courses: Course[];
+  courses: Course[];
 }
 
 export interface Course {
