@@ -30,6 +30,7 @@ import { CourseComponent } from './components/course/course.component';
 import { CoursePickerComponent } from './components/course-picker/course-picker.component';
 import { AssignmentsComponent } from './components/assignments/assignments.component';
 import { CreateCourseComponent } from './components/create-course/create-course.component';
+import { VerifyEmailComponent } from './verify-email/verify-email.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -53,6 +54,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CoursePickerComponent,
     AssignmentsComponent,
     CreateCourseComponent,
+    VerifyEmailComponent,
   ],
   imports: [
     BrowserModule,
