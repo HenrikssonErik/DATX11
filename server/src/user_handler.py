@@ -18,7 +18,8 @@ def get_assignments(course_id: int) -> tuple:
                 query_data = """SELECT assignment FROM assignments
                             WHERE courseid = %s"""
                 cur.execute(query_data, [course_id])
-                data = cur.fetchall()
+                data =  [row[0] for row in cur.fetchall()]
+                print(data)
         conn.close()
         if not data:
             return []
