@@ -1,0 +1,24 @@
+.nav-tabs {
+  --bs-nav-tabs-border-width: 0px;
+}
+
+.nav-link {
+  color: #6c757d;
+  font-size: 18px;
+}
+
+.nav-link:hover {
+  background-color: #e6e6e6;
+  color: #6c757d;
+}
+
+.nav-tabs .nav-link.active {
+  color: whitesmoke;
+  background-color: #26734d;
+}
+
+.teachingIllu {
+  position: absolute;
+  bottom: 60px;
+  right: 50px;
+}
