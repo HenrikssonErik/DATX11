@@ -45,6 +45,7 @@ CREATE Table Courses (
 CREATE Table Assignments(
 	CourseId serial,
 	Assignment INTEGER check (Assignment > 0),
+	Description TEXT Not NULL,
 	endDate Date NOT NULL,
 	PRIMARY KEY (courseId, Assignment),
 	CONSTRAINT fk_course

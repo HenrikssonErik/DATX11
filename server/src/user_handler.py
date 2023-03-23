@@ -15,18 +15,16 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT assignment, enddate FROM assignments
-                            WHERE courseid = %s"""
+                query_data = """SELECT assignment, enddate, Description FROM
+                                assignments WHERE courseid = %s"""
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
                 assignments: list[dict[str:any]] = []
                 for assignmentRow in data:
-                    print(assignmentRow[0])
-                    print(assignmentRow[1])
                     assignments.append({'AssignmentNr': assignmentRow[0],
-                                        'DueDate': assignmentRow[1]})
-                print(assignments)
+                                        'DueDate': assignmentRow[1],
+                                        'Description': assignmentRow[2]})
         conn.close()
         if not data:
             return []
