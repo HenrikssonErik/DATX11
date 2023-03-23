@@ -46,8 +46,6 @@ CREATE Table TestFiles (
 	FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments(CourseId, Assignment)
 )
 
-CREATE TABLE UserEmail (email TEXT PRIMARY KEY CONSTRAINT proper_email CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'));
-
 CREATE TABLE UserData (
 	userId SERIAL,
 	cid TEXT UNIQUE,
