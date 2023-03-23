@@ -121,7 +121,9 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
                 ))
                 status = 'success'
                 res_code = 200
-            except psycopg2.IntegrityError:
+            except psycopg2.IntegrityError as e:
+
+                print("HERE\n", e, "\n")
                 status = 'already_registered'
                 res_code = 406
     conn.close()
