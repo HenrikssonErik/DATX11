@@ -17,7 +17,6 @@ def create_key():
       or login/registration will fail"""
     global __SECRET_KEY
     __SECRET_KEY = random_string()
-    print(__SECRET_KEY)
 
 
 def random_string() -> str:
@@ -32,7 +31,6 @@ def random_string() -> str:
     # Convert the list of bits to a string
     bitstring = ''.join(str(bit) for bit in bitlist)
     return bitstring
-    
 
 
 def check_data_input(cid: str, email: str, pwd: str, 
@@ -53,6 +51,7 @@ def check_data_input(cid: str, email: str, pwd: str,
     if not user_exists:
         return "cid_does_not_exist", 400
     return "OK", 200
+
 
 def user_registration(data: Request.form) -> \
         tuple[dict[str, str], Literal[200, 400, 401, 406]]:
