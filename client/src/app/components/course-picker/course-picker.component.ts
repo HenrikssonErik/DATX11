@@ -11,6 +11,7 @@ export class CoursePickerComponent {
   @Input() courses: Course[] = [];
   //TODO: Annoying to have to use !
   selectedCourse!: Course | undefined;
+  selectedAssignment!: any;
 
   constructor() {}
 
@@ -20,5 +21,9 @@ export class CoursePickerComponent {
   }
   goBack() {
     this.selectedCourse = undefined;
+  }
+
+  selectAssignment(assignment: any) {
+    console.log(assignment);
   }
 }
