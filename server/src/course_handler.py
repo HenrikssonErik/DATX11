@@ -2,7 +2,7 @@ from .connector import get_conn_string
 import psycopg2
 import datetime
 
-# TODO: move course and assignment stuff from user_handler to here
+# TODO: move course and assignment stuff from user_handler to here, implement create assignment
 
 
 # TODO: not tested yet
