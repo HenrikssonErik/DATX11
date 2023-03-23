@@ -1,3 +1,5 @@
+--The order of tables must change to able create entire database from this file
+-- without entering each tavle/view one by one
 
 -- CourseInstance, group and lab assignment shoudl be primary key here
 CREATE Table AssignmentFiles (
