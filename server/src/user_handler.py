@@ -60,7 +60,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT * FROM User_course_info
+                query_data = """SELECT * FROM UserCourseInfo
                             WHERE userid = %s"""
                 cur.execute(query_data, (user_id,))
                 data = cur.fetchall()
@@ -90,7 +90,7 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT groupid, groupnumber FROM
-                                user_group_course_info
+                                userGroupCourseInfo
                                 WHERE userid = %s and courseid = %s"""
                 cur.execute(query_data, (user_id, course_id))
                 data = cur.fetchone()
