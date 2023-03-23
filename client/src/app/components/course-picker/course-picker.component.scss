@@ -22,3 +22,19 @@
   bottom: 60px;
   right: 50px;
 }
+
+.card {
+  width: 500px;
+  height: 250px;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  background-color: #4c5458;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.1s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}

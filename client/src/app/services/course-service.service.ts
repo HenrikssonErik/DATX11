@@ -17,4 +17,11 @@ export class CourseService {
       .get<Courses>(`${API_URL}/getCourses`, { headers })
       .pipe(map((res) => res.courses));
   }
+
+  getCourse(id: number): Observable<Course> {
+    const headers = new HttpHeaders().append('Cookies', document.cookie);
+    return this.http.get<Course>(`${API_URL}/getCourse?Course=${id}`, {
+      headers,
+    });
+  }
 }

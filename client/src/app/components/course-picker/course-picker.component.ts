@@ -1,29 +1,29 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, Input } from '@angular/core';
-import { Course } from 'src/app/models/courses';
-
+import { Component, Input, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { Assignment, Course } from 'src/app/models/courses';
+import { Location } from '@angular/common';
 @Component({
   selector: 'app-course-picker',
   templateUrl: './course-picker.component.html',
   styleUrls: ['./course-picker.component.scss'],
 })
-export class CoursePickerComponent {
+export class CoursePickerComponent implements OnInit {
   @Input() courses: Course[] = [];
-  //TODO: Annoying to have to use !
-  selectedCourse!: Course | undefined;
-  selectedAssignment!: any;
+  showCourses = true;
 
-  constructor() {}
+  constructor(private router: Router, private location: Location) {}
 
-  setSelectedCourse(course: Course) {
-    console.log(course);
-    this.selectedCourse = course;
+  ngOnInit(): void {
+    //TODO: Don't like this.
+    this.location.onUrlChange((url: string) => {
+      if (url.endsWith('/courses') && !this.showCourses) {
+        this.showCourses = true;
+      }
+    });
   }
-  goBack() {
-    this.selectedCourse = undefined;
-  }
 
-  selectAssignment(assignment: any) {
-    console.log(assignment);
+  goToCourse(id: number) {
+    this.showCourses = false;
+    this.router.navigate(['/courses', id]);
   }
 }
