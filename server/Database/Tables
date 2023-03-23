@@ -87,7 +87,7 @@ CREATE TABLE UserInCourse (
 --View for user and course data can be called for course inf from specific user:
 --To Call do: select * from user_course_info where userId = 'id int';
 
-CREATE OR REPLACE VIEW user_course_info AS
+CREATE OR REPLACE VIEW UserCourseInfo AS
 SELECT uic.userId, uic.userRole, c.courseId, c.courseName, c.Course, c.TeachingPeriod, c.CourseYear
 FROM UserInCourse uic
 JOIN Courses c ON uic.courseId = c.CourseId;
@@ -95,7 +95,7 @@ JOIN Courses c ON uic.courseId = c.CourseId;
 
 --This view shows user and its courses with corresponding groups. Useful to get group info if user and course id is known
 
-CREATE OR REPLACE VIEW user_group_course_info AS
+CREATE OR REPLACE VIEW UserGroupCourseInfo AS
 SELECT uig.userId, uig.groupId, g.groupNumber, g.course as courseId, c.Course, c.courseyear, c.teachingperiod
 FROM UserInGroup uig
 JOIN Groups g ON uig.groupId = g.groupId
