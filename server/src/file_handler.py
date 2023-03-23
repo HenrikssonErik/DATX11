@@ -107,7 +107,6 @@ def save_to_temp_and_database(
                     pep8_test_dir,
                     filename_patterns=["./" + str(file_path.name)]
                 )
-            print(f"Got here: {pep8_result}")
             response_items[count].update({"PEP8_results": pep8_result})
 
 
@@ -329,7 +328,6 @@ def run_unit_tests_in_container(
 ) -> str:
     path = Path(__file__).absolute().parent/"podman"/"temp"
     path.mkdir(parents=True, exist_ok=True)
-    print(path)
     files = get_unit_test_files_from_db(courseid, assignment)
     files.extend(get_all_assignment_files_from_db(courseid, assignment,
                                                   group_id))
@@ -337,7 +335,6 @@ def run_unit_tests_in_container(
         with open(path/name, "wb") as f:
             f.write(data.read())
     is_empty = gen_requirements(str(path))
-    print(f"is_empty={is_empty}")
     if (is_empty):
         json_feedback = run_container("default", str(path), is_empty)
 

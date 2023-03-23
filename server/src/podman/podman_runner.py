@@ -4,7 +4,6 @@ from pathlib import Path
 
 
 def init_images(): 
-    print("Got here ")
     cmd = ["podman", "build", "-t", "default",
            "-f", "Containerfile.basic", Path(__file__).absolute().parent]
     subprocess.run(cmd)
@@ -21,9 +20,10 @@ def gen_requirements(path: str) -> bool:
     subprocess.run(cmd)
     if (os.stat(f"{path}/requirements.txt").st_size == 1):
         return True
-    
-    # Checks if the generated requirements are included in the default
-    # requirements and returns true if that is the case
+    """
+    Checks if the generated requirements are included in the default
+    requirements and returns true if that is the case
+    """
     requirements_submission = open(f'{path}/requirements.txt', 'r')
     lines_req_sub = requirements_submission.readlines()
     lines_req_sub[:] = [line.split('==')[0].lower() for line in lines_req_sub]
