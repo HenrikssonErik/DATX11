@@ -72,7 +72,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
                                 "CourseName": info[3],
                                 "Course": info[4], "Year": info[5],
                                 "StudyPeriod": info[6],
-                                'Assignments': get_assignments(info[3])})
+                                'Assignments': get_assignments(info[2])})
         return orderedData
 
     except Exception as e:
@@ -273,6 +273,6 @@ def get_global_role(user_id) -> str:
 def check_admin_or_course_teacher(user_id: int, course_id: int):
     course_administrator: bool = is_admin_on_course(user_id, course_id) or \
                             is_teacher_on_course(user_id, course_id)
-    # global_admin: bool = get_global_role(user_id) == Role.Admin.name
+    global_admin: bool = get_global_role(user_id) == Role.Admin.name
 
-    return course_administrator # or global_admin
+    return course_administrator or global_admin
