@@ -1,7 +1,6 @@
 import subprocess
 import os
 from pathlib import Path
-__cached_images = {"default"}
 
 
 def init_images(): 
@@ -20,7 +19,20 @@ def gen_requirements(path: str) -> bool:
     """
     cmd = ["pipreqs", "--force", path]
     subprocess.run(cmd)
-    return os.stat(f"{path}/requirements.txt").st_size == 1
+    if (os.stat(f"{path}/requirements.txt").st_size == 1):
+        return True
+    
+    # Checks if the generated requirements are included in the default
+    # requirements and returns true if that is the case
+    requirements_submission = open(f'{path}/requirements.txt', 'r')
+    lines_req_sub = requirements_submission.readlines()
+    lines_req_sub[:] = [line.split('==')[0].lower() for line in lines_req_sub]
+    requirements_default = open(Path(__file__).parent/'requirements.txt',
+                                'r')
+    lines_req_default = requirements_default.readlines()
+    lines_req_default[:] = [line.split('\n')[0].lower()
+                            for line in lines_req_default]
+    return all(lines in lines_req_default for lines in lines_req_sub)
 
 
 def copy_files(path: str, container_id: str):

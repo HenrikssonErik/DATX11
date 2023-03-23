@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 import sys
 import os
 import shutil
-from io import BytesIO
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 from src.podman.podman_runner import gen_requirements, copy_files, \

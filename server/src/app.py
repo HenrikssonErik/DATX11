@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 CORS(app)
 # init basic image
-init_images()
+# init_images()
 # creating private key for signing tokens
 create_key()
 
