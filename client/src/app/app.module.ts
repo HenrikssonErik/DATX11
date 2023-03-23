@@ -27,6 +27,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { CoursesComponent } from './components/courses/courses.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { CourseComponent } from './components/course/course.component';
+import { CoursePickerComponent } from './components/course-picker/course-picker.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -47,6 +48,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     PageNotFoundComponent,
     CoursesComponent,
     CourseComponent,
+    CoursePickerComponent,
   ],
   imports: [
     BrowserModule,
