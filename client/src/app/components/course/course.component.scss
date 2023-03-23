@@ -1,9 +1,6 @@
 .card {
   width: 220px;
-  height: 200px;
-  /*background-color: #e1ece4;*/
-  background-color: #d3d2ff;
-  /*background-color: #fbeeb2;*/
+  height: 210px;
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
   border-radius: 16px;
   padding: 16px;
@@ -16,9 +13,6 @@
 }
 
 .courseIcon {
-  background-color: #c9caf3;
-  /*background-color: #d6e0d8;*/
-  /*  background-color: #eee4ad;*/
   border-radius: 30px;
 }
 :host {
@@ -26,7 +20,16 @@
   margin-right: 16px; /* add some space between app-course components */
 }
 
-.card-container {
+.roleText {
+  font-size: 14px;
+}
+
+.color-box {
+  display: inline-block;
+  height: 10px;
+  width: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
 }
 
 .header {
@@ -58,6 +61,11 @@
   opacity: 1;
 }
 
+.card:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
 .courseText {
   margin: 0;
   font-size: 14px;
@@ -70,7 +78,6 @@
   align-items: center;
   flex-direction: row;
   height: 3px;
-  background-color: #a1a0c5;
   border-radius: 5px;
   margin-bottom: 10px;
 }
@@ -97,7 +104,7 @@
 
 .dropdown-item {
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .dropdown-item:hover {
