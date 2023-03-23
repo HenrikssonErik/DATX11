@@ -28,6 +28,7 @@ import { CoursesComponent } from './components/courses/courses.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { CourseComponent } from './components/course/course.component';
 import { CoursePickerComponent } from './components/course-picker/course-picker.component';
+import { AssignmentsComponent } from './components/assignments/assignments.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -49,6 +50,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CoursesComponent,
     CourseComponent,
     CoursePickerComponent,
+    AssignmentsComponent,
   ],
   imports: [
     BrowserModule,
