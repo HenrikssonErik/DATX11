@@ -52,7 +52,7 @@ CREATE TABLE UserData (
 	cid TEXT UNIQUE,
 	email TEXT NOT NULL,
 	passphrase BYTEA NOT NULL,
-	globalRole TEXT NOT NULL,
+	globalRole TEXT NOT NULL CHECK (globalRole in ('Student', 'Teacher' )),
 	fullName TEXT NOT NULL,
 	--globalRole TEXT NOT NUll CHECK (globalRole IN ('Admin', 'Teacher', 'Student')),
 	PRIMARY KEY (userId),
