@@ -2,15 +2,28 @@
 -- without entering each tavle/view one by one
 
 -- CourseInstance, group and lab assignment shoudl be primary key here
+CREATE Table AssignmentFeedback (
+	groupId INTEGER NOT NULL,
+	CourseId serial,
+	Assignment INTEGER,
+	TestFeedback JSON,
+	TeacherFeedback TEXT,
+	TestPass BOOLEAN NOT NULL DEFAULT FALSE, 
+	TeacherGrade BOOLEAN NOT NULL DEFAULT FALSE,
+	PRIMARY KEY(GroupId,CourseId, Assignment),
+	CONSTRAINT fk_assignment
+		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),
+		FOREIGN Key (groupId) REFERENCES Groups(groupId)
+);
+
+
 CREATE Table AssignmentFiles (
 		GroupId INTEGER  NOT NULL, 
 		CourseId serial,
 		Assignment INTEGER,
-		FileName TEXT NOT NULL,
+		FileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		FileData BYTEA NOT NULL, 
 		FileType TEXT NOT NULL,
-		--Feedback JSON,
-		--Grade TEXT CHECK Grade IN ('Fail', 'Pass')
 		PRIMARY KEY(GroupId,CourseId, Assignment, FileName),
 		CONSTRAINT fk_assignment
 		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),
@@ -36,6 +49,16 @@ CREATE Table Assignments(
 	PRIMARY KEY (courseId, Assignment),
 	CONSTRAINT fk_course
 	FOREIGN KEY (CourseId) REFERENCES Courses(CourseId)
+);
+
+-- Used for tests to find the correct filenames
+CREATE Table FileNames (
+	nameId SERIAl PRIMARY KEY,
+	CourseId SERIAL,
+	Assignment INTEGER,
+	FileName TEXT NOT NULL,
+	CONSTRAINT fk_assignment
+	FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),
 );
 
 --for unittests

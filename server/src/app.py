@@ -96,6 +96,7 @@ def get_files():
     res.headers = headers
     return res
 
+
 @app.route('/getUserInfo', methods=['GET'])
 def get_user_info():
     token = extract_token(request)
@@ -126,6 +127,18 @@ def getCourses():
     else:
         return make_response('', 401)
 
+
+@app.rout('/getCourse', methods=['GET'])
+def getCourse():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course_id = request.args.get('Course')
+
+    if (user_id):
+        course = get_course_info(user_id, course_id)
+        return make_response(jsonify(course), 200)
+    else:
+        return make_response("", 401)
 
 @app.route('/getGroup', methods=['GET'])
 def getGroup():
@@ -228,4 +241,4 @@ def createCourse():
     else:
         return make_response("Not allowed to create course", 401)
 
-# TODO: remove course, getUser lists? (to add people), change user role, create assignment, edit assignment desc
+# TODO: remove course, getUser lists or invite link? (to add people), change user role, create assignment, edit assignment desc

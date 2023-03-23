@@ -80,3 +80,11 @@ def __create_course(course_name: str, course_abbr: str, year: int,
     except Exception as e:
         print(e)
         return None
+
+
+def create_assignment(course_id: int, assignment_nr: int, end_date: str, file_names: tuple):
+    # validate data
+
+    # create assignment
+
+    # create filenames

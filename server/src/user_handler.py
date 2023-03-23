@@ -88,6 +88,34 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         return [{'status': "No Courses Found"}]
 
 
+def get_course_info(user_id: int, course_id: int):
+    """Returns a dict with information on the specified course associated to the user_id, course_id"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT * FROM UserCourseInfo
+                            WHERE userid = %s AND courseid=%s"""
+                cur.execute(query_data, [user_id, course_id])
+                data = cur.fetchone()
+        conn.close()
+        if not data:
+            raise Exception("No Courses Found")
+
+        orderedData: dict[str, any] = {}
+        orderedData.append({"Role": data[1], "courseID": data[2],
+                            "CourseName": data[3],
+                            "Course": data[4], "Year": data[5],
+                            "StudyPeriod": data[6],
+                            'Assignments': get_assignments(data[2])})
+        return orderedData
+
+    except Exception as e:
+        print(e)
+        return [{'status': "No Courses Found"}]
+
+
 def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
     """Returns group ID and group number associated with the users group
         in the specified course"""
