@@ -1,5 +1,13 @@
-import { Component, Renderer2, OnInit, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  Renderer2,
+  OnInit,
+  AfterViewInit,
+  SimpleChanges,
+  OnChanges,
+} from '@angular/core';
 import * as $ from 'jquery';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -7,9 +15,15 @@ import * as $ from 'jquery';
   styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent implements OnInit, AfterViewInit {
-  constructor(private renderer: Renderer2) {}
+  isLoggedIn: boolean = false;
+
+  constructor(private renderer: Renderer2, private authService: AuthService) {}
 
   ngOnInit(): void {
+    this.authService.isAuthenticated.subscribe(
+      (isAuthenticated) => (this.isLoggedIn = isAuthenticated)
+    );
+
     const nav: Element | null = document.querySelector('.nav');
     if (!nav) {
       return;
@@ -32,5 +46,9 @@ export class NavbarComponent implements OnInit, AfterViewInit {
       $('#mainListDiv').toggleClass('show_list');
       $('#mainListDiv').fadeIn();
     });
+  }
+
+  logOut() {
+    this.authService.logOut();
   }
 }
