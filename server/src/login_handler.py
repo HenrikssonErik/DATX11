@@ -35,8 +35,8 @@ def random_string() -> str:
     
 
 
-def check_data_input(cid: str, email: str,
-                     pwd: str) -> tuple[str, Literal[200, 400]]:
+def check_data_input(cid: str, email: str, pwd: str, 
+                     user_exists: bool) -> tuple[str, Literal[200, 400]]:
     """Validates the inputs from the frontend. If any of these checks are
     not valid, return the appropriate error message and error code as a
     tuple."""
@@ -50,7 +50,7 @@ def check_data_input(cid: str, email: str,
                              string.punctuation)
     if not set(pwd) <= allowed_characters:
         return "pass_not_ok", 400
-    if not check_against_ldap(cid):
+    if not user_exists:
         return "cid_does_not_exist", 400
     return "OK", 200
 
@@ -66,7 +66,13 @@ def user_registration(data: Request.form) -> \
     cid: str = data['cid']
     pwd: str = data['password']
 
-    data_check = check_data_input(cid, email, pwd)
+    role = check_against_ldap(cid)
+    user_exists = True
+
+    if (role[1] == "false"):
+        user_exists = False
+    
+    data_check = check_data_input(cid, email, pwd, user_exists)
 
     if (data_check[1] != 200):
         return {'status': data_check[0]}, data_check[1]
@@ -75,13 +81,15 @@ def user_registration(data: Request.form) -> \
     hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
 
     res_query: tuple[dict[str, str], Literal[200, 406]
-                     ] = registration_query(cid, email, hashed_pass)
+                     ] = registration_query(cid, email, hashed_pass, 
+                                            role[0], role[1])
     res_object = (log_in(email, pwd)) if (res_query[1] == 200) else (res_query)
 
     return res_object
 
 
-def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
+def registration_query(cid: str, email: str, hashed_pass: bytes,
+                       role: str, name: str) -> \
         tuple[dict[str, str], Literal[200, 406]]:
     """Queries the database with the information given.
     If the unique key already is in the database, return error message
@@ -94,12 +102,14 @@ def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
         with conn.cursor() as cur:
             try:
                 query = """INSERT INTO UserData
-                (cid, email, passphrase)
-                VALUES (%s, %s, %s);"""
+                (cid, email, passphrase, globalRole, fullName)
+                VALUES (%s, %s, %s, %s, %s );"""
                 cur.execute(query, (
                     cid,
                     email,
-                    hashed_pass
+                    hashed_pass,
+                    role,
+                    name
                 ))
                 status = 'success'
                 res_code = 200

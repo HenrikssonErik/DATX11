@@ -20,7 +20,6 @@ func main() {
 	defer conn.Close()
 
 	printUserAttributes(conn, os.Args[1])
-
 }
 
 func printUserAttributes(conn *ldap.Conn, cid string) {
@@ -43,9 +42,19 @@ func printUserAttributes(conn *ldap.Conn, cid string) {
 		return
 	}
 
+	_name := "";
+	_affilitation := "";
+	_title := ""; 
+
 	for _, attr := range res.Entries[0].Attributes {
-		if(attr.Name == "uid"){
-			fmt.Println("User Exists")
+		if attr.Name == "cn"{
+			_name = attr.Values[0] + ",";
+		} else if attr.Name == "eduPersonAffiliation"{
+			_affilitation = attr.Name + ":" + attr.Values[0] + " " + attr.Values[1] + ",";
+		} else if attr.Name == "title"{
+			_title = attr.Name + ":" + attr.Values[0];
 		}
 	}
+
+	fmt.Println(_name + _affilitation + _title)
 }
