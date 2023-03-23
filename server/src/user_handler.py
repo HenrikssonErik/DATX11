@@ -69,8 +69,10 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         orderedData: list[dict[str, any]] = []
         for info in data:
             orderedData.append({"Role": info[1], "courseID": info[2],
-                                "Course": info[3], "Year": info[4],
-                                "StudyPeriod": info[5], 'Assignments': get_assignments(info[2])})
+                                "CourseName": info[3],
+                                "Course": info[4], "Year": info[5],
+                                "StudyPeriod": info[6],
+                                'Assignments': get_assignments(info[3])})
         return orderedData
 
     except Exception as e:

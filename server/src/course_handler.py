@@ -4,8 +4,9 @@ import datetime
 
 # TODO: move course and assignment stuff from user_handler to here
 
+
 # TODO: not tested yet
-def create_course(course_abbr: str, year: int,
+def create_course(course_name: str, course_abbr: str, year: int,
                   teaching_period: int) -> tuple | int:
     """Cretes a course. Alos checks so the course data that is
     added is according to database requirements
@@ -15,7 +16,7 @@ def create_course(course_abbr: str, year: int,
     if not (len(course_abbr) == 6):
         response['Course Abbreviation'] = 'Should be 6 characters'
 
-    if not (year >= datetime.datetime.now().year() ):
+    if not (year >= datetime.datetime.now().year()):
         response['Year'] = 'Cant be a year thats passed'
 
     if not (teaching_period <= 5 and teaching_period > 0):
@@ -25,8 +26,9 @@ def create_course(course_abbr: str, year: int,
         return response, 400
 
     else:
-        id = __create_course(course_abbr, year, teaching_period)
+        id = __create_course(course_name, course_abbr, year, teaching_period)
     return id
+
 
 # TODO: not tested yet
 def add_groups_to_course(number_of_groups: int, course_id: int):
@@ -55,16 +57,17 @@ def add_groups_to_course(number_of_groups: int, course_id: int):
         return None
 
 
-def __create_course(course_abbr: str, year: int, teaching_period: int) -> int:
+def __create_course(course_name: str, course_abbr: str, year: int,
+                    teaching_period: int) -> int:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
         with conn:
             with conn.cursor() as cur:
                 query_one = """Insert into Courses
-                                (course, teachingperiod, courseyear)
-                                values (%s,%s,%s) """
-                cur.execute(query_one, [course_abbr, teaching_period, year])
+                                (coursename,course, teachingperiod, courseyear)
+                                values (%s,%s,%s,%s) """
+                cur.execute(query_one, [course_name,course_abbr, teaching_period, year])
 
                 query_two = """select courseid from Courses
                                 where  (course = %s AND

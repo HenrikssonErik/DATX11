@@ -19,6 +19,7 @@ CREATE Table AssignmentFiles (
 --USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
 CREATE Table Courses (
 	CourseId serial PRIMARY KEY,
+	CourseName TEXT NOT NULL,
 	Course Char(6) NOT NULL,
 	TeachingPeriod INTEGER,
 	CourseYear INTEGER,
@@ -52,9 +53,8 @@ CREATE TABLE UserData (
 	cid TEXT UNIQUE,
 	email TEXT NOT NULL,
 	passphrase BYTEA NOT NULL,
-	globalRole TEXT NOT NULL CHECK (globalRole in ('Student', 'Teacher' )),
+	globalRole TEXT NOT NULL CHECK (globalRole IN ('Student', 'Teacher', 'Admin' )),
 	fullName TEXT NOT NULL,
-	--globalRole TEXT NOT NUll CHECK (globalRole IN ('Admin', 'Teacher', 'Student')),
 	PRIMARY KEY (userId),
 	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
@@ -90,7 +90,7 @@ CREATE TABLE UserInCourse (
 --To Call do: select * from user_course_info where userId = 'id int';
 
 CREATE OR REPLACE VIEW user_course_info AS
-SELECT uic.userId, uic.userRole, c.courseId, c.Course, c.TeachingPeriod, c.CourseYear
+SELECT uic.userId, uic.userRole, c.courseId, c.courseName, c.Course, c.TeachingPeriod, c.CourseYear
 FROM UserInCourse uic
 JOIN Courses c ON uic.courseId = c.CourseId;
 
