@@ -28,6 +28,7 @@ import { CoursesComponent } from './components/courses/courses.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { CourseComponent } from './components/course/course.component';
 import { CoursePickerComponent } from './components/course-picker/course-picker.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -60,6 +61,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ToastrModule.forRoot(),
     ReactiveFormsModule,
     MatTabsModule,
+    DragDropModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

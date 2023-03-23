@@ -9,4 +9,20 @@ import { Course } from 'src/app/models/courses';
 })
 export class CoursePickerComponent {
   @Input() courses: Course[] = [];
+
+  onCourseDrop(event: CdkDragDrop<Course[]>) {
+    moveItemInArray(
+      event.container.data,
+      event.previousIndex,
+      event.currentIndex
+    );
+  }
+
+  onCourseDragStarted() {
+    console.log('Course drag started');
+  }
+
+  onCourseDragEnded() {
+    console.log('Course drag ended');
+  }
 }

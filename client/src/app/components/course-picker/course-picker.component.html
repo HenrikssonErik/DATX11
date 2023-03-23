@@ -51,7 +51,18 @@
     tabindex="0"
   >
     <div class="mt-3">
-      <app-course [data]="course" *ngFor="let course of courses"></app-course>
+      <app-course
+        cdkDrop
+        cdkDropList
+        #courseList="cdkDropList"
+        [cdkDropListData]="courses"
+        (cdkDropListDropped)="onCourseDrop($event)"
+        [data]="course"
+        *ngFor="let course of courses"
+        cdkDrag
+        (cdkDragStarted)="onCourseDragStarted()"
+        (cdkDragEnded)="onCourseDragEnded()"
+      ></app-course>
     </div>
   </div>
   <div
