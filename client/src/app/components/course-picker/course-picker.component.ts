@@ -10,15 +10,15 @@ import { Course } from 'src/app/models/courses';
 export class CoursePickerComponent {
   @Input() courses: Course[] = [];
   //TODO: Annoying to have to use !
-  selectedCourse!: Course;
+  selectedCourse!: Course | undefined;
 
   constructor() {}
 
   setSelectedCourse(course: Course) {
     console.log(course);
     this.selectedCourse = course;
-    if (this.selectedCourse) {
-      console.log('hej');
-    }
+  }
+  goBack() {
+    this.selectedCourse = undefined;
   }
 }
