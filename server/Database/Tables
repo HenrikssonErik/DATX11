@@ -59,7 +59,7 @@ CREATE Table FileNames (
 	Assignment INTEGER,
 	FileName TEXT NOT NULL,
 	CONSTRAINT fk_assignment
-	FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),
+	FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment)
 );
 
 --for unittests

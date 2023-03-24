@@ -29,7 +29,7 @@ def extract_token(request) -> str:
     return ""
 
 @app.route('/login', methods=['POST'])
-def login():
+def logIn():
     password: str = request.form['password']
     email: str = request.form['email']
     data = log_in(email, password)
@@ -38,7 +38,7 @@ def login():
 
 
 @app.route('/signUp', methods=['POST'])
-def sign_up():
+def signUp():
     response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
         user_registration(request.form)
 
@@ -49,7 +49,7 @@ def sign_up():
 
 
 @app.route('/files', methods=['POST'])
-def post_files():
+def postFiles():
 
     files = request.files.getlist('files')
 
@@ -65,7 +65,7 @@ def post_files():
 
 
 @app.route('/unitTest', methods=['POST'])
-def post_tests():
+def postTests():
     print(request)
     files = request.files.getlist('files')
 
@@ -76,7 +76,7 @@ def post_tests():
 
 
 @app.route('/getAssignmentFile', methods=['POST'])
-def get_files():
+def getFiles():
     """
     Takes in information from the frontend about a specific course assignment
       file to then return its file content.
@@ -103,7 +103,7 @@ def get_files():
 
 
 @app.route('/getUserInfo', methods=['GET'])
-def get_user_info():
+def getUserInfo():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
 
@@ -144,6 +144,7 @@ def getCourse():
         return make_response(jsonify(course), 200)
     else:
         return make_response("", 401)
+
 
 @app.route('/getGroup', methods=['GET'])
 def getGroup():
@@ -221,8 +222,6 @@ def removeFromCourse():
     return make_response("", 401)
 
 
-# TODO: wont work until global role is implemented
-# HAVE NOT BEEN TESTED YET
 @app.route('/createCourse', methods=['POST'])
 def createCourse():
     token = extract_token(request)
@@ -246,4 +245,25 @@ def createCourse():
     else:
         return make_response("Not allowed to create course", 401)
 
-# TODO: remove course, getUser lists or invite link? (to add people), change user role, create assignment, edit assignment desc
+
+@app.route('/createAssignment', method=['POST'])
+def createAssignment():
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course_id = data['Course']
+    description = data.get('Description', "") # This default to an empty string if no desc are provided
+    end_date = data['Date']
+    assignment_nr = data['AssignmentNr']
+    file_names = data.get('FileNames', [])
+
+    if (check_admin_or_course_teacher(request_user_id, course_id)):
+        res = create_assignment(course_id, description, assignment_nr,
+                                end_date, file_names)
+        if res is not None:
+            return make_response(jsonify(res), 400)
+        else:
+            make_response("", 200)
+
+
+# TODO: remove course, getUser lists or invite link? (to add people), change user role, edit assignment desc

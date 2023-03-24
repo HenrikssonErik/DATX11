@@ -104,13 +104,34 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
                                 (%s, %s, %s, %s);"""
                 cur.execute(query_one, [course_id, assignment_nr, description,
                                         end_date])
-
-            # TODO: add filenames
             conn.close()
+
+        res = add_filenames(file_names, course_id, assignment_nr)
+
+        return res
 
     except Exception as e:
         print(e)
-        return None
+        return {'status': 'Insert failed'}
+
+
+def add_filenames(file_names: tuple(str), course_id: int,
+                  assignment: int) -> None | dict:
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                for file in file_names:
+                    query_one = """INSERT INTO FileNames (courseid, assignment, filename) VALUES
+                                    (%s, %s, %s);"""
+                    cur.execute(query_one, [course_id, assignment, file])
+
+            conn.close()
+        return
+    except Exception as e:
+        print(e)
+        return {'status': 'Insert filenames failed'}
 
 
 def check_file_extension(filename):
