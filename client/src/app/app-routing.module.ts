@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { verify } from 'crypto';
 import { AppComponent } from './app.component';
 import { CoursesComponent } from './components/courses/courses.component';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
@@ -9,6 +10,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { AuthguardGuard } from './authguard.guard';
 import { AssignmentsComponent } from './components/assignments/assignments.component';
 import { CoursePickerComponent } from './components/course-picker/course-picker.component';
+import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
 
 const routes: Routes = [
   /** THIS path seems to be the reason for the duplication of both the nav and footer.
@@ -39,6 +41,7 @@ const routes: Routes = [
   { path: 'upload', component: FileUploadComponent },
   { path: '404', component: PageNotFoundComponent },
   { path: '**', redirectTo: '/404' },
+  { path: '/verifyEmail/:token', component: VerifyEmailComponent },
 ];
 
 @NgModule({
