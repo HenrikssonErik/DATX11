@@ -2,16 +2,15 @@ from .connector import get_conn_string
 import psycopg2
 import datetime
 
-# TODO: move course and assignment stuff from user_handler to here, implement create assignment
 
-
-# TODO: not tested yet
+# TODO: nothin is tested yet
 def create_course(course_name: str, course_abbr: str, year: int,
                   teaching_period: int) -> tuple | int:
     """Cretes a course. Alos checks so the course data that is
     added is according to database requirements
-    
-    Returns: A dict with errors if they exists, otherwise the created course id"""
+
+    Returns: A dict with errors if they exists,
+            otherwise the created course id"""
     response = {}
     if not (len(course_abbr) == 6):
         response['Course Abbreviation'] = 'Should be 6 characters'
@@ -30,7 +29,63 @@ def create_course(course_name: str, course_abbr: str, year: int,
     return id
 
 
-# TODO: not tested yet
+def get_courses_info(user_id: int) -> list[dict[str, any]]:
+    """Returns an array with information on Courses associated to the userId"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT * FROM UserCourseInfo
+                            WHERE userid = %s"""
+                cur.execute(query_data, (user_id,))
+                data = cur.fetchall()
+        conn.close()
+        if not data:
+            return []
+        orderedData: list[dict[str, any]] = []
+        for info in data:
+            orderedData.append({"Role": info[1], "courseID": info[2],
+                                "CourseName": info[3],
+                                "Course": info[4], "Year": info[5],
+                                "StudyPeriod": info[6],
+                                'Assignments': get_assignments(info[2])})
+        return orderedData
+
+    except Exception as e:
+        print(e)
+        return [{'status': "No Courses Found"}]
+
+
+def get_course_info(user_id: int, course_id: int):
+    """Returns a dict with information on the specified course associated to
+    the user_id, course_id"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT * FROM UserCourseInfo
+                            WHERE userid = %s AND courseid=%s"""
+                cur.execute(query_data, [user_id, course_id])
+                data = cur.fetchone()
+        conn.close()
+        if not data:
+            raise Exception("No Courses Found")
+
+        orderedData: dict[str, any] = {}
+        orderedData.append({"Role": data[1], "courseID": data[2],
+                            "CourseName": data[3],
+                            "Course": data[4], "Year": data[5],
+                            "StudyPeriod": data[6],
+                            'Assignments': get_assignments(data[2])})
+        return orderedData
+
+    except Exception as e:
+        print(e)
+        return [{'status': "No Courses Found"}]
+
+
 def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
     """Creates a number of groups to the specified course, group number is set
     to the following integer that isnt already used for that course"""
@@ -39,12 +94,13 @@ def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """SELECT MAX(groupnumber) FROM Groups WHERE course = %s;"""
+                query_one = """SELECT MAX(groupnumber) FROM Groups WHERE
+                                course = %s;"""
                 cur.execute(query_one, [course_id])
                 current_group: int = cur.fetchone()[0]
                 if current_group is None:
                     current_group = 0
-                
+
                 for i in range(1, number_of_groups+1):
                     query_one = """Insert into Groups
                                 (course, groupnumber)
@@ -67,7 +123,8 @@ def __create_course(course_name: str, course_abbr: str, year: int,
                 query_one = """Insert into Courses
                                 (coursename,course, teachingperiod, courseyear)
                                 values (%s,%s,%s,%s) """
-                cur.execute(query_one, [course_name,course_abbr, teaching_period, year])
+                cur.execute(query_one, [course_name, course_abbr,
+                                        teaching_period, year])
 
                 query_two = """select courseid from Courses
                                 where  (course = %s AND
@@ -115,6 +172,34 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
         return {'status': 'Insert failed'}
 
 
+def get_assignments(course_id: int) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT assignment, enddate, Description FROM
+                                assignments WHERE courseid = %s"""
+                cur.execute(query_data, [course_id])
+                # data = [row[0] for row in cur.fetchall()]
+                data = cur.fetchall()
+                assignments: list[dict[str:any]] = []
+                for assignmentRow in data:
+                    assignments.append({'AssignmentNr': assignmentRow[0],
+                                        'DueDate': assignmentRow[1],
+                                        'Description': assignmentRow[2]})
+        conn.close()
+        if not data:
+            return []
+        # orderedData: dict[str, list] = []
+        # orderedData.append({"Assignments": data})
+        return assignments
+
+    except Exception as e:
+        print(e)
+        return {'status': "No Courses Found"}
+
+
 def add_filenames(file_names: tuple(str), course_id: int,
                   assignment: int) -> None:
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -123,7 +208,8 @@ def add_filenames(file_names: tuple(str), course_id: int,
         with conn:
             with conn.cursor() as cur:
                 for file in file_names:
-                    query_one = """INSERT INTO FileNames (courseid, assignment, filename) VALUES
+                    query_one = """INSERT INTO FileNames (courseid, assignment,
+                                    filename) VALUES
                                     (%s, %s, %s);"""
                     cur.execute(query_one, [course_id, assignment, file])
 
@@ -142,7 +228,8 @@ def check_file_extension(filename):
 
 def check_date_format(date_string):
     """
-    Check if a date string has the same structure as the Date type in PostgreSQL.
+    Check if a date string has the same structure as the
+    Date type in PostgreSQL.
     """
     try:
         datetime.strptime(date_string, '%Y-%m-%d')
