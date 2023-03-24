@@ -7,6 +7,7 @@ import { HomePageComponent } from './components/home-page/home-page.component';
 import { LoginComponent } from './components/login/login.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { AuthguardGuard } from './authguard.guard';
+import { AssignmentsComponent } from './components/assignments/assignments.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent },
@@ -15,10 +16,11 @@ const routes: Routes = [
     path: 'courses',
     component: CoursesComponent,
     canActivate: [AuthguardGuard],
+    children: [{ path: ':id', component: AssignmentsComponent }],
   },
+  { path: 'upload', component: FileUploadComponent },
   { path: '404', component: PageNotFoundComponent },
   { path: '**', redirectTo: '/404' },
-  { path: 'upload', component: FileUploadComponent },
 ];
 
 @NgModule({
