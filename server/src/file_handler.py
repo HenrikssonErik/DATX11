@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from .podman.podman_runner import gen_requirements, run_container, build_image
 import shutil
+import json
 from .connector import get_conn_string
 
 
@@ -32,7 +33,8 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
     allowed file names and file types
     Returns: json object with feedback on submitted files
     """
-    unittest_feedback = {"unittest_feedback": ""}
+    combined_feedback = {"general_tests_feedback": "",
+                         "unittest_feedback": ""}
     number_of_files = {}
     res_code = 200
     file_amount, res_code = ("OK", res_code)  \
@@ -60,11 +62,17 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
         response_items.append({"tested_file": res_object})
     if (res_code == 200):
         save_to_temp_and_database(files, response_items)
-        unittest_feedback = {"unittest_feedback": 
-                             run_unit_tests_in_container(course_id,
-                                                         assignment, group_id)}
+        unittest_feedback = json.loads(run_unit_tests_in_container(
+                                                            course_id,
+                                                            assignment,
+                                                            group_id))
+        passed = unittest_feedback["was_successful"]
+        combined_feedback = {"general_tests_feedback": response_items,
+                             "unittest_feedback": unittest_feedback}
+        save_feedback_to_db(course_id, assignment, group_id,
+                            combined_feedback, passed)
         
-    return response_items, number_of_files, unittest_feedback, res_code
+    return response_items, number_of_files, combined_feedback, res_code
 
 
 def save_to_temp_and_database(
@@ -253,13 +261,7 @@ def get_unit_test_files_from_db(
     """Gets all the unit-tests for a specific assignment in a specific course.
     """
 
-    conn = psycopg2.connect(
-        host="95.80.39.50",
-        port="5432",
-        dbname="hydrant",
-        user="postgres",
-        password="BorasSuger-1"
-    )
+    conn = psycopg2.connect(dsn=get_conn_string())
 
     files: list[tuple[str, io.BytesIO]] = []
 
@@ -289,17 +291,8 @@ def get_all_assignment_files_from_db(
 ) -> list[tuple[str, io.BytesIO]]:
     """Gets all the unit-tests for a specific assignment in a specific course.
     """
-
-    conn = psycopg2.connect(
-        host="95.80.39.50",
-        port="5432",
-        dbname="hydrant",
-        user="postgres",
-        password="BorasSuger-1"
-    )
-
+    conn = psycopg2.connect(dsn=get_conn_string())
     files: list[tuple[str, io.BytesIO]] = []
-
     with conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -344,3 +337,28 @@ def run_unit_tests_in_container(
                                       str(path), is_empty)
     shutil.rmtree(str(path))
     return json_feedback
+
+
+def save_feedback_to_db(
+        course_id: int,
+        assignment: int,
+        group_id: int,
+        feedback: json,
+        passed: bool,
+        ):
+
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO AssignmentFeedback (TestFeedback, TestPass)
+                    WHERE GroupId        = %s
+                    AND   CourseId       = %s
+                    AND   \"assignment\"   = %s
+                    VALUES(%s, %s)
+                    ON CONFLICT (TestFeedback) DO UPDATE;
+                """,
+                (group_id, course_id, assignment, feedback, passed)
+            )
+        conn.close()
