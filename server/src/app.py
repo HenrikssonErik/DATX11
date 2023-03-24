@@ -1,7 +1,7 @@
 
 
 from typing import Literal
-from flask import Flask, jsonify, make_response, render_template, request, \
+from flask import Flask, jsonify, make_response, redirect, render_template, request, \
     send_file, url_for
 from flask_cors import CORS
 from .file_handler import handle_files, \
@@ -64,20 +64,6 @@ def sign_up():
     return res
 
 
-@app.route('/verify_email/<token>')
-def verify_email(token):
-    try:
-        verify_user_from_email_verification(token)
-        return '<h1>The token: {thisToken} works!</h1>'\
-            .format(thisToken=token)
-    except jwt.ExpiredSignatureError:
-        return '<h1>The token: {thisToken} has timed out!</h1>'\
-            .format(thisToken=token)
-    except jwt.InvalidTokenError:
-        return '<h1>The token: {thisToken} does not work (uncaught)!</h1>'\
-            .format(thisToken=token)
-
-
 def send_verification_email(to: str, token_dict: dict) -> None:
 
     token: str = token_dict.get('Token')
@@ -85,9 +71,11 @@ def send_verification_email(to: str, token_dict: dict) -> None:
     msg = Message('Verification Email for Hydrant',
                   sender='temphydrant@gmail.com', recipients=[to])
 
-    link = url_for('verify_email', token=token, _external=True)
+    endpoint: str = "/verifyEmail/"+token
 
-    msg.html = render_template("emailTemplate.html", link=link)
+    url: str = "localhost:4200" + endpoint
+
+    msg.html = render_template("emailTemplate.html", link=url)
 
     mail.send(msg)
 

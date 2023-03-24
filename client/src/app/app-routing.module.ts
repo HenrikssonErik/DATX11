@@ -35,9 +35,9 @@ const routes: Routes = [
     component: AssignmentsComponent,
   },
   { path: 'upload', component: FileUploadComponent },
+  { path: 'verifyEmail/:token', component: VerifyEmailComponent },
   { path: '404', component: PageNotFoundComponent },
   { path: '**', redirectTo: '/404' },
-  { path: '/verifyEmail/:token', component: VerifyEmailComponent },
 ];
 
 @NgModule({
