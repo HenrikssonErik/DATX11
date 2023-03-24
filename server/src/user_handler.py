@@ -1,4 +1,5 @@
 from .connector import get_conn_string
+from course_handler import get_courses_info
 import psycopg2
 from enum import Enum
 
@@ -7,34 +8,6 @@ class Role(Enum):
     Admin = 'Admin'
     Teacher = 'Teacher'
     Student = 'Student'
-
-
-def get_assignments(course_id: int) -> tuple:
-    conn = psycopg2.connect(dsn=get_conn_string())
-
-    try:
-        with conn:
-            with conn.cursor() as cur:
-                query_data = """SELECT assignment, enddate, Description FROM
-                                assignments WHERE courseid = %s"""
-                cur.execute(query_data, [course_id])
-                # data = [row[0] for row in cur.fetchall()]
-                data = cur.fetchall()
-                assignments: list[dict[str:any]] = []
-                for assignmentRow in data:
-                    assignments.append({'AssignmentNr': assignmentRow[0],
-                                        'DueDate': assignmentRow[1],
-                                        'Description': assignmentRow[2]})
-        conn.close()
-        if not data:
-            return []
-        # orderedData: dict[str, list] = []
-        # orderedData.append({"Assignments": data})
-        return assignments
-
-    except Exception as e:
-        print(e)
-        return {'status': "No Courses Found"}
 
 
 def get_user(user_id: int) -> dict:
@@ -56,62 +29,6 @@ def get_user(user_id: int) -> dict:
     except Exception as e:
         print(e)
         return {'status': "No User Found"}
-
-
-def get_courses_info(user_id: int) -> list[dict[str, any]]:
-    """Returns an array with information on Courses associated to the userId"""
-    conn = psycopg2.connect(dsn=get_conn_string())
-
-    try:
-        with conn:
-            with conn.cursor() as cur:
-                query_data = """SELECT * FROM UserCourseInfo
-                            WHERE userid = %s"""
-                cur.execute(query_data, (user_id,))
-                data = cur.fetchall()
-        conn.close()
-        if not data:
-            return []
-        orderedData: list[dict[str, any]] = []
-        for info in data:
-            orderedData.append({"Role": info[1], "courseID": info[2],
-                                "CourseName": info[3],
-                                "Course": info[4], "Year": info[5],
-                                "StudyPeriod": info[6],
-                                'Assignments': get_assignments(info[2])})
-        return orderedData
-
-    except Exception as e:
-        print(e)
-        return [{'status': "No Courses Found"}]
-
-
-def get_course_info(user_id: int, course_id: int):
-    """Returns a dict with information on the specified course associated to the user_id, course_id"""
-    conn = psycopg2.connect(dsn=get_conn_string())
-
-    try:
-        with conn:
-            with conn.cursor() as cur:
-                query_data = """SELECT * FROM UserCourseInfo
-                            WHERE userid = %s AND courseid=%s"""
-                cur.execute(query_data, [user_id, course_id])
-                data = cur.fetchone()
-        conn.close()
-        if not data:
-            raise Exception("No Courses Found")
-
-        orderedData: dict[str, any] = {}
-        orderedData.append({"Role": data[1], "courseID": data[2],
-                            "CourseName": data[3],
-                            "Course": data[4], "Year": data[5],
-                            "StudyPeriod": data[6],
-                            'Assignments': get_assignments(data[2])})
-        return orderedData
-
-    except Exception as e:
-        print(e)
-        return [{'status': "No Courses Found"}]
 
 
 def get_group(user_id: int, course_id: int) -> dict[str, str | list]:

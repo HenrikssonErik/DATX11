@@ -25,6 +25,7 @@ def extract_token(request) -> str:
         return token
     return ""
 
+
 @app.route('/login', methods=['POST'])
 def logIn():
     password: str = request.form['password']
@@ -162,14 +163,14 @@ def addToGroup():
     request_user = verify_and_get_id(token)
     data = request.get_json()
     user_to_add: int = data['User']
-    group_id:int = data['Group']
+    group_id: int = data['Group']
     course_id = data['Course']
 
-    if(check_admin_or_course_teacher(request_user, course_id) or
+    if (check_admin_or_course_teacher(request_user, course_id) or
        request_user == user_to_add):
         add_user_to_group(user_to_add, group_id)
         return make_response("", 200)
-    return make_response ("", 401)
+    return make_response("", 401)
 
 
 @app.route('/removeFromGroup', methods=['POST'])
@@ -181,11 +182,11 @@ def removeFromGroup():
     group_id = data['Group']
     course_id = data['Course']
 
-    if(check_admin_or_course_teacher(request_user, course_id) or
+    if (check_admin_or_course_teacher(request_user, course_id) or
        request_user == user_to_remove):
         remove_user_from_group(user_to_remove, group_id)
         return make_response("", 200)
-    return make_response ("", 401)
+    return make_response("", 401)
 
 
 @app.route('/addToCourse', methods=['POST'])
@@ -198,8 +199,8 @@ def addToCourse():
     role = data['Role']
 
     if (check_admin_or_course_teacher(request_user_id, course_id)):
-            add_user_to_course(user_to_add, course_id, role)
-            return make_response("", 200)
+        add_user_to_course(user_to_add, course_id, role)
+        return make_response("", 200)
     return make_response("", 401)
 
 
@@ -212,8 +213,8 @@ def removeFromCourse():
     user_to_remove = data['User']
 
     if (check_admin_or_course_teacher(request_user_id, course_id)):
-            remove_user_from_course(user_to_remove, course_id)
-            return make_response("", 200)
+        remove_user_from_course(user_to_remove, course_id)
+        return make_response("", 200)
     return make_response("", 401)
 
 
@@ -247,7 +248,7 @@ def createAssignment():
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
     course_id = data['Course']
-    description = data.get('Description', "") # This default to an empty string if no desc are provided
+    description = data.get('Description', "")
     end_date = data['Date']
     assignment_nr = data['AssignmentNr']
     file_names = data.get('FileNames', [])
@@ -255,10 +256,11 @@ def createAssignment():
     if (check_admin_or_course_teacher(request_user_id, course_id)):
         res = create_assignment(course_id, description, assignment_nr,
                                 end_date, file_names)
-        if not(len(res) == 0):
+        if not (len(res) == 0):
             return make_response(jsonify(res), 400)
         else:
             make_response("", 200)
 
 
-# TODO: remove course, getUser lists or invite link? (to add people), change user role, edit assignment desc
+# TODO: remove course, getUser lists or invite link? (to add people),
+# change user role, edit assignment desc
