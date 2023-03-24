@@ -255,7 +255,7 @@ def createAssignment():
     if (check_admin_or_course_teacher(request_user_id, course_id)):
         res = create_assignment(course_id, description, assignment_nr,
                                 end_date, file_names)
-        if res is not None:
+        if not(len(res) == 0):
             return make_response(jsonify(res), 400)
         else:
             make_response("", 200)

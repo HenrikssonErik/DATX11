@@ -31,7 +31,7 @@ def create_course(course_name: str, course_abbr: str, year: int,
 
 
 # TODO: not tested yet
-def add_groups_to_course(number_of_groups: int, course_id: int):
+def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
     """Creates a number of groups to the specified course, group number is set
     to the following integer that isnt already used for that course"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -83,7 +83,7 @@ def __create_course(course_name: str, course_abbr: str, year: int,
 
 
 def create_assignment(course_id: int, description: str, assignment_nr: int,
-                      end_date: str, file_names: tuple) -> dict | None:
+                      end_date: str, file_names: tuple) -> dict:
     res: dict = {}
     for name in file_names:
         if not (check_file_extension(name)):
@@ -106,7 +106,7 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
                                         end_date])
             conn.close()
 
-        res = add_filenames(file_names, course_id, assignment_nr)
+        add_filenames(file_names, course_id, assignment_nr)
 
         return res
 
@@ -116,7 +116,7 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
 
 
 def add_filenames(file_names: tuple(str), course_id: int,
-                  assignment: int) -> None | dict:
+                  assignment: int) -> None:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -131,7 +131,6 @@ def add_filenames(file_names: tuple(str), course_id: int,
         return
     except Exception as e:
         print(e)
-        return {'status': 'Insert filenames failed'}
 
 
 def check_file_extension(filename):
