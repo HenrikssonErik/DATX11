@@ -82,9 +82,50 @@ def __create_course(course_name: str, course_abbr: str, year: int,
         return None
 
 
-def create_assignment(course_id: int, assignment_nr: int, end_date: str, file_names: tuple):
-    # validate data
+def create_assignment(course_id: int, description: str, assignment_nr: int,
+                      end_date: str, file_names: tuple) -> dict | None:
+    res: dict = {}
+    for name in file_names:
+        if not (check_file_extension(name)):
+            res[name] = 'Is of incorrect type, must be .py, .pdf or .txt'
 
-    # create assignment
+    if not (check_date_format(end_date)):
+        res['Date'] = 'End date has the wrong format, must be YYYY-MM-DD'
 
-    # create filenames
+    if not (len(res) == 0):
+        return {'status': res}
+
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_one = """INSERT INTO Assignments VALUES
+                                (%s, %s, %s, %s);"""
+                cur.execute(query_one, [course_id, assignment_nr, description,
+                                        end_date])
+
+            # TODO: add filenames
+            conn.close()
+
+    except Exception as e:
+        print(e)
+        return None
+
+
+def check_file_extension(filename):
+    """
+    Check if a filename ends with ".py", ".txt" or ".pdf".
+    """
+    return filename.endswith((".py", ".txt", ".pdf"))
+
+
+def check_date_format(date_string):
+    """
+    Check if a date string has the same structure as the Date type in PostgreSQL.
+    """
+    try:
+        datetime.strptime(date_string, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False
