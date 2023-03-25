@@ -18,7 +18,8 @@ def create_key():
     or login/registration will fail
     """
     global __SECRET_KEY
-    __SECRET_KEY = random_string()
+    __SECRET_KEY = "g"
+    # random_string()
 
 
 def random_string() -> str:
@@ -181,8 +182,7 @@ def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
     return {'Token': token}, 200
 
 
-def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
-                                                             Literal[200]]:
+def verify_user_from_email_verification(token: str) -> str:
     """
     Verifys if a token is issued by this system and if it is still valid.
     Returns the User_id or an error message
@@ -197,7 +197,7 @@ def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
         # If decoding was successful, return the user id
         print("FRÅN VERIFY_USER_FROM_EMAIL_VERIFICATION\n")
 
-        return {'status': 'success'}, 200
+        return cid
 
     except jwt.ExpiredSignatureError:
         # If the token has expired, raise an exception
