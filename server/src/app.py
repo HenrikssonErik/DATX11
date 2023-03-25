@@ -1,8 +1,8 @@
 
 
 from typing import Literal
-from flask import Flask, jsonify, make_response, redirect, render_template, request, \
-    send_file, url_for
+from flask import Flask, Response, jsonify, make_response, render_template, request, \
+    send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
@@ -61,6 +61,23 @@ def sign_up():
     return res
 
 
+@app.route('/verify_email', methods=['POST'])
+def verify_email() -> Response:
+    data = request.get_json()
+    token = data['token']
+
+    try:
+        cid: str = verify_user_from_email_verification(token)
+        response = make_response({'cid': cid}, 200)
+        return response
+    except jwt.ExpiredSignatureError:
+        res = make_response({'status': 'expired_verification_signature'}, 400)
+        return res
+    except jwt.InvalidTokenError:
+        res = make_response({'status': 'invalid_verification_token'}, 400)
+        return res
+
+
 def send_verification_email(to: str, token_dict: dict) -> None:
 
     token: str = token_dict.get('Token')
@@ -68,7 +85,7 @@ def send_verification_email(to: str, token_dict: dict) -> None:
     msg = Message('Verification Email for Hydrant',
                   sender='temphydrant@gmail.com', recipients=[to])
 
-    endpoint: str = "/verifyEmail/"+token
+    endpoint: str = "/verifyEmail/" + token
 
     url: str = "localhost:4200" + endpoint
 
