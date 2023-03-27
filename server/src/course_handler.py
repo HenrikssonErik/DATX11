@@ -3,7 +3,7 @@ import psycopg2
 import datetime
 
 
-# TODO: nothin is tested yet
+# test
 def create_course(course_name: str, course_abbr: str, year: int,
                   teaching_period: int) -> tuple | int:
     """Cretes a course. Alos checks so the course data that is
@@ -56,7 +56,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         print(e)
         return [{'status': "No Courses Found"}]
 
-
+# test
 def get_course_info(user_id: int, course_id: int):
     """Returns a dict with information on the specified course associated to
     the user_id, course_id"""
@@ -85,7 +85,7 @@ def get_course_info(user_id: int, course_id: int):
         print(e)
         return [{'status': "No Courses Found"}]
 
-
+# test
 def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
     """Creates a number of groups to the specified course, group number is set
     to the following integer that isnt already used for that course"""
@@ -138,9 +138,9 @@ def __create_course(course_name: str, course_abbr: str, year: int,
         print(e)
         return None
 
-
+#test
 def create_assignment(course_id: int, description: str, assignment_nr: int,
-                      end_date: str, file_names: tuple) -> dict:
+                      end_date: str, file_names: list) -> dict:
     res: dict = {}
     for name in file_names:
         if not (check_file_extension(name)):
@@ -171,7 +171,7 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
         print(e)
         return {'status': 'Insert failed'}
 
-
+#test
 def get_assignments(course_id: int) -> tuple:
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -199,8 +199,8 @@ def get_assignments(course_id: int) -> tuple:
         print(e)
         return {'status': "No Courses Found"}
 
-
-def add_filenames(file_names: tuple(str), course_id: int,
+#test
+def add_filenames(file_names: list, course_id: int,
                   assignment: int) -> None:
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -218,14 +218,14 @@ def add_filenames(file_names: tuple(str), course_id: int,
     except Exception as e:
         print(e)
 
-
+#test
 def check_file_extension(filename):
     """
     Check if a filename ends with ".py", ".txt" or ".pdf".
     """
     return filename.endswith((".py", ".txt", ".pdf"))
 
-
+#test
 def check_date_format(date_string):
     """
     Check if a date string has the same structure as the

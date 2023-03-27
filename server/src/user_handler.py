@@ -1,5 +1,5 @@
 from .connector import get_conn_string
-from course_handler import get_courses_info
+from src.course_handler import get_courses_info
 import psycopg2
 from enum import Enum
 
@@ -138,7 +138,7 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
             with conn.cursor() as cur:
                 query_data = """INSERT into userincourse values
                                 (%s, %s, %s)"""
-                cur.execute(query_data, [user_id, course_id, user_role])
+                cur.execute(query_data, [user_id, course_id, user_role.name])
         conn.close()
 
     except Exception as e:
@@ -220,7 +220,6 @@ def get_global_role(user_id) -> str:
         return {'status': "No User Found"}
 
 
-# TODO: include global admin when implemented
 def check_admin_or_course_teacher(user_id: int, course_id: int):
     course_administrator: bool = is_admin_on_course(user_id, course_id) or \
                             is_teacher_on_course(user_id, course_id)
