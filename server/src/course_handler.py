@@ -3,7 +3,7 @@ import psycopg2
 import datetime
 
 
-# test
+
 def create_course(course_name: str, course_abbr: str, year: int,
                   teaching_period: int) -> tuple | int:
     """Cretes a course. Alos checks so the course data that is
@@ -56,7 +56,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         print(e)
         return [{'status': "No Courses Found"}]
 
-# test
+
 def get_course_info(user_id: int, course_id: int):
     """Returns a dict with information on the specified course associated to
     the user_id, course_id"""
@@ -74,18 +74,20 @@ def get_course_info(user_id: int, course_id: int):
             raise Exception("No Courses Found")
 
         orderedData: dict[str, any] = {}
-        orderedData.append({"Role": data[1], "courseID": data[2],
-                            "CourseName": data[3],
-                            "Course": data[4], "Year": data[5],
-                            "StudyPeriod": data[6],
-                            'Assignments': get_assignments(data[2])})
+        orderedData["Role"] = data[1]
+        orderedData["courseID"] = data[2]
+        orderedData["CourseName"] = data[3]
+        orderedData["Course"] = data[4]
+        orderedData["Year"] = data[5]
+        orderedData["StudyPeriod"] = data[6]
+        orderedData['Assignments'] = get_assignments(data[2])
         return orderedData
 
     except Exception as e:
         print(e)
         return [{'status': "No Courses Found"}]
 
-# test
+
 def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
     """Creates a number of groups to the specified course, group number is set
     to the following integer that isnt already used for that course"""
@@ -94,8 +96,7 @@ def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """SELECT MAX(groupnumber) FROM Groups WHERE
-                                course = %s;"""
+                query_one = """SELECT MAX(groupnumber) FROM Groups WHERE course = %s"""
                 cur.execute(query_one, [course_id])
                 current_group: int = cur.fetchone()[0]
                 if current_group is None:
@@ -103,8 +104,7 @@ def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
 
                 for i in range(1, number_of_groups+1):
                     query_one = """Insert into Groups
-                                (course, groupnumber)
-                                values (%s,%s) """
+                    (course, groupnumber) values (%s,%s) """
                     cur.execute(query_one, [course_id, current_group + i])
             conn.close()
 
@@ -138,7 +138,7 @@ def __create_course(course_name: str, course_abbr: str, year: int,
         print(e)
         return None
 
-#test
+
 def create_assignment(course_id: int, description: str, assignment_nr: int,
                       end_date: str, file_names: list) -> dict:
     res: dict = {}
@@ -171,7 +171,7 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
         print(e)
         return {'status': 'Insert failed'}
 
-#test
+
 def get_assignments(course_id: int) -> tuple:
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -199,7 +199,7 @@ def get_assignments(course_id: int) -> tuple:
         print(e)
         return {'status': "No Courses Found"}
 
-#test
+
 def add_filenames(file_names: list, course_id: int,
                   assignment: int) -> None:
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -218,21 +218,21 @@ def add_filenames(file_names: list, course_id: int,
     except Exception as e:
         print(e)
 
-#test
+
 def check_file_extension(filename):
     """
     Check if a filename ends with ".py", ".txt" or ".pdf".
     """
     return filename.endswith((".py", ".txt", ".pdf"))
 
-#test
+
 def check_date_format(date_string):
     """
     Check if a date string has the same structure as the
     Date type in PostgreSQL.
     """
     try:
-        datetime.strptime(date_string, '%Y-%m-%d')
+        datetime.datetime.strptime(date_string, '%Y-%m-%d')
         return True
     except ValueError:
         return False
