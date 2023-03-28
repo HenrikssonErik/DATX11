@@ -27,10 +27,6 @@ export class VerifyEmailComponent implements OnInit {
   }
 
   verifyEmail(params: Params): void {
-    /*     let header: HttpHeaders = new HttpHeaders();
-
-    header.append('Content-Type', 'application/json'); */
-
     this.http
       .post<HttpResponse<any>>(`${API_URL}/verify_email`, params)
       .subscribe({
