@@ -95,7 +95,8 @@ def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """SELECT MAX(groupnumber) FROM Groups WHERE course = %s"""
+                query_one = """SELECT MAX(groupnumber) FROM Groups WHERE
+                course = %s"""
                 cur.execute(query_one, [course_id])
                 current_group: int = cur.fetchone()[0]
                 if current_group is None:

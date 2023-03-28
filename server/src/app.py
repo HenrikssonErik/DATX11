@@ -27,6 +27,7 @@ def extract_token(request) -> str:
             return value
     return ""
 
+
 @app.route('/login', methods=['POST'])
 def logIn():
     password: str = request.form['password']
@@ -286,10 +287,11 @@ def changeUserRole():
         return make_response("", 200)
     return make_response({"status": 'Only course admins can change roles'},
                          401)
-# TODO: remove course? mb not?, getGroupsInCourse, getUsersInCourse lists ? (to add people),
+
+
+# TODO: remove course? mb not?, getGroupsInCourse,
 # edit assignment enddate
 # add date, course, token and assignment checks to post assignmentfiles
-
 @app.route('/editDescription', methods=['POST'])
 def editDesc():
     token = extract_token(request)
@@ -300,7 +302,7 @@ def editDesc():
     assignment = data['Assignment']
 
     if (check_admin_or_course_teacher(request_user_id, course)):
-        res = change_descirption(new_desc, course, assignment)
+        res = change_description(new_desc, course, assignment)
 
         if res is None:
             return make_response("", 200)
@@ -308,6 +310,7 @@ def editDesc():
             return make_response(jsonify(res), 401)
     else:
         return make_response(jsonify({'status': 'Not a course teacher'}), 401)
+
 
 @app.route('/getUsersInCourse', methods=['GET'])
 def getUsersInCourse():
