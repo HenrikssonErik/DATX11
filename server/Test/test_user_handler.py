@@ -148,3 +148,21 @@ class TestUserHandler(unittest.TestCase):
         new_role = 'asdfghj'
         res = user_handler.change_role_on_course(new_role, user, course)
         assert isinstance(res, dict)
+
+    @patch('psycopg2.connect')
+    def test_get_users_on_course(self, mock_connect):
+        mock_cursor = setup_mock_cursor(mock_connect)
+        mock_cursor.fetchall.return_value = [(1, 'kvalden',
+                                              'Sebastian Kvalden',
+                                              'kvalden@chalmers.se', 'Student'),
+                                             (2, 'erhen', 'Erik Henriksson',
+                                              'erhen@chalmers.se', 'Student')]
+        course = 1
+        res = user_handler.get_users_on_course(course)
+        self.assertEqual(res, ([{'Id': 1, 'Cid': 'kvalden', 'Name':
+                                'Sebastian Kvalden',
+                                 'Email': 'kvalden@chalmers.se', 'Role':
+                                 'Student'}, {'Id': 2, 'Cid': 'erhen', 'Name':
+                                              'Erik Henriksson',
+                                              'Email': 'erhen@chalmers.se',
+                                              'Role': 'Student'}], 200))

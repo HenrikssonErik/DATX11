@@ -293,6 +293,7 @@ def changeUserRole():
                          401)
 # TODO: remove course? mb not?, getGroupsInCourse, getUsersInCourse lists ? (to add people),
 # edit assignment enddate
+# add date, course, token and assignment checks to post assignmentfiles
 
 @app.route('/editDescription', methods=['POST'])
 def editDesc():
@@ -312,3 +313,15 @@ def editDesc():
             return make_response(jsonify(res), 401)
     else:
         return make_response(jsonify({'status': 'Not a course teacher'}), 401)
+
+@app.route('/getUsersInCourse', methods=['GET'])
+def getUsersInCourse():
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    course = request.args.get('Course')
+
+    if (is_admin_on_course(request_user_id, course)):
+        res = get_users_on_course(course)
+        return make_response(jsonify(res[0]), res[1])
+    else:
+        return make_response("", 401)

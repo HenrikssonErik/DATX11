@@ -246,3 +246,30 @@ def change_role_on_course(new_role: str, user_id: int,
         return None
     else:
         return {'status': "Not an allowed role"}
+
+
+def get_users_on_course(course: int) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT userdata.userid, userdata.cid, userdata.fullname, userdata.email, userincourse.userrole
+                FROM public.userdata
+                JOIN public.userincourse ON userdata.userid = userincourse.userid
+                WHERE userincourse.courseid = %s;"""
+                cur.execute(query_data, [course])
+                data = cur.fetchall()
+        conn.close()
+        if not data:
+            return [], 200
+        
+        users: list[dict] = []
+        for user in data:
+            users.append({'Id': user[0], 'Cid': user[1], 'Name': user[2],
+                          'Email': user[3], 'Role': user[4]})
+        return users, 200
+
+    except Exception as e:
+        print(e)
+        return {'status': "Something went wrong"}, 400
