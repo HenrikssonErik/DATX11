@@ -115,6 +115,8 @@ def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
 
 def __create_course(course_name: str, course_abbr: str, year: int,
                     teaching_period: int) -> int:
+    """Internal method to create a course, used by create_course method after verification of data
+    Returnsthe new course ID"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -141,6 +143,8 @@ def __create_course(course_name: str, course_abbr: str, year: int,
 
 def create_assignment(course_id: int, description: str, assignment_nr: int,
                       end_date: str, file_names: list) -> dict:
+    """Creates an assignment for a course, assignment number will not be incremented automatically,
+    thus must be provided by the creator"""
     res: dict = {}
     for name in file_names:
         if not (check_file_extension(name)):
@@ -173,6 +177,7 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
 
 
 def get_assignments(course_id: int) -> tuple:
+    """Returns a list of all assignments connected to a course, with their description and end date"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -200,6 +205,7 @@ def get_assignments(course_id: int) -> tuple:
 
 def change_description(new_desc: str, course_id: int,
                        assignment: int) -> dict | None:
+    """ Changes the description for the a assignment"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -219,6 +225,8 @@ def change_description(new_desc: str, course_id: int,
 
 def add_filenames(file_names: list, course_id: int,
                   assignment: int) -> None:
+    """ Adds thelist of filenames to allowed filenames for the specified
+    assignment"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
