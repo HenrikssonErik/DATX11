@@ -96,3 +96,16 @@ class TestCourseHandler(unittest.TestCase):
             mock_cursor.execute.assert_called_once_with("""INSERT INTO Assignments VALUES
                                 (%s, %s, %s, %s);""", [course_id, assignment_nr, desc, end_date])
         mock_files.assert_called_once_with(file_names, course_id, assignment_nr)
+
+    @patch('psycopg2.connect')
+    def test_change_desc(self, mock_connect):
+        mock_cursor = setup_mock_cursor(mock_connect)
+        new_desc = "New desc"
+        course = 1
+        assignment = 1
+        res = course_handler.change_description(new_desc, course, assignment)
+        assert res is None
+
+        mock_cursor.execute.side_effect = Exception("Database error")
+        res = course_handler.change_description(new_desc, course, assignment)
+        assert isinstance(res, dict)

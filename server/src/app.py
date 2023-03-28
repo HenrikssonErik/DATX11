@@ -188,7 +188,9 @@ def removeFromGroup():
         return make_response("", 200)
     return make_response("", 401)
 
-# Should probably be redone to take a list of users, redo how singup works aswell with cid/email being added to the list first
+
+# Should probably be redone to take a list of users, redo how singup works
+# as well with cid/email being added to the list first
 @app.route('/addToCourse', methods=['POST'])
 def addToCourse():
     token = extract_token(request)
@@ -283,5 +285,24 @@ def changeUserRole():
         return make_response("", 200)
     return make_response({"status": 'Only course admins can change roles'},
                          401)
-# TODO: remove course? mb not?, getGroups, getUsersInCourse lists ? (to add people),
-#  edit assignment desc
+# TODO: remove course? mb not?, getGroupsInCourse, getUsersInCourse lists ? (to add people),
+#  edit assignment desc, edit assignment enddate
+
+@app.route('/editDescription', methods=['POST'])
+def editDesc():
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    data = request.get_json()
+    new_desc = data['Desc']
+    course = data['Course']
+    assignment = data['Assignment']
+
+    if (check_admin_or_course_teacher(request_user_id, course)):
+        res = change_descirption(new_desc, course, assignment)
+
+        if res is None:
+            return make_response("", 200)
+        else:
+            return make_response(jsonify(res), 401)
+    else:
+        return make_response(jsonify({'status': 'Not a course teacher'}), 401)
