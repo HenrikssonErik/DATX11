@@ -1,5 +1,5 @@
 from .connector import get_conn_string
-from src.course_handler import get_courses_info, get_course_info
+from .course_handler import get_courses_info, get_course_info
 import psycopg2
 from enum import Enum
 

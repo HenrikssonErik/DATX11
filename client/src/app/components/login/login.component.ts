@@ -83,13 +83,15 @@ export class LoginComponent implements OnInit {
         observe: 'response',
       })
       .subscribe({
-        //TODO: save token and id
         next: (response: any) => {
           try {
             if (response.body.Token) {
               const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
               document.cookie = `Token=${
                 response.body.Token
+              }; expires=${expirationDate.toUTCString()}; path=/`;
+              document.cookie = `Role=${
+                response.body.GlobalRole
               }; expires=${expirationDate.toUTCString()}; path=/`;
             }
           } catch {
@@ -148,6 +150,7 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: (response: any) => {
           try {
+            console.log(response.body.Token);
             if (response.body.Token) {
               const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
               document.cookie = `Token=${
