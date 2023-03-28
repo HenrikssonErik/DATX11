@@ -46,10 +46,6 @@ export class VerifyEmailComponent implements OnInit {
             this.verificationFinished = Promise.resolve(true);
             this.imgPath = 'successVerification';
           }, 2000);
-
-          // this.verificationFinished = new Promise((resolve) => {
-          //   setTimeout(() => resolve(true), 2000);
-          // }).then(() => (this.imgPath = 'successVerification'));
         },
         error: (error) => {
           let errorStatus = error.error.status;
@@ -67,11 +63,6 @@ export class VerifyEmailComponent implements OnInit {
             this.errorCaught = Promise.resolve(true);
             this.imgPath = 'errorVerification';
           }, 2000);
-
-          // this.errorCaught = new Promise((resolve) => {
-          //   setTimeout(() => resolve(true), 2000);
-          // }).then(() => (this.imgPath = 'errorVerification'));
-
           console.log(error);
         },
       });
