@@ -5,6 +5,7 @@ from enum import Enum
 
 
 class Role(Enum):
+    """Enum for allowed Roles, both global and Course-roles"""
     Admin = 'Admin'
     Teacher = 'Teacher'
     Student = 'Student'
@@ -63,6 +64,7 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
 
 
 def __get_group_members(group_id: int) -> list:
+    """ Internal method to retrieve all members of a group"""
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
         with conn:
@@ -86,7 +88,8 @@ def __get_group_members(group_id: int) -> list:
 
 
 def add_user_to_group(user_id: int, group_id: int) -> None:
-    # check user on course and group on the course
+    """Adds a user to the specified group, also checks that th euser is
+    part of the course to which the group is associated"""
     user_courses = get_courses_info(user_id)
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -110,6 +113,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
 
 
 def __get_course_id_from_group(group_id) -> int:
+    """Returns a groups associated course, only ment for internal use"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -131,6 +135,7 @@ def __get_course_id_from_group(group_id) -> int:
 
 
 def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
+    """Adds the specified user to a course and assigns it a course role"""
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
         with conn:
@@ -162,6 +167,7 @@ def remove_user_from_course(user_id: int, course_id) -> None:
 
 
 def remove_user_from_group(user_id: int, group_id: int) -> None:
+    """Removes a User from a group"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -177,6 +183,8 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
 
 
 def is_teacher_on_course(user_id: int, course_id: int) -> bool:
+    """Checks if a user has the teacher role on the course
+    Returns True/False"""
     courses = get_courses_info(user_id)
     for course in courses:
         if course['courseID'] == course_id \
@@ -187,6 +195,8 @@ def is_teacher_on_course(user_id: int, course_id: int) -> bool:
 
 
 def is_admin_on_course(user_id: int, course_id: int) -> bool:
+    """Checks if a user has the Admin role on the course
+    Returns True/False"""
     courses = get_courses_info(user_id)
     for course in courses:
         if course['courseID'] == course_id \
@@ -229,7 +239,7 @@ def check_admin_or_course_teacher(user_id: int, course_id: int):
 
 def change_role_on_course(new_role: str, user_id: int,
                           course_id: int) -> dict | None:
-
+    """Changes a users role on the specified course"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     if (new_role in [role.name for role in Role]):
@@ -249,6 +259,7 @@ def change_role_on_course(new_role: str, user_id: int,
 
 
 def get_users_on_course(course: int) -> tuple:
+    """Returns a list of all users associated with a course and their course role"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:

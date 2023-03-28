@@ -289,9 +289,6 @@ def changeUserRole():
                          401)
 
 
-# TODO: remove course? mb not?, getGroupsInCourse,
-# edit assignment enddate
-# add date, course, token and assignment checks to post assignmentfiles
 @app.route('/editDescription', methods=['POST'])
 def editDesc():
     token = extract_token(request)
@@ -323,3 +320,7 @@ def getUsersInCourse():
         return make_response(jsonify(res[0]), res[1])
     else:
         return make_response("", 401)
+
+# TODO: remove course? mb not?, getGroupsInCourse (and members?),
+# edit assignment enddate, set teacher feedback, teacher feedback
+# add date, course, token and assignment checks to post assignmentfiles
