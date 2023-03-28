@@ -23,11 +23,12 @@ create_key()
 
 def extract_token(request) -> str:
     cookies = request.headers.get('Cookies')
-    if cookies:
-        token = cookies.split('Token=')[1]
-        return token
+    separated_cookies = cookies.split('; ')
+    for cookie in separated_cookies:
+        name, value = cookie.split('=')
+        if name == 'Token':
+            return value
     return ""
-
 
 @app.route('/login', methods=['POST'])
 def logIn():
@@ -134,7 +135,7 @@ def getCourses():
         return make_response('', 401)
 
 
-@app.rout('/getCourse', methods=['GET'])
+@app.route('/getCourse', methods=['GET'])
 def getCourse():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
@@ -249,7 +250,7 @@ def createCourse():
         return make_response("Not allowed to create course", 401)
 
 
-@app.route('/createAssignment', method=['POST'])
+@app.route('/createAssignment', methods=['POST'])
 def createAssignment():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
@@ -291,7 +292,7 @@ def changeUserRole():
     return make_response({"status": 'Only course admins can change roles'},
                          401)
 # TODO: remove course? mb not?, getGroupsInCourse, getUsersInCourse lists ? (to add people),
-#  edit assignment desc, edit assignment enddate
+# edit assignment enddate
 
 @app.route('/editDescription', methods=['POST'])
 def editDesc():
