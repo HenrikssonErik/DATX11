@@ -1,1 +1,25 @@
-<p>verify-email works! {{cid$}} is now verified</p>
+<div class="container text-muted">
+  <div class="row" style="margin-top: 50px">
+    <div class="col-md-6 col-12 d-flex justify-content-center flex-column">
+      <div *ngIf="errorCaught | async; else noError">
+        <h4 style="text-decoration: underline">Oops! An error has occurred!</h4>
+        <p>{{ responseMessage }}</p>
+      </div>
+
+      <ng-template #noError
+        ><div *ngIf="verificationFinished | async; else verifyingComponent">
+          <h4 style="text-decoration: underline">Verification successful!</h4>
+          <p>verify-email works! {{ responseMessage }} is now verified</p>
+        </div>
+
+        <ng-template #verifyingComponent
+          ><h4 style="text-decoration: underline">Verification in progress!</h4>
+          <p>The link is being verified. Please wait.</p></ng-template
+        ></ng-template
+      >
+    </div>
+    <div class="col-md-6 col-12 d-flex justify-content-center">
+      <img src="assets\{{ imgPath }}.svg" height="250" width="auto" />
+    </div>
+  </div>
+</div>
