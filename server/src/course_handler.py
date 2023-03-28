@@ -190,14 +190,30 @@ def get_assignments(course_id: int) -> tuple:
         conn.close()
         if not data:
             return []
-        # orderedData: dict[str, list] = []
-        # orderedData.append({"Assignments": data})
         return assignments
 
     except Exception as e:
         print(e)
         return {'status': "No Courses Found"}
 
+
+def change_description(new_desc: str, course_id: int,
+                       assignment: int) -> dict | None:
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """UPDATE assignments set description = %s
+                                WHERE courseid = %s and assignment = %s"""
+                cur.execute(query_data, [new_desc, course_id, assignment])
+                
+        conn.close()
+        return None
+
+    except Exception as e:
+        print(e)
+        return {'status': "No Courses Found"}
 
 def add_filenames(file_names: list, course_id: int,
                   assignment: int) -> None:
