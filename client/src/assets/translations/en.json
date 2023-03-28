@@ -55,5 +55,14 @@
   "Year": "Year:",
   "Cannot_be_a_previous_year": "Cannot be a previous year",
   "Groups": "Groups:",
-  "Zero_or_larger": "Zero or larger"
+  "Zero_or_larger": "Zero or larger",
+  "Verify_error_title": "Oops! An error has occurred!",
+  "Verify_success_title": "Verification successful!",
+  "Verify_success_body1": "It worked!",
+  "Verify_success_body2": "is now verified",
+  "Verify_success_redirect": "You will now be redirected to the login page.",
+  "Verify_progress_title": "Verification in progress!",
+  "Verify_progress_body": "The link is being verified. Please wait.",
+  "expired_verification_signature": "The link that expired. Sign up again to receive a new verification email!",
+  "invalid_verification_token": "The link is invalid. Sign up again to receive a new verification email!"
 }
