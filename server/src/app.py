@@ -193,7 +193,7 @@ def removeFromGroup():
         return make_response("", 200)
     return make_response("", 401)
 
-
+# Should probably be redone to take a list of users, redo how singup works aswell with cid/email being added to the list first
 @app.route('/addToCourse', methods=['POST'])
 def addToCourse():
     token = extract_token(request)
@@ -267,5 +267,26 @@ def createAssignment():
             make_response("", 200)
 
 
-# TODO: remove course, getUser lists or invite link? (to add people),
-# change user role, edit assignment desc
+@app.route('/changeUserRole', methods=['POST'])
+def changeUserRole():
+    """Course admins can call this method to change a users role in a course.
+        E.g from Student to TA (Teacher)
+        Returns: Status Code 200, 401"""
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course = data['Course']
+    user_to_change = data['User']
+    new_role = data['Role']
+    # TODO: check so user dont change theri own role
+    if (is_admin_on_course(request_user_id, course)):
+        res = change_role_on_course(new_role, user_to_change, course)
+
+        if res is not None:
+            return make_response(jsonify(res), 401)
+
+        return make_response("", 200)
+    return make_response({"status": 'Only course admins can change roles'},
+                         401)
+# TODO: remove course? mb not?, getGroups, getUsersInCourse lists ? (to add people),
+#  edit assignment desc

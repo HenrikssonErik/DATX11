@@ -3,10 +3,9 @@ import psycopg2
 import datetime
 
 
-
 def create_course(course_name: str, course_abbr: str, year: int,
                   teaching_period: int) -> tuple | int:
-    """Cretes a course. Alos checks so the course data that is
+    """Cretes a course. Also checks so the course data that is
     added is according to database requirements
 
     Returns: A dict with errors if they exists,
@@ -106,7 +105,7 @@ def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
                     query_one = """Insert into Groups
                     (course, groupnumber) values (%s,%s) """
                     cur.execute(query_one, [course_id, current_group + i])
-            conn.close()
+        conn.close()
 
     except Exception as e:
         print(e)
@@ -131,8 +130,8 @@ def __create_course(course_name: str, course_abbr: str, year: int,
                                 teachingperiod = %s AND courseyear = %s)"""
                 cur.execute(query_two, [course_abbr, teaching_period, year])
                 data = cur.fetchone()
-            conn.close()
-            return data[0]
+        conn.close()
+        return data[0]
 
     except Exception as e:
         print(e)
@@ -161,7 +160,7 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
                                 (%s, %s, %s, %s);"""
                 cur.execute(query_one, [course_id, assignment_nr, description,
                                         end_date])
-            conn.close()
+        conn.close()
 
         add_filenames(file_names, course_id, assignment_nr)
 
@@ -213,7 +212,7 @@ def add_filenames(file_names: list, course_id: int,
                                     (%s, %s, %s);"""
                     cur.execute(query_one, [course_id, assignment, file])
 
-            conn.close()
+        conn.close()
         return
     except Exception as e:
         print(e)
