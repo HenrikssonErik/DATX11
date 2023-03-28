@@ -2,22 +2,27 @@
   <div class="row" style="margin-top: 50px">
     <div class="col-md-6 col-12 d-flex justify-content-center flex-column">
       <div *ngIf="errorCaught | async; else noError">
-        <h4 style="text-decoration: underline">Oops! An error has occurred!</h4>
-        <p>{{ responseMessage }}</p>
+        <h4 style="text-decoration: underline" translate>Verify_error_title</h4>
+        <p translate>{{ responseMessage }}</p>
       </div>
 
       <ng-template #noError
         ><div *ngIf="verificationFinished | async; else verifyingComponent">
-          <h4 style="text-decoration: underline">Verification successful!</h4>
+          <h4 style="text-decoration: underline" translate>
+            Verify_success_title
+          </h4>
           <p style="font-size: large">
-            verify-email works! {{ responseMessage }} is now verified
+            <span translate>Verify_success_body1</span> {{ responseMessage }}
+            <span translate>Verify_success_body2</span>
           </p>
-          <p>You will now be redirected to the login page.</p>
+          <p translate>You will now be redirected to the login page.</p>
         </div>
 
         <ng-template #verifyingComponent
-          ><h4 style="text-decoration: underline">Verification in progress!</h4>
-          <p>The link is being verified. Please wait.</p></ng-template
+          ><h4 style="text-decoration: underline" translate>
+            Verify_progress_title
+          </h4>
+          <p translate>Verify_progress_body</p></ng-template
         ></ng-template
       >
     </div>

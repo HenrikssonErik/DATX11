@@ -39,14 +39,7 @@ export class VerifyEmailComponent implements OnInit {
           }, 1500);
         },
         error: (error) => {
-          let errorStatus = error.error.status;
-          if (errorStatus == 'invalid_verification_token') {
-            this.responseMessage =
-              'The token is invalid. Sign up again to receive a new verification email';
-          } else if (errorStatus === 'expired_verification_signature') {
-            this.responseMessage =
-              'The signature that expired. Sign up again to receive a new verification email!';
-          }
+          this.responseMessage = error.error.status;
           // this.responseMessage = error.error.status;
           console.log(this.responseMessage);
 

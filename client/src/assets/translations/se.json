@@ -55,5 +55,14 @@
   "Year": "År:",
   "Cannot_be_a_previous_year": "Året har redan passerat",
   "Groups": "Grupper:",
-  "Zero_or_larger": "Större än noll"
+  "Zero_or_larger": "Större än noll",
+  "Verify_error_title": "Ett fel har uppstått!",
+  "Verify_success_title": "Verifikation lyckad!",
+  "Verify_success_body1": "Det gick!",
+  "Verify_success_body2": "är nu verifierad",
+  "Verify_success_redirect": "Du blir snart omdirigerad till inloggningssidan",
+  "Verify_progress_title": "Verifikation pågår",
+  "Verify_progress_body": "Verifikationslänken kontrolleras. Var god vänta.",
+  "expired_verification_signature": "Länken har utgått. Registrera dig igen för att få en ny länk!",
+  "invalid_verification_token": "Länken är inte giltlig. Registrera dig igen för att få en ny länk!"
 }
