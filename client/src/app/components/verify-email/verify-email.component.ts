@@ -1,12 +1,6 @@
-import {
-  HttpClient,
-  HttpHeaders,
-  HttpParams,
-  HttpResponse,
-} from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
-import { resolve } from 'dns';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { API_URL } from 'src/environments/environment';
 
 @Component({
@@ -22,7 +16,8 @@ export class VerifyEmailComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -45,7 +40,7 @@ export class VerifyEmailComponent implements OnInit {
           setTimeout(() => {
             this.verificationFinished = Promise.resolve(true);
             this.imgPath = 'successVerification';
-          }, 2000);
+          }, 1500);
         },
         error: (error) => {
           let errorStatus = error.error.status;
@@ -62,8 +57,13 @@ export class VerifyEmailComponent implements OnInit {
           setTimeout(() => {
             this.errorCaught = Promise.resolve(true);
             this.imgPath = 'errorVerification';
-          }, 2000);
+          }, 1500);
           console.log(error);
+        },
+        complete: () => {
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 5000);
         },
       });
   }

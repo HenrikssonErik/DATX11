@@ -9,7 +9,10 @@
       <ng-template #noError
         ><div *ngIf="verificationFinished | async; else verifyingComponent">
           <h4 style="text-decoration: underline">Verification successful!</h4>
-          <p>verify-email works! {{ responseMessage }} is now verified</p>
+          <p style="font-size: large">
+            verify-email works! {{ responseMessage }} is now verified
+          </p>
+          <p>You will now be redirected to the login page.</p>
         </div>
 
         <ng-template #verifyingComponent
