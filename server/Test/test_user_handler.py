@@ -1,5 +1,6 @@
 
 
+
 import src.user_handler as user_handler
 import sys
 from pathlib import Path
@@ -135,3 +136,15 @@ class TestUserHandler(unittest.TestCase):
         mock_cursor.execute.assert_called_once_with("""SELECT globalrole FROM userdata
                             WHERE userid = %s""", [user_id])
         self.assertEqual(res, user_handler.Role.Student.name)
+
+    @patch('psycopg2.connect')
+    def test_change_role_on_course(self, mock_connect):
+        mock_cursor = setup_mock_cursor(mock_connect)
+        user = 1
+        new_role = 'Student'
+        course = 1
+        res = user_handler.change_role_on_course(new_role, user, course)
+        assert res is None
+        new_role = 'asdfghj'
+        res = user_handler.change_role_on_course(new_role, user, course)
+        assert isinstance(res, dict)

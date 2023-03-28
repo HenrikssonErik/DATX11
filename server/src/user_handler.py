@@ -1,5 +1,5 @@
 from .connector import get_conn_string
-from src.course_handler import get_courses_info
+from src.course_handler import get_courses_info, get_course_info
 import psycopg2
 from enum import Enum
 
@@ -120,7 +120,7 @@ def __get_course_id_from_group(group_id) -> int:
                                 WHERE groupid = %s """
                 cur.execute(query_data, [group_id])
                 data = cur.fetchone()
-
+        conn.close()
         if not data:
             raise Exception("No such group")
         return data[0]
@@ -162,7 +162,6 @@ def remove_user_from_course(user_id: int, course_id) -> None:
 
 
 def remove_user_from_group(user_id: int, group_id: int) -> None:
-    # TODO: add some checks so not anyone can call this delete method, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -171,7 +170,7 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
                 query_data = """DELETE from useringroup
                                 WHERE userid = %s AND groupid = %s """
                 cur.execute(query_data, [user_id, group_id])
-            conn.close()
+        conn.close()
     except Exception as e:
         print(e)
         return {'status': "Could not remove from group"}
@@ -209,7 +208,7 @@ def get_global_role(user_id) -> str:
                             WHERE userid = %s"""
                 cur.execute(query_data, [user_id])
                 data = cur.fetchone()
-            conn.close()
+        conn.close()
         if not data:
             raise Exception("No such user")
 
@@ -226,3 +225,24 @@ def check_admin_or_course_teacher(user_id: int, course_id: int):
     global_admin: bool = get_global_role(user_id) == Role.Admin.name
 
     return course_administrator or global_admin
+
+
+def change_role_on_course(new_role: str, user_id: int,
+                          course_id: int) -> dict | None:
+
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    if (new_role in [role.name for role in Role]):
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    query_data = """UPDATE userincourse SET userrole = %s
+                    WHERE userid = %s AND courseid = %s;"""
+                    cur.execute(query_data, [new_role, user_id, course_id])
+            conn.close()
+        except Exception as e:
+            print(e)
+            return {'status': "Could not  change the role"}
+        return None
+    else:
+        return {'status': "Not an allowed role"}
