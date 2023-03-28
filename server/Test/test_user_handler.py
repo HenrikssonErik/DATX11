@@ -1,6 +1,4 @@
 
-
-
 import src.user_handler as user_handler
 import sys
 from pathlib import Path

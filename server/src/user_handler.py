@@ -1,5 +1,5 @@
 from .connector import get_conn_string
-from .course_handler import get_courses_info, get_course_info
+from .course_handler import get_courses_info
 import psycopg2
 from enum import Enum
 
@@ -131,7 +131,6 @@ def __get_course_id_from_group(group_id) -> int:
 
 
 def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
-    # TODO: Maybe add som check so admin or course teacher only can add people, mb need to take in the user doing the call
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
         with conn:
@@ -152,7 +151,8 @@ def remove_user_from_course(user_id: int, course_id) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """Delete from userincourse where userid = %s AND courseid = %s"""
+                query_data = """Delete from userincourse where userid = %s AND
+                courseid = %s"""
                 cur.execute(query_data, [user_id, course_id])
         conn.close()
 
@@ -254,16 +254,18 @@ def get_users_on_course(course: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT userdata.userid, userdata.cid, userdata.fullname, userdata.email, userincourse.userrole
+                query_data = """SELECT userdata.userid, userdata.cid,
+                userdata.fullname, userdata.email, userincourse.userrole
                 FROM public.userdata
-                JOIN public.userincourse ON userdata.userid = userincourse.userid
+                JOIN public.userincourse ON
+                userdata.userid = userincourse.userid
                 WHERE userincourse.courseid = %s;"""
                 cur.execute(query_data, [course])
                 data = cur.fetchall()
         conn.close()
         if not data:
             return [], 200
-        
+
         users: list[dict] = []
         for user in data:
             users.append({'Id': user[0], 'Cid': user[1], 'Name': user[2],
