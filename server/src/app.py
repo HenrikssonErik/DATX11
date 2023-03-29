@@ -144,8 +144,8 @@ def getCourse():
         return make_response("", 401)
 
 
-@app.route('/getGroup', methods=['GET'])
-def getGroup():
+@app.route('/getMyGroup', methods=['GET'])
+def getMyGroup():
     """Takes a Token as cookie, and a course_id.
     Returns the group_id, group_number and cid of members"""
     token = extract_token(request)
