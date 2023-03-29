@@ -321,6 +321,26 @@ def getUsersInCourse():
     else:
         return make_response("", 401)
 
-# TODO: remove course? mb not?, getGroupsInCourse (and members?),
-# edit assignment enddate, set teacher feedback, teacher feedback
+# TODO: remove course? mb not?, getGroupsInCourse (and members?, and assignmentstatus?),
+# set teacher feedback
 # add date, course, token and assignment checks to post assignmentfiles
+
+
+@app.route('/changeAssignmentDate', methods=['POST'])
+def changeAssignmentDate():
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course: int = data['Course']
+    assignment: int = data['Assignment']
+    new_date: str = data['Date']
+
+    if (check_admin_or_course_teacher(request_user_id)):
+        res = change_end_date(course, assignment, new_date)
+
+        if res is None:
+            return make_response("", 200)
+        else:
+            return make_response(jsonify(res), 401)
+    else:
+        return make_response(jsonify({'status': 'Not a course teacher'}), 401)

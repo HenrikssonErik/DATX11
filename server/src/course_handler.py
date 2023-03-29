@@ -223,6 +223,29 @@ def change_description(new_desc: str, course_id: int,
         return {'status': "No Courses Found"}
 
 
+# Not tested
+def change_end_date(course: int, assignment: int,
+                    new_date: str) -> dict | None:
+    """Changes the end-date of the specified assignment
+    Returns a dict if error occurs, otherwise None"""
+    if (check_date_format(new_date)):
+        conn = psycopg2.connect(dsn=get_conn_string())
+
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    query_one = """UPDATE assignments SET enddate = %s
+                    WHERE courseid = %s AND assignment = %s;"""
+                    cur.execute(query_one, [new_date, course, assignment])
+            conn.close()
+            return
+        except Exception as e:
+            print(e)
+            return {'status': 'Something went wrong'}
+    else:
+        return {'status': 'End date has the wrong format, must be YYYY-MM-DD'}
+
+
 def add_filenames(file_names: list, course_id: int,
                   assignment: int) -> None:
     """ Adds thelist of filenames to allowed filenames for the specified
@@ -244,14 +267,14 @@ def add_filenames(file_names: list, course_id: int,
         print(e)
 
 
-def check_file_extension(filename):
+def check_file_extension(filename) -> bool:
     """
     Check if a filename ends with ".py", ".txt" or ".pdf".
     """
     return filename.endswith((".py", ".txt", ".pdf"))
 
 
-def check_date_format(date_string):
+def check_date_format(date_string) -> bool:
     """
     Check if a date string has the same structure as the
     Date type in PostgreSQL.
