@@ -31,23 +31,23 @@ class TestLoginHandler(unittest.TestCase):
     def test_check_data_input(self):
         # Test case where input data is valid
         self.assertEqual(check_data_input(
-            'abc', 'abc@chalmers.se', '1234'), ('OK', 200))
+            'abc', 'abc@chalmers.se', '1234', True), ('OK', 200))
 
         # Test case where cid contains invalid characters
         self.assertEqual(check_data_input(
-            '123', 'abc@chalmers.se', '1234'), ('unallowed_tokens', 400))
+            '123', 'abc@chalmers.se', '1234', True), ('unallowed_tokens', 400))
 
         # Test case where email is missing
         self.assertEqual(check_data_input(
-            'abc', '', '1234'), ('email_missing', 400))
+            'abc', '', '1234', True), ('email_missing', 400))
 
         # Test case where email format is wrong
         self.assertEqual(check_data_input(
-            'abc', 'def@chalmers.se', '1234'), ('wrong_format', 400))
+            'abc', 'def@chalmers.se', '1234', True), ('wrong_format', 400))
 
         # Test case where password contains invalid characters
         self.assertEqual(check_data_input(
-            'abc', 'abc@chalmers.se', 'أَلِف'), ('pass_not_ok', 400))
+            'abc', 'abc@chalmers.se', 'أَلِف', True), ('pass_not_ok', 400))
 
     @patch('psycopg2.connect')
     def test_user_registration_success(self, mock_connect):
@@ -59,8 +59,8 @@ class TestLoginHandler(unittest.TestCase):
             mock_cursor = setup_mock_cursor(mock_connect)
             mock_cursor.fetchone.return_value = [1, passphrase]
 
-            result = user_registration({'cid': 'abc',
-                                        'email': 'abc@chalmers.se',
+            result = user_registration({'cid': 'erhen',
+                                        'email': 'erhen@chalmers.se',
                                         'password': 'abc123'})
 
             self.assertEqual(result[1], 200)
