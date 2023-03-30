@@ -25,12 +25,12 @@ CREATE TABLE IF NOT EXISTS public.assignmentfeedback
 /* -- Old
 CREATE Table AssignmentFeedback (
 	groupId INTEGER NOT NULL,
-	CourseId serial,
-	Assignment INTEGER,
+	CourseId serial NOT NULL,
+	Assignment INTEGER NOT NULL,
 	TestFeedback JSON,
 	TeacherFeedback TEXT,
-	TestPass BOOLEAN NOT NULL DEFAULT FALSE, 
-	TeacherGrade BOOLEAN NOT NULL DEFAULT FALSE,
+	TestPass BOOLEAN NOT NULL DEFAULT FALSE,  
+	TeacherGrade BOOLEAN,
 	PRIMARY KEY(GroupId,CourseId, Assignment),
 	CONSTRAINT fk_assignment
 		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),

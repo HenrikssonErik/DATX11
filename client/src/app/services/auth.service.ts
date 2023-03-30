@@ -8,7 +8,9 @@ export class AuthService {
   private isAuthenticated$: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
 
-  constructor() {}
+  constructor() {
+    this.isLoggedIn();
+  }
 
   get isAuthenticated(): Observable<boolean> {
     return this.isAuthenticated$.asObservable();

@@ -326,8 +326,9 @@ def getUsersInCourse():
     else:
         return make_response("", 401)
 
-# TODO: remove course? mb not?, getGroupsInCourse (and members?, and assignmentstatus?),
-# set teacher feedback
+# TODO: remove course? mb not?, getGroupsInCourse (and members?, and assignmentstatus?)
+# set teacher feedback, getAssignmentFeedback (and filenames, should be called
+# by the groumembers or teachers), getAllowedFilenames?
 # add date, course, token and assignment checks to post assignmentfiles
 
 
