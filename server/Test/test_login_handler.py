@@ -57,7 +57,7 @@ class TestLoginHandler(unittest.TestCase):
             passphrase = memoryview(bcrypt.hashpw('abc123'.encode('utf8'),
                                                   salt))
             mock_cursor = setup_mock_cursor(mock_connect)
-            mock_cursor.fetchone.return_value = [1, passphrase]
+            mock_cursor.fetchone.return_value = [1, passphrase, 'Admin']
 
             result = user_registration({'cid': 'erhen',
                                         'email': 'erhen@chalmers.se',
@@ -74,11 +74,13 @@ class TestLoginHandler(unittest.TestCase):
         cid = 'abc'
         email = 'abc@example.com'
         hashed_pass = b'secret'
+        role = 'student'
+        name = 'Test Testsson'
 
-        result = registration_query(cid, email, hashed_pass)
+        result = registration_query(cid, email, hashed_pass, role, name )
         mock_cursor.execute.assert_called_once_with("""INSERT INTO UserData
-                (cid, email, passphrase)
-                VALUES (%s, %s, %s);""", (cid, email, hashed_pass))
+                (cid, email, passphrase, globalRole, fullName)
+                VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass, role, name))
 
         self.assertEqual(result, ({'status': 'success'}, 200))
 
@@ -92,12 +94,14 @@ class TestLoginHandler(unittest.TestCase):
         cid = 'abc'
         email = 'abc@example.com'
         hashed_pass = b'secret'
+        role = 'student'
+        name = 'Test Testsson'
 
-        result = registration_query(cid, email, hashed_pass)
+        result = registration_query(cid, email, hashed_pass, role, name)
 
         mock_cursor.execute.assert_called_once_with("""INSERT INTO UserData
-                (cid, email, passphrase)
-                VALUES (%s, %s, %s);""", (cid, email, hashed_pass))
+                (cid, email, passphrase, globalRole, fullName)
+                VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass, role, name))
 
         self.assertEqual(result, ({'status': 'already_registered'}, 406))
 
