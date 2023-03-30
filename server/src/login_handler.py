@@ -134,7 +134,6 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
                 data = cur.fetchone()
                 id = data[0]
                 passphrase: bytes = data[1].tobytes()
-                print(data)
         conn.close()
         if not data:
             raise Exception("Wrong Credentials")
