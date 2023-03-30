@@ -107,7 +107,7 @@ class TestLoginHandler(unittest.TestCase):
         salt = bcrypt.gensalt()
         passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
         mock_cursor = setup_mock_cursor(mock_connect)
-        mock_cursor.fetchone.return_value = [1, passphrase]
+        mock_cursor.fetchone.return_value = [1, passphrase, 'Admin']
         result = log_in('test1.chalmers.se', 'pass')
         self.assertEqual(result[1], 200)
         self.assertTrue(result[0].get('Token').startswith(
@@ -119,7 +119,7 @@ class TestLoginHandler(unittest.TestCase):
         salt = bcrypt.gensalt()
         passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
         mock_cursor = setup_mock_cursor(mock_connect)
-        mock_cursor.fetchone.return_value = [1, passphrase]
+        mock_cursor.fetchone.return_value = [1, passphrase, 'Admin']
 
         result = log_in('test1.chalmers.se', 'pass1')
         self.assertEqual(result[1], 401)
