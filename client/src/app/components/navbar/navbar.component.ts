@@ -20,9 +20,14 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   constructor(private renderer: Renderer2, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.authService.isAuthenticated.subscribe(
+    /* this.authService.isAuthenticated.subscribe(
       (isAuthenticated) => (this.isLoggedIn = isAuthenticated)
-    );
+    ); */
+
+    this.authService.isAuthenticated.subscribe((element) => {
+      this.isLoggedIn = element;
+      console.log(element);
+    });
 
     const nav: Element | null = document.querySelector('.nav');
     if (!nav) {

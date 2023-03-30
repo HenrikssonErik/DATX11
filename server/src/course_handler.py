@@ -223,6 +223,28 @@ def change_description(new_desc: str, course_id: int,
         return {'status': "No Courses Found"}
 
 
+# TODO: not done or tested, returns statements must be fixed
+def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
+                         course: int, assignment: int):
+
+    conn = psycopg2.connect(dsn=get_conn_string())
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_one = """INSERT INTO AssignmentFeedback (groupId,
+                CourseId, Assignment, TeacherGrade, TeacherFeedback)
+                VALUES (%s, %s, %s, %s, %s) ON CONFLICT (groupId, CourseId,
+                Assignment) DO UPDATE SET TeacherGrade = excluded.TeacherGrade,
+                TeacherFeedback = excluded.TeacherFeedback;"""
+                cur.execute(query_one, [group_id, course, assignment, grade,
+                                        feedback])
+        conn.close()
+        return
+    except Exception as e:
+        print(e)
+        return {'status': 'Could Not update the feedback'}
+
+
 # Not tested
 def change_end_date(course: int, assignment: int,
                     new_date: str) -> dict | None:
