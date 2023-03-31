@@ -1,0 +1,68 @@
+<form (ngSubmit)="onSubmit()" #myForm="ngForm">
+  <h3 class="text-center text-muted mb-4 mt-3" translate>Create_Course</h3>
+  <div class="form-group">
+    <label for="name">Course Name:</label>
+    <input
+      type="text"
+      class="form-control"
+      id="name"
+      name="name"
+      required
+      [(ngModel)]="formData.name"
+      placeholder="Introduction to software engineering"
+    />
+  </div>
+  <div class="form-group">
+    <label for="abbreviation">Course Code (6 chars):</label>
+    <input
+      type="text"
+      class="form-control"
+      id="abbreviation"
+      name="abbreviation"
+      required
+      pattern="[A-Z]{6}"
+      title="Can only be six characters"
+      [(ngModel)]="formData.abbreviation"
+      placeholder="ABC123"
+    />
+  </div>
+  <div class="form-group">
+    <label for="rating">Teaching Period:</label>
+    <input
+      type="number"
+      class="form-control"
+      id="rating"
+      name="LP"
+      required
+      [(ngModel)]="formData.lp"
+      min="1"
+      max="5"
+      placeholder="E.g 5 (summer)"
+    />
+  </div>
+  <div class="form-group">
+    <label for="year">Year:</label>
+    <input
+      type="number"
+      class="form-control"
+      id="rating"
+      name="Year"
+      required
+      [(ngModel)]="formData.year"
+      [min]="minYear()"
+    />
+  </div>
+  <div class="form-group">
+    <label for="groups">Number of student groups:</label>
+    <input
+      type="number"
+      class="form-control"
+      id="groups"
+      name="groups"
+      required
+      [(ngModel)]="formData.groups"
+    />
+    <p style="font-size: smaller">(More groups can be added later)</p>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>

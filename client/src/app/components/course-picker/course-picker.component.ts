@@ -32,7 +32,6 @@ export class CoursePickerComponent implements OnInit {
       document.cookie.includes('Teacher') ||
       document.cookie.includes('Admin')
     ) {
-      console.log('in if');
       return true;
     } else return false;
   }
