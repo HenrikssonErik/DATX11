@@ -26,4 +26,14 @@ export class CoursePickerComponent implements OnInit {
     this.showCourses = false;
     this.router.navigate(['/courses', id]);
   }
+
+  isTeacher(): boolean {
+    if (
+      document.cookie.includes('Teacher') ||
+      document.cookie.includes('Admin')
+    ) {
+      console.log('in if');
+      return true;
+    } else return false;
+  }
 }

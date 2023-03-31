@@ -43,6 +43,20 @@
         >
           Completed
         </button>
+
+        <button
+          *ngIf="isTeacher()"
+          class="nav-link me-4"
+          id="upcoming-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#upcoming-tab-pane"
+          type="button"
+          role="tab"
+          aria-controls="upcoming-tab-pane"
+          aria-selected="false"
+        >
+          Create Course
+        </button>
       </li>
     </ul>
     <div class="tab-content" id="myTabContent">
