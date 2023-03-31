@@ -1,4 +1,4 @@
-<div class="container d-flex justify-content-center" style="max-width: 375px;">
+<div class="container" style="max-width: 375px">
   <div class="row">
     <div [ngClass]="files.length > 0 ? 'col-6' : 'col-12'">
       <div class="file-drop-area">
@@ -75,6 +75,9 @@
     </div>
   </div>
 </div>
-<div *ngIf="config.showFeedback"  style="padding-top: 10px; margin-bottom: 100px;">
+<div
+  *ngIf="config.showFeedback"
+  style="padding-top: 10px; margin-bottom: 100px"
+>
   <app-test-feedback [feedbackFiles]="testFeedBackArray"></app-test-feedback>
 </div>
