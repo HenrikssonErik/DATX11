@@ -12,14 +12,18 @@ export class CourseService {
   constructor(private http: HttpClient) {}
 
   getCourses(): Observable<Course[]> {
-    const headers = new HttpHeaders().append('Cookies', document.cookie);
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
     return this.http
       .get<Courses>(`${API_URL}/getCourses`, { headers })
       .pipe(map((res) => res.courses));
   }
 
   getCourse(id: number): Observable<Course> {
-    const headers = new HttpHeaders().append('Cookies', document.cookie);
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
     return this.http.get<Course>(`${API_URL}/getCourse?Course=${id}`, {
       headers,
     });
