@@ -2,277 +2,156 @@
 -- without entering each tavle/view one by one
 
 -- CourseInstance, group and lab assignment shoudl be primary key here
---New
-CREATE TABLE IF NOT EXISTS public.assignmentfeedback
-(
-    groupid integer NOT NULL,
-    courseid integer NOT NULL DEFAULT 'nextval('assignmentfeedback_courseid_seq'::regclass)',
-    assignment integer NOT NULL,
-    testfeedback json,
-    teacherfeedback text COLLATE pg_catalog."default",
-    testpass boolean NOT NULL DEFAULT 'false',
-    teachergrade boolean NOT NULL DEFAULT 'false',
-    CONSTRAINT assignmentfeedback_pkey PRIMARY KEY (groupid, courseid, assignment),
-    CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (assignment, courseid)
-        REFERENCES public.assignments (assignment, courseid) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupid)
-        REFERENCES public.groups (groupid) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
-/* -- Old
 CREATE Table AssignmentFeedback (
 	groupId INTEGER NOT NULL,
-	CourseId serial NOT NULL,
-	Assignment INTEGER NOT NULL,
-	TestFeedback JSON,
-	TeacherFeedback TEXT,
-	TestPass BOOLEAN NOT NULL DEFAULT FALSE,  
-	TeacherGrade BOOLEAN,
+	courseId serial NOT NULL,
+	assignment INTEGER NOT NULL,
+	testFeedback JSON,
+	teacherFeedback TEXT,
+	testPass BOOLEAN NOT NULL DEFAULT FALSE,  
+	teacherGrade BOOLEAN,
 	PRIMARY KEY(GroupId,CourseId, Assignment),
-	CONSTRAINT fk_assignment
-		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),
-		FOREIGN Key (groupId) REFERENCES Groups(groupId)
+	CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
+		REFERENCES groups(groupId) 
+		ON DELETE CASCADE 
+		ON UPDATE CASCADE,
+	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
+		REFERENCES assignments(courseid, assignment) 
+		ON DELETE CASCADE 
+		ON UPDATE CASCADE
 ); 
-*/
 
 
--- New 
-CREATE TABLE IF NOT EXISTS public.assignmentfiles
-(
-    groupid integer NOT NULL,
-    courseid integer NOT NULL DEFAULT 'nextval('assignmentfiles_courseid_seq'::regclass)',
-    assignment integer NOT NULL,
-    filename text COLLATE pg_catalog."default" NOT NULL,
-    filedata bytea NOT NULL,
-    filetype text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT assignmentfiles_pkey PRIMARY KEY (groupid, courseid, assignment, filename),
-    CONSTRAINT assignmentfiles_groupid_fkey FOREIGN KEY (groupid)
-        REFERENCES public.groups (groupid) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (assignment, courseid)
-        REFERENCES public.assignments (assignment, courseid) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
-/* // Old
 CREATE Table AssignmentFiles (
-		GroupId INTEGER  NOT NULL, 
-		CourseId serial,
-		Assignment INTEGER,
-		FileName TEXT NOT NULL, --Could add foregin key to FileName-table
-		FileData BYTEA NOT NULL, 
-		FileType TEXT NOT NULL,
-		PRIMARY KEY(GroupId,CourseId, Assignment, FileName),
-		CONSTRAINT fk_assignment
-		FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments (CourseId, Assignment),
-		FOREIGN Key (groupId) REFERENCES Groups(groupId)
+		groupId INTEGER NOT NULL, 
+		courseId SERIAL NOT NULL,
+		assignment INTEGER NOT NULL,
+		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
+		fileData BYTEA NOT NULL, 
+		fileType TEXT NOT NULL,
+		PRIMARY KEY(groupId, courseId, assignment, fileName),
+		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
+			REFERENCES Groups (groupId) 
+			ON DELETE CASCADE 
+			ON UPDATE CASCADE
+		CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
+			REFERENCES Assignments(courseId, assignment) 
+			ON DELETE CASCADE 
+			ON UPDATE CASCADE
 	);
-*/
 
 
---New
-CREATE TABLE IF NOT EXISTS public.courses
-(
-    courseid integer NOT NULL DEFAULT 'nextval('courses_courseid_seq'::regclass)',
-    coursename text COLLATE pg_catalog."default" NOT NULL,
-    course character(6) COLLATE pg_catalog."default" NOT NULL,
-    teachingperiod integer,
-    courseyear integer,
-    CONSTRAINT courses_pkey PRIMARY KEY (courseid),
-    CONSTRAINT courses_course_teachingperiod_courseyear_key UNIQUE (course, teachingperiod, courseyear),
-    CONSTRAINT courses_teachingperiod_check CHECK (teachingperiod >= 1 AND teachingperiod <= 5)
-)
-/* --Old
 --USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
 CREATE Table Courses (
-	CourseId serial PRIMARY KEY,
-	CourseName TEXT NOT NULL,
-	Course Char(6) NOT NULL,
-	TeachingPeriod INTEGER,
-	CourseYear INTEGER,
+	courseId SERIAL PRIMARY KEY,
+	courseName TEXT NOT NULL,
+	course Char(6) NOT NULL,
+	teachingPeriod INTEGER NOT NULL,
+	courseYear INTEGER NOT NULL,
 	CHECK (teachingPeriod BETWEEN 1 AND 5),
-	UNIQUE ( Course, teachingPeriod, CourseYear)
+	UNIQUE ( course, teachingPeriod, courseYear)
 );
-*/
 
 
---New
-CREATE TABLE IF NOT EXISTS public.assignments
-(
-    courseid integer NOT NULL DEFAULT 'nextval('assignments_courseid_seq'::regclass)',
-    assignment integer NOT NULL,
-    enddate date NOT NULL,
-    description text COLLATE pg_catalog."default" NOT NULL DEFAULT ''::text,
-    CONSTRAINT assignments_pkey PRIMARY KEY (courseid, assignment),
-    CONSTRAINT constraint_courseid_fkey FOREIGN KEY (courseid)
-        REFERENCES public.courses (courseid) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT assignments_assignment_check CHECK (assignment > 0)
-)
-/* -- Old
 CREATE Table Assignments(
-	CourseId serial,
-	Assignment INTEGER check (Assignment > 0),
-	Description TEXT Not NULL,
-	endDate Date NOT NULL,
-	PRIMARY KEY (courseId, Assignment),
-	CONSTRAINT fk_course
-	FOREIGN KEY (CourseId) REFERENCES Courses(CourseId)
-*/
+	courseId SERIAL,
+	assignment INTEGER NOT NULL CHECK (assignment > 0),
+	endDate DATE NOT NULL,
+	description TEXT NOT NULL,
+	PRIMARY KEY (courseId, assignment),
+	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (courseId) 
+			REFERENCES Courses(courseId) 
+			ON DELETE CASCADE 
+			ON UPDATE CASCADE
+);
 
 
--- New
-CREATE TABLE IF NOT EXISTS public.testfiles
-(
-    courseid integer NOT NULL DEFAULT 'nextval('testfiles_courseid_seq'::regclass)',
-    assignment integer NOT NULL,
-    filename text COLLATE pg_catalog."default" NOT NULL,
-    filedata bytea NOT NULL,
-    CONSTRAINT testfiles_pkey PRIMARY KEY (courseid, assignment, filename),
-    CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (assignment, courseid)
-        REFERENCES public.assignments (assignment, courseid) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
-/* --Old 
 --for unittests
 CREATE Table TestFiles (
-	CourseId serial ,
-	Assignment INTEGER , 
-	Filename TEXT NOT NULL,
-	FileData BYTEA NOT NULL,
-	PRIMARY KEY(CourseId, Assignment, FileName),
-	CONSTRAINT fk_assignment
-	FOREIGN KEY (CourseId, Assignment) REFERENCES Assignments(CourseId, Assignment)
-)
-*/
+	courseId SERIAL NOT NULL,
+	assignment INTEGER NOT NULL, 
+	filename TEXT NOT NULL,
+	fileData BYTEA NOT NULL,
+	PRIMARY KEY(courseId, assignment, fileName),
+	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
+		REFERENCES Assignments(courseId, assignment) 
+		ON UPDATE CASCADE 
+		ON DELETE CASCADE
+);
 
 
---New
-CREATE TABLE IF NOT EXISTS public.userdata
-(
-    userid integer NOT NULL DEFAULT 'nextval('userdata_userid_seq'::regclass)',
-    cid text COLLATE pg_catalog."default",
-    email text COLLATE pg_catalog."default" NOT NULL,
-    passphrase bytea NOT NULL,
-    verified boolean NOT NULL DEFAULT 'false',
-    globalrole text COLLATE pg_catalog."default" NOT NULL DEFAULT 'Student'::text,
-    fullname text COLLATE pg_catalog."default" NOT NULL DEFAULT 'Börje Brakskit'::text,
-    CONSTRAINT userdata_pkey PRIMARY KEY (userid),
-    CONSTRAINT userdata_cid_key UNIQUE (cid),
-    CONSTRAINT checkrole CHECK (globalrole = ANY (ARRAY['Student'::text, 'Teacher'::text])),
-    CONSTRAINT userdata_email_check CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'::text)
-)
-/* --Old
 CREATE TABLE UserData (
-	userId SERIAL,
-	cid TEXT UNIQUE,
+	userId SERIAL NOT NULL,
+	cid TEXT UNIQUE NOT NULL,
 	email TEXT NOT NULL,
 	passphrase BYTEA NOT NULL,
-	globalRole TEXT NOT NULL CHECK (globalRole IN ('Student', 'Teacher', 'Admin' )),
+	verified BOOLEAN NOT NULL DEFAULT FALSE,
+	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher', 'Admin')),
 	fullName TEXT NOT NULL,
 	PRIMARY KEY (userId),
 	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
-*/
 
 
--- New
-CREATE TABLE IF NOT EXISTS public.groups
-(
-    groupid integer NOT NULL DEFAULT 'nextval('groups_groupid_seq'::regclass)',
-    groupnumber integer,
-    course integer,
-    CONSTRAINT groups_pkey PRIMARY KEY (groupid),
-    CONSTRAINT coursegroups UNIQUE (groupnumber, course)
-)
-/* --Old
 CREATE TABLE Groups (
-	groupId serial,
-	groupNumber INTEGER,
-	course INTEGER,
-	PRIMARY KEY (groupId),
-	CONSTRAINT courseGroups UNIQUE (groupNumber,course),
-	FOREIGN KEY (course) REFERENCES Courses(courseId)
+	groupId SERIAL PRIMARY KEY,
+	groupNumber INTEGER NOT NULL,
+	course INTEGER NOT NULL,
+	UNIQUE (groupNumber, course)
+	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (course) 
+	REFERENCES Courses(courseid) 
+	ON DELETE CASCADE 
+	ON UPDATE CASCADE,
 );
-*/
 
 
---New
-CREATE TABLE IF NOT EXISTS public.useringroup
-(
-    userid integer NOT NULL,
-    groupid integer NOT NULL,
-    CONSTRAINT useringroup_pkey PRIMARY KEY (userid, groupid),
-    CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupid)
-        REFERENCES public.groups (groupid) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT constraint_userid_fkey FOREIGN KEY (userid)
-        REFERENCES public.userdata (userid) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
-/* -- Old
 CREATE TABLE UserInGroup (
 	userId INTEGER,
 	groupId INTEGER,
 	PRIMARY KEY (userId, groupId),
-	FOREIGN KEY (groupId) REFERENCES Groups(groupId) ON DELETE CASCADE,
-	FOREIGN KEY (userId) REFERENCES UserData(userId) ON DELETE CASCADE
+	CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
+		REFERENCES Groups(groupId) 
+		ON DELETE CASCADE 
+		ON UPDATE CASCADE,
+	CONSTRAINT constraint_userid_fkey FOREIGN KEY (userId) 
+		REFERENCES Userdata(userId) 
+		ON DELETE CASCADE 
+		ON UPDATE CASCADE
 );
-*/
 
 
---New
-CREATE TABLE IF NOT EXISTS public.userincourse
-(
-    userid integer NOT NULL,
-    courseid integer NOT NULL,
-    userrole text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT userincourse_pkey PRIMARY KEY (userid, courseid),
-    CONSTRAINT constraint_courseid_fkey FOREIGN KEY (courseid)
-        REFERENCES public.courses (courseid) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT constraint_userid_fkey FOREIGN KEY (userid)
-        REFERENCES public.userdata (userid) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT userincourse_userrole_check CHECK (userrole = ANY (ARRAY['Admin'::text, 'Teacher'::text, 'Student'::text]))
-)
-/* --Old
 CREATE TABLE UserInCourse (
 	userId INTEGER,
 	courseId INTEGER,
 	userRole TEXT NOT NULL CHECK (userRole IN ('Admin', 'Teacher', 'Student')),
 	PRIMARY KEY (userId, courseId),
-	FOREIGN KEY (courseId) REFERENCES Courses(courseId) ON DELETE CASCADE,
-	FOREIGN KEY (userId) REFERENCES UserData(userId) ON DELETE CASCADE
-);*/
+		CONSTRAINT constraint_courseid_fkey FOREIGN KEY (courseId) 
+		REFERENCES Courses(courseId) 
+		ON DELETE CASCADE 
+		ON UPDATE CASCADE,
+	CONSTRAINT constraint_userid_fkey FOREIGN KEY (userId) 
+		REFERENCES Userdata(userId) 
+		ON DELETE CASCADE 
+		ON UPDATE CASCADE
+);
 
 
 --View for user and course data can be called for course inf from specific user:
 --To Call do: select * from user_course_info where userId = 'id int';
 
 CREATE OR REPLACE VIEW UserCourseInfo AS
-SELECT uic.userId, uic.userRole, c.courseId, c.courseName, c.Course, c.TeachingPeriod, c.CourseYear
+SELECT uic.userId, uic.userRole, c.courseId, c.courseName, c.course, c.teachingPeriod, c.courseYear
 FROM UserInCourse uic
-JOIN Courses c ON uic.courseId = c.CourseId;
+JOIN Courses c ON uic.courseId = c.courseId;
 
 
 --This view shows user and its courses with corresponding groups. Useful to get group info if user and course id is known
 
 CREATE OR REPLACE VIEW UserGroupCourseInfo AS
-SELECT uig.userId, uig.groupId, g.groupNumber, g.course as courseId, c.Course, c.courseyear, c.teachingperiod
+SELECT uig.userId, uig.groupId, g.groupNumber, g.course AS courseId, c.course, c.courseYear, c.teachingPeriod
 FROM UserInGroup uig
 JOIN Groups g ON uig.groupId = g.groupId
-JOIN Courses c ON g.course = c.CourseId;
+JOIN Courses c ON g.course = c.courseId;
 
 
 --This view shows all user and group information, eg. used to get all groupmember cids from your group 
