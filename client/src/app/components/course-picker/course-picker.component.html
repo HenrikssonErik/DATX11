@@ -1,102 +1,63 @@
 <!--TODO: ADD A WRAPPER CLASS HERE FOR COURSEPICKER AND ASSIGNMENTS-->
 <div *ngIf="courses">
-  <div *ngIf="showCourses">
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button
-          class="nav-link active me-4"
-          id="current-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#current-tab-pane"
-          type="button"
-          role="tab"
-          aria-controls="current-tab-pane"
-          aria-selected="true"
-        >
-          Current Courses
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button
-          class="nav-link me-4"
-          id="upcoming-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#upcoming-tab-pane"
-          type="button"
-          role="tab"
-          aria-controls="upcoming-tab-pane"
-          aria-selected="false"
-        >
-          Upcoming
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button
-          class="nav-link me-4"
-          id="completed-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#completed-tab-pane"
-          type="button"
-          role="tab"
-          aria-controls="completed-tab-pane"
-          aria-selected="false"
-        >
-          Completed
-        </button>
-
-        <button
-          *ngIf="isTeacher()"
-          class="nav-link me-4"
-          id="create-course"
-          data-bs-toggle="tab"
-          data-bs-target="#create-course-tab-pane"
-          type="button"
-          role="tab"
-          aria-controls="create-course-tab-pane"
-          aria-selected="false"
-          onclick=""
-        >
-          Create Course
-        </button>
-      </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-      <div
-        class="tab-pane fade show active"
-        id="current-tab-pane"
-        role="tabpanel"
-        aria-labelledby="current-tab"
-        tabindex="0"
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link active me-4"
+        id="current-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#current-tab-pane"
+        type="button"
+        role="tab"
+        aria-controls="current-tab-pane"
+        aria-selected="true"
       >
-        <div class="mt-3">
-          <app-course
-            (click)="goToCourse(course.courseID)"
-            [data]="course"
-            *ngFor="let course of courses"
-          ></app-course>
-        </div>
-      </div>
-      <div
-        class="tab-pane fade"
-        id="upcoming-tab-pane"
-        role="tabpanel"
-        aria-labelledby="upcoming-tab"
-        tabindex="0"
+        Current Courses
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link me-4"
+        id="upcoming-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#upcoming-tab-pane"
+        type="button"
+        role="tab"
+        aria-controls="upcoming-tab-pane"
+        aria-selected="false"
       >
-        <p>
-          Here we should see courses with a startdate later than today's date.
-        </p>
-      </div>
-      <div
-        class="tab-pane fade"
-        id="completed-tab-pane"
-        role="tabpanel"
-        aria-labelledby="completed-tab"
-        tabindex="0"
+        Upcoming
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link me-4"
+        id="completed-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#completed-tab-pane"
+        type="button"
+        role="tab"
+        aria-controls="completed-tab-pane"
+        aria-selected="false"
       >
-        <p>
-          Here we should see courses that has a end date less than todays date
-        </p>
+        Completed
+      </button>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div
+      class="tab-pane fade show active"
+      id="current-tab-pane"
+      role="tabpanel"
+      aria-labelledby="current-tab"
+      tabindex="0"
+    >
+      <div class="mt-3">
+        <app-course
+          (click)="goToCourse(course.courseID)"
+          [data]="course"
+          *ngFor="let course of courses"
+        ></app-course>
       </div>
       <div
         class="tab-pane fade"
@@ -113,6 +74,30 @@
         <img src="assets\teaching.svg" height="220" width="auto" />
       </div>
     </div>
-    <router-outlet></router-outlet>
+    <div
+      class="tab-pane fade"
+      id="upcoming-tab-pane"
+      role="tabpanel"
+      aria-labelledby="upcoming-tab"
+      tabindex="0"
+    >
+      <p>
+        Here we should see courses with a startdate later than today's date.
+      </p>
+    </div>
+    <div
+      class="tab-pane fade"
+      id="completed-tab-pane"
+      role="tabpanel"
+      aria-labelledby="completed-tab"
+      tabindex="0"
+    >
+      <p>
+        Here we should see courses that has a end date less than todays date
+      </p>
+    </div>
+  </div>
+  <div class="teachingIllu">
+    <img src="assets\teaching.svg" height="220" width="auto" />
   </div>
 </div>
