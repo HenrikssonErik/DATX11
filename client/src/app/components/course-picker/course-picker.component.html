@@ -42,16 +42,17 @@
       >
         Completed
       </button>
-
+    </li>
+    <li>
       <button
         *ngIf="isTeacher()"
         class="nav-link me-4"
-        id="upcoming-tab"
+        id="createCourse-tab"
         data-bs-toggle="tab"
-        data-bs-target="#upcoming-tab-pane"
+        data-bs-target="#createCourse-tab-pane"
         type="button"
         role="tab"
-        aria-controls="upcoming-tab-pane"
+        aria-controls="createCourse-tab-pane"
         aria-selected="false"
       >
         Create Course
@@ -95,6 +96,15 @@
       <p>
         Here we should see courses that has a end date less than todays date
       </p>
+    </div>
+    <div
+      class="tab-pane fade"
+      id="createCourse-tab-pane"
+      role="tabpanel"
+      aria-labelledby="createCourse-tab"
+      tabindex="0"
+    >
+      <p>Here will be content to create a course</p>
     </div>
   </div>
   <div class="teachingIllu">
