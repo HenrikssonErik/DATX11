@@ -95,13 +95,17 @@
               }}</span>
             </p>
           </div>
-          <div class="col-md-3">
-            <h5>Group #69</h5>
-            <p>
-              Malte Carlstedt <br />
-              Alfred Karlsson <br />
-              Gabbe Gabster
-            </p>
+          <div class="col-md-3" *ngIf="group">
+            <h5>Group {{ group.groupId }}</h5>
+
+            <ng-container *ngIf="group.groupMembers.length > 0">
+              <p
+                style="padding: 0; margin: 0"
+                *ngFor="let member of group.groupMembers"
+              >
+                {{ member }}
+              </p>
+            </ng-container>
           </div>
 
           <div class="col-md-5">

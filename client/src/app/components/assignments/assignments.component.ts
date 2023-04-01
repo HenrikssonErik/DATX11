@@ -14,6 +14,7 @@ import { API_URL } from 'src/environments/environment';
 export class AssignmentsComponent implements OnInit {
   course: Course = {} as Course;
   selectedTab: number = 0;
+  group: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -31,6 +32,7 @@ export class AssignmentsComponent implements OnInit {
 
     this.getGroup(id).subscribe((res: Course) => {
       console.log(res);
+      this.group = res;
     });
   }
 
