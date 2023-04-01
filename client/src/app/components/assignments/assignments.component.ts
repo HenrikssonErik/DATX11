@@ -29,7 +29,7 @@ export class AssignmentsComponent implements OnInit {
       });
     }
 
-    this.getGroup().subscribe((res: Course) => {
+    this.getGroup(id).subscribe((res: Course) => {
       console.log(res);
     });
   }
@@ -46,15 +46,14 @@ export class AssignmentsComponent implements OnInit {
     window.history.back();
   }
 
-  getGroup(): Observable<Course> {
+  getGroup(id: number): Observable<Course> {
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
-    return this.http.get<Course>(`${API_URL}/getMyGroup`, {
+    return this.http.get<Course>(`${API_URL}/getMyGroup?Course=${id}`, {
       headers,
     });
   }
-
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('sv-SE');
   }
