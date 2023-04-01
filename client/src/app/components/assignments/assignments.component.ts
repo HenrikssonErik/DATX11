@@ -1,7 +1,10 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Assignment } from 'src/app/models/courses';
+import { Observable } from 'rxjs';
+import { Assignment, Course } from 'src/app/models/courses';
 import { CourseService } from 'src/app/services/course-service.service';
+import { API_URL } from 'src/environments/environment';
 
 @Component({
   selector: 'app-assignments',
@@ -9,19 +12,51 @@ import { CourseService } from 'src/app/services/course-service.service';
   styleUrls: ['./assignments.component.scss'],
 })
 export class AssignmentsComponent implements OnInit {
-  assignments: any;
+  course: Course = {} as Course;
+  selectedTab: number = 0;
+  group: any;
 
   constructor(
     private route: ActivatedRoute,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
     const id = parseInt(this.route.snapshot.paramMap?.get('id') || '', 10);
     if (!isNaN(id)) {
-      this.courseService.getCourse(id).subscribe((res) => {
-        this.assignments = res;
+      this.courseService.getCourse(id).subscribe((res: Course) => {
+        this.course = res;
       });
     }
+
+    this.getGroup(id).subscribe((res: Course) => {
+      console.log(res);
+      this.group = res;
+    });
+  }
+
+  get isAdmin(): boolean {
+    return this.course.Role === 'Admin' || this.course.Role === 'Teacher';
+  }
+
+  onTabSelect(tabNumber: number): void {
+    this.selectedTab = tabNumber;
+  }
+
+  goBack(): void {
+    window.history.back();
+  }
+
+  getGroup(id: number): Observable<Course> {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+    return this.http.get<Course>(`${API_URL}/getMyGroup?Course=${id}`, {
+      headers,
+    });
+  }
+  formatDate(date: Date): string {
+    return new Date(date).toLocaleDateString('sv-SE');
   }
 }

@@ -14,5 +14,6 @@ export interface Course {
 
 export interface Assignment {
   AssignmentNr: number;
+  Description: string;
   DueDate: Date;
 }

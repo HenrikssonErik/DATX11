@@ -8,15 +8,30 @@ import { LoginComponent } from './components/login/login.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { AuthguardGuard } from './authguard.guard';
 import { AssignmentsComponent } from './components/assignments/assignments.component';
+import { CoursePickerComponent } from './components/course-picker/course-picker.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'login', component: LoginComponent },
   {
     path: 'courses',
-    component: CoursesComponent,
     canActivate: [AuthguardGuard],
-    children: [{ path: ':id', component: AssignmentsComponent }],
+    component: CoursesComponent,
+    children: [
+      {
+        path: '',
+        component: CoursePickerComponent,
+      },
+      {
+        path: ':id',
+        component: AssignmentsComponent,
+      },
+    ],
+  },
+  {
+    path: 'courses/:id',
+    canActivate: [AuthguardGuard],
+    component: AssignmentsComponent,
   },
   { path: 'upload', component: FileUploadComponent },
   { path: '404', component: PageNotFoundComponent },

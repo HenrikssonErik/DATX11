@@ -1,30 +1,27 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Assignment, Course } from 'src/app/models/courses';
 import { Location } from '@angular/common';
+import { CourseService } from 'src/app/services/course-service.service';
 @Component({
   selector: 'app-course-picker',
   templateUrl: './course-picker.component.html',
   styleUrls: ['./course-picker.component.scss'],
 })
 export class CoursePickerComponent implements OnInit {
-  @Input() courses: Course[] = [];
-  showCourses = true;
+  courses: Course[] = [];
 
-  constructor(private router: Router, private location: Location) {}
+  constructor(private router: Router, private courseService: CourseService) {}
 
   ngOnInit(): void {
-    //TODO: Don't like this.
-    this.location.onUrlChange((url: string) => {
-      if (url.endsWith('/courses') && !this.showCourses) {
-        this.showCourses = true;
-      }
+    //TODO: FIX so that we dont have to call this twice. Once here and once in courses.component.ts
+    this.courseService.getCourses().subscribe((res: Course[]) => {
+      this.courses = res;
     });
   }
 
   goToCourse(id: number) {
-    this.showCourses = false;
-    this.router.navigate(['/courses', id]);
+    this.router.navigate([`courses/${id}`]);
   }
 
   isTeacher(): boolean {

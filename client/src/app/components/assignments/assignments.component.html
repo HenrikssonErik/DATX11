@@ -1,1 +1,136 @@
-<p>assignments works!</p>
+<app-spinner></app-spinner>
+<div class="text-muted" *ngIf="course">
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        [class.active]="selectedTab === null"
+        (click)="goBack()"
+      >
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation" *ngIf="isAdmin">
+      <button
+        class="nav-link"
+        [class.active]="selectedTab === -1"
+        [id]="'tab-settings'"
+        [attr.data-bs-toggle]="'tab'"
+        [attr.data-bs-target]="'#tab-pane-settings'"
+        type="button"
+        role="tab"
+        [attr.aria-controls]="'tab-pane-settings'"
+        [attr.aria-selected]="selectedTab === -1"
+        (click)="selectedTab = -1"
+        translate
+      >
+        Settings
+      </button>
+    </li>
+    <li
+      class="nav-item"
+      role="presentation"
+      *ngFor="let assignment of course.Assignments; let i = index"
+    >
+      <button
+        class="nav-link"
+        [class.active]="selectedTab === i"
+        [id]="'tab-' + assignment.AssignmentNr"
+        [attr.data-bs-toggle]="'tab'"
+        [attr.data-bs-target]="'#tab-pane-' + assignment.AssignmentNr"
+        type="button"
+        role="tab"
+        [attr.aria-controls]="'tab-pane-' + assignment.AssignmentNr"
+        [attr.aria-selected]="selectedTab === i"
+        (click)="selectedTab = i"
+      >
+        <span translate>Assignment </span>{{ assignment.AssignmentNr }}
+      </button>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade" *ngIf="selectedTab === null"></div>
+    <div
+      class="tab-pane fade"
+      [id]="'tab-pane-settings'"
+      *ngIf="selectedTab === -1"
+      role="tabpanel"
+      [attr.aria-labelledby]="'tab-settings'"
+      [class.show]="selectedTab === -1"
+      [class.active]="selectedTab === -1"
+    >
+      <!--CONTENT FOR SETTINGS-->
+      <p>Settings content goes here</p>
+    </div>
+    <div
+      class="tab-pane fade"
+      [id]="'tab-pane-' + assignment.AssignmentNr"
+      *ngFor="let assignment of course.Assignments; let i = index"
+      role="tabpanel"
+      [attr.aria-labelledby]="'tab-' + assignment.AssignmentNr"
+      [class.show]="selectedTab === i"
+      [class.active]="selectedTab === i"
+    >
+      <!--CONTENT FOR ASSIGNMENTS-->
+      <div class="card mt-3">
+        <div class="header">
+          <h5>
+            <span>{{ course.CourseName }} - {{ course.Course }} - </span
+            ><span translate>Assignment </span>{{ assignment.AssignmentNr }}
+          </h5>
+          <h5><i class="fa-solid fa-ellipsis-vertical courseIcon"></i></h5>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-2">
+            <h5>Teacher</h5>
+            <p>Livets Hårda Skola</p>
+          </div>
+          <div class="col-md-2">
+            <h5>Due Date</h5>
+            <p>
+              <span class="due-date-icon"
+                ><i class="fa-regular fa-calendar-days"></i></span
+              ><span class="due-date">{{
+                formatDate(assignment.DueDate)
+              }}</span>
+            </p>
+          </div>
+          <div class="col-md-3" *ngIf="group">
+            <h5>Group {{ group.groupId }}</h5>
+
+            <ng-container *ngIf="group.groupMembers.length > 0">
+              <p
+                style="padding: 0; margin: 0"
+                *ngFor="let member of group.groupMembers"
+              >
+                {{ member }}
+              </p>
+            </ng-container>
+          </div>
+
+          <div class="col-md-5">
+            <h5>Description</h5>
+            <p>{{ assignment.Description }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <h4>Submission</h4>
+          <div class="card">
+            <p>Here I'll have the fileupload and submission status</p>
+            <button class="btn btn-primary">
+              Upload <i class="fa-solid fa-upload"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h4>Feedback</h4>
+          <div class="card">
+            <p>Here I'll have the feedback</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
