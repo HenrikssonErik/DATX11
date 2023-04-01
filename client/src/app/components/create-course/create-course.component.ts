@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
 
 @Component({
   selector: 'app-create-course',
@@ -13,6 +14,16 @@ export class CreateCourseComponent {
     lp: null,
     year: this.minYear(),
   };
+
+  constructor(private tooltipEnabler: TooltipEnablerService) {}
+
+  ngOnInit(): void {
+    this.enableTooltips();
+  }
+
+  private enableTooltips(): void {
+    this.tooltipEnabler.enableTooltip();
+  }
 
   onSubmit() {
     // Handle form submission
