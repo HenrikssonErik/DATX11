@@ -5,6 +5,11 @@ import {
   HttpClientModule,
   HTTP_INTERCEPTORS,
 } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpClientModule,
+  HTTP_INTERCEPTORS,
+} from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
@@ -46,13 +51,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     TestFeedbackCardComponent,
     SpinnerComponent,
     LoginComponent,
-    HomePageComponent,
-    PageNotFoundComponent,
-    CoursesComponent,
-    CourseComponent,
-    CoursePickerComponent,
-    AssignmentsComponent,
-    CreateCourseComponent,
   ],
   imports: [
     BrowserModule,
@@ -63,16 +61,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
     ReactiveFormsModule,
-    MatTabsModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
-      },
-    }),
   ],
-  exports: [MatTabsModule],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
