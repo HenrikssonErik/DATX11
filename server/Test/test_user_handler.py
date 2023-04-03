@@ -22,7 +22,7 @@ class TestUserHandler(unittest.TestCase):
 
     @patch('psycopg2.connect')
     def test_get_group(self, mock_connect):
-        with patch.object(user_handler, '__get_group_members') as mock_groups:
+        with patch.object(user_handler, '_get_group_members') as mock_groups:
             mock_cursor = setup_mock_cursor(mock_connect)
             mock_cursor.fetchone.return_value = (2, 1)
             mock_groups.return_value = ['alebru']
