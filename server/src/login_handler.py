@@ -121,7 +121,7 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
                 ))
                 status = 'success'
                 res_code = 200
-            except psycopg2.IntegrityError as e:
+            except psycopg2.IntegrityError:
                 status = 'already_registered'
                 res_code = 406
     conn.close()
@@ -180,12 +180,12 @@ def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
     return {'Token': token}, 200
 
 
-def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
-                                                             Literal[200, 406, 500]]:
+def verify_user_from_email_verification(token: str) -> \
+        tuple[dict[str, str], Literal[200, 406, 500]]:
     """
     Verifies if a token is issued by this system and if it is still valid.
-    Returns the either the cid and success-code, indicator that the cid is not present
-    in the database and an errorcode, or raises an error.
+    Returns the either the cid and success-code, indicator that the cid is
+    not present in the database and an errorcode, or raises an error.
     """
     try:
         # print(__SECRET_KEY)
@@ -194,7 +194,8 @@ def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
                                          algorithms=['HS256'])
         cid: str = decoded_token['cid']
         verification_response: tuple[dict[str, str],
-                                     Literal[200, 406, 500]] = verify_user_in_db(cid)
+                                     Literal[200, 406, 500]] = \
+            verify_user_in_db(cid)
         # If decoding was successful, return the user id
 
         return verification_response
@@ -212,9 +213,11 @@ def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
         raise jwt.InvalidTokenError('Invalid token')
 
 
-def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406, 500]]:
+def verify_user_in_db(cid: str) -> \
+        tuple[dict[str, str], Literal[200, 406, 500]]:
     """
-    Updates the cid taken to verified=true. If the database doesn't contain the cid,
+    Updates the cid taken to verified=true.
+    If the database doesn't contain the cid,
     the function will return that as a status code.
     """
     conn = psycopg2.connect(get_conn_string())
