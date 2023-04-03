@@ -1,12 +1,10 @@
-import src.course_handler as course_handler
 import sys
 from pathlib import Path
 import unittest
 from unittest.mock import MagicMock, patch
 
-
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-
+import src.course_handler as course_handler  # noqa: E402
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
     mock_cursor = MagicMock()
