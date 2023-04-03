@@ -138,9 +138,9 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         if not data:
             raise Exception("Wrong Credentials")
         if (bcrypt.checkpw(password.encode('utf8'), passphrase)):
-            returnDict: dict[str, str] = create_token(id)
-            returnDict['GlobalRole'] = data[2]
-            return returnDict, 200
+            return_dict: dict[str, str] = {"Token":create_token(id)}
+            return_dict['GlobalRole'] = data[2]
+            return return_dict, 200
         else:
             raise Exception("Wrong Credentials")
 
@@ -149,7 +149,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         return {'status': "wrong_credentials"}, 401
 
 
-def create_token(id: int) -> dict[str, str]:
+def create_token(id: int) -> str:
     """Creates a token to verify a User that is valid for one hour."""
     data = {'iss': 'Hydrant',
             'id': id,
@@ -157,7 +157,7 @@ def create_token(id: int) -> dict[str, str]:
             }
 
     token = jwt.encode(payload=data, key=__SECRET_KEY)
-    return {'Token': token}
+    return token
 
 
 def verify_and_get_id(token: str) -> int:

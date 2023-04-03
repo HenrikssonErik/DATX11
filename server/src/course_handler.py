@@ -24,7 +24,7 @@ def create_course(course_name: str, course_abbr: str, year: int,
         return response, 400
 
     else:
-        id = __create_course(course_name, course_abbr, year, teaching_period)
+        id = _create_course(course_name, course_abbr, year, teaching_period)
     return id
 
 
@@ -56,7 +56,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         return [{'status': "No Courses Found"}]
 
 
-def get_course_info(user_id: int, course_id: int):
+def get_course_info(user_id: int, course_id: int) -> dict[str:any]:
     """Returns a dict with information on the specified course associated to
     the user_id, course_id"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -87,7 +87,7 @@ def get_course_info(user_id: int, course_id: int):
         return [{'status': "No Courses Found"}]
 
 
-def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
+def add_groups_to_course(number_of_groups: int, course_id: int):
     """Creates a number of groups to the specified course, group number is set
     to the following integer that isnt already used for that course"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -113,7 +113,7 @@ def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
         return None
 
 
-def __create_course(course_name: str, course_abbr: str, year: int,
+def _create_course(course_name: str, course_abbr: str, year: int,
                     teaching_period: int) -> int | tuple:
     """Internal method to create a course, used by create_course method after verification of data
     Returnsthe new course ID"""
@@ -189,10 +189,10 @@ def get_assignments(course_id: int) -> tuple:
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
                 assignments: list[dict[str:any]] = []
-                for assignmentRow in data:
-                    assignments.append({'AssignmentNr': assignmentRow[0],
-                                        'DueDate': assignmentRow[1],
-                                        'Description': assignmentRow[2]})
+                for assignment_row in data:
+                    assignments.append({'AssignmentNr': assignment_row[0],
+                                        'DueDate': assignment_row[1],
+                                        'Description': assignment_row[2]})
         conn.close()
         if not data:
             return []
@@ -214,7 +214,7 @@ def change_description(new_desc: str, course_id: int,
                 query_data = """UPDATE assignments set description = %s
                                 WHERE courseid = %s and assignment = %s"""
                 cur.execute(query_data, [new_desc, course_id, assignment])
-                
+
         conn.close()
         return None
 
@@ -226,7 +226,7 @@ def change_description(new_desc: str, course_id: int,
 # TODO: not done or tested, returns statements must be fixed
 def set_teacher_feedback(group_id: int, feedback: str, grade: bool, 
                          passed: bool, course: int, assignment: int):
-    """Submission is set to 0 since a primary cannot be null. 
+    """Submission is set to 0 since a primary cannot be null.
     It will increment by default anyway."""
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
@@ -268,7 +268,7 @@ def change_end_date(course: int, assignment: int,
 
 
 def add_filenames(file_names: list, course_id: int,
-                  assignment: int) -> None:
+                  assignment: int):
     """ Adds thelist of filenames to allowed filenames for the specified
     assignment"""
     conn = psycopg2.connect(dsn=get_conn_string())
