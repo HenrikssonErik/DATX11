@@ -63,7 +63,7 @@ def postFiles():
 
 
 @app.route('/unitTest', methods=['POST'])
-def postTests():
+def post_tests():
     print(request)
     files = request.files.getlist('files')
 
@@ -74,7 +74,7 @@ def postTests():
 
 
 @app.route('/getAssignmentFile', methods=['POST'])
-def getFiles():
+def get_files():
     """
     Takes in information from the frontend about a specific course assignment
       file to then return its file content.
@@ -101,7 +101,7 @@ def getFiles():
 
 
 @app.route('/getUserInfo', methods=['GET'])
-def getUserInfo():
+def get_user_info():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
 
@@ -113,7 +113,7 @@ def getUserInfo():
 
 
 @app.route('/getCourses', methods=['GET'])
-def getCourses():
+def get_courses():
     """Returns an array of all Courses a user is associated with together with
        the following information: Role, CourseID, Course (abbriviation),
        Year, StudyPeriod
@@ -132,7 +132,7 @@ def getCourses():
 
 
 @app.route('/getCourse', methods=['GET'])
-def getCourse():
+def get_course():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course_id = request.args.get('Course')
@@ -145,7 +145,7 @@ def getCourse():
 
 
 @app.route('/getMyGroup', methods=['GET'])
-def getMyGroup():
+def get_my_group():
     """Takes a Token as cookie, and a course_id.
     Returns the group_id, group_number and cid of members"""
     token = extract_token(request)
@@ -160,7 +160,7 @@ def getMyGroup():
 
 
 @app.route('/addToGroup', methods=['POST'])
-def addToGroup():
+def add_to_group():
     token = extract_token(request)
     request_user = verify_and_get_id(token)
     data = request.get_json()
@@ -176,7 +176,7 @@ def addToGroup():
 
 
 @app.route('/removeFromGroup', methods=['POST'])
-def removeFromGroup():
+def remove_from_group():
     token = extract_token(request)
     request_user = verify_and_get_id(token)
     data = request.get_json()
@@ -194,7 +194,7 @@ def removeFromGroup():
 # Should probably be redone to take a list of users, redo how singup works
 # as well with cid/email being added to the list first
 @app.route('/addToCourse', methods=['POST'])
-def addToCourse():
+def add_to_course():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -210,7 +210,7 @@ def addToCourse():
 
 
 @app.route('/removeFromCourse', methods=['POST'])
-def removeFromCourse():
+def remove_from_course():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -225,7 +225,7 @@ def removeFromCourse():
 
 
 @app.route('/createCourse', methods=['POST'])
-def createCourse():
+def create_course():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -252,7 +252,7 @@ def createCourse():
 
 
 @app.route('/createAssignment', methods=['POST'])
-def createAssignment():
+def create_assignment():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -274,7 +274,7 @@ def createAssignment():
 
 
 @app.route('/changeUserRole', methods=['POST'])
-def changeUserRole():
+def change_user_role():
     """Course admins can call this method to change a users role in a course.
         E.g from Student to TA (Teacher)
         Returns: Status Code 200, 401"""
@@ -298,7 +298,7 @@ def changeUserRole():
 
 
 @app.route('/editDescription', methods=['POST'])
-def editDesc():
+def edit_desc():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
