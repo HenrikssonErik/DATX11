@@ -236,10 +236,11 @@ def createCourse():
     year: int = data['Year']
     lp: int = data['TeachingPeriod']
     groups: int = data['Groups']
+    abbreviation: str = data['Abbreviation']
     role = get_global_role(request_user_id)
 
     if (role == "Admin" or role == "Teacher"):
-        course_id = create_course(course, year, lp)
+        course_id = create_course(course, abbreviation, year, lp)
 
         if (type(course_id) == tuple):
             return make_response(jsonify(course_id[0]), course_id[1])

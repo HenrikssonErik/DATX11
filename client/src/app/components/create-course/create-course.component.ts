@@ -1,5 +1,11 @@
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { UntypedFormBuilder } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { ToastrResponseService } from 'src/app/services/toastr-response.service';
 import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
+import { API_URL } from 'src/environments/environment';
+import { CourseService } from 'src/app/services/course-service.service';
 
 @Component({
   selector: 'app-create-course',
@@ -8,14 +14,20 @@ import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service'
 })
 export class CreateCourseComponent {
   formData = {
-    name: '',
-    abbreviation: '',
-    groups: null,
-    lp: null,
-    year: this.minYear(),
+    Course: null,
+    Abbreviation: null,
+    Groups: null,
+    TeachingPeriod: null,
+    Year: this.minYear(),
   };
 
-  constructor(private tooltipEnabler: TooltipEnablerService) {}
+  constructor(
+    private tooltipEnabler: TooltipEnablerService,
+    private toastr: ToastrService,
+    private toastrResponse: ToastrResponseService,
+    private http: HttpClient,
+    private courseService: CourseService
+  ) {}
 
   ngOnInit(): void {
     this.enableTooltips();
@@ -25,10 +37,38 @@ export class CreateCourseComponent {
     this.tooltipEnabler.enableTooltip();
   }
 
-  onSubmit() {
+  onSubmit(): void {
     // Handle form submission
-    console.log('onSubmit');
-    console.log(this.formData);
+
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/createCourse`, this.formData, {
+        observe: 'response',
+        headers: headers,
+      })
+      .subscribe({
+        next: (response: any) => {
+          try {
+            if (response.status == 200) {
+              this.toastr.success('', response.body);
+              //TODO: update courselist here
+            }
+          } catch {
+            throw new Error('unexpected_error');
+          }
+        },
+        error: (err) => {
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+      });
   }
 
   minYear(): number {
