@@ -53,7 +53,7 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
         orderedData: dict = {}
         orderedData["groupId"] = data[0]
         orderedData["groupNumber"] = data[1]
-        group_members = __get_group_members(data[0])
+        group_members = _get_group_members(data[0])
         print(group_members)
         orderedData["groupMembers"] = group_members
         return orderedData
@@ -63,7 +63,7 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
         return {'status': "No Group Found"}
 
 
-def __get_group_members(group_id: int) -> list:
+def _get_group_members(group_id: int) -> list:
     """ Internal method to retrieve all members of a group"""
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
@@ -93,7 +93,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
     user_courses = get_courses_info(user_id)
     conn = psycopg2.connect(dsn=get_conn_string())
 
-    course_id = __get_course_id_from_group(group_id)
+    course_id = _get_course_id_from_group(group_id)
 
     # add to group
     try:
@@ -112,7 +112,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
         return {'status': e.args}
 
 
-def __get_course_id_from_group(group_id) -> int:
+def _get_course_id_from_group(group_id) -> int:
     """Returns a groups associated course, only ment for internal use"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
