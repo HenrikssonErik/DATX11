@@ -18,8 +18,7 @@ def create_key():
     or login/registration will fail
     """
     global __SECRET_KEY
-    __SECRET_KEY = "g"
-    # random_string()
+    __SECRET_KEY = random_string()
 
 
 def random_string() -> str:
@@ -168,7 +167,8 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
 
 def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
     """
-    Creates a token to verify a User that is valid for one hour.
+    Creates a token to verify a User that is valid for 24 hours.
+    This token is sent in the verification email to the user registering.
     """
     data = {
         'iss': 'Hydrant',
@@ -183,8 +183,9 @@ def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
 def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
                                                              Literal[200, 406, 500]]:
     """
-    Verifys if a token is issued by this system and if it is still valid.
-    Returns the User_id or an error message
+    Verifies if a token is issued by this system and if it is still valid.
+    Returns the either the cid and success-code, indicator that the cid is not present
+    in the database and an errorcode, or raises an error.
     """
     try:
         # print(__SECRET_KEY)
@@ -212,6 +213,10 @@ def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
 
 
 def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406, 500]]:
+    """
+    Updates the cid taken to verified=true. If the database doesn't contain the cid,
+    the function will return that as a status code.
+    """
     conn = psycopg2.connect(get_conn_string())
     with conn:
         with conn.cursor() as cur:
@@ -223,7 +228,8 @@ def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406, 500]]
                     cid,
                 ))
 
-                if (cur.rowcount == 0):  # TODO: Om rowcount=0, raise exception
+                if (cur.rowcount == 0):
+                    conn.close()
                     return {'status': 'no_user_to_verify'}, 406
                 print("\n\n\n", cur.rowcount, "\n\n\n")
                 status = 'success'
