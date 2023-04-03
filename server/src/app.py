@@ -7,8 +7,8 @@ from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
 from .login_handler import user_registration, log_in, create_key,\
                             verify_and_get_id
-from .user_handler import *
-from .course_handler import *
+from . import user_handler
+from . import course_handler
 
 # creating the Flask application
 app = Flask(__name__)
@@ -106,7 +106,7 @@ def getUserInfo():
     user_id = verify_and_get_id(token)
 
     if (user_id):
-        user_info = get_user(user_id)
+        user_info = user_handler.get_user(user_id)
         return make_response(jsonify(user_info), 200)
     else:
         return make_response("", 401)
@@ -123,7 +123,7 @@ def getCourses():
 
     if (user_id):
         course_info: dict = {}
-        course_info['courses'] = get_courses_info(user_id)
+        course_info['courses'] = course_handler.get_courses_info(user_id)
         res = make_response(jsonify(course_info), 200)
         return res
 
@@ -138,7 +138,7 @@ def getCourse():
     course_id = request.args.get('Course')
 
     if (user_id):
-        course = get_course_info(user_id, course_id)
+        course = course_handler.get_course_info(user_id, course_id)
         return make_response(jsonify(course), 200)
     else:
         return make_response("", 401)
@@ -152,7 +152,7 @@ def getMyGroup():
     user_id = verify_and_get_id(token)
     if (user_id):
         course = request.args.get('Course')
-        group = get_group(user_id, course)
+        group = user_handler.get_group(user_id, course)
         return make_response(jsonify(group), 200)
 
     else:
@@ -168,9 +168,9 @@ def addToGroup():
     group_id: int = data['Group']
     course_id = data['Course']
 
-    if (check_admin_or_course_teacher(request_user, course_id) or
+    if (user_handler.check_admin_or_course_teacher(request_user, course_id) or
        request_user == user_to_add):
-        add_user_to_group(user_to_add, group_id)
+        user_handler.add_user_to_group(user_to_add, group_id)
         return make_response("", 200)
     return make_response("", 401)
 
@@ -184,9 +184,9 @@ def removeFromGroup():
     group_id = data['Group']
     course_id = data['Course']
 
-    if (check_admin_or_course_teacher(request_user, course_id) or
+    if (user_handler.check_admin_or_course_teacher(request_user, course_id) or
        request_user == user_to_remove):
-        remove_user_from_group(user_to_remove, group_id)
+        user_handler.remove_user_from_group(user_to_remove, group_id)
         return make_response("", 200)
     return make_response("", 401)
 
@@ -202,8 +202,9 @@ def addToCourse():
     user_to_add: int = data['User']
     role = data['Role']
 
-    if (check_admin_or_course_teacher(request_user_id, course_id)):
-        add_user_to_course(user_to_add, course_id, role)
+    if (user_handler.check_admin_or_course_teacher(request_user_id,
+                                                   course_id)):
+        user_handler.add_user_to_course(user_to_add, course_id, role)
         return make_response("", 200)
     return make_response("", 401)
 
@@ -216,8 +217,9 @@ def removeFromCourse():
     course_id = data['Course']
     user_to_remove = data['User']
 
-    if (check_admin_or_course_teacher(request_user_id, course_id)):
-        remove_user_from_course(user_to_remove, course_id)
+    if (user_handler.check_admin_or_course_teacher(request_user_id,
+                                                   course_id)):
+        user_handler.remove_user_from_course(user_to_remove, course_id)
         return make_response("", 200)
     return make_response("", 401)
 
@@ -232,16 +234,18 @@ def createCourse():
     lp: int = data['TeachingPeriod']
     groups: int = data['Groups']
     abbreviation: str = data['Abbreviation']
-    role = get_global_role(request_user_id)
+    role = user_handler.get_global_role(request_user_id)
 
     if (role == "Admin" or role == "Teacher"):
-        course_id = create_course(course, abbreviation, year, lp)
+        course_id = course_handler.create_course(course, abbreviation, year,
+                                                 lp)
 
         if (type(course_id) == tuple):
             return make_response(jsonify(course_id[0]), course_id[1])
         else:
-            add_groups_to_course(groups, course_id)
-            add_user_to_course(request_user_id, course_id, Role.Admin)
+            course_handler.add_groups_to_course(groups, course_id)
+            user_handler.add_user_to_course(request_user_id, course_id,
+                                            user_handler.Role.Admin)
             return make_response(jsonify('Course Created'), 200)
     else:
         return make_response("Not allowed to create course", 401)
@@ -258,9 +262,11 @@ def createAssignment():
     assignment_nr = data['AssignmentNr']
     file_names = data.get('FileNames', [])
 
-    if (check_admin_or_course_teacher(request_user_id, course_id)):
-        res = create_assignment(course_id, description, assignment_nr,
-                                end_date, file_names)
+    if (user_handler.check_admin_or_course_teacher(request_user_id,
+                                                   course_id)):
+        res = course_handler.create_assignment(course_id, description,
+                                               assignment_nr, end_date,
+                                               file_names)
         if not (len(res) == 0):
             return make_response(jsonify(res), 400)
         else:
@@ -279,8 +285,9 @@ def changeUserRole():
     user_to_change = data['User']
     new_role = data['Role']
     # TODO: check so user dont change theri own role
-    if (is_admin_on_course(request_user_id, course)):
-        res = change_role_on_course(new_role, user_to_change, course)
+    if (user_handler.is_admin_on_course(request_user_id, course)):
+        res = user_handler.change_role_on_course(new_role, user_to_change,
+                                                 course)
 
         if res is not None:
             return make_response(jsonify(res), 401)
@@ -299,8 +306,8 @@ def editDesc():
     course = data['Course']
     assignment = data['Assignment']
 
-    if (check_admin_or_course_teacher(request_user_id, course)):
-        res = change_description(new_desc, course, assignment)
+    if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
+        res = course_handler.change_description(new_desc, course, assignment)
 
         if res is None:
             return make_response("", 200)
@@ -311,25 +318,26 @@ def editDesc():
 
 
 @app.route('/getUsersInCourse', methods=['GET'])
-def getUsersInCourse():
+def getUsers_in_course():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     course = request.args.get('Course')
 
-    if (is_admin_on_course(request_user_id, course)):
-        res = get_users_on_course(course)
+    if (user_handler.is_admin_on_course(request_user_id, course)):
+        res = user_handler.get_users_on_course(course)
         return make_response(jsonify(res[0]), res[1])
     else:
         return make_response("", 401)
 
-# TODO: remove course? mb not?, getGroupsInCourse (and members?, and assignmentstatus?)
+# TODO: remove course? mb not?, getGroupsInCourse (and members?,
+# and assignmentstatus?)
 # set teacher feedback, getAssignmentFeedback (and filenames, should be called
 # by the groumembers or teachers), getAllowedFilenames?
 # add date, course, token and assignment checks to post assignmentfiles
 
 
 @app.route('/changeAssignmentDate', methods=['POST'])
-def changeAssignmentDate():
+def change_assignmentDate():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -337,8 +345,8 @@ def changeAssignmentDate():
     assignment: int = data['Assignment']
     new_date: str = data['Date']
 
-    if (check_admin_or_course_teacher(request_user_id)):
-        res = change_end_date(course, assignment, new_date)
+    if (user_handler.check_admin_or_course_teacher(request_user_id)):
+        res = course_handler.change_end_date(course, assignment, new_date)
 
         if res is None:
             return make_response("", 200)
