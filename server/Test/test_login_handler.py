@@ -1,13 +1,15 @@
-
-import sys
-from pathlib import Path
-import unittest
-from unittest.mock import MagicMock, patch
-import bcrypt
 from psycopg2 import IntegrityError
+import bcrypt
+from unittest.mock import MagicMock, patch
+import unittest
+from pathlib import Path
+import sys
+from typing import Literal
+import string
+from random import random
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query   # noqa: E402, E501
+from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_verification_token, verify_user_in_db, verify_user_from_email_verification  # noqa: E402, E501
 
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
@@ -76,7 +78,7 @@ class TestLoginHandler(unittest.TestCase):
         role = 'student'
         name = 'Test Testsson'
 
-        result = registration_query(cid, email, hashed_pass, role, name )
+        result = registration_query(cid, email, hashed_pass, role, name)
         mock_cursor.execute.assert_called_once_with("""INSERT INTO UserData
                 (cid, email, passphrase, globalRole, fullName)
                 VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass, role, name))
@@ -116,7 +118,7 @@ class TestLoginHandler(unittest.TestCase):
         self.assertTrue(result[0].get('Token').startswith(
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'))
 
-    @ patch('psycopg2.connect')
+    @patch('psycopg2.connect')
     def test_unsucessful_log_in(self, mock_connect):
         # Set up the mock return value
         salt = bcrypt.gensalt()
@@ -131,3 +133,54 @@ class TestLoginHandler(unittest.TestCase):
     def test_create_and_verify_id(self):
         token = create_token(2)
         verify_and_get_id(token)
+
+    def test_create_verification_token_collision_resistance(self):
+        test_tokens = set()
+
+        for i in range(100):
+            test_token = create_verification_token('abc')
+            self.assertNotIn(test_token, test_tokens)
+            test_tokens.add(test_token)
+
+    @patch('psycopg2.connect')
+    def test_verify_user_in_db_success(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.rowcount.return_value = 1
+        expected_tuple: tuple[dict[str, str], Literal[200]] = \
+            {'status': 'success'}, 200
+
+        response = verify_user_in_db('abc')
+        self.assertTupleEqual(
+            tuple(expected_tuple), tuple(response))
+
+    @patch('psycopg2.connect')
+    def test_verify_user_in_db_no_user_updated_fail(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.rowcount.return_value = 0
+        expected_tuple: tuple[dict[str, str], Literal[406]] = \
+            {'status': 'no_user_to_verify'}, 406
+
+        response = verify_user_in_db('abc')
+        self.assertTupleEqual(
+            tuple(expected_tuple), tuple(response))
+
+    @patch('psycopg2.connect')
+    def test_verify_user_in_db_uncaught_error(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.execute.side_effect = Exception("Generic uncaught exception")
+        expected_tuple: tuple[dict[str, str], Literal[500]] = \
+            {'status': 'uncaught_error'}, 500
+
+        response = verify_user_in_db('abc')
+        self.assertTupleEqual(
+            tuple(expected_tuple), tuple(response))
+
+    def test_verify_user_from_email_verification_success(self):
+        cid_length = 5
+        random_cid = ''.join(random.choice(string.ascii_lowercase)
+                             for i in range(cid_length))
+        test_token = create_verification_token(random_cid)[0].get('Token')
+
+        verification_response = verify_user_from_email_verification(test_token)
+
+        self.assertEquals(random_cid, verification_response[0].get('cid'))
