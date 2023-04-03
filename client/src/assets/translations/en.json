@@ -47,5 +47,13 @@
   "Recent_Events": "Recent Events",
   "Labs": "Labs",
   "Settings": "Settings",
-  "Assignment": "Assignment"
+  "Assignment": "Assignment",
+  "Course_Name": "Course Name:",
+  "Course_Code": "Course Code:",
+  "Teaching_Period": "Teaching Period:",
+  "lp_form": "1-5, (5=Summer)",
+  "Year": "Year:",
+  "Cannot_be_a_previous_year": "Cannot be a previous year",
+  "Groups": "Groups:",
+  "Zero_or_larger": "Zero or larger"
 }

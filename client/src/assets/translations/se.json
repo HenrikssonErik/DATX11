@@ -42,10 +42,18 @@
   "Nothing_new": "Inget Nytt",
   "No_deadlines": "Inga tidsfrister, illgött ju!",
   "Log_Out": "Logga ut",
-  "Create_Course": "Skapa en kurs!",
+  "Create_Course": "Skapa kurs!",
   "Coming_Up": "Kommande",
   "Recent_Events": "Senaste händelserna",
   "Labs": "Labbar",
   "Settings": "Inställningar",
-  "Assignment": "Uppgift"
+  "Assignment": "Uppgift",
+  "Course_Name": "Kursnamn",
+  "Course_Code": "Kurskod:",
+  "Teaching_Period": "Läsperiod:",
+  "lp_form": "1-5, (5=Sommar)",
+  "Year": "År:",
+  "Cannot_be_a_previous_year": "Året har redan passerat",
+  "Groups": "Grupper:",
+  "Zero_or_larger": "Större än noll"
 }

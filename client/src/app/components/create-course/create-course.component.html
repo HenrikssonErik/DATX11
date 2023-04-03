@@ -2,7 +2,7 @@
   <h3 class="text-center text-muted mb-4 mt-3" translate>Create_Course</h3>
   <div class="form-group row">
     <div class="col-md-6 mb-3">
-      <label for="name">Course Name:</label>
+      <label for="name" translate>Course_Name</label>
       <input
         type="text"
         class="form-control"
@@ -14,7 +14,7 @@
       />
     </div>
     <div class="col-md-2">
-      <label for="abbreviation">Course Code:</label>
+      <label for="abbreviation" translate>Course_Code</label>
       <input
         type="text"
         class="form-control"
@@ -38,7 +38,7 @@
   </div>
   <div class="form-group row mb-3">
     <div class="col-md-2">
-      <label for="rating">Teaching Period:</label>
+      <label for="rating" translate>Teaching_Period</label>
       <input
         type="number"
         class="form-control"
@@ -55,12 +55,13 @@
       <div
         class="error-message"
         *ngIf="LpControl.errors?.['min'] || LpControl.errors?.['max']"
+        translate
       >
-        1-5, (5=Summer)
+        lp_form
       </div>
     </div>
     <div class="col-md-2">
-      <label for="year">Year:</label>
+      <label for="year" translate>Year</label>
       <input
         type="number"
         class="form-control"
@@ -71,13 +72,13 @@
         [min]="minYear()"
         #YearControl="ngModel"
       />
-      <div class="error-message" *ngIf="YearControl.errors?.['min']">
-        Cannot be a previous year
+      <div class="error-message" *ngIf="YearControl.errors?.['min']" translate>
+        Cannot_be_a_previous_year
       </div>
     </div>
     <div class="col-md-2">
-      <label for="groups"
-        >Groups:
+      <label for="groups" translate
+        >Groups
         <span
           ><i
             class="fa-regular fa-circle-question"
@@ -98,8 +99,8 @@
         placeholder="E.g 0"
         #GroupControl="ngModel"
       />
-      <div class="error-message" *ngIf="GroupControl.errors?.['min']">
-        Zero or larger
+      <div class="error-message" *ngIf="GroupControl.errors?.['min']" translate>
+        Zero_or_larger
       </div>
     </div>
   </div>
@@ -108,7 +109,8 @@
     type="submit"
     class="btn btn-primary"
     [disabled]="!myForm.valid"
+    translate
   >
-    Create Course
+    Create_Course
   </button>
 </form>
