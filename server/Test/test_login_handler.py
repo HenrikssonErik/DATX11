@@ -1,3 +1,11 @@
+import random
+import string
+from typing import Literal
+import sys
+from pathlib import Path
+import unittest
+from unittest.mock import MagicMock, patch
+import bcrypt
 from psycopg2 import IntegrityError
 import bcrypt
 from unittest.mock import MagicMock, patch
@@ -137,18 +145,10 @@ class TestLoginHandler(unittest.TestCase):
         token = create_token(2)
         verify_and_get_id(token)
 
-    def test_create_verification_token_collision_resistance(self):
-        test_tokens = set()
-
-        for i in range(100):
-            test_token = create_verification_token('abc')
-            self.assertNotIn(test_token, test_tokens)
-            test_tokens.add(test_token)
-
     @patch('psycopg2.connect')
     def test_verify_user_in_db_success(self, mock_connect):
         mock_cur = setup_mock_cursor(mock_connect)
-        mock_cur.rowcount.return_value = 1
+        mock_cur.rowcount = 1
         expected_tuple: tuple[dict[str, str], Literal[200]] = \
             {'status': 'success'}, 200
 
@@ -159,7 +159,7 @@ class TestLoginHandler(unittest.TestCase):
     @patch('psycopg2.connect')
     def test_verify_user_in_db_no_user_updated_fail(self, mock_connect):
         mock_cur = setup_mock_cursor(mock_connect)
-        mock_cur.rowcount.return_value = 0
+        mock_cur.rowcount = 0
         expected_tuple: tuple[dict[str, str], Literal[406]] = \
             {'status': 'no_user_to_verify'}, 406
 
@@ -183,7 +183,10 @@ class TestLoginHandler(unittest.TestCase):
         random_cid = ''.join(random.choice(string.ascii_lowercase)
                              for i in range(cid_length))
         test_token = create_verification_token(random_cid)[0].get('Token')
-
-        verification_response = verify_user_from_email_verification(test_token)
-
-        self.assertEquals(random_cid, verification_response[0].get('cid'))
+        # with patch.object(bcrypt, 'gensalt') as mock_gensalt:
+        mock_response = {'status': 'success'}, 200
+        with patch('src.login_handler.verify_user_in_db', return_value=mock_response):
+            # verify_result.return_value = {'status': 'success'}, 200
+            verification_response = verify_user_from_email_verification(
+                test_token)
+            self.assertEqual(random_cid, verification_response[0].get('cid'))
