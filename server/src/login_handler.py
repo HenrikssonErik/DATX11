@@ -132,7 +132,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
                                                Literal[200, 401]]:
     """
     Checks if the user exists in the database, if so it returns a
-    token that the user can use to verify itself
+    token that the user can use to verify itself.
     """
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -175,7 +175,6 @@ def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
         'cid': cid,
         'exp': datetime.utcnow() + timedelta(hours=24)
     }
-
     token = jwt.encode(payload=data, key=__SECRET_KEY)
     return {'Token': token}, 200
 
@@ -193,12 +192,16 @@ def verify_user_from_email_verification(token: str) -> \
         decoded_token: dict = jwt.decode(token, __SECRET_KEY,
                                          algorithms=['HS256'])
         cid: str = decoded_token['cid']
+
         verification_response: tuple[dict[str, str],
                                      Literal[200, 406, 500]] = \
             verify_user_in_db(cid)
         # If decoding was successful, return the user id
 
-        return verification_response
+        if (verification_response[1] is 200):
+            return {'cid': cid}, 200
+        else:
+            return verification_response
 
     except jwt.ExpiredSignatureError:
         # If the token has expired, raise an exception
