@@ -1,35 +1,61 @@
 --The order of tables must change to able create entire database from this file
 -- without entering each tavle/view one by one
 
--- CourseInstance, group and lab assignment shoudl be primary key here
-CREATE Table AssignmentFeedback (
-	groupId INTEGER NOT NULL,
-	courseId serial NOT NULL,
-	assignment INTEGER NOT NULL,
-	testFeedback JSON,
-	teacherFeedback TEXT,
-	testPass BOOLEAN NOT NULL DEFAULT FALSE,  
-	teacherGrade BOOLEAN,
-	PRIMARY KEY(GroupId,CourseId, Assignment),
-	CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
-		REFERENCES groups(groupId) 
-		ON DELETE CASCADE 
-		ON UPDATE CASCADE,
-	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
-		REFERENCES assignments(courseid, assignment) 
-		ON DELETE CASCADE 
-		ON UPDATE CASCADE
-); 
+---------------------
+---------------------
+-- CourseInstance, group and lab assignment and submission should be primary key here
+CREATE TABLE AssignmentFeedback (
+    groupId INTEGER NOT NULL,
+    courseId SERIAL NOT NULL,
+    assignment INTEGER NOT NULL,
+    submission SERIAL NOT NULL,
+    testFeedback JSON,
+    teacherFeedback TEXT,
+    testPass BOOLEAN NOT NULL DEFAULT FALSE,
+    teacherGrade BOOLEAN,
+    PRIMARY KEY (groupId, courseId, assignment, submission),
+    CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId)
+        REFERENCES groups(groupId)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
+        REFERENCES assignments(courseid, assignment)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE OR REPLACE FUNCTION set_submission_number()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.submission = 0 THEN
+    SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
+    FROM AssignmentFeedback
+    WHERE groupId = NEW.groupId
+      AND courseId = NEW.courseId
+      AND assignment = NEW.assignment;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER set_submission_trigger
+BEFORE INSERT ON AssignmentFeedback
+FOR EACH ROW
+EXECUTE FUNCTION set_submission_number();
+
+---------------------------------------
+---------------------------------------
 
 
 CREATE Table AssignmentFiles (
 		groupId INTEGER NOT NULL, 
 		courseId SERIAL NOT NULL,
 		assignment INTEGER NOT NULL,
+		submission SERIAL NOT NULL,
 		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
 		fileType TEXT NOT NULL,
-		PRIMARY KEY(groupId, courseId, assignment, fileName),
+		PRIMARY KEY(groupId, courseId, assignment, fileName, submission),
 		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
 			REFERENCES Groups (groupId) 
 			ON DELETE CASCADE 
@@ -40,7 +66,25 @@ CREATE Table AssignmentFiles (
 			ON UPDATE CASCADE
 	);
 
+CREATE OR REPLACE FUNCTION set_submission_number_assignmentfiles()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.submission = 0 THEN
+    SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
+    FROM AssignmentFiles
+    WHERE groupId = NEW.groupId
+      AND courseId = NEW.courseId
+      AND assignment = NEW.assignment
+      AND fileName = NEW.fileName;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE TRIGGER increment_submission_assignmentfiles
+BEFORE INSERT ON AssignmentFiles
+FOR EACH ROW
+EXECUTE FUNCTION set_submission_number_assignmentfiles();
 --USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
 CREATE Table Courses (
 	courseId SERIAL PRIMARY KEY,
