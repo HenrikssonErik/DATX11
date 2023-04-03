@@ -70,8 +70,9 @@ def verify_email() -> Response:
     token = data['token']
 
     try:
-        cid: str = verify_user_from_email_verification(token)
-        response = make_response({'cid': cid}, 200)
+        verify: tuple[dict[str, str],
+                      Literal[200, 406, 500]] = verify_user_from_email_verification(token)
+        response = make_response(verify)
         return response
     except jwt.ExpiredSignatureError:
         res = make_response({'status': 'expired_verification_signature'}, 400)
