@@ -1,8 +1,8 @@
 
 
 from typing import Literal
-from flask import Flask, Response, jsonify, make_response, render_template, request, \
-    send_file
+from flask import Flask, Response, jsonify, make_response, render_template, \
+    request, send_file
 from flask_cors import CORS
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
@@ -51,12 +51,14 @@ def login():
 
 @app.route('/signUp', methods=['POST'])
 def sign_up() -> Response:
-    """Signs the user up to the database. If the data is validated in 
-    the backend, we send a verification email via the send_verification_email-function
+    """Signs the user up to the database. If the data is validated in
+    the backend, we send a verification email via the
+    send_verification_email-function.
 
     Returns:
-        Response: An HTTP-Response containing of the status from login_handler's
-        user_registration-function, either successful or invalidated.
+        Response: An HTTP-Response containing of the status
+        from login_handler's user_registration-function,
+        either successful or invalidated.
     """
     response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
         user_registration(request.form)
@@ -74,12 +76,13 @@ def sign_up() -> Response:
 @app.route('/verify_email', methods=['POST'])
 def verify_email() -> Response:
     """
-    This function will be routed to whenever a verification, including a 
-    verification token in clicked. This will verify the user, if possible, otherwise;
-    return the appropriate error message to the frontend to be displayed.
+    This function will be routed to whenever a verification,
+    including a verification token in clicked.
+    This will verify the user, if possible, otherwise; return
+    the appropriate error message to the frontend to be displayed.
 
     Returns:
-        Response: An HTTP-Response containing either: 
+        Response: An HTTP-Response containing either:
 
         {'status': status_message}, status_code
         OR:
@@ -90,7 +93,8 @@ def verify_email() -> Response:
 
     try:
         verify: tuple[dict[str, str],
-                      Literal[200, 406, 500]] = verify_user_from_email_verification(token)
+                      Literal[200, 406, 500]] = \
+            verify_user_from_email_verification(token)
         response = make_response(verify)
         return response
     except jwt.ExpiredSignatureError:
