@@ -1,12 +1,10 @@
-import src.course_handler as course_handler
 import sys
 from pathlib import Path
 import unittest
 from unittest.mock import MagicMock, patch
 
-
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-
+import src.course_handler as course_handler  # noqa: E402
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
     mock_cursor = MagicMock()
@@ -51,8 +49,16 @@ class TestCourseHandler(unittest.TestCase):
             mock_cursor.execute.assert_called_once_with("""SELECT * FROM UserCourseInfo
                             WHERE userid = %s AND courseid=%s""", [user_id, course_id])
             self.assertEqual(
-                result, {'Role': 'Admin', 'courseID': 1, 'CourseName': 'Whole course name', 'Course': 'datx12',
-                          'Year': 2023, 'StudyPeriod': 3, 'Assignments': []})
+                result, {
+                    'Role': 'Admin',
+                    'courseID': 1,
+                    'CourseName': 'Whole course name',
+                    'Course': 'datx12',
+                    'Year': 2023,
+                    'StudyPeriod': 3,
+                    'Assignments': []
+                }
+            )
 
     @patch('psycopg2.connect')
     def test_add_groups_to_course(self, mock_connect):
@@ -71,7 +77,7 @@ class TestCourseHandler(unittest.TestCase):
         res = course_handler.get_assignments(course_id)
         mock_cursor.execute.assert_called_once_with("""SELECT assignment, enddate, Description FROM
                                 assignments WHERE courseid = %s""", [course_id])
-        self.assertEqual(res, [{'AssignmentNr':2, 'DueDate': '2022-03-18', 'Description': 'description'}])
+        self.assertEqual(res, [{'AssignmentNr': 2, 'DueDate': '2022-03-18', 'Description': 'description'}])
 
     @patch('psycopg2.connect')
     def test_add_filenames(self, mock_connect):
