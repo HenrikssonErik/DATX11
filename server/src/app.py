@@ -145,7 +145,6 @@ def post_files():
 
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
-    print(request)
     files = request.files.getlist('files')
 
     if not files:
