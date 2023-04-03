@@ -49,8 +49,16 @@ class TestCourseHandler(unittest.TestCase):
             mock_cursor.execute.assert_called_once_with("""SELECT * FROM UserCourseInfo
                             WHERE userid = %s AND courseid=%s""", [user_id, course_id])
             self.assertEqual(
-                result, {'Role': 'Admin', 'courseID': 1, 'CourseName': 'Whole course name', 'Course': 'datx12',
-                          'Year': 2023, 'StudyPeriod': 3, 'Assignments': []})
+                result, {
+                    'Role': 'Admin',
+                    'courseID': 1,
+                    'CourseName': 'Whole course name',
+                    'Course': 'datx12',
+                    'Year': 2023,
+                    'StudyPeriod': 3,
+                    'Assignments': []
+                }
+            )
 
     @patch('psycopg2.connect')
     def test_add_groups_to_course(self, mock_connect):
