@@ -50,7 +50,14 @@ def login():
 
 
 @app.route('/signUp', methods=['POST'])
-def sign_up():
+def sign_up() -> Response:
+    """Signs the user up to the database. If the data is validated in 
+    the backend, we send a verification email via the send_verification_email-function
+
+    Returns:
+        Response: An HTTP-Response containing of the status from login_handler's
+        user_registration-function, either successful or invalidated.
+    """
     response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
         user_registration(request.form)
 
@@ -66,6 +73,18 @@ def sign_up():
 
 @app.route('/verify_email', methods=['POST'])
 def verify_email() -> Response:
+    """
+    This function will be routed to whenever a verification, including a 
+    verification token in clicked. This will verify the user, if possible, otherwise;
+    return the appropriate error message to the frontend to be displayed.
+
+    Returns:
+        Response: An HTTP-Response containing either: 
+
+        {'status': status_message}, status_code
+        OR:
+        {'cid': user's cid(will be got from the token)}, 200
+    """
     data = request.get_json()
     token = data['token']
 
@@ -83,7 +102,19 @@ def verify_email() -> Response:
 
 
 def send_verification_email(to: str, token_dict: dict) -> None:
+    """
+    Sends a verification email to the specific user signing up.
+    This email is in an HTML format, with a working link sending
+    the user directly to the correct endpoint in the frontend
+    (To be updated whenever the website is launched to not link to localhost)
 
+
+    Args:
+        to (str): The recipient's email address, which has been verified
+        in login_handler's check_data_input to be a valid email.
+        token_dict (dict): The jwt-generated token from login_handler's
+        create_verification_token-function.
+    """
     token: str = token_dict.get('Token')
 
     msg = Message('Verification Email for Hydrant',
