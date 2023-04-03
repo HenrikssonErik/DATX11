@@ -86,7 +86,7 @@ export class LoginComponent implements OnInit {
         next: (response: any) => {
           try {
             if (response.body.Token) {
-              const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
+              const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000); //2 hours
               document.cookie = `Token=${
                 response.body.Token
               }; expires=${expirationDate.toUTCString()}; path=/`;
@@ -150,7 +150,6 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: (response: any) => {
           try {
-            console.log(response.body.Token);
             if (response.body.Token) {
               const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
               document.cookie = `Token=${

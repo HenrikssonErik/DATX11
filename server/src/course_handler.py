@@ -14,7 +14,7 @@ def create_course(course_name: str, course_abbr: str, year: int,
     if not (len(course_abbr) == 6):
         response['Course Abbreviation'] = 'Should be 6 characters'
 
-    if not (year >= datetime.datetime.now().year()):
+    if not (year >= datetime.datetime.now().year):
         response['Year'] = 'Cant be a year thats passed'
 
     if not (teaching_period <= 5 and teaching_period > 0):
@@ -114,7 +114,7 @@ def add_groups_to_course(number_of_groups: int, course_id: int) -> None:
 
 
 def __create_course(course_name: str, course_abbr: str, year: int,
-                    teaching_period: int) -> int:
+                    teaching_period: int) -> int | tuple:
     """Internal method to create a course, used by create_course method after verification of data
     Returnsthe new course ID"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -138,7 +138,7 @@ def __create_course(course_name: str, course_abbr: str, year: int,
 
     except Exception as e:
         print(e)
-        return None
+        return {'status': "course_exists"}, 400
 
 
 def create_assignment(course_id: int, description: str, assignment_nr: int,
