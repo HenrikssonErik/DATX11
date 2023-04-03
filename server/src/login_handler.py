@@ -162,7 +162,6 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
             raise Exception("Wrong Credentials")
 
     except Exception as e:
-        print(e)
         return {'status': "wrong_credentials"}, 401
 
 
@@ -188,7 +187,6 @@ def verify_user_from_email_verification(token: str) -> \
     not present in the database and an errorcode, or raises an error.
     """
     try:
-        # print(__SECRET_KEY)
         # Verify and decode the token
         decoded_token: dict = jwt.decode(token, __SECRET_KEY,
                                          algorithms=['HS256'])
@@ -206,13 +204,11 @@ def verify_user_from_email_verification(token: str) -> \
 
     except jwt.ExpiredSignatureError:
         # If the token has expired, raise an exception
-        print("ERROR FRÅN EXPIRED SIGNATURE\n")
 
         raise jwt.ExpiredSignatureError('Expired token')
 
     except jwt.InvalidTokenError:
         # If the token is invalid, raise an exception
-        print("ERROR FRÅN INVALID TOKEN\n")
 
         raise jwt.InvalidTokenError('Invalid token')
 
@@ -238,14 +234,10 @@ def verify_user_in_db(cid: str) -> \
                 if (cur.rowcount == 0):
                     conn.close()
                     return {'status': 'no_user_to_verify'}, 406
-                print("\n\n\n", cur.rowcount, "\n\n\n")
                 status = 'success'
                 res_code = 200
-                print("FRÅN VERIFY USER IN DB \n")
 
-            except Exception as e:
-                print(e)
-                print("ERROR FRÅN VERIFY USER IN DB\n")
+            except Exception:
                 status = 'uncaught_error'
                 res_code = 500
 
