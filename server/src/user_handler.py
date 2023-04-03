@@ -259,7 +259,8 @@ def change_role_on_course(new_role: str, user_id: int,
 
 
 def get_users_on_course(course: int) -> tuple:
-    """Returns a list of all users associated with a course and their course role"""
+    """Returns a list of all users associated with a course and their
+    course role"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
