@@ -54,7 +54,7 @@
 }
 
 .nav div.main_list ul li a:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .navTrigger {
@@ -66,6 +66,14 @@
   padding-bottom: 20px;
   -webkit-transition: all 0.4s ease;
   transition: all 0.4s ease;
+}
+
+.navbarLink:hover {
+  border-bottom: 2px solid #6c757d;
+}
+
+.active-link {
+  border-bottom: 2px solid #6c757d;
 }
 
 .container {

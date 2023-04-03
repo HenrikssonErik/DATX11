@@ -11,10 +11,60 @@
     <div id="mainListDiv" class="main_list">
       <ul class="navlinks">
         <!-- TODO: Use routerLinkActive and [routerLink] when the links becomes active -->
-        <li><a href="#" class="text-muted">Courses</a></li>
-        <li><a href="#" class="text-muted">Assignments</a></li>
-        <li><a href="#" class="text-muted">Settings</a></li>
-        <li><a href="/login" class="text-muted">Login</a></li>
+        <<<<<<<<< Temporary merge branch 1
+        <li><a href="#" class="text-muted" translate>Courses</a></li>
+        <li><a href="#" class="text-muted" translate>Assignments</a></li>
+        <li><a href="#" class="text-muted" translate>My_Page</a></li>
+        <li><a href="/login" class="text-muted" translate>Login</a></li>
+        <!--       <li class="nav-item dropdown">
+      
+          <a
+            class="text-muted"
+            type="button"
+            id="dropdownMenuButton"
+            data-bs-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <i class="fa-solid fa-globe"></i>
+          </a>
+         
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#"
+              ><img src="assets/se.png" width="35px" alt="lang" />Swedish</a
+            >
+            <a class="dropdown-item" href="#"
+              ><img src="assets/en.png" width="35px" alt="lang" />English</a
+            >
+          </div>
+        </li> -->
+        =========
+        <li *ngIf="isLoggedIn">
+          <a
+            routerLink="/courses"
+            routerLinkActive="active-link"
+            class="text-muted navbarLink"
+            translate
+            >Courses</a
+          >
+        </li>
+        <li *ngIf="isLoggedIn">
+          <a href="#" class="text-muted" translate>Assignments</a>
+        </li>
+        <li *ngIf="isLoggedIn">
+          <a href="#" class="text-muted" translate>My_Page</a>
+        </li>
+        <li *ngIf="!isLoggedIn">
+          <a routerLink="/login" class="text-muted navbarLink" translate
+            >Login</a
+          >
+        </li>
+        <li *ngIf="isLoggedIn">
+          <a class="text-muted navbarLink logOut" (click)="logOut()" translate
+            >Log_Out</a
+          >
+        </li>
+        >>>>>>>>> Temporary merge branch 2
       </ul>
     </div>
     <span class="navTrigger">

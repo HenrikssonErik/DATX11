@@ -51,6 +51,13 @@ export function HttpLoaderFactory(http: HttpClient) {
     TestFeedbackCardComponent,
     SpinnerComponent,
     LoginComponent,
+    HomePageComponent,
+    PageNotFoundComponent,
+    CoursesComponent,
+    CourseComponent,
+    CoursePickerComponent,
+    AssignmentsComponent,
+    CreateCourseComponent,
   ],
   imports: [
     BrowserModule,
@@ -61,7 +68,16 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
     ReactiveFormsModule,
+    MatTabsModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
   ],
+  exports: [MatTabsModule],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
