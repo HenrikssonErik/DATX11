@@ -77,7 +77,7 @@ class TestCourseHandler(unittest.TestCase):
         res = course_handler.get_assignments(course_id)
         mock_cursor.execute.assert_called_once_with("""SELECT assignment, enddate, Description FROM
                                 assignments WHERE courseid = %s""", [course_id])
-        self.assertEqual(res, [{'AssignmentNr':2, 'DueDate': '2022-03-18', 'Description': 'description'}])
+        self.assertEqual(res, [{'AssignmentNr': 2, 'DueDate': '2022-03-18', 'Description': 'description'}])
 
     @patch('psycopg2.connect')
     def test_add_filenames(self, mock_connect):
