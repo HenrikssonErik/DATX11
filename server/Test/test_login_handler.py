@@ -31,10 +31,14 @@ def setup_mock_cursor(mock_connect) -> MagicMock:
     return mock_cursor
 
 
-class TestLoginHandler(unittest.TestCase):
+def random_cid_generator(length=5) -> str:
+    random_cid = ''.join(random.choice(string.ascii_lowercase)
+                         for i in range(length))
+    return random_cid
 
+
+class TestFileHandler(unittest.TestCase):
     def setUp(self):
-        self.test_file_dir = Path(__file__).parent/"test_files_file_handler"
         create_key()
 
     def test_check_data_input(self):
@@ -80,8 +84,10 @@ class TestLoginHandler(unittest.TestCase):
     def test_registration_query_success(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
 
-        cid = 'abc'
-        email = 'abc@example.com'
+        random_cid = random_cid_generator()
+
+        cid = random_cid
+        email = cid + '@example.com'
         hashed_pass = b'secret'
         role = 'student'
         name = 'Test Testsson'
@@ -100,8 +106,10 @@ class TestLoginHandler(unittest.TestCase):
             "duplicate key value violates unique constraint 'userdata_pkey'"
         )
 
-        cid = 'abc'
-        email = 'abc@example.com'
+        random_cid = random_cid_generator()
+
+        cid = random_cid
+        email = cid + '@example.com'
         hashed_pass = b'secret'
         role = 'student'
         name = 'Test Testsson'
@@ -152,9 +160,14 @@ class TestLoginHandler(unittest.TestCase):
         expected_tuple: tuple[dict[str, str], Literal[200]] = \
             {'status': 'success'}, 200
 
-        response = verify_user_in_db('abc')
+        random_cid = random_cid_generator()
+
+        response = verify_user_in_db(random_cid)
         self.assertTupleEqual(
             tuple(expected_tuple), tuple(response))
+        mock_cur.execute.assert_called_once_with("""UPDATE UserData
+                SET verified = TRUE
+                WHERE cid = %s""", (random_cid,))
 
     @patch('psycopg2.connect')
     def test_verify_user_in_db_no_user_updated_fail(self, mock_connect):
@@ -163,9 +176,15 @@ class TestLoginHandler(unittest.TestCase):
         expected_tuple: tuple[dict[str, str], Literal[406]] = \
             {'status': 'no_user_to_verify'}, 406
 
-        response = verify_user_in_db('abc')
+        random_cid = random_cid_generator()
+
+        response = verify_user_in_db(random_cid)
+
         self.assertTupleEqual(
             tuple(expected_tuple), tuple(response))
+        mock_cur.execute.assert_called_once_with("""UPDATE UserData
+                SET verified = TRUE
+                WHERE cid = %s""", (random_cid,))
 
     @patch('psycopg2.connect')
     def test_verify_user_in_db_uncaught_error(self, mock_connect):
@@ -174,14 +193,17 @@ class TestLoginHandler(unittest.TestCase):
         expected_tuple: tuple[dict[str, str], Literal[500]] = \
             {'status': 'uncaught_error'}, 500
 
-        response = verify_user_in_db('abc')
+        random_cid = random_cid_generator()
+
+        response = verify_user_in_db(random_cid)
         self.assertTupleEqual(
             tuple(expected_tuple), tuple(response))
+        mock_cur.execute.assert_called_once_with("""UPDATE UserData
+                SET verified = TRUE
+                WHERE cid = %s""", (random_cid,))
 
     def test_verify_user_from_email_verification_success(self):
-        cid_length = 5
-        random_cid = ''.join(random.choice(string.ascii_lowercase)
-                             for i in range(cid_length))
+        random_cid = random_cid_generator()
         test_token = create_verification_token(random_cid)[0].get('Token')
         # with patch.object(bcrypt, 'gensalt') as mock_gensalt:
         mock_response = {'status': 'success'}, 200
