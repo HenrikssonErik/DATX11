@@ -173,15 +173,15 @@ def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
     data = {
         'iss': 'Hydrant',
         'cid': cid,
-        'exp': datetime.utcnow() + timedelta(hours=1)
+        'exp': datetime.utcnow() + timedelta(hours=24)
     }
-    # generate secret key, set exp-time
 
     token = jwt.encode(payload=data, key=__SECRET_KEY)
     return {'Token': token}, 200
 
 
-def verify_user_from_email_verification(token: str) -> str:
+def verify_user_from_email_verification(token: str) -> tuple[dict[str, str],
+                                                             Literal[200, 406, 500]]:
     """
     Verifys if a token is issued by this system and if it is still valid.
     Returns the User_id or an error message
@@ -192,11 +192,11 @@ def verify_user_from_email_verification(token: str) -> str:
         decoded_token: dict = jwt.decode(token, __SECRET_KEY,
                                          algorithms=['HS256'])
         cid: str = decoded_token['cid']
-        verify_user_in_db(cid)
+        verification_response: tuple[dict[str, str],
+                                     Literal[200, 406, 500]] = verify_user_in_db(cid)
         # If decoding was successful, return the user id
-        print("FRÅN VERIFY_USER_FROM_EMAIL_VERIFICATION\n")
 
-        return cid
+        return verification_response
 
     except jwt.ExpiredSignatureError:
         # If the token has expired, raise an exception
@@ -211,7 +211,7 @@ def verify_user_from_email_verification(token: str) -> str:
         raise jwt.InvalidTokenError('Invalid token')
 
 
-def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406]]:
+def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406, 500]]:
     conn = psycopg2.connect(get_conn_string())
     with conn:
         with conn.cursor() as cur:
@@ -222,6 +222,10 @@ def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406]]:
                 cur.execute(query, (
                     cid,
                 ))
+
+                if (cur.rowcount == 0):  # TODO: Om rowcount=0, raise exception
+                    return {'status': 'no_user_to_verify'}, 406
+                print("\n\n\n", cur.rowcount, "\n\n\n")
                 status = 'success'
                 res_code = 200
                 print("FRÅN VERIFY USER IN DB \n")
@@ -229,8 +233,8 @@ def verify_user_in_db(cid: str) -> tuple[dict[str, str], Literal[200, 406]]:
             except Exception as e:
                 print(e)
                 print("ERROR FRÅN VERIFY USER IN DB\n")
-                status = 'no_user_to_verify'
-                res_code = 406
+                status = 'uncaught_error'
+                res_code = 500
 
     conn.close()
     return {'status': status}, res_code

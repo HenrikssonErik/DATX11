@@ -40,7 +40,6 @@ export class VerifyEmailComponent implements OnInit {
         },
         error: (error) => {
           this.responseMessage = error.error.status;
-          // this.responseMessage = error.error.status;
           console.log(this.responseMessage);
 
           setTimeout(() => {
