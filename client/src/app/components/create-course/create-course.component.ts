@@ -54,7 +54,7 @@ export class CreateCourseComponent {
           try {
             if (response.status == 200) {
               this.toastr.success('', response.body);
-              //TODO: update courselist here
+              location.reload();
             }
           } catch {
             throw new Error('unexpected_error');
