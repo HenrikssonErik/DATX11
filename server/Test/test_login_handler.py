@@ -131,4 +131,4 @@ class TestLoginHandler(unittest.TestCase):
 
     def test_create_and_verify_id(self):
         token = create_token(2)
-        verify_and_get_id(token.get('Token'))
+        verify_and_get_id(token)
