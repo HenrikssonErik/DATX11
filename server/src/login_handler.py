@@ -160,7 +160,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         else:
             raise Exception("Wrong Credentials")
 
-    except Exception as e:
+    except Exception:
         return {'status': "wrong_credentials"}, 401
 
 
@@ -196,7 +196,7 @@ def verify_user_from_email_verification(token: str) -> \
             verify_user_in_db(cid)
         # If decoding was successful, return the user id
 
-        if (verification_response[1] is 200):
+        if (verification_response[1] == 200):
             return {'cid': cid}, 200
         else:
             return verification_response
