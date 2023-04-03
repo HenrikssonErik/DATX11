@@ -224,20 +224,19 @@ def change_description(new_desc: str, course_id: int,
 
 
 # TODO: not done or tested, returns statements must be fixed
-def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
-                         course: int, assignment: int):
-
+def set_teacher_feedback(group_id: int, feedback: str, grade: bool, 
+                         passed: bool, course: int, assignment: int):
+    """Submission is set to 0 since a primary cannot be null. 
+    It will increment by default anyway."""
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
         with conn:
             with conn.cursor() as cur:
                 query_one = """INSERT INTO AssignmentFeedback (groupId,
-                CourseId, Assignment, TeacherGrade, TeacherFeedback)
-                VALUES (%s, %s, %s, %s, %s) ON CONFLICT (groupId, CourseId,
-                Assignment) DO UPDATE SET TeacherGrade = excluded.TeacherGrade,
-                TeacherFeedback = excluded.TeacherFeedback;"""
-                cur.execute(query_one, [group_id, course, assignment, grade,
-                                        feedback])
+                courseId, assignment, submission, teacherGrade, teacherFeedback, testPassed)
+                VALUES (%s, %s, %s, 0, %s, %s, %s);"""
+                cur.execute(query_one, [group_id, course, assignment, 0, grade,
+                                        feedback, passed])
         conn.close()
         return
     except Exception as e:
