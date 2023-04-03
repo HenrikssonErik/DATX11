@@ -92,8 +92,9 @@ def get_files():
     course = data['course']
     assignment = data['assignment']
     filename = data['filename']  # should also be imported from frontend
+    submission = data['submission']
     result = get_assignment_files_from_database(
-        group_id, course, assignment, filename)
+        group_id, course, assignment, filename, submission)
 
     res = make_response(send_file(path_or_file=result,
                                   download_name=filename, as_attachment=True))

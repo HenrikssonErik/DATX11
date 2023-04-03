@@ -8,7 +8,7 @@ CREATE TABLE AssignmentFeedback (
     groupId INTEGER NOT NULL,
     courseId SERIAL NOT NULL,
     assignment INTEGER NOT NULL,
-    submission SERIAL,
+    submission SERIAL NOT NULL,
     testFeedback JSON,
     teacherFeedback TEXT,
     testPass BOOLEAN NOT NULL DEFAULT FALSE,
@@ -51,10 +51,11 @@ CREATE Table AssignmentFiles (
 		groupId INTEGER NOT NULL, 
 		courseId SERIAL NOT NULL,
 		assignment INTEGER NOT NULL,
+		submission SERIAL NOT NULL,
 		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
 		fileType TEXT NOT NULL,
-		PRIMARY KEY(groupId, courseId, assignment, fileName),
+		PRIMARY KEY(groupId, courseId, assignment, fileName, submission),
 		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
 			REFERENCES Groups (groupId) 
 			ON DELETE CASCADE 
@@ -65,7 +66,25 @@ CREATE Table AssignmentFiles (
 			ON UPDATE CASCADE
 	);
 
+CREATE OR REPLACE FUNCTION set_submission_number_assignmentfiles()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.submission = 0 THEN
+    SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
+    FROM AssignmentFiles
+    WHERE groupId = NEW.groupId
+      AND courseId = NEW.courseId
+      AND assignment = NEW.assignment
+      AND fileName = NEW.fileName;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE TRIGGER increment_submission_assignmentfiles
+BEFORE INSERT ON AssignmentFiles
+FOR EACH ROW
+EXECUTE FUNCTION set_submission_number_assignmentfiles();
 --USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
 CREATE Table Courses (
 	courseId SERIAL PRIMARY KEY,
