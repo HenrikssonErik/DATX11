@@ -2,9 +2,14 @@ import subprocess
 import pathlib
 
 def check_against_ldap(cid: str):
-    print(pathlib.Path(__file__).absolute().parent)
-    output = subprocess.run(['go', 'run', 'cidCheck.go', cid], capture_output=True, cwd=pathlib.Path(__file__).absolute().parent)
-    result = output.stdout.decode().strip()  # convert bytes to string and remove whitespace
+    output = subprocess.run(
+        ['go', 'run', 'cidCheck.go', cid],
+        capture_output=True,
+        cwd=pathlib.Path(__file__).absolute().parent
+    )
+
+    # convert bytes to string and remove whitespace
+    result = output.stdout.decode().strip()
 
     b_student = "student" in result.lower()
     b_teacher = "employee" in result.lower()
