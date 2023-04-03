@@ -263,7 +263,7 @@ def create_token(id: int) -> str:
     return token
 
 
-def verify_and_get_token(token: str) -> int:
+def verify_and_get_id(token: str) -> int:
     """
     Verifys if a token is issued by this system and if it is still valid.
     Returns the User_id or an error message
