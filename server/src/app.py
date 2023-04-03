@@ -29,7 +29,7 @@ def extract_token(request) -> str:
 
 
 @app.route('/login', methods=['POST'])
-def logIn():
+def login():
     password: str = request.form['password']
     email: str = request.form['email']
     data = log_in(email, password)
@@ -38,7 +38,7 @@ def logIn():
 
 
 @app.route('/signUp', methods=['POST'])
-def signUp():
+def sign_up():
     response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
         user_registration(request.form)
 
@@ -49,7 +49,7 @@ def signUp():
 
 
 @app.route('/files', methods=['POST'])
-def postFiles():
+def post_files():
 
     files = request.files.getlist('files')
 
@@ -319,7 +319,7 @@ def edit_desc():
 
 
 @app.route('/getUsersInCourse', methods=['GET'])
-def getUsers_in_course():
+def get_users_in_course():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     course = request.args.get('Course')
