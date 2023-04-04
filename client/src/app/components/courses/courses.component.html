@@ -1,0 +1,65 @@
+<!--TODO: CHANGE TO LOCAL SPINNER?-->
+<app-spinner></app-spinner>
+<div class="container text-muted mt-4">
+  <div class="row flex-wrap">
+    <div class="col-md-2 col-12 rightBorder">
+      <div class="row">
+        <div class="col-12">
+          <h3 class="mt-3" *ngIf="user">{{ user.cid }}</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <p *ngIf="user">{{ user.email }}</p>
+        </div>
+      </div>
+
+      <div class="row bottomBorder">
+        <div class="col-6">
+          <div class="row mb-4">
+            <div class="col-6 iconRow" style="padding: 0">
+              <i class="coursesIcon fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="col-6" style="padding: 0">
+              <p class="numberText" *ngIf="courses">
+                {{ courses.length }}
+              </p>
+              <p class="nameText" translate>Courses</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="row">
+            <div class="col-6 iconRow" style="padding: 0">
+              <i class="coursesIcon fa-solid fa-code"></i>
+            </div>
+            <div class="col-6" style="padding: 0">
+              <p class="numberText">99</p>
+              <td><p class="nameText" translate>Labs</p></td>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row comingUp">
+        <div class="col-12 bottomBorder">
+          <h5 class="mt-3" translate="">Coming_Up</h5>
+          <div *ngIf="deadlines.length == 0">
+            <p class="noDeadLines mt-5" translate>No_deadlines</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row recentEvents">
+        <div class="col-12">
+          <h5 class="mt-3" translate>Recent_Events</h5>
+          <div *ngIf="events.length == 0">
+            <p class="nothingNew mt-5" translate>Nothing_new</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-10 col-12">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

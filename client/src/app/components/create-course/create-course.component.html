@@ -1,0 +1,116 @@
+<form (ngSubmit)="onSubmit()" #myForm="ngForm">
+  <h3 class="text-center text-muted mb-4 mt-3" translate>Create_Course</h3>
+  <div class="form-group row">
+    <div class="col-md-6 mb-3">
+      <label for="name" translate>Course_Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        name="name"
+        required
+        [(ngModel)]="formData.Course"
+        placeholder="Introduction to software engineering"
+      />
+    </div>
+    <div class="col-md-2">
+      <label for="abbreviation" translate>Course_Code</label>
+      <input
+        type="text"
+        class="form-control"
+        id="abbreviation"
+        name="abbreviation"
+        required
+        pattern="[A-Z]{3}[A-Z\d]{3}"
+        title="Can only be six characters"
+        [(ngModel)]="formData.Abbreviation"
+        placeholder="ABC123"
+        #abbreviationControl="ngModel"
+        (ngModelChange)="formData.Abbreviation = $event.toUpperCase()"
+      />
+      <div
+        class="error-message"
+        *ngIf="abbreviationControl.errors?.['pattern']"
+      >
+        Format: ABC123
+      </div>
+    </div>
+  </div>
+  <div class="form-group row mb-3">
+    <div class="col-md-2">
+      <label for="rating" translate>Teaching_Period</label>
+      <input
+        type="number"
+        class="form-control"
+        id="rating"
+        name="LP"
+        required
+        [(ngModel)]="formData.TeachingPeriod"
+        min="1"
+        max="5"
+        placeholder="E.g 5
+      (summer)"
+        #LpControl="ngModel"
+      />
+      <div
+        class="error-message"
+        *ngIf="LpControl.errors?.['min'] || LpControl.errors?.['max']"
+        translate
+      >
+        lp_form
+      </div>
+    </div>
+    <div class="col-md-2">
+      <label for="year" translate>Year</label>
+      <input
+        type="number"
+        class="form-control"
+        id="rating"
+        name="Year"
+        required
+        [(ngModel)]="formData.Year"
+        [min]="minYear()"
+        #YearControl="ngModel"
+      />
+      <div class="error-message" *ngIf="YearControl.errors?.['min']" translate>
+        Cannot_be_a_previous_year
+      </div>
+    </div>
+    <div class="col-md-2">
+      <label for="groups" translate
+        >Groups
+        <span
+          ><i
+            class="fa-regular fa-circle-question"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-title="
+            Number of student groups, more can be added later"
+          ></i></span
+      ></label>
+      <input
+        type="number"
+        class="form-control"
+        id="groups"
+        name="groups"
+        required
+        [(ngModel)]="formData.Groups"
+        min="0"
+        placeholder="E.g 0"
+        #GroupControl="ngModel"
+      />
+      <div class="error-message" *ngIf="GroupControl.errors?.['min']" translate>
+        Zero_or_larger
+      </div>
+    </div>
+  </div>
+  <button
+    class="mt-3"
+    type="submit"
+    class="btn btn-primary"
+    [disabled]="!myForm.valid"
+    translate
+  >
+    Create_Course
+  </button>
+</form>

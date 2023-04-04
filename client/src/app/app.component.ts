@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
         `${API_URL}/getAssignmentFile`,
 
         // replace fixed values with dynamic user input, when that is implemented
-        { groupId: 1, course: 6, assignment: 6, filename: 'Test1.pdf' },
+        { groupId: 1, course: 6, assignment: 6, filename: 'Test1.pdf', submission: 0},
         {
           observe: 'response',
           responseType: 'blob',

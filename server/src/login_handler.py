@@ -7,6 +7,7 @@ import psycopg2
 import string
 import jwt
 import random
+from .call_ldap import check_against_ldap
 
 __SECRET_KEY: str = None
 
@@ -24,13 +25,16 @@ def random_string() -> str:
 
     For length reference: A string of 8 Chars takes aproximatly 1 year to
     brute force with bcryp-signatures."""
-    length = 40
-    letters_and_digits = string.ascii_lowercase + string.digits
-    return ''.join(random.choice(letters_and_digits) for i in range(length))
+    bit_length = 320
+    # Generate a list of 286 random bits (0 or 1)
+    bitlist = [random.choice([0, 1]) for _ in range(bit_length)]
+    # Convert the list of bits to a string
+    bitstring = ''.join(str(bit) for bit in bitlist)
+    return bitstring
 
 
-def check_data_input(cid: str, email: str,
-                     pwd: str) -> tuple[str, Literal[200, 400]]:
+def check_data_input(cid: str, email: str, pwd: str, 
+                     user_exists: bool) -> tuple[str, Literal[200, 400]]:
     """Validates the inputs from the frontend. If any of these checks are
     not valid, return the appropriate error message and error code as a
     tuple."""
@@ -44,6 +48,8 @@ def check_data_input(cid: str, email: str,
                              string.punctuation)
     if not set(pwd) <= allowed_characters:
         return "pass_not_ok", 400
+    if not user_exists:
+        return "cid_does_not_exist", 400
     return "OK", 200
 
 
@@ -59,7 +65,13 @@ def user_registration(data: Request.form) -> \
     cid: str = data['cid']
     pwd: str = data['password']
 
-    data_check = check_data_input(cid, email, pwd)
+    role = check_against_ldap(cid)
+    user_exists = True
+
+    if (role[1] == "false"):
+        user_exists = False
+    
+    data_check = check_data_input(cid, email, pwd, user_exists)
 
     if (data_check[1] != 200):
         return {'status': data_check[0]}, data_check[1]
@@ -68,13 +80,15 @@ def user_registration(data: Request.form) -> \
     hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
 
     res_query: tuple[dict[str, str], Literal[200, 406]
-                     ] = registration_query(cid, email, hashed_pass)
+                     ] = registration_query(cid, email, hashed_pass, 
+                                            role[0], role[1])
     res_object = (log_in(email, pwd)) if (res_query[1] == 200) else (res_query)
 
     return res_object
 
 
-def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
+def registration_query(cid: str, email: str, hashed_pass: bytes,
+                       role: str, name: str) -> \
         tuple[dict[str, str], Literal[200, 406]]:
     """Queries the database with the information given.
     If the unique key already is in the database, return error message
@@ -87,12 +101,14 @@ def registration_query(cid: str, email: str, hashed_pass: bytes) -> \
         with conn.cursor() as cur:
             try:
                 query = """INSERT INTO UserData
-                (cid, email, passphrase)
-                VALUES (%s, %s, %s);"""
+                (cid, email, passphrase, globalRole, fullName)
+                VALUES (%s, %s, %s, %s, %s );"""
                 cur.execute(query, (
                     cid,
                     email,
-                    hashed_pass
+                    hashed_pass,
+                    role,
+                    name
                 ))
                 status = 'success'
                 res_code = 200
@@ -112,7 +128,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT userId, passphrase FROM UserData
+                query_data = """SELECT userId, passphrase, globalrole FROM UserData
                             WHERE userdata.email = %s"""
                 cur.execute(query_data, (email,))
                 data = cur.fetchone()
@@ -122,8 +138,9 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         if not data:
             raise Exception("Wrong Credentials")
         if (bcrypt.checkpw(password.encode('utf8'), passphrase)):
-            token: dict[str, str] = create_token(id)
-            return token, 200
+            return_dict: dict[str, str] = {"Token":create_token(id)}
+            return_dict['GlobalRole'] = data[2]
+            return return_dict, 200
         else:
             raise Exception("Wrong Credentials")
 
@@ -132,19 +149,18 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         return {'status': "wrong_credentials"}, 401
 
 
-def create_token(id: int) -> dict[str, str]:
+def create_token(id: int) -> str:
     """Creates a token to verify a User that is valid for one hour."""
     data = {'iss': 'Hydrant',
             'id': id,
-            'exp': datetime.utcnow() + timedelta(hours=1)
+            'exp': datetime.utcnow() + timedelta(hours=2)
             }
-    # generate secret key, set exp-time
 
     token = jwt.encode(payload=data, key=__SECRET_KEY)
-    return {'Token': token}
+    return token
 
 
-def verify_and_get_token(token: str) -> int:
+def verify_and_get_id(token: str) -> int:
     """Verifys if a token is issued by this system and if it is still valid.
     Returns the User_id or an error message"""
     try:

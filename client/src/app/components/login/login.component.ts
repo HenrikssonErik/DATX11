@@ -1,6 +1,11 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from '@angular/forms';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ToastrResponseService } from 'src/app/services/toastr-response.service';
 import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
@@ -13,18 +18,19 @@ import { API_URL } from 'src/environments/environment';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup = new FormGroup({});
-  signUpForm: FormGroup = new FormGroup({});
+  loginForm: UntypedFormGroup = new UntypedFormGroup({});
+  signUpForm: UntypedFormGroup = new UntypedFormGroup({});
   submitFailed: boolean = false;
   cid: string = '';
   passwordVisible: boolean = false;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private http: HttpClient,
     private toastr: ToastrService,
     private tooltipEnabler: TooltipEnablerService,
-    private toastrResponse: ToastrResponseService
+    private toastrResponse: ToastrResponseService,
+    public router: Router
   ) {}
 
   ngOnInit(): void {
@@ -77,13 +83,19 @@ export class LoginComponent implements OnInit {
         observe: 'response',
       })
       .subscribe({
-        //TODO: save token and id
         next: (response: any) => {
-          if (response.body.Token) {
-            const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
-            document.cookie = `sessionToken=${
-              response.body.Token
-            }; expires=${expirationDate.toUTCString()}; path=/`;
+          try {
+            if (response.body.Token) {
+              const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000); //2 hours
+              document.cookie = `Token=${
+                response.body.Token
+              }; expires=${expirationDate.toUTCString()}; path=/`;
+              document.cookie = `Role=${
+                response.body.GlobalRole
+              }; expires=${expirationDate.toUTCString()}; path=/`;
+            }
+          } catch {
+            throw new Error('unexpected_error');
           }
         },
         error: (err) => {
@@ -93,6 +105,9 @@ export class LoginComponent implements OnInit {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+        },
+        complete: () => {
+          this.router.navigate(['/courses']);
         },
       });
   }
@@ -137,7 +152,7 @@ export class LoginComponent implements OnInit {
           try {
             if (response.body.Token) {
               const expirationDate = new Date(Date.now() + 2 * 60 * 60 * 1000);
-              document.cookie = `sessionToken=${
+              document.cookie = `Token=${
                 response.body.Token
               }; expires=${expirationDate.toUTCString()}; path=/`;
             }
@@ -173,7 +188,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  onInputFocus(input: string, form: FormGroup): void {
+  onInputFocus(input: string, form: UntypedFormGroup): void {
     const control = form.get(input);
 
     if (control) {

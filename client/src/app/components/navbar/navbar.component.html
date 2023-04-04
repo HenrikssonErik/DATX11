@@ -1,17 +1,20 @@
 <nav class="nav">
   <div class="container">
     <div class="logo">
-      <a href="/" class="fw-bold text-muted pt-1" style="font-size: 29px"
+      <a
+        href="/"
+        class="text-uppercase fw-bold text-muted pt-1"
+        style="font-size: 29px"
         >Hydrant</a
       >
     </div>
     <div id="mainListDiv" class="main_list">
       <ul class="navlinks">
         <!-- TODO: Use routerLinkActive and [routerLink] when the links becomes active -->
-        <li><a href="#" class="text-muted" translate>Courses</a></li>
+       <!-- <li><a href="#" class="text-muted" translate>Courses</a></li>
         <li><a href="#" class="text-muted" translate>Assignments</a></li>
         <li><a href="#" class="text-muted" translate>My_Page</a></li>
-        <li><a href="/login" class="text-muted" translate>Login</a></li>
+        <li><a href="/login" class="text-muted" translate>Login</a></li> -->
         <!--       <li class="nav-item dropdown">
       
           <a
@@ -34,6 +37,31 @@
             >
           </div>
         </li> -->
+        <li *ngIf="isLoggedIn">
+          <a
+            routerLink="/courses"
+            routerLinkActive="active-link"
+            class="text-muted navbarLink"
+            translate
+            >Courses</a
+          >
+        </li>
+        <li *ngIf="isLoggedIn">
+          <a href="#" class="text-muted" translate>Assignments</a>
+        </li>
+        <li *ngIf="isLoggedIn">
+          <a href="#" class="text-muted" translate>My_Page</a>
+        </li>
+        <li *ngIf="!isLoggedIn">
+          <a routerLink="/login" class="text-muted navbarLink" translate
+            >Login</a
+          >
+        </li>
+        <li *ngIf="isLoggedIn">
+          <a class="text-muted navbarLink logOut" (click)="logOut()" translate
+            >Log_Out</a
+          >
+        </li>
       </ul>
     </div>
     <span class="navTrigger">
@@ -44,5 +72,3 @@
   </div>
 </nav>
 <div style="height: 80px"></div>
-
-<!--TODO: add witch language is active-->

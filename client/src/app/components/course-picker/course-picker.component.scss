@@ -1,0 +1,40 @@
+.nav-tabs {
+  --bs-nav-tabs-border-width: 0px;
+}
+
+.nav-link {
+  color: #6c757d;
+  font-size: 18px;
+}
+
+.nav-link:hover {
+  background-color: #e6e6e6;
+  color: #6c757d;
+}
+
+.nav-tabs .nav-link.active {
+  color: whitesmoke;
+  background-color: #26734d;
+}
+
+.teachingIllu {
+  position: absolute;
+  bottom: 60px;
+  right: 50px;
+}
+
+.card {
+  width: 500px;
+  height: 250px;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  background-color: #4c5458;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.1s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from "@angular/forms";
 import { LoginComponent } from "./login.component";
 
 describe('Testing Creating the login component', () => { 
@@ -7,7 +7,7 @@ describe('Testing Creating the login component', () => {
     TestBed.configureTestingModule({
       imports: [],
       declarations: [LoginComponent],
-      providers : [FormBuilder]
+      providers : [UntypedFormBuilder]
     })
   })
   it('should create the login component',(() => {
@@ -26,7 +26,7 @@ describe('Testing the flip', () => {
     TestBed.configureTestingModule({
       imports: [],
       declarations: [LoginComponent],
-      providers : [FormBuilder]
+      providers : [UntypedFormBuilder]
     })
 
     fixture = TestBed.createComponent(LoginComponent);
@@ -63,13 +63,13 @@ describe('Testing the flip', () => {
 describe('Testing effect on login/signup input', () => {
   let loginComponent : LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let form: FormGroup;
+  let form: UntypedFormGroup;
  
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ LoginComponent ],
-      providers : [FormBuilder]
+      providers : [UntypedFormBuilder]
     })
     .compileComponents();
   });
@@ -80,10 +80,10 @@ describe('Testing effect on login/signup input', () => {
     loginComponent = fixture.componentInstance;
     fixture.detectChanges();
 
-    form = new FormGroup({
-      email: new FormControl('', Validators.required),
-      password: new FormControl('', Validators.required),
-      rememberMe: new FormControl(false)
+    form = new UntypedFormGroup({
+      email: new UntypedFormControl('', Validators.required),
+      password: new UntypedFormControl('', Validators.required),
+      rememberMe: new UntypedFormControl(false)
     });
   });
 
