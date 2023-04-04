@@ -1,6 +1,6 @@
 import subprocess
 import pathlib
-from user_handler import Role
+from .user_handler import Role
 
 def check_against_ldap(cid: str):
     output = subprocess.run(
