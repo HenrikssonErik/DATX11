@@ -28,7 +28,7 @@ def create_course(course_name: str, course_abbr: str, year: int,
     return id
 
 
-def get_courses_info(user_id: int) -> list[dict[str, any]]:
+def get_courses_info(user_id: int) -> list[dict[str, str | int]]:
     """Returns an array with information on Courses associated to the userId"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -42,7 +42,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         conn.close()
         if not data:
             return []
-        orderedData: list[dict[str, any]] = []
+        orderedData: list[dict[str, str | int]] = []
         for info in data:
             orderedData.append({"Role": info[1], "courseID": info[2],
                                 "CourseName": info[3],
@@ -56,7 +56,7 @@ def get_courses_info(user_id: int) -> list[dict[str, any]]:
         return [{'status': "No Courses Found"}]
 
 
-def get_course_info(user_id: int, course_id: int) -> dict[str:any]:
+def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
     """Returns a dict with information on the specified course associated to
     the user_id, course_id"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -72,7 +72,7 @@ def get_course_info(user_id: int, course_id: int) -> dict[str:any]:
         if not data:
             raise Exception("No Courses Found")
 
-        orderedData: dict[str, any] = {}
+        orderedData: dict[str, str | int] = {}
         orderedData["Role"] = data[1]
         orderedData["courseID"] = data[2]
         orderedData["CourseName"] = data[3]
@@ -188,7 +188,7 @@ def get_assignments(course_id: int) -> tuple:
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
-                assignments: list[dict[str:any]] = []
+                assignments: list[dict[str: str | int]] = []
                 for assignment_row in data:
                     assignments.append({'AssignmentNr': assignment_row[0],
                                         'DueDate': assignment_row[1],
