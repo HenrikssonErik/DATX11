@@ -18,8 +18,8 @@ def check_against_ldap(cid: str):
     name = result.split(",")[0]
 
     if (b_teacher and not b_ta):
-        return [Role.Teacher, name]
+        return [Role.Teacher.name, name]
     if (b_student):
-        return [Role.Student, name]
+        return [Role.Student.name, name]
     else:
         return ["false", "false"]
