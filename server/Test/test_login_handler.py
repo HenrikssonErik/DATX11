@@ -31,7 +31,7 @@ def setup_mock_cursor(mock_connect) -> MagicMock:
     return mock_cursor
 
 
-def random_cid_generator(length=5) -> str:
+def random_cid_generator(length=6) -> str:
     random_cid = ''.join(random.choice(string.ascii_lowercase)
                          for i in range(length))
     return random_cid
