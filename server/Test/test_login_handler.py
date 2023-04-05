@@ -7,14 +7,6 @@ import unittest
 from unittest.mock import MagicMock, patch
 import bcrypt
 from psycopg2 import IntegrityError
-import bcrypt
-from unittest.mock import MagicMock, patch
-import unittest
-from pathlib import Path
-import sys
-from typing import Literal
-import string
-from random import random
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_verification_token, verify_user_in_db, verify_user_from_email_verification  # noqa: E402, E501

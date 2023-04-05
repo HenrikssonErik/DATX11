@@ -72,10 +72,12 @@ def user_registration(data: Request.form) -> \
     pwd: str = data['password']
 
     role = check_against_ldap(cid)
-    user_exists = True
 
-    if (role[1] == "false"):
-        user_exists = False
+    user_exists = False if (role[1] == "false") else True
+    # user_exists = True
+
+    # if (role[1] == "false"):
+    #     user_exists = False
 
     data_check = check_data_input(cid, email, pwd, user_exists)
 
@@ -146,7 +148,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
                 data = cur.fetchone()
                 id = data[0]
                 passphrase: bytes = data[1].tobytes()
-                verified = data[2]
+                verified = data[3]
 
         conn.close()
         if not data:
