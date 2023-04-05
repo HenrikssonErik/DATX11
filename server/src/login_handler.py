@@ -75,10 +75,6 @@ def user_registration(data: Request.form) -> \
     role = check_against_ldap(cid)
 
     user_exists = False if (role[1] == "false") else True
-    # user_exists = True
-
-    # if (role[1] == "false"):
-    #     user_exists = False
 
     data_check = check_data_input(cid, email, pwd, user_exists)
 
