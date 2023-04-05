@@ -169,9 +169,13 @@ export class LoginComponent implements OnInit {
           });
         },
         complete: () => {
-          this.toastr.success('Success!', 'User created!', {
-            closeButton: true,
-          });
+          this.toastr.success(
+            'You will now receive a verification email, click the link in the email to verify your account!',
+            'User created!',
+            {
+              closeButton: true,
+            }
+          );
         },
       });
   }
