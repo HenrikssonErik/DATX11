@@ -83,6 +83,7 @@ def _get_group_members(group_id: int) -> list:
 
     except Exception as e:
         print(e)
+        # TODO: Raise exception instead of returning a value / change return type
         return {'status': "no_group_members"}
 
 
@@ -108,6 +109,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
 
     except Exception as e:
         print(e)
+        # TODO: Raise exception instead of returning a value / change return type
         return {'status': e.args}
 
 
@@ -130,6 +132,7 @@ def _get_course_id_from_group(group_id) -> int:
 
     except Exception as e:
         print(e)
+        # TODO: Raise exception instead of returning a value / change return type
         return e
 
 
@@ -146,6 +149,7 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
 
     except Exception as e:
         print(e)
+        # TODO: Raise exception instead of returning a value / change return type
         return e
 
 
@@ -162,6 +166,7 @@ def remove_user_from_course(user_id: int, course_id) -> None:
 
     except Exception as e:
         print(e)
+        # TODO: Raise exception instead of returning a value / change return type
         return (e)
 
 
@@ -178,6 +183,7 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
         conn.close()
     except Exception as e:
         print(e)
+        # TODO: Raise exception instead of returning a value / change return type
         return {'status': "Could not remove from group"}
 
 
@@ -225,6 +231,7 @@ def get_global_role(user_id) -> str:
 
     except Exception as e:
         print(e)
+        # TODO: Raise exception instead of returning a value / change return type
         return {'status': "No User Found"}
 
 
