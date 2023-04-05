@@ -48,12 +48,13 @@ def check_data_input(cid: str, email: str, pwd: str,
         return 'email_missing', 400
     if not email == cid + "@chalmers.se":
         return "wrong_format", 400
+    if not user_exists:
+        return "cid_does_not_exist", 400
     allowed_characters = set(string.ascii_letters + string.digits +
                              string.punctuation)
     if not set(pwd) <= allowed_characters:
         return "pass_not_ok", 400
-    if not user_exists:
-        return "cid_does_not_exist", 400
+
     return "OK", 200
 
 
