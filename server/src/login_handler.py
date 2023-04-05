@@ -54,7 +54,6 @@ def check_data_input(cid: str, email: str, pwd: str,
                              string.punctuation)
     if not set(pwd) <= allowed_characters:
         return "pass_not_ok", 400
-
     return "OK", 200
 
 
