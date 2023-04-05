@@ -54,7 +54,6 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
         orderedData["groupId"] = data[0]
         orderedData["groupNumber"] = data[1]
         group_members = _get_group_members(data[0])
-        print(group_members)
         orderedData["groupMembers"] = group_members
         return orderedData
 
@@ -231,7 +230,7 @@ def get_global_role(user_id) -> str:
 
 def check_admin_or_course_teacher(user_id: int, course_id: int):
     course_administrator: bool = is_admin_on_course(user_id, course_id) or \
-                            is_teacher_on_course(user_id, course_id)
+        is_teacher_on_course(user_id, course_id)
     global_admin: bool = get_global_role(user_id) == Role.Admin.name
 
     return course_administrator or global_admin
