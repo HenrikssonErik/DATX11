@@ -9,7 +9,7 @@ from .file_handler import handle_files, \
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
-    verify_user_from_email_verification
+    verify_user_from_email_verification, verify_and_get_id
 from flask_mail import Mail, Message
 import jwt
 from .podman.podman_runner import init_images

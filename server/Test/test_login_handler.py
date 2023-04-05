@@ -123,8 +123,9 @@ class TestFileHandler(unittest.TestCase):
         salt = bcrypt.gensalt()
         passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
         mock_cursor = setup_mock_cursor(mock_connect)
-        mock_cursor.fetchone.return_value = [1, passphrase, 'Admin']
+        mock_cursor.fetchone.return_value = [1, passphrase, 'Admin', True]
         result = log_in('test1.chalmers.se', 'pass')
+        print(result)
         self.assertEqual(result[1], 200)
         self.assertTrue(result[0].get('Token').startswith(
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'))
