@@ -83,8 +83,7 @@ def _get_group_members(group_id: int) -> list:
 
     except Exception as e:
         print(e)
-        # TODO: Raise exception instead of returning a value / change return type
-        return {'status': "no_group_members"}
+        raise Exception("Something went wrong when getting group members")
 
 
 def add_user_to_group(user_id: int, group_id: int) -> None:
@@ -109,8 +108,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
 
     except Exception as e:
         print(e)
-        # TODO: Raise exception instead of returning a value / change return type
-        return {'status': e.args}
+        raise Exception("Error when adding user!")
 
 
 def _get_course_id_from_group(group_id) -> int:
@@ -132,8 +130,7 @@ def _get_course_id_from_group(group_id) -> int:
 
     except Exception as e:
         print(e)
-        # TODO: Raise exception instead of returning a value / change return type
-        return e
+        raise Exception("Error when getting course id!")
 
 
 def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
@@ -149,8 +146,7 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
 
     except Exception as e:
         print(e)
-        # TODO: Raise exception instead of returning a value / change return type
-        return e
+        raise Exception("Error when adding user to course!")
 
 
 def remove_user_from_course(user_id: int, course_id) -> None:
@@ -166,8 +162,7 @@ def remove_user_from_course(user_id: int, course_id) -> None:
 
     except Exception as e:
         print(e)
-        # TODO: Raise exception instead of returning a value / change return type
-        return (e)
+        raise Exception("Error when removing user from course!")
 
 
 def remove_user_from_group(user_id: int, group_id: int) -> None:
@@ -183,8 +178,7 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
         conn.close()
     except Exception as e:
         print(e)
-        # TODO: Raise exception instead of returning a value / change return type
-        return {'status': "Could not remove from group"}
+        raise Exception("Error when removing user from group!")
 
 
 def is_teacher_on_course(user_id: int, course_id: int) -> bool:
@@ -231,8 +225,7 @@ def get_global_role(user_id) -> str:
 
     except Exception as e:
         print(e)
-        # TODO: Raise exception instead of returning a value / change return type
-        return {'status': "No User Found"}
+        raise Exception("Error when finding the user!")
 
 
 def check_admin_or_course_teacher(user_id: int, course_id: int):
