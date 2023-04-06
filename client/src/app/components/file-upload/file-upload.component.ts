@@ -24,7 +24,9 @@ export class FileUploadComponent {
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
 
-  @Input() config!: UploadFileConfigService | UploadUnitTestConfigService;
+  endpoint = 'files';
+  allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
+  allowedFileTypesForPrint = ['.py', '.pdf', '.txt'];
 
   testFeedBackArray: any[] = [];
 
@@ -69,7 +71,7 @@ export class FileUploadComponent {
    * @returns {void}
    */
   prepareFilesList(files: Array<File>): void {
-    const allowedTypes = this.config.allowedFileTypes;
+    const allowedTypes = this.allowedFileTypes;
     for (const file of files) {
       const index = this.files.findIndex((f) => f.name === file.name);
       if (allowedTypes.includes(file.type)) {
@@ -139,7 +141,7 @@ export class FileUploadComponent {
     );
 
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + this.config.endpoint, formData, {
+      .post<HttpResponse<any>>(`${API_URL}/` + this.endpoint, formData, {
         observe: 'response',
       })
       .subscribe({

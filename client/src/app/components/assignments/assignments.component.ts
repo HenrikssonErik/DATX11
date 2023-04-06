@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 import { Assignment, Course } from 'src/app/models/courses';
 import { CourseService } from 'src/app/services/course-service.service';
 import { API_URL } from 'src/environments/environment';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FileUploadModalComponent } from '../file-upload-modal/file-upload-modal.component';
 
 @Component({
   selector: 'app-assignments',
@@ -19,7 +21,8 @@ export class AssignmentsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private courseService: CourseService,
-    private http: HttpClient
+    private http: HttpClient,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit() {
@@ -31,8 +34,13 @@ export class AssignmentsComponent implements OnInit {
     }
 
     this.getGroup(id).subscribe((res: Course) => {
+      //TODO: HANDLE THE EMPTY GROUP BETTER
       console.log(res);
-      this.group = res;
+      if (res.hasOwnProperty('status')) {
+        this.group = [];
+      } else {
+        this.group = res;
+      }
     });
   }
 
@@ -46,6 +54,11 @@ export class AssignmentsComponent implements OnInit {
 
   goBack(): void {
     window.history.back();
+  }
+
+  openModal(): void {
+    const modalRef = this.modalService.open(FileUploadModalComponent);
+    modalRef.componentInstance.name = 'fileUpload';
   }
 
   getGroup(id: number): Observable<Course> {

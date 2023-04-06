@@ -1,83 +1,62 @@
-<div class="container" style="max-width: 375px">
-  <div class="row">
-    <div [ngClass]="files.length > 0 ? 'col-6' : 'col-12'">
-      <div class="file-drop-area">
-        <div appDnd (fileDropped)="onFileDropped($event)">
-          <input
-            type="file"
-            #fileUpload
-            id="fileUpload"
-            multiple
-            (change)="fileBrowseHandler($event)"
-          />
-          <i class="fa-solid fa-arrow-up-from-bracket upload-icon"></i>
-          <h3 class="text-muted">Drag and drop a file here</h3>
-          <h3 class="text-muted">or</h3>
-          <button
-            class="btn btn-primary"
-            style="background-color: #3d9970; border: #3d9970"
-          >
-            <label for="fileUpload">Browse</label>
-          </button>
-          <br />
-          <p>
-            <small class="small-text"
-              >Supported files:
-              <span
-                *ngFor="
-                  let supportedFileType of config.allowedFileTypesForPrint;
-                  let isLast = last
-                "
-              >
-                {{ supportedFileType }}{{ isLast ? "" : "," }}&nbsp;
-              </span>
-            </small>
+<div class="file-drop-area">
+  <div appDnd (fileDropped)="onFileDropped($event)">
+    <input
+      type="file"
+      #fileUpload
+      id="fileUpload"
+      multiple
+      (change)="fileBrowseHandler($event)"
+    />
+    <i class="fa-solid fa-arrow-up-from-bracket upload-icon"></i>
+    <h5 class="text-muted">Drag and drop a file here</h5>
+    <h5 class="text-muted">or</h5>
+    <button class="btn btn-primary">
+      <label for="fileUpload">Browse</label>
+    </button>
+    <br />
+    <p>
+      <small class="small-text"
+        >Supported files:
+        <span
+          *ngFor="
+            let supportedFileType of allowedFileTypesForPrint;
+            let isLast = last
+          "
+        >
+          {{ supportedFileType }}{{ isLast ? "" : "," }}&nbsp;
+        </span>
+      </small>
+    </p>
+  </div>
+</div>
+<div *ngIf="files.length > 0">
+  <div class="files-list">
+    <div class="row">
+      <div class="single-file" *ngFor="let file of files; let i = index">
+        <img
+          src="assets/{{ getImageType(file) }}"
+          width="auto"
+          height="35px"
+          alt="file"
+        />
+        <!--<i [ngClass]="{'fa-brands fa-python file-type': file.type === 'text/x-python', 'fa-solid fa-file file-type' : file.type === 'text/plain', 'fa-regular fa-file-pdf file-type' : file.type === 'application/pdf'}"></i>-->
+        <div class="info">
+          <h4 class="name">
+            {{ file.name }}
+          </h4>
+          <p class="size">
+            {{ formatBytes(file.size) }}
           </p>
         </div>
-      </div>
-    </div>
-    <div [ngClass]="{ 'col-6 right-column': files.length > 0 }">
-      <div *ngIf="files.length > 0">
-        <div class="files-list">
-          <div class="row">
-            <div class="info-wrap">
-              <div
-                class="single-file"
-                *ngFor="let file of files; let i = index"
-              >
-                <img
-                  src="assets/{{ getImageType(file) }}"
-                  width="45px"
-                  alt="file"
-                />
-                <!--<i [ngClass]="{'fa-brands fa-python file-type': file.type === 'text/x-python', 'fa-solid fa-file file-type' : file.type === 'text/plain', 'fa-regular fa-file-pdf file-type' : file.type === 'application/pdf'}"></i>-->
-                <div class="info">
-                  <h4 class="name">
-                    {{ file.name }}
-                  </h4>
-                  <p class="size">
-                    {{ formatBytes(file.size) }}
-                  </p>
-                </div>
-                <i class="fa-solid fa-xmark delete" (click)="deleteFile(i)"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button
-          style="background-color: #3d9970; border: #3d9970"
-          class="btn btn-primary upload-button"
-          (click)="uploadFiles()"
-        >
-          Upload
-        </button>
+        <i class="fa-solid fa-xmark delete" (click)="deleteFile(i)"></i>
       </div>
     </div>
   </div>
-</div>
-<div
-  *ngIf="config.showFeedback"
-  style="padding-top: 10px; margin-bottom: 100px"
->
-  <app-test-feedback [feedbackFiles]="testFeedBackArray"></app-test-feedback>
+  <button
+    style="background-color: #3d9970; border: #3d9970"
+    class="btn btn-primary upload-button"
+    (click)="uploadFiles()"
+  >
+    Submit
+  </button>
 </div>
