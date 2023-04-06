@@ -16,3 +16,8 @@ body {
   background-color: #216b42 !important;
   border-color: #216b42 !important;
 }
+
+/* Fix for modal shifting the background */
+body.modal-open {
+  padding-left: 17px;
+}
