@@ -37,7 +37,6 @@ class TestUserHandler(unittest.TestCase):
         self.assertIn('not_exist1', res[1])
         self.assertIn('not_exist2', res[1])
 
-
     @patch('psycopg2.connect')
     def test_get_user_ids_from_cids_only_not_exist(self, mock_connect):
         valid_uid_and_cid = []
@@ -52,7 +51,6 @@ class TestUserHandler(unittest.TestCase):
         self.assertEqual(len(res[1]), 2)
         self.assertIn('not_exist1', res[1])
         self.assertIn('not_exist2', res[1])
-
 
     @patch('psycopg2.connect')
     def test_get_user_ids_from_cids_only_exist(self, mock_connect):

@@ -304,8 +304,10 @@ def add_to_course():
     user_to_add: int = data['User']
     role = data['Role']
 
-    if (user_handler.check_admin_or_course_teacher(request_user_id,
-                                                   course_id)):
+    if (user_handler.check_admin_or_course_teacher(
+        request_user_id,
+        course_id
+    )):
         user_handler.add_user_to_course(user_to_add, course_id, role)
         return make_response("", 200)
     return make_response("", 401)
