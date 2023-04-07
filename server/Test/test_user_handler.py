@@ -21,6 +21,55 @@ class TestUserHandler(unittest.TestCase):
         self.test_file_dir = Path(__file__).parent/"test_files_user_handler"
 
     @patch('psycopg2.connect')
+    def test_get_user_ids_from_cids_exist_and_not_exist(self, mock_connect):
+        valid_uid_and_cid = [(1, "test1"), (2, "test2")]
+        mock_cursor = setup_mock_cursor(mock_connect)
+        mock_cursor.fetchall.return_value = valid_uid_and_cid
+
+        res = user_handler.get_user_ids_from_cids(
+            ["test1", "test2", "not_exist1", "not_exist2"]
+        )
+
+        self.assertEqual(len(res[0]), 2)
+        self.assertEqual(len(res[1]), 2)
+        self.assertIn(1, res[0])
+        self.assertIn(2, res[0])
+        self.assertIn('not_exist1', res[1])
+        self.assertIn('not_exist2', res[1])
+
+
+    @patch('psycopg2.connect')
+    def test_get_user_ids_from_cids_only_not_exist(self, mock_connect):
+        valid_uid_and_cid = []
+        mock_cursor = setup_mock_cursor(mock_connect)
+        mock_cursor.fetchall.return_value = valid_uid_and_cid
+
+        res = user_handler.get_user_ids_from_cids(
+            ["not_exist1", "not_exist2"]
+        )
+
+        self.assertEqual(len(res[0]), 0)
+        self.assertEqual(len(res[1]), 2)
+        self.assertIn('not_exist1', res[1])
+        self.assertIn('not_exist2', res[1])
+
+
+    @patch('psycopg2.connect')
+    def test_get_user_ids_from_cids_only_exist(self, mock_connect):
+        valid_uid_and_cid = [(1, "test1"), (2, "test2")]
+        mock_cursor = setup_mock_cursor(mock_connect)
+        mock_cursor.fetchall.return_value = valid_uid_and_cid
+
+        res = user_handler.get_user_ids_from_cids(
+            ["test1", "test2"]
+        )
+
+        self.assertEqual(len(res[0]), 2)
+        self.assertEqual(len(res[1]), 0)
+        self.assertIn(1, res[0])
+        self.assertIn(2, res[0])
+
+    @patch('psycopg2.connect')
     def test_get_group(self, mock_connect):
         with patch.object(user_handler, '_get_group_members') as mock_groups:
             mock_cursor = setup_mock_cursor(mock_connect)
@@ -34,14 +83,16 @@ class TestUserHandler(unittest.TestCase):
                                 userGroupCourseInfo
                                 WHERE userid = %s and courseid = %s""",
                                                         (user_id, course_id))
-            self.assertEqual(result, {'groupId': 2, 'groupNumber': 1, 'groupMembers': ['alebru']})
+            self.assertEqual(
+                result, {'groupId': 2, 'groupNumber': 1, 'groupMembers': ['alebru']})
 
     @patch('psycopg2.connect')
     def test_add_user_to_course(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
         user_id = 1
         course_id = 6
-        user_handler.add_user_to_course(user_id, course_id, user_handler.Role.Student)
+        user_handler.add_user_to_course(
+            user_id, course_id, user_handler.Role.Student)
 
         mock_cursor.execute.assert_called_once_with("""INSERT into userincourse values
                                 (%s, %s, %s)""", [user_id, course_id, user_handler.Role.Student.name])
@@ -117,11 +168,13 @@ class TestUserHandler(unittest.TestCase):
     def test_get_user(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
         user_id = 1
-        mock_cursor.fetchone.return_value = ('kvalden', 'kvalden@chalmers.se', 'Sebastian Kvaldén')
+        mock_cursor.fetchone.return_value = (
+            'kvalden', 'kvalden@chalmers.se', 'Sebastian Kvaldén')
         result = user_handler.get_user(user_id)
         mock_cursor.execute.assert_called_once_with("""SELECT cid, email, fullname FROM Userdata
                             WHERE userid = %s""", (user_id,))
-        self.assertEqual(result, {'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén'})
+        self.assertEqual(result, {
+                         'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén'})
 
     @patch('psycopg2.connect')
     def test_get_global_role(self, mock_connect):
