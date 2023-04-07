@@ -272,6 +272,27 @@ def remove_from_group():
     return make_response("", 401)
 
 
+# gets a list of cids that needs to be added to a course and
+# in the case of the user not existing should create the user with a random
+# temp password
+@app.route('/batchAddToCourse', methods=['POST'])
+def batch_add_to_course():
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course_id: int = data['Course']
+    if (user_handler.check_admin_or_course_teacher(
+        request_user_id,
+        course_id
+    )):
+        (user_ids, none_existing_cids) = \
+            user_handler.get_user_ids_from_cids(data["Cids"])
+        user_handler.add_users_to_course(user_ids, course_id)
+        if len(none_existing_cids) != 0:
+            # TODO: create these users and then add them to this course
+            pass
+
+
 # Should probably be redone to take a list of users, redo how singup works
 # as well with cid/email being added to the list first
 @app.route('/addToCourse', methods=['POST'])
