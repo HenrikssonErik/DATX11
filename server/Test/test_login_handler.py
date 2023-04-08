@@ -69,7 +69,7 @@ class TestFileHandler(unittest.TestCase):
                                         'password': 'abc123'})
 
             self.assertEqual(result[1], 200)
-            self.assertTrue(result[0].get('Token').
+            self.assertTrue(result[0].get('token').
                             startswith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"))
 
     @patch('psycopg2.connect')
@@ -196,7 +196,7 @@ class TestFileHandler(unittest.TestCase):
 
     def test_verify_user_from_email_verification_success(self):
         random_cid = random_cid_generator()
-        test_token = create_verification_token(random_cid)[0].get('Token')
+        test_token = create_verification_token(random_cid)
         # with patch.object(bcrypt, 'gensalt') as mock_gensalt:
         mock_response = {'status': 'success'}, 200
         with patch('src.login_handler.verify_user_in_db', return_value=mock_response):
