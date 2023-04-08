@@ -87,7 +87,7 @@ def user_registration(data: Request.form) -> \
     res_query: tuple[dict[str, str], Literal[200, 406]
                      ] = registration_query(cid, email, hashed_pass,
                                             role[0], role[1])
-    res_object = (create_verification_token(cid)) if (
+    res_object = ({'token': create_verification_token(cid)}, 200) if (
         res_query[1] == 200) else (res_query)
 
     return res_object
@@ -127,7 +127,7 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
     return {'status': status}, res_code
 
 
-def user_to_verify(cid: str) -> tuple:
+def user_to_resend_verification(cid: str) -> tuple:
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
@@ -138,11 +138,15 @@ def user_to_verify(cid: str) -> tuple:
                 cur.execute(query_data, (cid,))
                 data = cur.fetchone()
                 verified = data[1]
+                mail = data[0]
 
                 if not data:
-                    return {"status": "no_user"}, 406
+                    raise psycopg2.DatabaseError()
                 if not verified:
-                    return {"email": data[0]}, 200
+                    response_object = {"email": mail}
+                    token = create_verification_token(cid)
+                    response_object.update({'token': token})
+                    return response_object, 200
                 else:
                     return {"status": "already_verified"}, 406
             except:
@@ -185,7 +189,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         return {'status': "wrong_credentials"}, 401
 
 
-def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
+def create_verification_token(cid: str) -> str:
     """
     Creates a token to verify a User that is valid for 24 hours.
     This token is sent in the verification email to the user registering.
@@ -196,7 +200,7 @@ def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
         'exp': datetime.utcnow() + timedelta(hours=24)
     }
     token = jwt.encode(payload=data, key=__SECRET_KEY)
-    return {'Token': token}, 200
+    return token
 
 
 def verify_user_from_email_verification(token: str) -> \

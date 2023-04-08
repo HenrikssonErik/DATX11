@@ -4,12 +4,14 @@ from typing import Literal
 from flask import Flask, Response, jsonify, make_response, render_template, \
     request, send_file
 from flask_cors import CORS
+import psycopg2
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
-    verify_user_from_email_verification, verify_and_get_id
+    user_to_resend_verification, verify_user_from_email_verification, \
+    verify_and_get_id
 from flask_mail import Mail, Message
 import jwt
 from .podman.podman_runner import init_images
@@ -71,6 +73,24 @@ def sign_up() -> Response:
         res = make_response(response[0], response[1])
 
     return res
+
+
+@app.route('/resendVerification', methods=["POST"])
+def resend_verification_email():
+    data = request.get_json()
+    cid = data['cid']
+
+    try:
+        user_lookup = user_to_resend_verification(cid)
+        if (user_lookup[1] == 200):
+            email = user_lookup[0]['email']
+            token = user_lookup[0]['token']
+            send_verification_email(email, token)
+            return make_response({"status": "success"}, 200)
+        else:
+            return user_lookup
+    except psycopg2.DatabaseError.pgcode:
+        return make_response({'status': 'no_user'}, 406)
 
 
 @app.route('/verify_email', methods=['POST'])
