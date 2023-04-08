@@ -126,6 +126,28 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
     return {'status': status}, res_code
 
 
+def user_to_verify(cid: str) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            try:
+                query_data = """SELECT email, verified
+                            FROM UserData
+                            WHERE userdata.cid = %s"""
+                cur.execute(query_data, (cid,))
+                data = cur.fetchone()
+                verified = data[1]
+
+                if not data:
+                    return {"status": "no_user"}, 406
+                if not verified:
+                    return {"email": data[0]}, 200
+                else:
+                    return {"status": "already_verified"}, 406
+            except:
+                return {"status": "uncaught_error"}, 500
+
+
 def log_in(email: str, password: str) -> tuple[dict[str, str],
                                                Literal[200, 401]]:
     """
