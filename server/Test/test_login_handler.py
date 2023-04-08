@@ -201,3 +201,9 @@ class TestFileHandler(unittest.TestCase):
             verification_response = verify_user_from_email_verification(
                 test_token)
             self.assertEqual(random_cid, verification_response[0].get('cid'))
+
+    @patch('psycopg2.connect')
+    def test_user_to_resend_verification_success(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        cid = random_cid_generator()
+        mock_cur.fetchone.return_value = [cid + '@chalmers.se', 'False']
