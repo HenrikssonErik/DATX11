@@ -5,7 +5,7 @@ import datetime
 
 def create_course(course_name: str, course_abbr: str, year: int,
                   teaching_period: int) -> tuple | int:
-    """Cretes a course. Also checks so the course data that is
+    """Creates a course. Also checks so the course data that is
     added is according to database requirements
 
     Returns: A dict with errors if they exists,
@@ -114,9 +114,9 @@ def add_groups_to_course(number_of_groups: int, course_id: int):
 
 
 def _create_course(course_name: str, course_abbr: str, year: int,
-                    teaching_period: int) -> int | tuple:
-    """Internal method to create a course, used by create_course method after verification of data
-    Returnsthe new course ID"""
+                   teaching_period: int) -> int | tuple:
+    """Internal method to create a course, used by create_course method after
+       verification of data Returnsthe new course ID"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -143,8 +143,8 @@ def _create_course(course_name: str, course_abbr: str, year: int,
 
 def create_assignment(course_id: int, description: str, assignment_nr: int,
                       end_date: str, file_names: list) -> dict:
-    """Creates an assignment for a course, assignment number will not be incremented automatically,
-    thus must be provided by the creator"""
+    """Creates an assignment for a course, assignment number will not be
+       incremented automatically, thus must be provided by the creator"""
     res: dict = {}
     for name in file_names:
         if not (check_file_extension(name)):
@@ -177,7 +177,8 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
 
 
 def get_assignments(course_id: int) -> tuple:
-    """Returns a list of all assignments connected to a course, with their description and end date"""
+    """Returns a list of all assignments connected to a course, with their
+       description and end date"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -224,7 +225,7 @@ def change_description(new_desc: str, course_id: int,
 
 
 # TODO: not done or tested, returns statements must be fixed
-def set_teacher_feedback(group_id: int, feedback: str, grade: bool, 
+def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
                          passed: bool, course: int, assignment: int):
     """Submission is set to 0 since a primary cannot be null.
     It will increment by default anyway."""
@@ -232,9 +233,10 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """INSERT INTO AssignmentFeedback (groupId,
-                courseId, assignment, submission, teacherGrade, teacherFeedback, testPassed)
-                VALUES (%s, %s, %s, 0, %s, %s, %s);"""
+                query_one = """INSERT INTO AssignmentFeedback
+                               (groupId, courseId, assignment, submission,
+                                teacherGrade, teacherFeedback, testPassed)
+                                VALUES (%s, %s, %s, 0, %s, %s, %s);"""
                 cur.execute(query_one, [group_id, course, assignment, 0, grade,
                                         feedback, passed])
         conn.close()

@@ -1,4 +1,5 @@
-import time, pprint
+import time
+import pprint
 
 
 if "__main__" == __name__:

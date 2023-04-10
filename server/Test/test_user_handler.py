@@ -30,21 +30,25 @@ class TestUserHandler(unittest.TestCase):
             course_id = 6
             result = user_handler.get_group(user_id, course_id)
 
-            mock_cursor.execute.assert_called_once_with("""SELECT groupid, groupnumber FROM
-                                userGroupCourseInfo
-                                WHERE userid = %s and courseid = %s""",
-                                                        (user_id, course_id))
-            self.assertEqual(result, {'groupId': 2, 'groupNumber': 1, 'groupMembers': ['alebru']})
+            mock_cursor.execute.assert_called_once_with(
+                    """SELECT groupId, groupNumber FROM UserGroupCourseInfo
+                    WHERE userId = %s and courseId = %s""",
+                    (user_id, course_id))
+
+            self.assertEqual(result, {'groupId': 2, 'groupNumber': 1,
+                                      'groupMembers': ['alebru']})
 
     @patch('psycopg2.connect')
     def test_add_user_to_course(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
         user_id = 1
         course_id = 6
-        user_handler.add_user_to_course(user_id, course_id, user_handler.Role.Student)
+        user_handler.add_user_to_course(user_id, course_id,
+                                        user_handler.Role.Student)
 
-        mock_cursor.execute.assert_called_once_with("""INSERT into userincourse values
-                                (%s, %s, %s)""", [user_id, course_id, user_handler.Role.Student.name])
+        mock_cursor.execute.assert_called_once_with(
+                        """INSERT INTO Userincourse VALUES (%s, %s, %s)""",
+                        [user_id, course_id, user_handler.Role.Student.name])
 
     @patch('psycopg2.connect')
     def test_remove_user_from_group(self, mock_connect):
@@ -53,8 +57,8 @@ class TestUserHandler(unittest.TestCase):
         mock_cursor = setup_mock_cursor(mock_connect)
         user_handler.remove_user_from_group(user_id, group_id)
 
-        mock_cursor.execute.assert_called_once_with("""DELETE from useringroup
-                                WHERE userid = %s AND groupid = %s """,
+        mock_cursor.execute.assert_called_once_with("""DELETE FROM UserInGroup
+                                WHERE userId = %s AND groupId = %s """,
                                                     [user_id, group_id])
 
     @patch('src.user_handler.get_courses_info')
@@ -117,11 +121,17 @@ class TestUserHandler(unittest.TestCase):
     def test_get_user(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
         user_id = 1
-        mock_cursor.fetchone.return_value = ('kvalden', 'kvalden@chalmers.se', 'Sebastian Kvaldén')
+        mock_cursor.fetchone.return_value = ('kvalden', 'kvalden@chalmers.se',
+                                             'Sebastian Kvaldén')
+
         result = user_handler.get_user(user_id)
-        mock_cursor.execute.assert_called_once_with("""SELECT cid, email, fullname FROM Userdata
-                            WHERE userid = %s""", (user_id,))
-        self.assertEqual(result, {'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén'})
+        mock_cursor.execute.assert_called_once_with(
+                                """SELECT cid, email, fullname FROM Userdata
+                                WHERE userid = %s""", (user_id,))
+
+        self.assertEqual(result, {'cid': 'kvalden',
+                                  'email': 'kvalden@chalmers.se',
+                                  'fullname': 'Sebastian Kvaldén'})
 
     @patch('psycopg2.connect')
     def test_get_global_role(self, mock_connect):
@@ -129,8 +139,10 @@ class TestUserHandler(unittest.TestCase):
         user_id = 1
         mock_cursor.fetchone.return_value = ['Student']
         res = user_handler.get_global_role(user_id)
-        mock_cursor.execute.assert_called_once_with("""SELECT globalrole FROM userdata
+        mock_cursor.execute.assert_called_once_with(
+                            """SELECT globalrole FROM userdata
                             WHERE userid = %s""", [user_id])
+
         self.assertEqual(res, user_handler.Role.Student.name)
 
     @patch('psycopg2.connect')
