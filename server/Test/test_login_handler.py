@@ -233,7 +233,7 @@ class TestFileHandler(unittest.TestCase):
         self.assertEqual(actual_response, expected_response)
 
     @patch('psycopg2.connect')
-    def test_user_to_resend_verification_no_user(self, mock_connect):
+    def test_user_to_resend_verification_unexpected_error(self, mock_connect):
         mock_cur = setup_mock_cursor(mock_connect)
         mock_cur.execute.side_effect = Exception("Generic uncaught exception")
         cid = random_cid_generator()
