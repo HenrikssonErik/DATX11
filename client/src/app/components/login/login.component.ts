@@ -23,6 +23,7 @@ export class LoginComponent implements OnInit {
   submitFailed: boolean = false;
   cid: string = '';
   passwordVisible: boolean = false;
+  verificationCidForm: UntypedFormGroup = new UntypedFormGroup({});
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -36,6 +37,7 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.initializeLoginForm();
     this.initializeSignUpForm();
+    this.initCid();
     this.enableTooltips();
   }
 
@@ -44,6 +46,12 @@ export class LoginComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       rememberMe: [false],
+    });
+  }
+
+  private initCid(): void {
+    this.verificationCidForm = this.fb.group({
+      cid: ['', [Validators.required]],
     });
   }
 
@@ -204,5 +212,48 @@ export class LoginComponent implements OnInit {
       el?.classList.toggle('error', isInvalid);
       el?.classList.toggle('success', !isInvalid && !isValid);
     }
+  }
+
+  onResendVerification(): void {
+    if (this.verificationCidForm.invalid) {
+      return;
+    }
+
+    const cidForm = new FormData();
+    const cid = this.verificationCidForm.get('cid');
+    if (cid) {
+      cidForm.append('cid', cid.value);
+    } else {
+      return;
+    }
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/resendVerification`, cidForm, {
+        observe: 'response',
+      })
+      .subscribe({
+        next: (response: any) => {},
+        error: (err) => {
+          let statusMsg = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+        complete: () => {
+          this.toastr.success(
+            'Click the link in the email to verify your account!',
+            'Verification mail has been sent!',
+            {
+              closeButton: true,
+            }
+          );
+        },
+      });
+  }
+
+  openVerificationModal(): void {
+    this.verificationCidForm.reset();
   }
 }

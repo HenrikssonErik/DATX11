@@ -4,12 +4,14 @@ from typing import Literal
 from flask import Flask, Response, jsonify, make_response, render_template, \
     request, send_file
 from flask_cors import CORS
+from .constants import DOMAIN
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
-    verify_user_from_email_verification, verify_and_get_id, random_string
+    user_to_resend_verification, verify_user_from_email_verification, \
+    verify_and_get_id
 from flask_mail import Mail, Message
 import jwt
 
@@ -62,12 +64,27 @@ def sign_up() -> Response:
         user_registration(request.form)
     if (response[1] == 200):
         send_verification_email(
-            request.form['email'], response[0])
+            request.form['email'], response[0]['token'])
         res = make_response({'status': 'success'}, response[1])
     else:
         res = make_response(response[0], response[1])
 
     return res
+
+
+@app.route('/resendVerification', methods=['POST'])
+def resend_verification_email() -> Response:
+    data = request.form
+    cid = data['cid']
+
+    user_lookup = user_to_resend_verification(cid)
+    if (user_lookup[1] == 200):
+        email = user_lookup[0]['email']
+        token = user_lookup[0]['token']
+        send_verification_email(email, token)
+        return make_response({'status': "success"}, 200)
+    else:
+        return make_response(user_lookup)
 
 
 @app.route('/verify_email', methods=['POST'])
@@ -102,7 +119,7 @@ def verify_email() -> Response:
         return res
 
 
-def send_verification_email(to: str, token_dict: dict) -> None:
+def send_verification_email(to: str, token: str) -> None:
     """
     Sends a verification email to the specific user signing up.
     This email is in an HTML format, with a working link sending
@@ -116,14 +133,12 @@ def send_verification_email(to: str, token_dict: dict) -> None:
         token_dict (dict): The jwt-generated token from login_handler's
         create_verification_token-function.
     """
-    token: str = token_dict.get('Token')
-
     msg = Message('Verification Email for Hydrant',
                   sender='temphydrant@gmail.com', recipients=[to])
 
     endpoint: str = "/verifyEmail/" + token
 
-    url: str = "localhost:4200" + endpoint
+    url: str = DOMAIN + endpoint
 
     msg.html = render_template("emailTemplate.html", link=url)
 

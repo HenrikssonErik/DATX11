@@ -25,9 +25,11 @@ const response_to_toastr: ResponseToToastr = {
   cid_does_not_exist: ['CID is not correct.', 'CID is not correct.'],
   course_exists: ['This course already exists'],
   not_verified: [
-    'Check your email to verify',
+    'Check your email to verify.',
     'You have not verified your account yet!',
   ],
+  no_user: ['Register to create your user.', 'There is no user with that CID!'],
+  already_verified: ['Want to login instead?', 'You are already verified!'],
 };
 
 @Injectable({
