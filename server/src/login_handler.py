@@ -136,11 +136,11 @@ def user_to_resend_verification(cid: str) -> tuple:
                             WHERE userdata.cid = %s"""
                 cur.execute(query_data, (cid,))
                 data = cur.fetchone()
+                if not data:
+                    return {'status': 'no_user'}, 406
                 verified = data[1]
                 mail = data[0]
 
-                if not data:
-                    raise psycopg2.DatabaseError()
                 if not verified:
                     response_object = {"email": mail}
                     token = create_verification_token(cid)
@@ -149,7 +149,7 @@ def user_to_resend_verification(cid: str) -> tuple:
                 else:
                     return {"status": "already_verified"}, 406
             except:
-                return {"status": "uncaught_error"}, 500
+                return {"status": "unexpected_error"}, 500
 
 
 def log_in(email: str, password: str) -> tuple[dict[str, str],

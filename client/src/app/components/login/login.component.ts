@@ -1,7 +1,9 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import {
+  FormControl,
   UntypedFormBuilder,
+  UntypedFormControl,
   UntypedFormGroup,
   Validators,
 } from '@angular/forms';
@@ -22,7 +24,9 @@ export class LoginComponent implements OnInit {
   signUpForm: UntypedFormGroup = new UntypedFormGroup({});
   submitFailed: boolean = false;
   cid: string = '';
+  // verCid: string = '';
   passwordVisible: boolean = false;
+  verificationCidForm: UntypedFormGroup = new UntypedFormGroup({});
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -36,6 +40,7 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.initializeLoginForm();
     this.initializeSignUpForm();
+    this.initCid();
     this.enableTooltips();
   }
 
@@ -44,6 +49,12 @@ export class LoginComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       rememberMe: [false],
+    });
+  }
+
+  private initCid(): void {
+    this.verificationCidForm = this.fb.group({
+      cid: ['', [Validators.required]],
     });
   }
 
@@ -205,4 +216,51 @@ export class LoginComponent implements OnInit {
       el?.classList.toggle('success', !isInvalid && !isValid);
     }
   }
+
+  onResendVerification(): void {
+    if (this.verificationCidForm.invalid) {
+      return;
+    }
+
+    const cidForm = new FormData();
+    const cid = this.verificationCidForm.get('cid');
+    if (cid) {
+      console.log('YOU ARE HERE');
+      cidForm.append('cid', cid.value);
+      console.log(cidForm.get('cid'));
+    } else {
+      return;
+    }
+
+    console.log(cidForm);
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/resendVerification`, cidForm, {
+        observe: 'response',
+      })
+      .subscribe({
+        next: (response: any) => {
+          console.log('response', response);
+        },
+        error: (err) => {
+          let statusMsg = err.error.status;
+          console.log(statusMsg);
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+        complete: () => {
+          this.toastr.success(
+            'Click the link in the email to verify your account!',
+            'Verification mail has been sent!',
+            {
+              closeButton: true,
+            }
+          );
+        },
+      });
+  }
+
+  openVerificationModal(): void {}
 }

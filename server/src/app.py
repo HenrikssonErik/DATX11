@@ -64,7 +64,7 @@ def sign_up() -> Response:
 
     if (response[1] == 200):
         send_verification_email(
-            request.form['email'], response[0])
+            request.form['email'], response[0]['token'])
         res = make_response({'status': 'success'}, response[1])
     else:
         res = make_response(response[0], response[1])
@@ -72,22 +72,22 @@ def sign_up() -> Response:
     return res
 
 
-@app.route('/resendVerification', methods=["POST"])
-def resend_verification_email():
-    data = request.get_json()
+@app.route('/resendVerification', methods=['POST'])
+def resend_verification_email() -> Response:
+    print("Tjo")
+    data = request.form
     cid = data['cid']
 
-    try:
-        user_lookup = user_to_resend_verification(cid)
-        if (user_lookup[1] == 200):
-            email = user_lookup[0]['email']
-            token = user_lookup[0]['token']
-            send_verification_email(email, token)
-            return make_response({"status": "success"}, 200)
-        else:
-            return user_lookup
-    except psycopg2.DatabaseError.pgcode:
-        return make_response({'status': 'no_user'}, 406)
+    print("Got it", cid)
+
+    user_lookup = user_to_resend_verification(cid)
+    if (user_lookup[1] == 200):
+        email = user_lookup[0]['email']
+        token = user_lookup[0]['token']
+        send_verification_email(email, token)
+        return make_response({'status': "success"}, 200)
+    else:
+        return make_response(user_lookup)
 
 
 @app.route('/verify_email', methods=['POST'])
@@ -122,7 +122,7 @@ def verify_email() -> Response:
         return res
 
 
-def send_verification_email(to: str, token_dict: dict) -> None:
+def send_verification_email(to: str, token: str) -> None:
     """
     Sends a verification email to the specific user signing up.
     This email is in an HTML format, with a working link sending
@@ -136,8 +136,6 @@ def send_verification_email(to: str, token_dict: dict) -> None:
         token_dict (dict): The jwt-generated token from login_handler's
         create_verification_token-function.
     """
-    token: str = token_dict.get('Token')
-
     msg = Message('Verification Email for Hydrant',
                   sender='temphydrant@gmail.com', recipients=[to])
 
