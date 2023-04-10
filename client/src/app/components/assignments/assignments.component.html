@@ -48,9 +48,108 @@
         <span translate>Assignment </span>{{ assignment.AssignmentNr }}
       </button>
     </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        [class.active]="selectedTab === -2"
+        [id]="'tab-groups'"
+        [attr.data-bs-toggle]="'tab'"
+        [attr.data-bs-target]="'#tab-pane-groups'"
+        type="button"
+        role="tab"
+        [attr.aria-controls]="'tab-pane-groups'"
+        [attr.aria-selected]="selectedTab === -2"
+        (click)="selectedTab = -2"
+        translate
+      >
+        Groups_Tab
+      </button>
+    </li>
   </ul>
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade" *ngIf="selectedTab === null"></div>
+    <div
+      class="tab-pane fade"
+      role="tabpanel"
+      [attr.aria-labelledby]="'tab-groups'"
+      [id]="'tab-pane-groups'"
+      [class.show]="selectedTab === -2"
+      [class.active]="selectedTab === -2"
+      *ngIf="selectedTab === -2"
+    >
+      <!--CONTENT FOR GROUPS-->
+      <div class="mb-3" style="display: flex; justify-content: space-between">
+        <h5>Groups</h5>
+        <button class="btn btn-primary">Create Group</button>
+      </div>
+      <ngb-accordion #groupAccordion="ngbAccordion">
+        <ngb-panel>
+          <ng-template ngbPanelTitle>
+            <div class="titleAccordion">
+              <span>Group 53</span>
+              <span
+                class="joinButton"
+                (click)="joinGroup(); $event.stopPropagation()"
+                >Join</span
+              >
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="row">
+              <div class="flex-container">
+                <p>Malte</p>
+                <p>Erik</p>
+                <p>Alfred</p>
+                <p>Alex</p>
+                <p>Gabster</p>
+                <p>Sebbe</p>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-panel>
+        <ngb-panel>
+          <ng-template ngbPanelTitle>
+            <div class="titleAccordion">
+              <span>Group 420</span>
+              <span
+                class="joinButton"
+                (click)="joinGroup(); $event.stopPropagation()"
+                >Join</span
+              >
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="row">
+              <div class="flex-container">
+                <p>Malte</p>
+                <p>Erik</p>
+                <p>Alfred</p>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-panel>
+        <ngb-panel>
+          <ng-template ngbPanelTitle>
+            <div class="titleAccordion">
+              <span>Group 69</span>
+              <span
+                class="joinButton"
+                (click)="joinGroup(); $event.stopPropagation()"
+                >Join</span
+              >
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="row">
+              <div class="flex-container">
+                <p>Malte</p>
+                <p>Erik</p>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-panel>
+      </ngb-accordion>
+    </div>
     <div
       class="tab-pane fade"
       [id]="'tab-pane-settings'"
@@ -121,7 +220,7 @@
       </div>
       <div class="row mt-3">
         <div class="col-12">
-          <ngb-accordion #myAccordion="ngbAccordion">
+          <ngb-accordion #submissionAccordion="ngbAccordion">
             <ngb-panel>
               <ng-template ngbPanelTitle>
                 <div class="titleAccordion">
@@ -130,7 +229,31 @@
                 </div>
               </ng-template>
               <ng-template ngbPanelContent>
-                <p>Content of panel 3</p>
+                <div class="row text-muted">
+                  <div class="col-md-4">
+                    <h6>Reviewed By</h6>
+                    <p class="statusText">Malte Carlstedt</p>
+                  </div>
+                  <div class="col-md-4">
+                    <h6>Status</h6>
+                    <p class="statusText passed">Passed</p>
+                  </div>
+                  <div class="col-md-4">
+                    <h6>Comments</h6>
+                    <div class="form-floating mb-3">
+                      <textarea
+                        class="form-control"
+                        placeholder="Leave a comment here"
+                        id="comments"
+                        style="height: 100px"
+                        disabled
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <app-test-feedback></app-test-feedback>
+                </div>
               </ng-template>
             </ngb-panel>
             <ngb-panel>
