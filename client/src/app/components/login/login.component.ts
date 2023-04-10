@@ -230,7 +230,6 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    console.log(cidForm);
     this.http
       .post<HttpResponse<any>>(`${API_URL}/resendVerification`, cidForm, {
         observe: 'response',
@@ -239,7 +238,6 @@ export class LoginComponent implements OnInit {
         next: (response: any) => {},
         error: (err) => {
           let statusMsg = err.error.status;
-          console.log(statusMsg);
           const [errorMessage, errorTitle]: string[] =
             this.toastrResponse.getToastrRepsonse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
