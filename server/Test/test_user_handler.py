@@ -21,6 +21,21 @@ class TestUserHandler(unittest.TestCase):
         self.test_file_dir = Path(__file__).parent/"test_files_user_handler"
 
     @patch('psycopg2.connect')
+    def test_add_users_to_course_in_batch(self, mock_connect):
+        mock_cursor = setup_mock_cursor(mock_connect)
+
+        user_ids = [1, 2]
+        course_id = 1
+        user_handler.add_users_to_course(user_ids, course_id)
+
+        mock_cursor.execute.assert_called_with(
+            "insert into userincourse values "
+            "(%s,%s,%s) on conflict do nothing;",
+            [user_ids[1], course_id, "Student"]
+        )
+        self.assertEqual(2, len(mock_cursor.mock_calls))
+
+    @patch('psycopg2.connect')
     def test_get_user_ids_from_cids_exist_and_not_exist(self, mock_connect):
         valid_uid_and_cid = [(1, "test1"), (2, "test2")]
         mock_cursor = setup_mock_cursor(mock_connect)
@@ -92,8 +107,10 @@ class TestUserHandler(unittest.TestCase):
         user_handler.add_user_to_course(
             user_id, course_id, user_handler.Role.Student)
 
-        mock_cursor.execute.assert_called_once_with("""INSERT into userincourse values
-                                (%s, %s, %s)""", [user_id, course_id, user_handler.Role.Student.name])
+        mock_cursor.execute.assert_called_once_with(
+            "INSERT into userincourse values (%s, %s, %s)",
+            [user_id, course_id, user_handler.Role.Student.name]
+        )
 
     @patch('psycopg2.connect')
     def test_remove_user_from_group(self, mock_connect):

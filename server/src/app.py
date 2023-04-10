@@ -9,7 +9,7 @@ from .file_handler import handle_files, \
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
-    verify_user_from_email_verification, verify_and_get_id
+    verify_user_from_email_verification, verify_and_get_id, random_string
 from flask_mail import Mail, Message
 import jwt
 
@@ -40,6 +40,7 @@ def extract_token(request) -> str:
 @app.route('/login', methods=['POST'])
 def login():
     password: str = request.form['password']
+    print(password)
     email: str = request.form['email']
     data = log_in(email, password)
     res = make_response(jsonify(data[0]), data[1])
@@ -59,7 +60,6 @@ def sign_up() -> Response:
     """
     response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
         user_registration(request.form)
-
     if (response[1] == 200):
         send_verification_email(
             request.form['email'], response[0])
@@ -277,20 +277,37 @@ def remove_from_group():
 # temp password
 @app.route('/batchAddToCourse', methods=['POST'])
 def batch_add_to_course():
-    token = extract_token(request)
-    request_user_id = verify_and_get_id(token)
+    # token = extract_token(request)
+    # request_user_id = verify_and_get_id(token)
     data = request.get_json()
     course_id: int = data['Course']
-    if (user_handler.check_admin_or_course_teacher(
-        request_user_id,
-        course_id
-    )):
-        (user_ids, none_existing_cids) = \
-            user_handler.get_user_ids_from_cids(data["Cids"])
+    # if (user_handler.check_admin_or_course_teacher(
+    #     request_user_id,
+    #     course_id
+    # )):
+    (user_ids, none_existing_cids) = \
+        user_handler.get_user_ids_from_cids(data["Cids"])
+    print(user_ids)
+    print(none_existing_cids)
+    user_handler.add_users_to_course(user_ids, course_id)
+    if len(none_existing_cids) != 0:
+        newly_registered_cids = []
+        for cid in none_existing_cids:
+            user = {
+                "email": cid + "@chalmers.se",
+                "cid": cid,
+                # TODO: When we can use forgot password, We need to
+                #   change this to use `random_string()`
+                #   or something similar.
+                "password": cid
+            }
+            reg_res = user_registration(user)
+            if reg_res[1] == 200:
+                newly_registered_cids.append(cid)
+        (user_ids, _) = \
+            user_handler.get_user_ids_from_cids(newly_registered_cids)
         user_handler.add_users_to_course(user_ids, course_id)
-        if len(none_existing_cids) != 0:
-            # TODO: create these users and then add them to this course
-            pass
+    return make_response("", 200)
 
 
 # Should probably be redone to take a list of users, redo how singup works

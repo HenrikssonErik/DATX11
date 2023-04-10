@@ -23,7 +23,9 @@ def get_user_ids_from_cids(cids: list[str]) -> tuple[list[int], list[str]]:
             res = cur.fetchall()
     conn.close()
     user_ids = [e[0] for e in res]
-    not_user_cids = list(set(cids).difference(e[1] for e in res))
+
+    not_user_cids = [] if len(cids) == len(res) \
+        else list(set(cids).difference(e[1] for e in res))
 
     return (user_ids, not_user_cids)
 
@@ -150,8 +152,24 @@ def _get_course_id_from_group(group_id) -> int:
         raise Exception("Error when getting course id!")
 
 
-def add_users_to_course(user_ids_and_role: list[int], course_id: int):
-    pass
+def add_users_to_course(user_ids: list[int], course_id: int):
+    if len(user_ids) > 0:
+        conn = psycopg2.connect(dsn=get_conn_string())
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    query_data = "insert into userincourse values " + \
+                        "(%s,%s,%s) on conflict do nothing;"
+
+                    for id in user_ids:
+                        cur.execute(query_data, [id, course_id, 'Student'])
+        except Exception as e:
+            raise \
+                Exception(
+                    f"Could not add users {user_ids} to course {course_id}"
+                ) from e
+        finally:
+            conn.close()
 
 
 def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
@@ -160,8 +178,7 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """INSERT into userincourse values
-                                (%s, %s, %s)"""
+                query_data = "INSERT into userincourse values (%s, %s, %s)"
                 cur.execute(query_data, [user_id, course_id, user_role.name])
         conn.close()
 
