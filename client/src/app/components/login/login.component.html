@@ -315,8 +315,8 @@
                   >Sign_Up</a
                 >
               </p>
-              <p class="mt-2 text-muted mb-0">
-                Behöver du verifiera dig?
+              <p class="mt-2 text-muted mb-0" translate>
+                Verify_text
                 <a
                   [routerLink]=""
                   href="#"
@@ -325,8 +325,9 @@
                   data-bs-toggle="modal"
                   data-bs-target="#exampleModal"
                   role="button"
+                  translate
                 >
-                  Klicka här
+                  Click_here_verification
                 </a>
               </p>
             </div>
@@ -347,8 +348,8 @@
   <div class="modal-dialog verificationModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">
-          Skicka ny verifikationslänk
+        <h5 class="modal-title" id="exampleModalLabel" translate>
+          Send_verification_link_title
         </h5>
         <button
           type="button"
@@ -387,15 +388,17 @@
             type="button"
             class="btn btn-secondary"
             data-bs-dismiss="modal"
+            translate
           >
-            Stäng
+            Close
           </button>
           <button
             type="submit"
             [disabled]="verificationCidForm.invalid"
             class="btn btn-primary btn-success-bg"
+            translate
           >
-            Skicka länk
+            Send_verification_link_btn
           </button>
         </div>
       </form>

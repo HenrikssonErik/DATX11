@@ -253,5 +253,7 @@ export class LoginComponent implements OnInit {
       });
   }
 
-  openVerificationModal(): void {}
+  openVerificationModal(): void {
+    this.verificationCidForm.reset();
+  }
 }
