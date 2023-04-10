@@ -1,9 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import {
-  FormControl,
   UntypedFormBuilder,
-  UntypedFormControl,
   UntypedFormGroup,
   Validators,
 } from '@angular/forms';
@@ -24,7 +22,6 @@ export class LoginComponent implements OnInit {
   signUpForm: UntypedFormGroup = new UntypedFormGroup({});
   submitFailed: boolean = false;
   cid: string = '';
-  // verCid: string = '';
   passwordVisible: boolean = false;
   verificationCidForm: UntypedFormGroup = new UntypedFormGroup({});
 
