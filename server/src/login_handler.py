@@ -33,7 +33,7 @@ def random_string() -> str:
     return bitstring
 
 
-def check_data_input(cid: str, email: str, pwd: str, 
+def check_data_input(cid: str, email: str, pwd: str,
                      user_exists: bool) -> tuple[str, Literal[200, 400]]:
     """Validates the inputs from the frontend. If any of these checks are
     not valid, return the appropriate error message and error code as a
@@ -70,7 +70,7 @@ def user_registration(data: Request.form) -> \
 
     if (role[1] == "false"):
         user_exists = False
-    
+
     data_check = check_data_input(cid, email, pwd, user_exists)
 
     if (data_check[1] != 200):
@@ -80,7 +80,7 @@ def user_registration(data: Request.form) -> \
     hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
 
     res_query: tuple[dict[str, str], Literal[200, 406]
-                     ] = registration_query(cid, email, hashed_pass, 
+                     ] = registration_query(cid, email, hashed_pass,
                                             role[0], role[1])
     res_object = (log_in(email, pwd)) if (res_query[1] == 200) else (res_query)
 
@@ -128,8 +128,9 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT userId, passphrase, globalrole FROM UserData
-                            WHERE userdata.email = %s"""
+                query_data = """SELECT userId, passphrase, globalrole
+                                FROM UserData
+                                WHERE userdata.email = %s"""
                 cur.execute(query_data, (email,))
                 data = cur.fetchone()
                 id = data[0]
@@ -138,7 +139,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         if not data:
             raise Exception("Wrong Credentials")
         if (bcrypt.checkpw(password.encode('utf8'), passphrase)):
-            return_dict: dict[str, str] = {"Token":create_token(id)}
+            return_dict: dict[str, str] = {"Token": create_token(id)}
             return_dict['GlobalRole'] = data[2]
             return return_dict, 200
         else:
