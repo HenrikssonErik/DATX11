@@ -74,11 +74,8 @@ def sign_up() -> Response:
 
 @app.route('/resendVerification', methods=['POST'])
 def resend_verification_email() -> Response:
-    print("Tjo")
     data = request.form
     cid = data['cid']
-
-    print("Got it", cid)
 
     user_lookup = user_to_resend_verification(cid)
     if (user_lookup[1] == 200):
