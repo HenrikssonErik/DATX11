@@ -28,8 +28,8 @@ const response_to_toastr: ResponseToToastr = {
     'Check your email to verify.',
     'You have not verified your account yet!',
   ],
-  no_user: ['yo', 'yo'],
-  already_verified: ['yo2', 'yo2'],
+  no_user: ['Register to create your user.', 'There is no user with that CID!'],
+  already_verified: ['Want to login instead?', 'You are already verified!'],
 };
 
 @Injectable({
