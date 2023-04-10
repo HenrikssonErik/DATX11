@@ -162,6 +162,20 @@
                   >Login</a
                 >
               </p>
+              <p class="mt-2 text-muted mb-0">
+                Behöver du verifiera dig?
+                <a
+                  [routerLink]=""
+                  href="#"
+                  class="verification-link"
+                  (click)="openVerificationModal()"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal"
+                  role="button"
+                >
+                  Klicka här
+                </a>
+              </p>
             </div>
           </form>
         </div>
@@ -284,6 +298,7 @@
               Login_with_Chalmers-SSO
               Login_with_Chalmers-SSO
             </button>
+
             <div class="text-center">
               <p class="mt-3 text-muted mb-0" translate>
                 Need_an_account
@@ -300,10 +315,90 @@
                   >Sign_Up</a
                 >
               </p>
+              <p class="mt-2 text-muted mb-0">
+                Behöver du verifiera dig?
+                <a
+                  [routerLink]=""
+                  href="#"
+                  class="verification-link"
+                  (click)="openVerificationModal()"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal"
+                  role="button"
+                >
+                  Klicka här
+                </a>
+              </p>
             </div>
           </form>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog verificationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+          Skicka ny verifikationslänk
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form
+        (ngSubmit)="onResendVerification()"
+        [formGroup]="verificationCidForm"
+      >
+        <div class="modal-body">
+          <label for="verCid" class="text-muted" translate
+            >Chalmers ID (CID)</label
+          >
+          <input
+            [ngClass]="{
+              success: verificationCidForm.get('cid')?.valid,
+              error:
+                verificationCidForm.get('cid')?.invalid &&
+                (verificationCidForm.get('cid')?.dirty ||
+                  verificationCidForm.get('cid')?.touched)
+            }"
+            type="text"
+            formControlName="cid"
+            class="form-control focus-border"
+            id="verCid"
+            placeholder="{{ 'Enter_Cid' | translate }}"
+            (focus)="onInputFocus('cid', verificationCidForm)"
+            required
+          />
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Stäng
+          </button>
+          <button
+            type="submit"
+            [disabled]="verificationCidForm.invalid"
+            class="btn btn-primary btn-success-bg"
+          >
+            Skicka länk
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
