@@ -4,7 +4,7 @@ from typing import Literal
 from flask import Flask, Response, jsonify, make_response, render_template, \
     request, send_file
 from flask_cors import CORS
-import psycopg2
+from .constants import DOMAIN
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
 from . import user_handler
@@ -141,7 +141,7 @@ def send_verification_email(to: str, token: str) -> None:
 
     endpoint: str = "/verifyEmail/" + token
 
-    url: str = "localhost:4200" + endpoint
+    url: str = DOMAIN + endpoint
 
     msg.html = render_template("emailTemplate.html", link=url)
 
