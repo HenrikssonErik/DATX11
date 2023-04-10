@@ -67,5 +67,7 @@
   "no_user_to_verify": "Your user profile is not in our system. Sign up to create your account",
   "Send_verification_link_btn": "Send verification link",
   "Close": "Close",
-  "Send_verification_link_title": "Send new verification link"
+  "Send_verification_link_title": "Send new verification link",
+  "Verify_text": "Need to be verified?",
+  "Click_here_verification": "Click here"
 }
