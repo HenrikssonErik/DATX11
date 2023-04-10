@@ -225,9 +225,7 @@ export class LoginComponent implements OnInit {
     const cidForm = new FormData();
     const cid = this.verificationCidForm.get('cid');
     if (cid) {
-      console.log('YOU ARE HERE');
       cidForm.append('cid', cid.value);
-      console.log(cidForm.get('cid'));
     } else {
       return;
     }
@@ -238,9 +236,7 @@ export class LoginComponent implements OnInit {
         observe: 'response',
       })
       .subscribe({
-        next: (response: any) => {
-          console.log('response', response);
-        },
+        next: (response: any) => {},
         error: (err) => {
           let statusMsg = err.error.status;
           console.log(statusMsg);
