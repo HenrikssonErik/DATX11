@@ -72,4 +72,8 @@ export class AssignmentsComponent implements OnInit {
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('sv-SE');
   }
+
+  joinGroup(): void {
+    console.log('join group');
+  }
 }
