@@ -66,5 +66,6 @@
   "expired_verification_signature": "Länken har utgått. Registrera dig igen för att få en ny länk!",
   "invalid_verification_token": "Länken är inte giltlig. Registrera dig igen för att få en ny länk!",
   "no_user_to_verify": "Din användarprofil finns inte i vårt system. Registrera dig för att skapa din profil!",
-  "Upload_File": "Ladda upp fil"
+  "Upload_File": "Ladda upp fil",
+  "Groups_Tab": "Grupper"
 }
