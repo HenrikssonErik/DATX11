@@ -21,7 +21,16 @@ class TestUserHandler(unittest.TestCase):
         self.test_file_dir = Path(__file__).parent/"test_files_user_handler"
 
     @patch('psycopg2.connect')
-    def test_add_users_to_course_in_batch(self, mock_connect):
+    def test_add_users_to_course_in_batch_with_no_users(self, mock_connect):
+        mock_cursor = setup_mock_cursor(mock_connect)
+
+        user_ids = []
+        course_id = 1
+        user_handler.add_users_to_course(user_ids, course_id)
+        mock_cursor.execute.assert_not_called()
+
+    @patch('psycopg2.connect')
+    def test_add_users_to_course_in_batch_with_users(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
 
         user_ids = [1, 2]

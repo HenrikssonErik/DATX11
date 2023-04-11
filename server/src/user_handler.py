@@ -153,6 +153,7 @@ def _get_course_id_from_group(group_id) -> int:
 
 
 def add_users_to_course(user_ids: list[int], course_id: int):
+    """Adds all the users in `user_ids` to the specified course"""
     if len(user_ids) > 0:
         conn = psycopg2.connect(dsn=get_conn_string())
         try:
@@ -163,6 +164,12 @@ def add_users_to_course(user_ids: list[int], course_id: int):
 
                     for id in user_ids:
                         cur.execute(query_data, [id, course_id, 'Student'])
+        except psycopg2.IntegrityError as e:
+            raise \
+                Exception(
+                    f"Could not add users {user_ids} to course {course_id} "
+                    "because either the course or a student do not exist"
+                ) from e
         except Exception as e:
             raise \
                 Exception(

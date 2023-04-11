@@ -29,20 +29,20 @@ mail = Mail(app)
 create_key()
 
 
-def extract_token(request) -> str:
+def extract_token(request) -> str | None:
     cookies = request.headers.get('Cookies')
-    separated_cookies = cookies.split('; ')
-    for cookie in separated_cookies:
-        name, value = cookie.split('=')
-        if name == 'Token':
-            return value
-    return ""
+    if cookies is not None:
+        separated_cookies = cookies.split('; ')
+        for cookie in separated_cookies:
+            name, value = cookie.split('=')
+            if name == 'Token':
+                return value
+    return None
 
 
 @app.route('/login', methods=['POST'])
 def login():
     password: str = request.form['password']
-    print(password)
     email: str = request.form['email']
     data = log_in(email, password)
     res = make_response(jsonify(data[0]), data[1])
@@ -292,18 +292,20 @@ def remove_from_group():
 # temp password
 @app.route('/batchAddToCourse', methods=['POST'])
 def batch_add_to_course():
-    # token = extract_token(request)
-    # request_user_id = verify_and_get_id(token)
+    token = extract_token(request)
+    if token is None:
+        return make_response("Missing token", 401)
+    request_user_id = verify_and_get_id(token)
     data = request.get_json()
     course_id: int = data['Course']
-    # if (user_handler.check_admin_or_course_teacher(
-    #     request_user_id,
-    #     course_id
-    # )):
+    if not (user_handler.check_admin_or_course_teacher(
+        request_user_id,
+        course_id
+    )):
+        return make_response("aaaa", 401)
+    
     (user_ids, none_existing_cids) = \
         user_handler.get_user_ids_from_cids(data["Cids"])
-    print(user_ids)
-    print(none_existing_cids)
     user_handler.add_users_to_course(user_ids, course_id)
     if len(none_existing_cids) != 0:
         newly_registered_cids = []
@@ -312,8 +314,8 @@ def batch_add_to_course():
                 "email": cid + "@chalmers.se",
                 "cid": cid,
                 # TODO: When we can use forgot password, We need to
-                #   change this to use `random_string()`
-                #   or something similar.
+                #   change the password to use a randomly generated
+                #   string instead of cid.
                 "password": cid
             }
             reg_res = user_registration(user)
@@ -323,6 +325,7 @@ def batch_add_to_course():
             user_handler.get_user_ids_from_cids(newly_registered_cids)
         user_handler.add_users_to_course(user_ids, course_id)
     return make_response("", 200)
+    
 
 
 # Should probably be redone to take a list of users, redo how singup works
