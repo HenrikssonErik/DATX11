@@ -1,2 +1,1 @@
-import time
-import pprint
+import time, pprint
