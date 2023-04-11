@@ -100,9 +100,9 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
     with conn:
         with conn.cursor() as cur:
             try:
-                query = """INSERT INTO UserData
-                (cid, email, passphrase, globalRole, fullName)
-                VALUES (%s, %s, %s, %s, %s );"""
+                query = "INSERT INTO UserData " +\
+                    "(cid, email, passphrase, globalRole, fullName) " +\
+                    "VALUES (%s, %s, %s, %s, %s );"
                 cur.execute(query, (
                     cid,
                     email,
