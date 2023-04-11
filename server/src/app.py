@@ -287,23 +287,28 @@ def remove_from_group():
     return make_response("", 401)
 
 
-# gets a list of cids that needs to be added to a course and
-# in the case of the user not existing should create the user with a random
-# temp password
 @app.route('/batchAddToCourse', methods=['POST'])
 def batch_add_to_course():
+    """
+    Gets a list of cids that needs to be added to a course and
+    in the case of the user not existing, the user should be created
+    with a random temp password.
+    """
     token = extract_token(request)
     if token is None:
         return make_response("Missing token", 401)
-    request_user_id = verify_and_get_id(token)
+    try:
+        request_user_id = verify_and_get_id(token)
+    except jwt.InvalidTokenError:
+        return make_response("Invalid token", 400)
     data = request.get_json()
     course_id: int = data['Course']
     if not (user_handler.check_admin_or_course_teacher(
         request_user_id,
         course_id
     )):
-        return make_response("aaaa", 401)
-    
+        return make_response("", 401)
+
     (user_ids, none_existing_cids) = \
         user_handler.get_user_ids_from_cids(data["Cids"])
     user_handler.add_users_to_course(user_ids, course_id)
@@ -311,7 +316,7 @@ def batch_add_to_course():
         newly_registered_cids = []
         for cid in none_existing_cids:
             user = {
-                "email": cid + "@chalmers.se",
+                "email": f"{cid}@chalmers.se",
                 "cid": cid,
                 # TODO: When we can use forgot password, We need to
                 #   change the password to use a randomly generated
@@ -325,7 +330,6 @@ def batch_add_to_course():
             user_handler.get_user_ids_from_cids(newly_registered_cids)
         user_handler.add_users_to_course(user_ids, course_id)
     return make_response("", 200)
-    
 
 
 # Should probably be redone to take a list of users, redo how singup works

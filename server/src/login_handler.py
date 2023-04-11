@@ -294,10 +294,12 @@ def verify_and_get_id(token: str) -> int:
         # If decoding was successful, return the user id
         return decoded_token['id']
 
-    except jwt.ExpiredSignatureError:
+    except jwt.ExpiredSignatureError as e:
         # If the token has expired, raise an exception
-        raise Exception('Invalid token')
+        e.add_note("Expired token")
+        raise e
 
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
         # If the token is invalid, raise an exception
-        raise Exception('Invalid token')
+        e.add_note("Invalid token")
+        raise e
