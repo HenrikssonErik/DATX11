@@ -143,7 +143,7 @@ def send_verification_email(to: str, token: str) -> None:
 
     url: str = DOMAIN + endpoint
 
-    msg.html = render_template("emailTemplate.html", link=url)
+    msg.html = render_template("emailTemplate.html", link=url, raw_url=url)
 
     mail.send(msg)
 
