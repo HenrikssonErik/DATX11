@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 import src.course_handler as course_handler  # noqa: E402
 
-
 def setup_mock_cursor(mock_connect) -> MagicMock:
     mock_cursor = MagicMock()
     mock_conn = MagicMock()
@@ -22,49 +21,33 @@ class TestCourseHandler(unittest.TestCase):
 
     @patch('psycopg2.connect')
     def test_get_user_courses_info(self, mock_connect):
-        r_value = [(1, 'Admin', 1, 'Whole course name', 'datx12', 2023, 3),
-                   (1, 'Student', 2, 'Whole course name', 'datx11', 2023, 2)]
-
-        with patch.object(course_handler,
-                          'get_assignments') as mock_assignments:
+        with patch.object(course_handler, 'get_assignments') as mock_assignments:
             mock_assignments.return_value = []
             mock_cursor = setup_mock_cursor(mock_connect)
-            mock_cursor.fetchall.return_value = r_value
+            mock_cursor.fetchall.return_value = [(1, 'Admin', 1, 'Whole course name', 'datx12', 2023, 3), (1, 'Student', 2, 'Whole course name', 'datx11', 2023, 2)]
 
             user_id = 1
             result = course_handler.get_courses_info(user_id)
-            mock_cursor.execute.assert_called_once_with(
-                            """SELECT * FROM UserCourseInfo
+            mock_cursor.execute.assert_called_once_with("""SELECT * FROM UserCourseInfo
                             WHERE userid = %s""", (user_id,))
-
             self.assertEqual(
-                result, [{'Role': 'Admin', 'courseID': 1,
-                          'CourseName': 'Whole course name',
-                          'Course': 'datx12',
+                result, [{'Role': 'Admin', 'courseID': 1, 'CourseName': 'Whole course name', 'Course': 'datx12',
                           'Year': 2023, 'StudyPeriod': 3, 'Assignments': []},
-                         {'Role': 'Student', 'courseID': 2,
-                          'CourseName': 'Whole course name',
-                          'Course': 'datx11', 'Year': 2023,
-                          'StudyPeriod': 2, 'Assignments': []}, ])
+                         {'Role': 'Student', 'courseID': 2, 'CourseName': 'Whole course name', 'Course': 'datx11',
+                          'Year': 2023, 'StudyPeriod': 2, 'Assignments': []}, ])
 
     @patch('psycopg2.connect')
     def test_get_user_course_info(self, mock_connect):
-        with patch.object(course_handler,
-                          'get_assignments') as mock_assignments:
+        with patch.object(course_handler, 'get_assignments') as mock_assignments:
             mock_assignments.return_value = []
             mock_cursor = setup_mock_cursor(mock_connect)
-            mock_cursor.fetchone.return_value = [1, 'Admin', 1,
-                                                 'Whole course name',
-                                                 'datx12', 2023, 3]
+            mock_cursor.fetchone.return_value = [1, 'Admin', 1, 'Whole course name', 'datx12', 2023, 3]
 
             user_id = 1
             course_id = 1
             result = course_handler.get_course_info(user_id, course_id)
-            mock_cursor.execute.assert_called_once_with(
-                            """SELECT * FROM UserCourseInfo
-                            WHERE userid = %s AND courseid=%s""",
-                            [user_id, course_id])
-
+            mock_cursor.execute.assert_called_once_with("""SELECT * FROM UserCourseInfo
+                            WHERE userid = %s AND courseid=%s""", [user_id, course_id])
             self.assertEqual(
                 result, {
                     'Role': 'Admin',
@@ -92,12 +75,9 @@ class TestCourseHandler(unittest.TestCase):
         course_id = 1
         mock_cursor.fetchall.return_value = [(2, '2022-03-18', 'description')]
         res = course_handler.get_assignments(course_id)
-        mock_cursor.execute.assert_called_once_with(
-                            """SELECT assignment, endDate, description FROM
-                            Assignments WHERE courseId = %s""", [course_id])
-
-        self.assertEqual(res, [{'AssignmentNr': 2, 'DueDate': '2022-03-18',
-                                'Description': 'description'}])
+        mock_cursor.execute.assert_called_once_with("""SELECT assignment, enddate, Description FROM
+                                assignments WHERE courseid = %s""", [course_id])
+        self.assertEqual(res, [{'AssignmentNr': 2, 'DueDate': '2022-03-18', 'Description': 'description'}])
 
     @patch('psycopg2.connect')
     def test_add_filenames(self, mock_connect):
@@ -118,15 +98,10 @@ class TestCourseHandler(unittest.TestCase):
         file_names = ['file1.txt', 'file2.py']
 
         with patch.object(course_handler, 'add_filenames') as mock_files:
-            course_handler.create_assignment(course_id, desc, assignment_nr,
-                                             end_date, file_names)
-            mock_cursor.execute.assert_called_once_with(
-                        """INSERT INTO Assignments VALUES
-                        (%s, %s, %s, %s);""",
-                        [course_id, assignment_nr, desc, end_date])
-
-        mock_files.assert_called_once_with(file_names, course_id,
-                                           assignment_nr)
+            course_handler.create_assignment(course_id, desc, assignment_nr, end_date, file_names)
+            mock_cursor.execute.assert_called_once_with("""INSERT INTO Assignments VALUES
+                                (%s, %s, %s, %s);""", [course_id, assignment_nr, desc, end_date])
+        mock_files.assert_called_once_with(file_names, course_id, assignment_nr)
 
     @patch('psycopg2.connect')
     def test_change_desc(self, mock_connect):

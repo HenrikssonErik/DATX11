@@ -76,11 +76,10 @@ class TestLoginHandler(unittest.TestCase):
         role = 'student'
         name = 'Test Testsson'
 
-        result = registration_query(cid, email, hashed_pass, role, name)
+        result = registration_query(cid, email, hashed_pass, role, name )
         mock_cursor.execute.assert_called_once_with("""INSERT INTO UserData
                 (cid, email, passphrase, globalRole, fullName)
-                VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass,
-                                                   role, name))
+                VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass, role, name))
 
         self.assertEqual(result, ({'status': 'success'}, 200))
 
@@ -101,8 +100,7 @@ class TestLoginHandler(unittest.TestCase):
 
         mock_cursor.execute.assert_called_once_with("""INSERT INTO UserData
                 (cid, email, passphrase, globalRole, fullName)
-                VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass,
-                                                   role, name))
+                VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass, role, name))
 
         self.assertEqual(result, ({'status': 'already_registered'}, 406))
 
