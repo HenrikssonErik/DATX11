@@ -95,20 +95,28 @@ def add_group_to_course(course_id: int, user_id: int):
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """SELECT MAX(groupnumber) FROM Groups WHERE
-                course = %s"""
-                cur.execute(query_one, [course_id])
-                current_group: int = cur.fetchone()[0]
-                if current_group is None:
-                    current_group = 0
+                query = """SELECT EXISTS(SELECT 1 FROM
+                        usergroupcourseinfo WHERE courseid=%s AND userid=%s) as
+                        exists_row;"""
+                cur.execute(query, [course_id, user_id])
+                in_group = cur.fetchone()[0]
+                if not (in_group):
+                    query_one = """SELECT MAX(groupnumber) FROM Groups WHERE
+                    course = %s"""
+                    cur.execute(query_one, [course_id])
+                    current_group: int = cur.fetchone()[0]
+                    if current_group is None:
+                        current_group = 0
 
-                query_one = """Insert into Groups
-                    (course, groupnumber) values (%s,%s) """
-                cur.execute(query_one, [course_id, current_group + 1])
-                query_two = """INSERT INTO UserInGroup (userId, groupId)
-                SELECT %s, gd.groupid FROM GroupDetails gd WHERE
-                gd.groupnumber = %s AND gd.course = %s;"""
-                cur.execute(query_two, [user_id, current_group+1, course_id])
+                    query_two = """Insert into Groups
+                        (course, groupnumber) values (%s,%s) """
+                    cur.execute(query_two, [course_id, current_group + 1])
+                    query_three = """INSERT INTO UserInGroup (userId, groupId)
+                    SELECT %s, gd.groupid FROM GroupDetails gd WHERE
+                    gd.groupnumber = %s AND gd.course = %s;"""
+                    cur.execute(query_three, [user_id, current_group+1, course_id])
+                else:
+                    raise Exception("Already in group")
         conn.close()
 
     except Exception as e:
