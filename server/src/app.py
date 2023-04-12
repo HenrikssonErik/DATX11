@@ -467,8 +467,11 @@ def get_course_groups():
     course = request.args.get('Course')
 
     if (user_id):
-        groups = course_handler.get_course_groups(course)
-        return make_response(jsonify(groups), 200)
+        if (user_handler.is_in_course(user_id, course)):
+            groups = course_handler.get_course_groups(course)
+            return make_response(jsonify(groups), 200)
+        else:
+            return make_response("not_in_course", 401)
     else:
         return make_response("not_logged_in", 401)
     
