@@ -25,7 +25,7 @@ export class AssignmentsComponent implements OnInit {
     [];
 
   myGroup: any;
-  isLoading: boolean = false;
+  isLoadingMap = new Map<number, boolean>();
   createGroupLoader: boolean = false;
 
   constructor(
@@ -100,7 +100,7 @@ export class AssignmentsComponent implements OnInit {
   }
 
   joinGroup(courseId: number, groupId: number): void {
-    this.isLoading = true;
+    this.isLoadingMap.set(groupId, true);
     this.userService.getUserData().subscribe((res) => {
       console.log(res);
       this.groupService.joinGroup(courseId, groupId, res.id).subscribe({
@@ -112,7 +112,7 @@ export class AssignmentsComponent implements OnInit {
           console.log(err);
         },
         complete: () => {
-          this.isLoading = false;
+          this.isLoadingMap.set(groupId, false);
           location.reload();
         },
       });
@@ -120,7 +120,7 @@ export class AssignmentsComponent implements OnInit {
   }
 
   removeFromGroup(courseId: number, groupId: number) {
-    this.isLoading = true;
+    this.isLoadingMap.set(groupId, true);
     this.userService.getUserData().subscribe((res) => {
       this.groupService.removeFromGroup(courseId, groupId, res.id).subscribe({
         next: (res) => {
@@ -130,7 +130,7 @@ export class AssignmentsComponent implements OnInit {
           console.log(err);
         },
         complete: () => {
-          this.isLoading = false;
+          this.isLoadingMap.set(groupId, false);
           location.reload();
         },
       });
