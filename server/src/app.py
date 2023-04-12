@@ -474,5 +474,5 @@ def get_course_groups():
             return make_response("not_in_course", 401)
     else:
         return make_response("not_logged_in", 401)
-    
+
 # TODO add endpoint to get all groups latest submissions

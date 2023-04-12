@@ -356,19 +356,21 @@ def get_course_groups(course: int):
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT * FROM
+                query_data = """SELECT groupid, groupnumber, fullname FROM
                                 GroupDetails WHERE course = %s"""
                 cur.execute(query_data, [course])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
-                group_dict = {}
+                group_list = []
                 for row in data:
                     group_name = f"group{row[1]}"
                     user_name = row[2]
-                    if group_name not in group_dict:
-                        group_dict[group_name] = {"users": [user_name]}
-                    else:
-                        group_dict[group_name]["users"].append(user_name)
+                    group_dict = next((item for item in group_list if
+                                       group_name in item),
+                                      {"users": [], 'id': row[0]})
+                    group_dict.setdefault(group_name, []).append(user_name)
+                    if group_dict not in group_list:
+                        group_list.append(group_dict)
         conn.close()
         if not data:
             return {}
