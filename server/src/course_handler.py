@@ -121,7 +121,7 @@ def add_group_to_course(course_id: int, user_id: int):
 
     except Exception as e:
         print(e)
-        return None
+        raise Exception("Could not create group")
 
 
 def _create_course(course_name: str, course_abbr: str, year: int,
