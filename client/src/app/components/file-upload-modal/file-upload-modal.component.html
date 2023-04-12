@@ -1,7 +1,7 @@
 <div class="modal-content">
   <div class="modal-header">
     <h4 class="modal-title text-muted" translate>
-      Upload_File <span>For Assignment #123</span>
+      Upload_File <span>For Assignment {{ assignmentNumber }}</span>
     </h4>
     <i
       class="fa-solid fa-xmark close"
@@ -11,7 +11,11 @@
   <div class="modal-body">
     <div class="row">
       <div class="col-12">
-        <app-file-upload></app-file-upload>
+        <app-file-upload
+          [courseId]="courseId"
+          [assignmentNumber]="assignmentNumber"
+          [groupId]="groupId"
+        ></app-file-upload>
       </div>
     </div>
   </div>

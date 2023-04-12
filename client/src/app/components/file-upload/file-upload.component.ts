@@ -23,6 +23,10 @@ export class FileUploadComponent {
   files: File[] = [];
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
+  //TODO: Give types to these inputs
+  @Input() courseId: any;
+  @Input() assignmentNumber: any;
+  @Input() groupId: any;
 
   endpoint = 'files';
   allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
@@ -132,6 +136,9 @@ export class FileUploadComponent {
    * @returns {void}
    */
   uploadFiles(): void {
+    console.log(this.assignmentNumber);
+    console.log(this.groupId);
+    console.log(this.courseId);
     let header: HttpHeaders = new HttpHeaders();
     header = header.append('Content-Type', 'application/json');
 
@@ -139,6 +146,10 @@ export class FileUploadComponent {
     this.files.forEach((file: File): void =>
       formData.append('files', file, file.name)
     );
+
+    formData.append('Course', this.courseId),
+      formData.append('Assignment', this.assignmentNumber),
+      formData.append('Group', this.groupId);
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/` + this.endpoint, formData, {
