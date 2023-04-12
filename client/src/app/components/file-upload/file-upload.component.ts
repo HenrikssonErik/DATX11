@@ -28,7 +28,6 @@ export class FileUploadComponent {
   @Input() assignmentNumber: any;
   @Input() groupId: any;
 
-  endpoint = 'files';
   allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
   allowedFileTypesForPrint = ['.py', '.pdf', '.txt'];
 
@@ -147,12 +146,12 @@ export class FileUploadComponent {
       formData.append('files', file, file.name)
     );
 
-    formData.append('Course', this.courseId),
-      formData.append('Assignment', this.assignmentNumber),
-      formData.append('Group', this.groupId);
+    formData.append('Course', this.courseId);
+    formData.append('Assignment', this.assignmentNumber);
+    formData.append('Group', this.groupId);
 
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + this.endpoint, formData, {
+      .post<HttpResponse<any>>(`${API_URL}/files`, formData, {
         observe: 'response',
       })
       .subscribe({

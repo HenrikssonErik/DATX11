@@ -21,6 +21,8 @@ def handle_files(files: list[FileStorage], course: int, group: int,
 
     __allowed_filenames: tuple = get_filenames(course, assignment)
     __nr_of_files = len(__allowed_filenames)
+    print(__allowed_filenames)
+    print(__nr_of_files)
 
     number_of_files = {}
     res_code = 200
@@ -61,13 +63,13 @@ def get_filenames(course: int, assignment: int) -> tuple:
             with conn.cursor() as cur:
                 query = """SELECT filename FROM filenames
                         WHERE filenames.courseId   = %s
-                        AND AssignmentFiles.assignment = %s
+                        AND filenames.assignment = %s
                         """
 
                 cur.execute(query, (course, assignment))
                 data = cur.fetchall()
         conn.close()
-        return data
+        return tuple(value[0] for value in data)
 
     except Exception as e:
         print(e)
@@ -209,12 +211,12 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
         with conn.cursor() as cur:
             query = """INSERT INTO AssignmentFiles
                     (groupId, courseId, assignment, fileName,
-                    fileData, fileType, submission) 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, 0);
+                    fileData, fileType) 
+                    VALUES (%s, %s, %s, %s, %s, %s);
                     """
 
             cur.execute(query, (group_id, course_id, assignment,
-                        file_name, binary, file_type, 0))
+                        file_name, binary, file_type))
     conn.close()
 
 
