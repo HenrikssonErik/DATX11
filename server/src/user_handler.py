@@ -25,7 +25,7 @@ def get_user(user_id: int) -> dict:
         conn.close()
         if not data:
             raise Exception("No such user")
-        return {'cid': data[0], 'email': data[1], 'fullname': data[2]}
+        return {'cid': data[0], 'email': data[1], 'fullname': data[2], 'id': user_id}
 
     except Exception as e:
         print(e)
