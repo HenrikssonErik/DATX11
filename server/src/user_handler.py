@@ -94,16 +94,23 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
 
     course_id = _get_course_id_from_group(group_id)
 
-    # add to group
     try:
         for course in user_courses:
             if course['courseID'] == course_id and \
                course['Role'] == Role.Student.name:
                 with conn:
                     with conn.cursor() as cur:
-                        query_data = """INSERT into useringroup VALUES
-                                       (%s, %s)"""
-                        cur.execute(query_data, [user_id, group_id])
+                        query_one = """SELECT EXISTS(SELECT 1 FROM
+                        usergroupcourseinfo WHERE courseid=%s AND userid=%s) as
+                        exists_row;"""
+                        cur.execute(query_one, [course_id, user_id])
+                        in_group = cur.fetchone()[0]
+                        if not (in_group):
+                            query_two = """INSERT into useringroup VALUES
+                                           (%s, %s)"""
+                            cur.execute(query_two, [user_id, group_id])
+                        else:
+                            raise Exception("Already in group")
                 conn.close()
 
     except Exception as e:
