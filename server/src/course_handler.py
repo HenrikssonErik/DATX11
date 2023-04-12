@@ -114,7 +114,8 @@ def add_group_to_course(course_id: int, user_id: int):
                     query_three = """INSERT INTO UserInGroup (userId, groupId)
                     SELECT %s, gd.groupid FROM GroupDetails gd WHERE
                     gd.groupnumber = %s AND gd.course = %s;"""
-                    cur.execute(query_three, [user_id, current_group+1, course_id])
+                    cur.execute(query_three, [user_id, current_group+1,
+                                              course_id])
                 else:
                     raise Exception("Already in group")
         conn.close()
