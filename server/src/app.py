@@ -1,19 +1,30 @@
 
 
 from typing import Literal
-from flask import Flask, jsonify, make_response, request, send_file
+from flask import Flask, Response, jsonify, make_response, render_template, \
+    request, send_file
 from flask_cors import CORS
+from .constants import DOMAIN
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database
-from .login_handler import user_registration, log_in, create_key,\
-                            verify_and_get_id
 from . import user_handler
 from . import course_handler
+from .login_handler import user_registration, log_in, create_key, \
+    user_to_resend_verification, verify_user_from_email_verification, \
+    verify_and_get_id
+from flask_mail import Mail, Message
+import jwt
 
 # creating the Flask application
 app = Flask(__name__)
-
 CORS(app)
+mail = Mail(app)
+
+app.config.from_pyfile('mailconfig.cfg')
+
+mail = Mail(app)
+
+
 # creating private key for signing tokens
 create_key()
 
@@ -38,19 +49,104 @@ def login():
 
 
 @app.route('/signUp', methods=['POST'])
-def sign_up():
+def sign_up() -> Response:
+    """Signs the user up to the database. If the data is validated in
+    the backend, we send a verification email via the
+    send_verification_email-function.
+
+    Returns:
+        Response: An HTTP-Response containing of the status
+        from login_handler's user_registration-function,
+        either successful or invalidated.
+    """
     response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
         user_registration(request.form)
 
-    # sign_up_response = {}
-    # sign_up_response.update({'status': response[0]})
-    res = make_response(response[0], response[1])
+    if (response[1] == 200):
+        send_verification_email(
+            request.form['email'], response[0]['token'])
+        res = make_response({'status': 'success'}, response[1])
+    else:
+        res = make_response(response[0], response[1])
+
     return res
+
+
+@app.route('/resendVerification', methods=['POST'])
+def resend_verification_email() -> Response:
+    data = request.form
+    cid = data['cid']
+
+    user_lookup = user_to_resend_verification(cid)
+    if (user_lookup[1] == 200):
+        email = user_lookup[0]['email']
+        token = user_lookup[0]['token']
+        send_verification_email(email, token)
+        return make_response({'status': "success"}, 200)
+    else:
+        return make_response(user_lookup)
+
+
+@app.route('/verify_email', methods=['POST'])
+def verify_email() -> Response:
+    """
+    This function will be routed to whenever a verification,
+    including a verification token in clicked.
+    This will verify the user, if possible, otherwise; return
+    the appropriate error message to the frontend to be displayed.
+
+    Returns:
+        Response: An HTTP-Response containing either:
+
+        {'status': status_message}, status_code
+        OR:
+        {'cid': user's cid(will be got from the token)}, 200
+    """
+    data = request.get_json()
+    token = data['token']
+
+    try:
+        verify: tuple[dict[str, str],
+                      Literal[200, 406, 500]] = \
+            verify_user_from_email_verification(token)
+        response = make_response(verify)
+        return response
+    except jwt.ExpiredSignatureError:
+        res = make_response({'status': 'expired_verification_signature'}, 400)
+        return res
+    except jwt.InvalidTokenError:
+        res = make_response({'status': 'invalid_verification_token'}, 400)
+        return res
+
+
+def send_verification_email(to: str, token: str) -> None:
+    """
+    Sends a verification email to the specific user signing up.
+    This email is in an HTML format, with a working link sending
+    the user directly to the correct endpoint in the frontend
+    (To be updated whenever the website is launched to not link to localhost)
+
+
+    Args:
+        to (str): The recipient's email address, which has been verified
+        in login_handler's check_data_input to be a valid email.
+        token_dict (dict): The jwt-generated token from login_handler's
+        create_verification_token-function.
+    """
+    msg = Message('Verification Email for Hydrant',
+                  sender='temphydrant@gmail.com', recipients=[to])
+
+    endpoint: str = "/verifyEmail/" + token
+
+    url: str = DOMAIN + endpoint
+
+    msg.html = render_template("emailTemplate.html", link=url, raw_url=url)
+
+    mail.send(msg)
 
 
 @app.route('/files', methods=['POST'])
 def post_files():
-
     files = request.files.getlist('files')
 
     if not files:
@@ -64,7 +160,6 @@ def post_files():
 
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
-    print(request)
     files = request.files.getlist('files')
 
     if not files:

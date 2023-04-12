@@ -29,7 +29,7 @@ def get_user(user_id: int) -> dict:
 
     except Exception as e:
         print(e)
-        return {'status': "No User Found"}
+        raise Exception("No user found") from e
 
 
 def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
@@ -54,13 +54,12 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
         orderedData["groupId"] = data[0]
         orderedData["groupNumber"] = data[1]
         group_members = _get_group_members(data[0])
-        print(group_members)
         orderedData["groupMembers"] = group_members
         return orderedData
 
     except Exception as e:
         print(e)
-        return {'status': "No Group Found"}
+        raise Exception("No group found") from e
 
 
 def _get_group_members(group_id: int) -> list:
@@ -84,7 +83,8 @@ def _get_group_members(group_id: int) -> list:
 
     except Exception as e:
         print(e)
-        return {'status': "no_group_members"}
+        raise Exception(
+            "Something went wrong when getting group members") from e
 
 
 def add_user_to_group(user_id: int, group_id: int) -> None:
@@ -109,7 +109,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
 
     except Exception as e:
         print(e)
-        return {'status': e.args}
+        raise Exception("Error when adding user!") from e
 
 
 def _get_course_id_from_group(group_id) -> int:
@@ -131,7 +131,7 @@ def _get_course_id_from_group(group_id) -> int:
 
     except Exception as e:
         print(e)
-        return e
+        raise Exception("Error when getting course id!") from e
 
 
 def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
@@ -147,7 +147,7 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
 
     except Exception as e:
         print(e)
-        return e
+        raise Exception("Error when adding user to course!") from e
 
 
 def remove_user_from_course(user_id: int, course_id) -> None:
@@ -163,7 +163,7 @@ def remove_user_from_course(user_id: int, course_id) -> None:
 
     except Exception as e:
         print(e)
-        return (e)
+        raise Exception("Error when removing user from course!") from e
 
 
 def remove_user_from_group(user_id: int, group_id: int) -> None:
@@ -179,7 +179,7 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
         conn.close()
     except Exception as e:
         print(e)
-        return {'status': "Could not remove from group"}
+        raise Exception("Error when removing user from group!") from e
 
 
 def is_teacher_on_course(user_id: int, course_id: int) -> bool:
@@ -226,12 +226,12 @@ def get_global_role(user_id) -> str:
 
     except Exception as e:
         print(e)
-        return {'status': "No User Found"}
+        raise Exception("Error when finding the user!") from e
 
 
 def check_admin_or_course_teacher(user_id: int, course_id: int):
     course_administrator: bool = is_admin_on_course(user_id, course_id) or \
-                            is_teacher_on_course(user_id, course_id)
+        is_teacher_on_course(user_id, course_id)
     global_admin: bool = get_global_role(user_id) == Role.Admin.name
 
     return course_administrator or global_admin
@@ -252,7 +252,7 @@ def change_role_on_course(new_role: str, user_id: int,
             conn.close()
         except Exception as e:
             print(e)
-            return {'status': "Could not  change the role"}
+            raise Exception("Could not change the role") from e
         return None
     else:
         return {'status': "Not an allowed role"}
@@ -286,4 +286,4 @@ def get_users_on_course(course: int) -> tuple:
 
     except Exception as e:
         print(e)
-        return {'status': "Something went wrong"}, 400
+        raise Exception("Could not get users in course") from e

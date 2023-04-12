@@ -9,11 +9,9 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { AuthguardGuard } from './authguard.guard';
 import { AssignmentsComponent } from './components/assignments/assignments.component';
 import { CoursePickerComponent } from './components/course-picker/course-picker.component';
+import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
 
 const routes: Routes = [
-  /** THIS path seems to be the reason for the duplication of both the nav and footer.
-   * Though, I do not know if this would be a good fix to remove this path entirely.
-   * */
   { path: '', component: HomePageComponent },
   { path: 'login', component: LoginComponent },
   {
@@ -37,6 +35,7 @@ const routes: Routes = [
     component: AssignmentsComponent,
   },
   { path: 'upload', component: FileUploadComponent },
+  { path: 'verifyEmail/:token', component: VerifyEmailComponent },
   { path: '404', component: PageNotFoundComponent },
   { path: '**', redirectTo: '/404' },
 ];
