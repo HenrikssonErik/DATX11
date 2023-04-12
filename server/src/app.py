@@ -133,11 +133,11 @@ def send_verification_email(to: str, token_dict: dict) -> None:
 @app.route('/files', methods=['POST'])
 def post_files():
     token = extract_token(request)
-    user_id:int = verify_and_get_id(token)
+    user_id: int = verify_and_get_id(token)
     files = request.files.getlist('files')
-    course_id: int = request.form['Course']
-    group_id: int = request.form['Group']
-    assignment_nr:int  = request.form['Assignment']
+    course_id: int = int(request.form['Course'])
+    group_id: int = int(request.form['Group'])
+    assignment_nr: int = int(request.form['Assignment'])
 
     if not files:
         return "Files not found", 406
