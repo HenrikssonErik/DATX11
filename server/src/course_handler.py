@@ -355,23 +355,23 @@ def get_course_groups(course: int):
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupid, groupnumber, fullname FROM
-                                GroupDetails WHERE course = %s"""
+                query_data = """SELECT groupnumber, groupid,
+                array_agg(fullname) FROM GroupDetails WHERE course = %s GROUP
+                BY groupid, groupnumber"""
                 cur.execute(query_data, [course])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
                 group_list = []
+                if not data:
+                    return {}
                 for row in data:
-                    group = {'groupId': row[0], 'groupNumber': row[1], 'users': []}
-                    cur.execute(f"SELECT fullName FROM userdata INNER JOIN useringroup ON userdata.userid = useringroup.userid WHERE useringroup.groupid = {row[0]}")
-                    users = cur.fetchall()
-                    for user in users:
-                        group['users'].append(user[0])
-                    group_list.append(group)
+                    group_dict = {
+                        "groupNumber": row[0],
+                        "groupId": row[1],
+                        "users": row[2]}
+                    group_list.append(group_dict)
         conn.close()
-        if not data:
-            return {}
-        return group_dict
+        return group_list
 
     except Exception as e:
         print(e)
