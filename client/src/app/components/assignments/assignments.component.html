@@ -83,73 +83,32 @@
         <button class="btn btn-primary">Create Group</button>
       </div>
       <ngb-accordion #groupAccordion="ngbAccordion">
-        <ngb-panel>
+        <ngb-panel *ngFor="let group of courseGroups">
           <ng-template ngbPanelTitle>
             <div class="titleAccordion">
-              <span>Group 53</span>
+              <span>Group {{ group.groupNumber }}</span>
+              <span> </span>
               <span
+                *ngIf="!(group.groupId === myGroup.groupId) && !hasGroup()"
                 class="joinButton"
                 (click)="joinGroup(); $event.stopPropagation()"
                 >Join</span
               >
               <span
-                ><i
-                  class="fa-solid fa-circle-minus"
-                  (click)="removeFromGroup(); $event.stopPropagation()"
-                ></i
-              ></span>
-            </div>
-          </ng-template>
-          <ng-template ngbPanelContent>
-            <div class="row">
-              <div class="flex-container">
-                <p>Malte</p>
-                <p>Erik</p>
-                <p>Alfred</p>
-                <p>Alex</p>
-                <p>Gabster</p>
-                <p>Sebbe</p>
-              </div>
-            </div>
-          </ng-template>
-        </ngb-panel>
-        <ngb-panel>
-          <ng-template ngbPanelTitle>
-            <div class="titleAccordion">
-              <span>Group 420</span>
-              <span
-                class="joinButton"
-                (click)="joinGroup(); $event.stopPropagation()"
-                >Join</span
+                *ngIf="group.groupId === myGroup.groupId"
+                (click)="
+                  removeFromGroup(course.courseID, group.groupId);
+                  $event.stopPropagation()
+                "
+                class="leaveButton"
+                >Leave</span
               >
             </div>
           </ng-template>
           <ng-template ngbPanelContent>
             <div class="row">
               <div class="flex-container">
-                <p>Malte</p>
-                <p>Erik</p>
-                <p>Alfred</p>
-              </div>
-            </div>
-          </ng-template>
-        </ngb-panel>
-        <ngb-panel>
-          <ng-template ngbPanelTitle>
-            <div class="titleAccordion">
-              <span>Group 69</span>
-              <span
-                class="joinButton"
-                (click)="joinGroup(); $event.stopPropagation()"
-                >Join</span
-              >
-            </div>
-          </ng-template>
-          <ng-template ngbPanelContent>
-            <div class="row">
-              <div class="flex-container">
-                <p>Malte</p>
-                <p>Erik</p>
+                <p *ngFor="let member of group.users">{{ member }}</p>
               </div>
             </div>
           </ng-template>

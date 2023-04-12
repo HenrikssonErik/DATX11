@@ -9,6 +9,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FileUploadModalComponent } from '../file-upload-modal/file-upload-modal.component';
 import { SubmissionService } from 'src/app/services/submission.service';
 import { GroupService } from 'src/app/services/group.service';
+import { UserService } from 'src/app/services/user-service.service';
 
 @Component({
   selector: 'app-assignments',
@@ -20,7 +21,10 @@ export class AssignmentsComponent implements OnInit {
   selectedTab: number = 0;
   //TODO: Create a Model for group
   group: any;
-  courseGroups = [];
+  courseGroups: { groupId: number; groupNumber: number; users: string[] }[] =
+    [];
+
+  myGroup: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -28,7 +32,8 @@ export class AssignmentsComponent implements OnInit {
     private http: HttpClient,
     private modalService: NgbModal,
     private submissionService: SubmissionService,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private userService: UserService
   ) {}
 
   ngOnInit() {
@@ -51,6 +56,11 @@ export class AssignmentsComponent implements OnInit {
 
     this.groupService.getGroups(id).subscribe((res) => {
       this.courseGroups = res;
+      console.log(this.courseGroups);
+    });
+
+    this.groupService.getMyGroup(id).subscribe((res) => {
+      this.myGroup = res;
       console.log(res);
     });
   }
@@ -91,8 +101,15 @@ export class AssignmentsComponent implements OnInit {
     console.log('join group');
   }
 
-  removeFromGroup() {
-    console.log('remove from group');
+  removeFromGroup(courseId: number, groupId: number) {
+    this.userService.getUserData().subscribe((res) => {
+      console.log(res);
+      /*  this.groupService
+        .removeFromGroup(courseId, groupId, res.id)
+        .subscribe((res) => {
+          console.log(res);
+        }); */
+    });
   }
 
   // TODO: Handle in backend instead
@@ -101,6 +118,17 @@ export class AssignmentsComponent implements OnInit {
       if ('status' in this.group) {
         return false;
       } else if (this.group.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+  // TODO: Bad
+  hasGroup(): boolean {
+    if (this.myGroup) {
+      if ('status' in this.myGroup) {
         return false;
       } else {
         return true;
