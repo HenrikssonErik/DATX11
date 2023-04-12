@@ -347,3 +347,29 @@ def get_assignment_feedback(course: int, assignment: int, group: int) -> list | 
     except Exception as e:
         print(e)
         return {'status': "No feedback found"}
+
+def get_course_groups(course: int):
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT * FROM
+                                GroupDetails WHERE course = %s"""
+                cur.execute(query_data, [course])
+                # data = [row[0] for row in cur.fetchall()]
+                data = cur.fetchall()
+                groups: list[dict[str: str | int]] = []
+                # TODO change below
+                for assignment_row in data:
+                    assignments.append({'AssignmentNr': assignment_row[0],
+                                        'DueDate': assignment_row[1],
+                                        'Description': assignment_row[2]})
+        conn.close()
+        if not data:
+            return []
+        return assignments
+
+    except Exception as e:
+        print(e)
+        raise Exception("Error when getting course groups")

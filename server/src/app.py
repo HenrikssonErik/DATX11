@@ -460,3 +460,13 @@ def get_feedback():
         return make_response({"status": 'not_logged_in'}, 401)
 
 # TODO: get all groups for course
+@app.route('/getFeedback', methods=['GET'])
+def get_course_groups():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = request.args.get('Course')
+
+    if (user_id):
+        groups = course_handler.get_course_groups(course)
+
+# TODO add endpoint to get all groups latest submissions
