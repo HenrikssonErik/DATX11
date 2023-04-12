@@ -362,14 +362,12 @@ def get_course_groups(course: int):
                 data = cur.fetchall()
                 group_list = []
                 for row in data:
-                    group_name = f"group{row[1]}"
-                    user_name = row[2]
-                    group_dict = next((item for item in group_list if
-                                       group_name in item),
-                                      {"users": [], 'id': row[0]})
-                    group_dict.setdefault(group_name, []).append(user_name)
-                    if group_dict not in group_list:
-                        group_list.append(group_dict)
+                    group = {'groupId': row[0], 'groupNumber': row[1], 'users': []}
+                    cur.execute(f"SELECT fullName FROM userdata INNER JOIN useringroup ON userdata.userid = useringroup.userid WHERE useringroup.groupid = {row[0]}")
+                    users = cur.fetchall()
+                    for user in users:
+                        group['users'].append(user[0])
+                    group_list.append(group)
         conn.close()
         if not data:
             return {}
