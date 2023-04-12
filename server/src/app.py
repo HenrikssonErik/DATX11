@@ -132,7 +132,6 @@ def send_verification_email(to: str, token_dict: dict) -> None:
 
 @app.route('/files', methods=['POST'])
 def post_files():
-    # take in course id, groupid, assignmentnr, chekc for stored names
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     files = request.files.getlist('files')
@@ -142,13 +141,19 @@ def post_files():
 
     if not files:
         return "Files not found", 406
-    if (user_id and group_id == user_handler.get_group(user_id,
-                                                       course_id)["groupId"]):
-        res = handle_files(files, course_id, group_id, assignment_nr)
-        feedback_res = {}
-        feedback_res.update({"feedback": res[0]})
-        feedback_res.update(res[1])
-        return make_response(jsonify(feedback_res), res[2])
+    if (user_id):
+        if (group_id == user_handler.get_group(user_id,
+                                               course_id)["groupId"]):
+            res = handle_files(files, course_id, group_id, assignment_nr)
+            feedback_res = {}
+            feedback_res.update({"feedback": res[0]})
+            feedback_res.update(res[1])
+            return make_response(jsonify(feedback_res), res[2])
+        else:
+            return make_response({'status: not_in_group'}, 401)
+    else:
+        return make_response({'status: not_logged_in'}, 401)
+
 # TODO: add course and assingmetn in post
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
