@@ -25,6 +25,8 @@ export class AssignmentsComponent implements OnInit {
     [];
 
   myGroup: any;
+  isLoading: boolean = false;
+  createGroupLoader: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -97,18 +99,57 @@ export class AssignmentsComponent implements OnInit {
     return new Date(date).toLocaleDateString('sv-SE');
   }
 
-  joinGroup(): void {
-    console.log('join group');
+  joinGroup(courseId: number, groupId: number): void {
+    this.isLoading = true;
+    this.userService.getUserData().subscribe((res) => {
+      console.log(res);
+      this.groupService.joinGroup(courseId, groupId, res.id).subscribe({
+        next: (res) => {
+          console.log(res);
+        },
+
+        error: (err) => {
+          console.log(err);
+        },
+        complete: () => {
+          this.isLoading = false;
+          location.reload();
+        },
+      });
+    });
   }
 
   removeFromGroup(courseId: number, groupId: number) {
+    this.isLoading = true;
     this.userService.getUserData().subscribe((res) => {
-      console.log(res);
-      /*  this.groupService
-        .removeFromGroup(courseId, groupId, res.id)
-        .subscribe((res) => {
+      this.groupService.removeFromGroup(courseId, groupId, res.id).subscribe({
+        next: (res) => {
           console.log(res);
-        }); */
+        },
+        error: (err) => {
+          console.log(err);
+        },
+        complete: () => {
+          this.isLoading = false;
+          location.reload();
+        },
+      });
+    });
+  }
+
+  createGroup(courseId: number) {
+    this.createGroupLoader = true;
+    this.groupService.createGroup(courseId).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+      complete: () => {
+        this.createGroupLoader = false;
+        location.reload();
+      },
     });
   }
 

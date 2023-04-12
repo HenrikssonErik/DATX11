@@ -80,22 +80,32 @@
       <!--CONTENT FOR GROUPS-->
       <div class="mb-3" style="display: flex; justify-content: space-between">
         <h5>Groups</h5>
-        <button class="btn btn-primary">Create Group</button>
+        <button class="btn btn-primary" (click)="createGroup(course.courseID)">
+          <span *ngIf="createGroupLoader" class="loader"></span>
+          <span *ngIf="!createGroupLoader">Create Group</span>
+        </button>
       </div>
       <ngb-accordion #groupAccordion="ngbAccordion">
         <ngb-panel *ngFor="let group of courseGroups">
           <ng-template ngbPanelTitle>
             <div class="titleAccordion">
               <span>Group {{ group.groupNumber }}</span>
-              <span> </span>
+              <span *ngIf="isLoading" class="loader"> </span>
               <span
-                *ngIf="!(group.groupId === myGroup.groupId) && !hasGroup()"
+                *ngIf="
+                  !(group.groupId === myGroup.groupId) &&
+                  !hasGroup() &&
+                  !isLoading
+                "
                 class="joinButton"
-                (click)="joinGroup(); $event.stopPropagation()"
+                (click)="
+                  joinGroup(course.courseID, group.groupId);
+                  $event.stopPropagation()
+                "
                 >Join</span
               >
               <span
-                *ngIf="group.groupId === myGroup.groupId"
+                *ngIf="group.groupId === myGroup.groupId && !isLoading"
                 (click)="
                   removeFromGroup(course.courseID, group.groupId);
                   $event.stopPropagation()
