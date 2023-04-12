@@ -80,7 +80,12 @@
       <!--CONTENT FOR GROUPS-->
       <div class="mb-3" style="display: flex; justify-content: space-between">
         <h5>Groups</h5>
-        <button class="btn btn-primary" (click)="createGroup(course.courseID)">
+
+        <button
+          *ngIf="!hasGroup()"
+          class="btn btn-primary"
+          (click)="createGroup(course.courseID)"
+        >
           <span *ngIf="createGroupLoader" class="loader"></span>
           <span *ngIf="!createGroupLoader">Create Group</span>
         </button>
@@ -90,12 +95,15 @@
           <ng-template ngbPanelTitle>
             <div class="titleAccordion">
               <span>Group {{ group.groupNumber }}</span>
-              <span *ngIf="isLoading" class="loader"> </span>
+              <span
+                *ngIf="isLoadingMap.get(group.groupId)"
+                class="loader"
+              ></span>
               <span
                 *ngIf="
                   !(group.groupId === myGroup.groupId) &&
                   !hasGroup() &&
-                  !isLoading
+                  !isLoadingMap.get(group.groupId)
                 "
                 class="joinButton"
                 (click)="
@@ -105,7 +113,10 @@
                 >Join</span
               >
               <span
-                *ngIf="group.groupId === myGroup.groupId && !isLoading"
+                *ngIf="
+                  group.groupId === myGroup.groupId &&
+                  !isLoadingMap.get(group.groupId)
+                "
                 (click)="
                   removeFromGroup(course.courseID, group.groupId);
                   $event.stopPropagation()
