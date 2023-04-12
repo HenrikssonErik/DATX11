@@ -150,9 +150,9 @@ def post_files():
             feedback_res.update(res[1])
             return make_response(jsonify(feedback_res), res[2])
         else:
-            return make_response({'status: not_in_group'}, 401)
+            return make_response({'status': 'not_in_group'}, 401)
     else:
-        return make_response({'status: not_logged_in'}, 401)
+        return make_response({'status': 'not_logged_in'}, 401)
 
 # TODO: add course and assingmetn in post
 @app.route('/unitTest', methods=['POST'])
