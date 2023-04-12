@@ -69,8 +69,11 @@ class TestFileHandler(unittest.TestCase):
                                         'password': 'abc123'})
 
             self.assertEqual(result[1], 200)
-            self.assertTrue(result[0].get('token').
-                            startswith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"))
+            self.assertTrue(
+                result[0].get('token').startswith(
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+                )
+            )
 
     @patch('psycopg2.connect')
     def test_registration_query_success(self, mock_connect):
@@ -85,9 +88,12 @@ class TestFileHandler(unittest.TestCase):
         name = 'Test Testsson'
 
         result = registration_query(cid, email, hashed_pass, role, name)
-        mock_cursor.execute.assert_called_once_with("""INSERT INTO UserData
-                (cid, email, passphrase, globalRole, fullName)
-                VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass, role, name))
+        mock_cursor.execute.assert_called_once_with(
+            "INSERT INTO UserData "
+            "(cid, email, passphrase, globalRole, fullName) "
+            "VALUES (%s, %s, %s, %s, %s );",
+            (cid, email, hashed_pass, role, name)
+        )
 
         self.assertEqual(result, ({'status': 'success'}, 200))
 
@@ -108,9 +114,12 @@ class TestFileHandler(unittest.TestCase):
 
         result = registration_query(cid, email, hashed_pass, role, name)
 
-        mock_cursor.execute.assert_called_once_with("""INSERT INTO UserData
-                (cid, email, passphrase, globalRole, fullName)
-                VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass, role, name))
+        mock_cursor.execute.assert_called_once_with(
+            "INSERT INTO UserData "
+            "(cid, email, passphrase, globalRole, fullName) "
+            "VALUES (%s, %s, %s, %s, %s );",
+            (cid, email, hashed_pass, role, name)
+        )
 
         self.assertEqual(result, ({'status': 'already_registered'}, 406))
 
@@ -196,7 +205,10 @@ class TestFileHandler(unittest.TestCase):
         test_token = create_verification_token(random_cid)
         # with patch.object(bcrypt, 'gensalt') as mock_gensalt:
         mock_response = {'status': 'success'}, 200
-        with patch('src.login_handler.verify_user_in_db', return_value=mock_response):
+        with patch(
+            'src.login_handler.verify_user_in_db',
+            return_value=mock_response
+        ):
             # verify_result.return_value = {'status': 'success'}, 200
             verification_response = verify_user_from_email_verification(
                 test_token)
@@ -208,7 +220,10 @@ class TestFileHandler(unittest.TestCase):
         cid = random_cid_generator()
         mock_cur.fetchone.return_value = [cid + '@chalmers.se', False]
         new_verification_token = create_verification_token(cid)
-        with patch('src.login_handler.create_verification_token', return_value=new_verification_token):
+        with patch(
+            'src.login_handler.create_verification_token',
+            return_value=new_verification_token
+        ):
             actual_response = user_to_resend_verification(cid)
         expected_response = {"email": cid + "@chalmers.se",
                              "token": new_verification_token}, 200

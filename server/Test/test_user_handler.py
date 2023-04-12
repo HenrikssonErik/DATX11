@@ -101,12 +101,19 @@ class TestUserHandler(unittest.TestCase):
             course_id = 6
             result = user_handler.get_group(user_id, course_id)
 
-            mock_cursor.execute.assert_called_once_with("""SELECT groupid, groupnumber FROM
-                                userGroupCourseInfo
-                                WHERE userid = %s and courseid = %s""",
-                                                        (user_id, course_id))
+            mock_cursor.execute.assert_called_once_with(
+                "SELECT groupid, groupnumber FROM "
+                "userGroupCourseInfo "
+                "WHERE userid = %s and courseid = %s",
+                (user_id, course_id)
+            )
             self.assertEqual(
-                result, {'groupId': 2, 'groupNumber': 1, 'groupMembers': ['alebru']})
+                result, {
+                    'groupId': 2,
+                    'groupNumber': 1,
+                    'groupMembers': ['alebru']
+                }
+            )
 
     @patch('psycopg2.connect')
     def test_add_user_to_course(self, mock_connect):
@@ -117,7 +124,8 @@ class TestUserHandler(unittest.TestCase):
             user_id, course_id, user_handler.Role.Student)
 
         mock_cursor.execute.assert_called_once_with(
-            "INSERT into userincourse values (%s, %s, %s)",
+            "INSERT into userincourse values "
+            "(%s, %s, %s)",
             [user_id, course_id, user_handler.Role.Student.name]
         )
 
@@ -193,12 +201,23 @@ class TestUserHandler(unittest.TestCase):
         mock_cursor = setup_mock_cursor(mock_connect)
         user_id = 1
         mock_cursor.fetchone.return_value = (
-            'kvalden', 'kvalden@chalmers.se', 'Sebastian Kvaldén')
+            'kvalden',
+            'kvalden@chalmers.se',
+            'Sebastian Kvaldén'
+        )
         result = user_handler.get_user(user_id)
-        mock_cursor.execute.assert_called_once_with("""SELECT cid, email, fullname FROM Userdata
-                            WHERE userid = %s""", (user_id,))
-        self.assertEqual(result, {
-                         'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén'})
+        mock_cursor.execute.assert_called_once_with(
+            "SELECT cid, email, fullname FROM Userdata "
+            "WHERE userid = %s",
+            (user_id,)
+        )
+        self.assertEqual(
+            result, {
+                'cid': 'kvalden',
+                'email': 'kvalden@chalmers.se',
+                'fullname': 'Sebastian Kvaldén'
+            }
+        )
 
     @patch('psycopg2.connect')
     def test_get_global_role(self, mock_connect):
@@ -206,13 +225,16 @@ class TestUserHandler(unittest.TestCase):
         user_id = 1
         mock_cursor.fetchone.return_value = ['Student']
         res = user_handler.get_global_role(user_id)
-        mock_cursor.execute.assert_called_once_with("""SELECT globalrole FROM userdata
-                            WHERE userid = %s""", [user_id])
+        mock_cursor.execute.assert_called_once_with(
+            "SELECT globalrole FROM userdata "
+            "WHERE userid = %s",
+            [user_id]
+        )
         self.assertEqual(res, user_handler.Role.Student.name)
 
     @patch('psycopg2.connect')
     def test_change_role_on_course(self, mock_connect):
-        mock_cursor = setup_mock_cursor(mock_connect)
+        setup_mock_cursor(mock_connect)
         user = 1
         new_role = 'Student'
         course = 1
@@ -225,17 +247,34 @@ class TestUserHandler(unittest.TestCase):
     @patch('psycopg2.connect')
     def test_get_users_on_course(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
-        mock_cursor.fetchall.return_value = [(1, 'kvalden',
-                                              'Sebastian Kvalden',
-                                              'kvalden@chalmers.se', 'Student'),
-                                             (2, 'erhen', 'Erik Henriksson',
-                                              'erhen@chalmers.se', 'Student')]
+        mock_cursor.fetchall.return_value = [
+            (
+                1, 'kvalden',
+                'Sebastian Kvalden',
+                'kvalden@chalmers.se', 'Student'
+            ),
+            (
+                2, 'erhen', 'Erik Henriksson',
+                'erhen@chalmers.se', 'Student'
+            )
+        ]
         course = 1
         res = user_handler.get_users_on_course(course)
-        self.assertEqual(res, ([{'Id': 1, 'Cid': 'kvalden', 'Name':
-                                'Sebastian Kvalden',
-                                 'Email': 'kvalden@chalmers.se', 'Role':
-                                 'Student'}, {'Id': 2, 'Cid': 'erhen', 'Name':
-                                              'Erik Henriksson',
-                                              'Email': 'erhen@chalmers.se',
-                                              'Role': 'Student'}], 200))
+        self.assertEqual(
+            res, ([
+                {
+                    'Id': 1,
+                    'Cid': 'kvalden',
+                    'Name': 'Sebastian Kvalden',
+                    'Email': 'kvalden@chalmers.se',
+                    'Role': 'Student'
+                },
+                {
+                    'Id': 2,
+                    'Cid': 'erhen',
+                    'Name': 'Erik Henriksson',
+                    'Email': 'erhen@chalmers.se',
+                    'Role': 'Student'
+                }
+            ], 200)
+        )

@@ -170,7 +170,8 @@ def remove_existing_assignment(file_name: str, group_id: int, course_id: int,
                  AND   AssignmentFiles.submission = %s;
                  """
 
-            cur.execute(query, (file_name, group_id, course_id, assignment, submission))
+            cur.execute(query, (file_name, group_id, course_id,
+                                assignment, submission))
     conn.close()
 
 
@@ -180,8 +181,8 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
 
     Removed previous file if it exists
     """
-    #We do not need to delete an assignment with several submission anymore. 
-    #remove_existing_assignment(file_name, group_id, course_id, assignment)
+    # We do not need to delete an assignment with several submission anymore.
+    # remove_existing_assignment(file_name, group_id, course_id, assignment)
     binary = psycopg2.Binary(file_data)
 
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -191,7 +192,7 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
         with conn.cursor() as cur:
             query = """INSERT INTO AssignmentFiles
                     (groupId, courseId, assignment, fileName,
-                    fileData, fileType, submission) 
+                     fileData, fileType, submission)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, 0);
                     """
 
@@ -239,7 +240,8 @@ def get_assignment_files_from_database(
                         AND   AssignmentFiles.submission = %s
                         """
 
-            cur.execute(query_data, (file_name, group_id, course, assignment, submission))
+            cur.execute(query_data, (file_name, group_id, course,
+                                     assignment, submission))
             data = cur.fetchall()
     conn.close()
 

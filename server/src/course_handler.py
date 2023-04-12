@@ -5,7 +5,7 @@ import datetime
 
 def create_course(course_name: str, course_abbr: str, year: int,
                   teaching_period: int) -> tuple | int:
-    """Cretes a course. Also checks so the course data that is
+    """Creates a course. Also checks so the course data that is
     added is according to database requirements
 
     Returns: A dict with errors if they exists,
@@ -42,14 +42,14 @@ def get_courses_info(user_id: int) -> list[dict[str, str | int]]:
         conn.close()
         if not data:
             return []
-        orderedData: list[dict[str, str | int]] = []
+        ordered_data: list[dict[str, str | int]] = []
         for info in data:
-            orderedData.append({"Role": info[1], "courseID": info[2],
+            ordered_data.append({"Role": info[1], "courseID": info[2],
                                 "CourseName": info[3],
-                                "Course": info[4], "Year": info[5],
-                                "StudyPeriod": info[6],
-                                'Assignments': get_assignments(info[2])})
-        return orderedData
+                                 "Course": info[4], "Year": info[5],
+                                 "StudyPeriod": info[6],
+                                 'Assignments': get_assignments(info[2])})
+        return ordered_data
 
     except Exception as e:
         print(e)
@@ -72,15 +72,15 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
         if not data:
             raise Exception("No Courses Found")
 
-        orderedData: dict[str, str | int] = {}
-        orderedData["Role"] = data[1]
-        orderedData["courseID"] = data[2]
-        orderedData["CourseName"] = data[3]
-        orderedData["Course"] = data[4]
-        orderedData["Year"] = data[5]
-        orderedData["StudyPeriod"] = data[6]
-        orderedData['Assignments'] = get_assignments(data[2])
-        return orderedData
+        ordered_data: dict[str, str | int] = {}
+        ordered_data["Role"] = data[1]
+        ordered_data["courseID"] = data[2]
+        ordered_data["CourseName"] = data[3]
+        ordered_data["Course"] = data[4]
+        ordered_data["Year"] = data[5]
+        ordered_data["StudyPeriod"] = data[6]
+        ordered_data['Assignments'] = get_assignments(data[2])
+        return ordered_data
 
     except Exception as e:
         print(e)
@@ -114,9 +114,9 @@ def add_groups_to_course(number_of_groups: int, course_id: int):
 
 
 def _create_course(course_name: str, course_abbr: str, year: int,
-                    teaching_period: int) -> int | tuple:
-    """Internal method to create a course, used by create_course method after verification of data
-    Returnsthe new course ID"""
+                   teaching_period: int) -> int | tuple:
+    """Internal method to create a course, used by create_course method after
+       verification of data Returnsthe new course ID"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -143,8 +143,8 @@ def _create_course(course_name: str, course_abbr: str, year: int,
 
 def create_assignment(course_id: int, description: str, assignment_nr: int,
                       end_date: str, file_names: list) -> dict:
-    """Creates an assignment for a course, assignment number will not be incremented automatically,
-    thus must be provided by the creator"""
+    """Creates an assignment for a course, assignment number will not be
+       incremented automatically, thus must be provided by the creator"""
     res: dict = {}
     for name in file_names:
         if not (check_file_extension(name)):
@@ -161,10 +161,16 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """INSERT INTO Assignments VALUES
-                                (%s, %s, %s, %s);"""
-                cur.execute(query_one, [course_id, assignment_nr, description,
-                                        end_date])
+                query_one = "INSERT INTO Assignments VALUES " +\
+                    "(%s, %s, %s, %s);"
+                cur.execute(
+                    query_one,
+                    [
+                        course_id,
+                        assignment_nr,
+                        description, end_date
+                    ]
+                )
         conn.close()
 
         add_filenames(file_names, course_id, assignment_nr)
@@ -177,14 +183,15 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
 
 
 def get_assignments(course_id: int) -> tuple:
-    """Returns a list of all assignments connected to a course, with their description and end date"""
+    """Returns a list of all assignments connected to a course, with their
+       description and end date"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT assignment, enddate, Description FROM
-                                assignments WHERE courseid = %s"""
+                query_data = "SELECT assignment, enddate, Description FROM " +\
+                    "assignments WHERE courseid = %s"
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
@@ -224,7 +231,7 @@ def change_description(new_desc: str, course_id: int,
 
 
 # TODO: not done or tested, returns statements must be fixed
-def set_teacher_feedback(group_id: int, feedback: str, grade: bool, 
+def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
                          passed: bool, course: int, assignment: int):
     """Submission is set to 0 since a primary cannot be null.
     It will increment by default anyway."""
@@ -232,9 +239,10 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """INSERT INTO AssignmentFeedback (groupId,
-                courseId, assignment, submission, teacherGrade, teacherFeedback, testPassed)
-                VALUES (%s, %s, %s, 0, %s, %s, %s);"""
+                query_one = """INSERT INTO AssignmentFeedback
+                               (groupId, courseId, assignment, submission,
+                                teacherGrade, teacherFeedback, testPassed)
+                                VALUES (%s, %s, %s, 0, %s, %s, %s);"""
                 cur.execute(query_one, [group_id, course, assignment, 0, grade,
                                         feedback, passed])
         conn.close()
