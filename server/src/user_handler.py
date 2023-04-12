@@ -175,6 +175,13 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
                 query_data = """DELETE from useringroup
                                 WHERE userid = %s AND groupid = %s """
                 cur.execute(query_data, [user_id, group_id])
+                query_two = """SELECT (fullname IS NULL)
+                AS is_empty FROM GroupDetails WHERE groupid = %s;"""
+                cur.execute(query_two, [group_id])
+                emptyGroup: bool = cur.fetchone()
+                if (emptyGroup):
+                    query_three = """delete from groups where groupid = %s """
+                    cur.execute(query_three, [group_id])
         conn.close()
     except Exception as e:
         print(e)
