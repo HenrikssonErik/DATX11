@@ -331,7 +331,7 @@ def get_assignment_feedback(course: int, assignment: int, group: int) -> list | 
                     except IndexError:
                         testfeedback = ""
                     try:
-                        grade = ""
+                        grade = submission[4]
                     except IndexError:
                         grade = None
                     assignments.append({'Submission': submission[0],
