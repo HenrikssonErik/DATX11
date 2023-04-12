@@ -307,7 +307,8 @@ def check_date_format(date_string) -> bool:
         return False
 
 
-def get_assignment_feedback(course: int, assignment: int, group: int) -> list | dict:
+def get_assignment_feedback(course: int, assignment: int,
+                            group: int) -> list | dict:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -348,6 +349,7 @@ def get_assignment_feedback(course: int, assignment: int, group: int) -> list | 
         print(e)
         return {'status': "No feedback found"}
 
+
 def get_course_groups(course: int):
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -359,16 +361,18 @@ def get_course_groups(course: int):
                 cur.execute(query_data, [course])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
-                groups: list[dict[str: str | int]] = []
-                # TODO change below
-                for assignment_row in data:
-                    assignments.append({'AssignmentNr': assignment_row[0],
-                                        'DueDate': assignment_row[1],
-                                        'Description': assignment_row[2]})
+                group_dict = {}
+                for row in data:
+                    group_name = f"group{row[1]}"
+                    user_name = row[2]
+                    if group_name not in group_dict:
+                        group_dict[group_name] = {"users": [user_name]}
+                    else:
+                        group_dict[group_name]["users"].append(user_name)
         conn.close()
         if not data:
-            return []
-        return assignments
+            return {}
+        return group_dict
 
     except Exception as e:
         print(e)
