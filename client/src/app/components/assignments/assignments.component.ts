@@ -8,6 +8,7 @@ import { API_URL } from 'src/environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FileUploadModalComponent } from '../file-upload-modal/file-upload-modal.component';
 import { SubmissionService } from 'src/app/services/submission.service';
+import { GroupService } from 'src/app/services/group.service';
 
 @Component({
   selector: 'app-assignments',
@@ -19,13 +20,15 @@ export class AssignmentsComponent implements OnInit {
   selectedTab: number = 0;
   //TODO: Create a Model for group
   group: any;
+  courseGroups = [];
 
   constructor(
     private route: ActivatedRoute,
     private courseService: CourseService,
     private http: HttpClient,
     private modalService: NgbModal,
-    private submissionService: SubmissionService
+    private submissionService: SubmissionService,
+    private groupService: GroupService
   ) {}
 
   ngOnInit() {
@@ -38,14 +41,16 @@ export class AssignmentsComponent implements OnInit {
 
     this.getGroup(id).subscribe((res: Course) => {
       //TODO: HANDLE THE EMPTY GROUP BETTER, THIS FIX IS DUMB
-      if (res.hasOwnProperty('status')) {
-        this.group = [];
-      } else {
-        this.group = res;
-      }
+
+      this.group = res;
     });
 
     this.submissionService.getSubmission(1, 1).subscribe((res) => {
+      console.log(res);
+    });
+
+    this.groupService.getGroups(id).subscribe((res) => {
+      this.courseGroups = res;
       console.log(res);
     });
   }
@@ -84,6 +89,10 @@ export class AssignmentsComponent implements OnInit {
 
   joinGroup(): void {
     console.log('join group');
+  }
+
+  removeFromGroup() {
+    console.log('remove from group');
   }
 
   // TODO: Handle in backend instead
