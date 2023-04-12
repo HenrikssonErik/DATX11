@@ -132,17 +132,22 @@ def send_verification_email(to: str, token_dict: dict) -> None:
 
 @app.route('/files', methods=['POST'])
 def post_files():
+    # take in course id, groupid, assignmentnr, chekc for stored names
     files = request.files.getlist('files')
+    data = request.get_json()
+    course_id = data['Course']
+    group_id = data['Group']
+    assignment_nr = data['Assignment']
 
     if not files:
         return "Files not found", 406
-    res = handle_files(files)
+    res = handle_files(files, course_id, group_id, assignment_nr)
     feedback_res = {}
     feedback_res.update({"feedback": res[0]})
     feedback_res.update(res[1])
     return make_response(jsonify(feedback_res), res[2])
 
-
+# TODO: add course and assingmetn in post
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
     files = request.files.getlist('files')
