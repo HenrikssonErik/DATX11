@@ -18,8 +18,8 @@ def get_user(user_id: int) -> dict:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT cid, email, fullname FROM Userdata
-                            WHERE userid = %s"""
+                query_data = "SELECT cid, email, fullname FROM Userdata " +\
+                    "WHERE userid = %s"
                 cur.execute(query_data, (user_id,))
                 data = cur.fetchone()
         conn.close()
@@ -40,9 +40,9 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupid, groupnumber FROM
-                                userGroupCourseInfo
-                                WHERE userid = %s and courseid = %s"""
+                query_data = "SELECT groupid, groupnumber FROM " +\
+                    "userGroupCourseInfo " +\
+                    "WHERE userid = %s and courseid = %s"
                 cur.execute(query_data, (user_id, course_id))
                 data = cur.fetchone()
         conn.close()
@@ -50,12 +50,13 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
         if not data:
             raise Exception("No group for this user")
 
-        orderedData: dict = {}
-        orderedData["groupId"] = data[0]
-        orderedData["groupNumber"] = data[1]
+        ordered_data: dict = {}
+        ordered_data["groupId"] = data[0]
+        ordered_data["groupNumber"] = data[1]
         group_members = _get_group_members(data[0])
-        orderedData["groupMembers"] = group_members
-        return orderedData
+        print(group_members)
+        ordered_data["groupMembers"] = group_members
+        return ordered_data
 
     except Exception as e:
         print(e)
@@ -140,8 +141,8 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """INSERT into userincourse values
-                                (%s, %s, %s)"""
+                query_data = "INSERT into userincourse values " +\
+                    "(%s, %s, %s)"
                 cur.execute(query_data, [user_id, course_id, user_role.name])
         conn.close()
 
@@ -214,8 +215,8 @@ def get_global_role(user_id) -> str:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT globalrole FROM userdata
-                            WHERE userid = %s"""
+                query_data = "SELECT globalrole FROM userdata " + \
+                    "WHERE userid = %s"
                 cur.execute(query_data, [user_id])
                 data = cur.fetchone()
         conn.close()

@@ -433,7 +433,7 @@ def get_users_in_course():
 
 
 @app.route('/changeAssignmentDate', methods=['POST'])
-def change_assignmentDate():
+def change_assignment_date():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -441,7 +441,7 @@ def change_assignmentDate():
     assignment: int = data['Assignment']
     new_date: str = data['Date']
 
-    if (user_handler.check_admin_or_course_teacher(request_user_id)):
+    if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
         res = course_handler.change_end_date(course, assignment, new_date)
 
         if res is None:
