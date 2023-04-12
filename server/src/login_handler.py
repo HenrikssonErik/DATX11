@@ -149,7 +149,7 @@ def user_to_resend_verification(cid: str) -> tuple:
                     return response_object, 200
                 else:
                     return {"status": "already_verified"}, 406
-            except:
+            except Exception:
                 return {"status": "unexpected_error"}, 500
 
 
