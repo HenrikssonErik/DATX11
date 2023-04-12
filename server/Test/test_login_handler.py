@@ -1,4 +1,6 @@
-
+import random
+import string
+from typing import Literal
 import sys
 from pathlib import Path
 import unittest
@@ -7,7 +9,7 @@ import bcrypt
 from psycopg2 import IntegrityError
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query   # noqa: E402, E501
+from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_verification_token, verify_user_in_db, verify_user_from_email_verification, user_to_resend_verification  # noqa: E402, E501
 
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
@@ -21,10 +23,14 @@ def setup_mock_cursor(mock_connect) -> MagicMock:
     return mock_cursor
 
 
-class TestLoginHandler(unittest.TestCase):
+def random_cid_generator(length=6) -> str:
+    random_cid = ''.join(random.choice(string.ascii_lowercase)
+                         for i in range(length))
+    return random_cid
 
+
+class TestFileHandler(unittest.TestCase):
     def setUp(self):
-        self.test_file_dir = Path(__file__).parent/"test_files_file_handler"
         create_key()
 
     def test_check_data_input(self):
@@ -63,26 +69,25 @@ class TestLoginHandler(unittest.TestCase):
                                         'password': 'abc123'})
 
             self.assertEqual(result[1], 200)
-            self.assertTrue(result[0].get('Token').
+            self.assertTrue(result[0].get('token').
                             startswith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"))
 
     @patch('psycopg2.connect')
     def test_registration_query_success(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
 
-        cid = 'abc'
-        email = 'abc@example.com'
+        random_cid = random_cid_generator()
+
+        cid = random_cid
+        email = cid + '@example.com'
         hashed_pass = b'secret'
         role = 'student'
         name = 'Test Testsson'
 
         result = registration_query(cid, email, hashed_pass, role, name)
-        mock_cursor.execute.assert_called_once_with(
-            "INSERT INTO UserData "
-            "(cid, email, passphrase, globalRole, fullName) "
-            "VALUES (%s, %s, %s, %s, %s );",
-            (cid, email, hashed_pass, role, name)
-        )
+        mock_cursor.execute.assert_called_once_with("""INSERT INTO UserData
+                (cid, email, passphrase, globalRole, fullName)
+                VALUES (%s, %s, %s, %s, %s );""", (cid, email, hashed_pass, role, name))
 
         self.assertEqual(result, ({'status': 'success'}, 200))
 
@@ -93,8 +98,10 @@ class TestLoginHandler(unittest.TestCase):
             "duplicate key value violates unique constraint 'userdata_pkey'"
         )
 
-        cid = 'abc'
-        email = 'abc@example.com'
+        random_cid = random_cid_generator()
+
+        cid = random_cid
+        email = cid + '@example.com'
         hashed_pass = b'secret'
         role = 'student'
         name = 'Test Testsson'
@@ -116,13 +123,13 @@ class TestLoginHandler(unittest.TestCase):
         salt = bcrypt.gensalt()
         passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
         mock_cursor = setup_mock_cursor(mock_connect)
-        mock_cursor.fetchone.return_value = [1, passphrase, 'Admin']
+        mock_cursor.fetchone.return_value = [1, passphrase, 'Admin', True]
         result = log_in('test1.chalmers.se', 'pass')
         self.assertEqual(result[1], 200)
         self.assertTrue(result[0].get('Token').startswith(
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'))
 
-    @ patch('psycopg2.connect')
+    @patch('psycopg2.connect')
     def test_unsucessful_log_in(self, mock_connect):
         # Set up the mock return value
         salt = bcrypt.gensalt()
@@ -137,3 +144,103 @@ class TestLoginHandler(unittest.TestCase):
     def test_create_and_verify_id(self):
         token = create_token(2)
         verify_and_get_id(token)
+
+    @patch('psycopg2.connect')
+    def test_verify_user_in_db_success(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.rowcount = 1
+        expected_tuple: tuple[dict[str, str], Literal[200]] = \
+            {'status': 'success'}, 200
+
+        random_cid = random_cid_generator()
+
+        response = verify_user_in_db(random_cid)
+        self.assertTupleEqual(
+            tuple(expected_tuple), tuple(response))
+        mock_cur.execute.assert_called_once_with("""UPDATE UserData
+                SET verified = TRUE
+                WHERE cid = %s""", (random_cid,))
+
+    @patch('psycopg2.connect')
+    def test_verify_user_in_db_no_user_updated_fail(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.rowcount = 0
+        expected_tuple: tuple[dict[str, str], Literal[406]] = \
+            {'status': 'no_user_to_verify'}, 406
+
+        random_cid = random_cid_generator()
+
+        response = verify_user_in_db(random_cid)
+
+        self.assertTupleEqual(
+            tuple(expected_tuple), tuple(response))
+        mock_cur.execute.assert_called_once_with("""UPDATE UserData
+                SET verified = TRUE
+                WHERE cid = %s""", (random_cid,))
+
+    @patch('psycopg2.connect')
+    def test_verify_user_in_db_uncaught_error(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.execute.side_effect = Exception("Generic uncaught exception")
+        expected_tuple: tuple[dict[str, str], Literal[500]] = \
+            {'status': 'uncaught_error'}, 500
+
+        random_cid = random_cid_generator()
+
+        response = verify_user_in_db(random_cid)
+        self.assertTupleEqual(
+            tuple(expected_tuple), tuple(response))
+        mock_cur.execute.assert_called_once_with("""UPDATE UserData
+                SET verified = TRUE
+                WHERE cid = %s""", (random_cid,))
+
+    def test_verify_user_from_email_verification_success(self):
+        random_cid = random_cid_generator()
+        test_token = create_verification_token(random_cid)
+        # with patch.object(bcrypt, 'gensalt') as mock_gensalt:
+        mock_response = {'status': 'success'}, 200
+        with patch('src.login_handler.verify_user_in_db', return_value=mock_response):
+            # verify_result.return_value = {'status': 'success'}, 200
+            verification_response = verify_user_from_email_verification(
+                test_token)
+            self.assertEqual(random_cid, verification_response[0].get('cid'))
+
+    @patch('psycopg2.connect')
+    def test_user_to_resend_verification_success(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        cid = random_cid_generator()
+        mock_cur.fetchone.return_value = [cid + '@chalmers.se', False]
+        new_verification_token = create_verification_token(cid)
+        with patch('src.login_handler.create_verification_token', return_value=new_verification_token):
+            actual_response = user_to_resend_verification(cid)
+        expected_response = {"email": cid + "@chalmers.se",
+                             "token": new_verification_token}, 200
+        self.assertEqual(actual_response, expected_response)
+
+    @patch('psycopg2.connect')
+    def test_user_to_resend_verification_no_user(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        cid = random_cid_generator()
+        mock_cur.fetchone.return_value = None
+        actual_response = user_to_resend_verification(cid)
+        expected_response = {"status": "no_user"}, 406
+        self.assertEqual(actual_response, expected_response)
+
+    @patch('psycopg2.connect')
+    def test_user_to_resend_verification_already_verified(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        cid = random_cid_generator()
+        mock_cur.fetchone.return_value = [cid + "@chalmers.se", True]
+        actual_response = user_to_resend_verification(cid)
+        expected_response = {"status": "already_verified"}, 406
+        self.assertEqual(actual_response, expected_response)
+
+    @patch('psycopg2.connect')
+    def test_user_to_resend_verification_unexpected_error(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.execute.side_effect = Exception("Generic uncaught exception")
+        cid = random_cid_generator()
+        mock_cur.fetchone.return_value = None
+        actual_response = user_to_resend_verification(cid)
+        expected_response = {"status": "unexpected_error"}, 500
+        self.assertEqual(actual_response, expected_response)

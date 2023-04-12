@@ -130,7 +130,7 @@ span {
 .flip-card-inner {
   position: relative;
   width: 100%;
-  height: 525px;
+  height: 545px;
   transition: transform 0.8s;
   transform-style: preserve-3d;
 }
@@ -157,4 +157,18 @@ span {
 
 .toastrLayout {
   width: 2000px;
+}
+
+.verificationModal {
+  margin-top: 100px;
+}
+
+.verification-link {
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.btn-success-bg {
+  background-color: #26734d;
 }
