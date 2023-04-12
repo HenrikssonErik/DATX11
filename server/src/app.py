@@ -142,7 +142,6 @@ def post_files():
 
     if not files:
         return "Files not found", 406
-
     if (user_id and group_id == user_handler.get_group(user_id,
                                                        course_id)["groupId"]):
         res = handle_files(files, course_id, group_id, assignment_nr)
@@ -150,9 +149,6 @@ def post_files():
         feedback_res.update({"feedback": res[0]})
         feedback_res.update(res[1])
         return make_response(jsonify(feedback_res), res[2])
-    else:
-        return make_response({'status: not_logged_in'}, 401)
-
 # TODO: add course and assingmetn in post
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
