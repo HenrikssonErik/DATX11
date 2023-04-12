@@ -422,12 +422,6 @@ def get_users_in_course():
     else:
         return make_response("", 401)
 
-# TODO: remove course? mb not?, getGroupsInCourse (and members?,
-# and assignmentstatus?)
-# set teacher feedback, getAssignmentFeedback (and filenames, should be called
-# by the groumembers or teachers), getAllowedFilenames?
-# add date, course, token and assignment checks to post assignmentfiles
-
 
 @app.route('/changeAssignmentDate', methods=['POST'])
 def change_assignmentDate():
@@ -447,3 +441,20 @@ def change_assignmentDate():
             return make_response(jsonify(res), 401)
     else:
         return make_response(jsonify({'status': 'Not a course teacher'}), 401)
+
+
+@app.route('/getFeedback', methods=['GET'])
+def get_feedback():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = request.args.get('Course')
+    assignment = request.args.get('Assignment')
+
+    if (user_id):
+        group = user_handler.get_group(user_id, course)['groupId']
+        feedback = course_handler.get_assignment_feedback(course, assignment,
+                                                          group)
+        return make_response(jsonify(feedback), 200)
+
+    else:
+        return make_response({"status": 'not_logged_in'}, 401)

@@ -305,3 +305,45 @@ def check_date_format(date_string) -> bool:
         return True
     except ValueError:
         return False
+
+
+def get_assignment_feedback(course: int, assignment: int, group: int) -> list | dict:
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT submission,, testpass,
+                testfeedback, teacherfeedback, teachergrade FROM
+                                assignmentfeedback WHERE courseid = %s AND
+                                groupid = %s AND assignment = %s"""
+                cur.execute(query_data, (course, group, assignment))
+                data = cur.fetchall()
+                print(data)
+                assignments: list[dict[str: str | int]] = []
+                for submission in data:
+                    try:
+                        testfeedback = submission[2]
+                    except IndexError:
+                        testfeedback = ""
+                    try:
+                        teacherfeedback = submission[3]
+                    except IndexError:
+                        testfeedback = ""
+                    try:
+                        grade = ""
+                    except IndexError:
+                        grade = None
+                    assignments.append({'Submission': submission[0],
+                                        'testpass': submission[1],
+                                        'testfeedback': testfeedback,
+                                        'teacherfeedback': teacherfeedback,
+                                        'Grade': grade})
+        conn.close()
+        if not data:
+            return []
+        return assignments
+
+    except Exception as e:
+        print(e)
+        return {'status': "No feedback found"}
