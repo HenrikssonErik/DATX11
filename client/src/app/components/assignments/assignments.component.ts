@@ -10,6 +10,7 @@ import { FileUploadModalComponent } from '../file-upload-modal/file-upload-modal
 import { SubmissionService } from 'src/app/services/submission.service';
 import { GroupService } from 'src/app/services/group.service';
 import { UserService } from 'src/app/services/user-service.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-assignments',
@@ -35,7 +36,8 @@ export class AssignmentsComponent implements OnInit {
     private modalService: NgbModal,
     private submissionService: SubmissionService,
     private groupService: GroupService,
-    private userService: UserService
+    private userService: UserService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -109,7 +111,8 @@ export class AssignmentsComponent implements OnInit {
         },
 
         error: (err) => {
-          console.log(err);
+          this.isLoadingMap.set(groupId, false);
+          this.toastr.error('Could not join group', 'Error');
         },
         complete: () => {
           this.isLoadingMap.set(groupId, false);
@@ -127,7 +130,8 @@ export class AssignmentsComponent implements OnInit {
           console.log(res);
         },
         error: (err) => {
-          console.log(err);
+          this.isLoadingMap.set(groupId, false);
+          this.toastr.error('Could not leave group', 'Error');
         },
         complete: () => {
           this.isLoadingMap.set(groupId, false);
@@ -144,7 +148,8 @@ export class AssignmentsComponent implements OnInit {
         console.log(res);
       },
       error: (err) => {
-        console.log(err);
+        this.createGroupLoader = false;
+        this.toastr.error('Error when creating group', 'Error');
       },
       complete: () => {
         this.createGroupLoader = false;
