@@ -207,5 +207,5 @@ JOIN Groups ON UserInGroup.groupId = Groups.groupId;
 CREATE VIEW GroupDetails AS
 SELECT g.groupid, g.groupnumber, g.course, u.fullname
 FROM Groups g
-JOIN UserInGroup uig ON g.groupid = uig.groupid
-JOIN UserData u ON uig.userid = u.userid;
+LEFT JOIN UserInGroup uig ON g.groupid = uig.groupid
+LEFT JOIN UserData u ON uig.userid = u.userid;

@@ -359,7 +359,6 @@ def get_course_groups(course: int):
                 array_agg(fullname) FROM GroupDetails WHERE course = %s GROUP
                 BY groupid, groupnumber"""
                 cur.execute(query_data, [course])
-                # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
                 group_list = []
                 if not data:
