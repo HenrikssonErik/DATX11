@@ -313,7 +313,7 @@ def get_assignment_feedback(course: int, assignment: int, group: int) -> list | 
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT submission,, testpass,
+                query_data = """SELECT submission, testpass,
                 testfeedback, teacherfeedback, teachergrade FROM
                                 assignmentfeedback WHERE courseid = %s AND
                                 groupid = %s AND assignment = %s"""
