@@ -87,8 +87,8 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
         return [{'status': "No Courses Found"}]
 
 
-def add_groups_to_course(number_of_groups: int, course_id: int):
-    """Creates a number of groups to the specified course, group number is set
+def add_group_to_course(course_id: int, user_id: int):
+    """Creates a  group to the specified course and adds the user to it, group number is set
     to the following integer that isnt already used for that course"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -102,10 +102,13 @@ def add_groups_to_course(number_of_groups: int, course_id: int):
                 if current_group is None:
                     current_group = 0
 
-                for i in range(1, number_of_groups+1):
-                    query_one = """Insert into Groups
+                query_one = """Insert into Groups
                     (course, groupnumber) values (%s,%s) """
-                    cur.execute(query_one, [course_id, current_group + i])
+                cur.execute(query_one, [course_id, current_group + 1])
+                query_two = """INSERT INTO UserInGroup (userId, groupId)
+                SELECT %s, gd.groupid FROM GroupDetails gd WHERE
+                gd.groupnumber = %s AND gd.course = %s;"""
+                cur.execute(query_two, [user_id, current_group+1, course_id])
         conn.close()
 
     except Exception as e:
@@ -114,7 +117,7 @@ def add_groups_to_course(number_of_groups: int, course_id: int):
 
 
 def _create_course(course_name: str, course_abbr: str, year: int,
-                    teaching_period: int) -> int | tuple:
+                   teaching_period: int) -> int | tuple:
     """Internal method to create a course, used by create_course method after verification of data
     Returnsthe new course ID"""
     conn = psycopg2.connect(dsn=get_conn_string())

@@ -325,7 +325,6 @@ def create_course():
     course: str = data['Course']
     year: int = data['Year']
     lp: int = data['TeachingPeriod']
-    groups: int = data['Groups']
     abbreviation: str = data['Abbreviation']
     role = user_handler.get_global_role(request_user_id)
 
@@ -336,13 +335,28 @@ def create_course():
         if (type(course_id) == tuple):
             return make_response(jsonify(course_id[0]), course_id[1])
         else:
-            course_handler.add_groups_to_course(groups, course_id)
             user_handler.add_user_to_course(request_user_id, course_id,
                                             user_handler.Role.Admin)
             return make_response(jsonify('Course Created'), 200)
     else:
         return make_response("Not allowed to create course", 401)
 
+@app.route('/createGroup', methods=['POST'])
+def create_group():
+    """Creates a group for the specified course and adds the user to it"""
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course_id = data['Course']
+
+    if (user_id):
+        if (user_handler.is_in_course(user_id, course_id)):
+            course_handler.add_group_to_course(course_id, user_id)
+            return make_response("", 200)
+        else:
+            return make_response({'status': 'not_in_course'}, 401)
+    else:
+        return make_response({'status': 'not_in_course'}, 401)
 
 @app.route('/createAssignment', methods=['POST'])
 def create_assignment():
