@@ -7,6 +7,7 @@ import { CourseService } from 'src/app/services/course-service.service';
 import { API_URL } from 'src/environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FileUploadModalComponent } from '../file-upload-modal/file-upload-modal.component';
+import { SubmissionService } from 'src/app/services/submission.service';
 
 @Component({
   selector: 'app-assignments',
@@ -23,7 +24,8 @@ export class AssignmentsComponent implements OnInit {
     private route: ActivatedRoute,
     private courseService: CourseService,
     private http: HttpClient,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private submissionService: SubmissionService
   ) {}
 
   ngOnInit() {
@@ -41,6 +43,10 @@ export class AssignmentsComponent implements OnInit {
       } else {
         this.group = res;
       }
+    });
+
+    this.submissionService.getSubmission(1, 1).subscribe((res) => {
+      console.log(res);
     });
   }
 
