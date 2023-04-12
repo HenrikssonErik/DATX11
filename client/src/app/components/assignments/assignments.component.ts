@@ -16,6 +16,7 @@ import { FileUploadModalComponent } from '../file-upload-modal/file-upload-modal
 export class AssignmentsComponent implements OnInit {
   course: Course = {} as Course;
   selectedTab: number = 0;
+  //TODO: Create a Model for group
   group: any;
 
   constructor(
@@ -34,8 +35,7 @@ export class AssignmentsComponent implements OnInit {
     }
 
     this.getGroup(id).subscribe((res: Course) => {
-      //TODO: HANDLE THE EMPTY GROUP BETTER
-      console.log(res);
+      //TODO: HANDLE THE EMPTY GROUP BETTER, THIS FIX IS DUMB
       if (res.hasOwnProperty('status')) {
         this.group = [];
       } else {
@@ -56,9 +56,12 @@ export class AssignmentsComponent implements OnInit {
     window.history.back();
   }
 
-  openModal(): void {
+  openModal(courseId: number, groupId: number, assignmentNumber: number): void {
     const modalRef = this.modalService.open(FileUploadModalComponent);
     modalRef.componentInstance.name = 'fileUpload';
+    modalRef.componentInstance.courseId = courseId;
+    modalRef.componentInstance.groupId = groupId;
+    modalRef.componentInstance.assignmentNumber = assignmentNumber;
   }
 
   getGroup(id: number): Observable<Course> {
@@ -75,5 +78,19 @@ export class AssignmentsComponent implements OnInit {
 
   joinGroup(): void {
     console.log('join group');
+  }
+
+  // TODO: Handle in backend instead
+  groupExists(): boolean {
+    if (this.group) {
+      if ('status' in this.group) {
+        return false;
+      } else if (this.group.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    return false;
   }
 }
