@@ -193,12 +193,12 @@ def is_teacher_on_course(user_id: int, course_id: int) -> bool:
     return False
 
 
-def is_in_course(user_id:int, course_id: int) -> bool:
+def is_in_course(user_id: int, course_id: int) -> bool:
     """Checks if a user is a member of the course
     Returns True/False"""
     courses = get_courses_info(user_id)
     for course in courses:
-        if course['courseID'] == course_id
+        if (course['courseID'] == course_id):
             return True
     return False
 
