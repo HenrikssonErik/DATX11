@@ -4,7 +4,8 @@ html,
 body {
   width: auto !important;
   overflow-x: hidden !important;
-  background-color: #f5f5f5 !important;
+  /*  background-color: #f5f5f5 !important; */
+  background-color: #f6f9f9 !important;
 }
 
 .btn-primary {
