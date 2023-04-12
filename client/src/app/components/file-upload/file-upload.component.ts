@@ -135,11 +135,10 @@ export class FileUploadComponent {
    * @returns {void}
    */
   uploadFiles(): void {
-    console.log(this.assignmentNumber);
-    console.log(this.groupId);
-    console.log(this.courseId);
-    let header: HttpHeaders = new HttpHeaders();
-    header = header.append('Content-Type', 'application/json');
+    const headers: HttpHeaders = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .append('Content-Type', 'application/json')
+      .set('Cache-Control', 'public, max-age=3600');
 
     const formData = new FormData();
     this.files.forEach((file: File): void =>
@@ -148,10 +147,11 @@ export class FileUploadComponent {
 
     formData.append('Course', this.courseId);
     formData.append('Assignment', this.assignmentNumber);
-    formData.append('Group', this.groupId);
+    formData.append('Group', '10');
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/files`, formData, {
+        headers: headers,
         observe: 'response',
       })
       .subscribe({
