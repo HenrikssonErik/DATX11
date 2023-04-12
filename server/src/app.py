@@ -464,7 +464,7 @@ def get_feedback():
 def get_course_groups():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
-    course = request.args.get('Course')
+    course = int(request.args.get('Course'))
 
     if (user_id):
         if (user_handler.is_in_course(user_id, course)):

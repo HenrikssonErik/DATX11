@@ -320,7 +320,6 @@ def get_assignment_feedback(course: int, assignment: int,
                                 groupid = %s AND assignment = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
-                print(data)
                 assignments: list[dict[str: str | int]] = []
                 for submission in data:
                     try:

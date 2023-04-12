@@ -202,6 +202,7 @@ def is_in_course(user_id: int, course_id: int) -> bool:
             return True
     return False
 
+
 def is_admin_on_course(user_id: int, course_id: int) -> bool:
     """Checks if a user has the Admin role on the course
     Returns True/False"""
