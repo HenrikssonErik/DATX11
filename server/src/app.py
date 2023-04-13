@@ -555,6 +555,7 @@ def change_course_name():
             course_handler.change_course_name(new_name, course)
             return make_response("", 200)
         else:
-            return make_response(jsonify({'status': 'Not a course teacher'}), 401)
+            return make_response(jsonify({'status': 'Not a course teacher'}),
+                                 401)
     else:
         return make_response(jsonify({'status': 'no_permission'}), 401)
