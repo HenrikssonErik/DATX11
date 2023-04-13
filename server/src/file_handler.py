@@ -210,8 +210,8 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
         with conn.cursor() as cur:
             query = """INSERT INTO AssignmentFiles
                     (groupId, courseId, assignment, fileName,
-                    fileData, fileType) 
-                    VALUES (%s, %s, %s, %s, %s, %s);
+                    fileData, fileType, submission) 
+                    VALUES (%s, %s, %s, %s, %s, %s, 0);
                     """
 
             cur.execute(query, (group_id, course_id, assignment,
