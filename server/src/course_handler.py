@@ -136,7 +136,7 @@ def _create_course(course_name: str, course_abbr: str, year: int,
         with conn:
             with conn.cursor() as cur:
                 query_one = """Insert into Courses
-                                (coursename,course, teachingperiod, courseyear)
+                                (coursename, course, teachingperiod, courseyear)
                                 values (%s,%s,%s,%s) """
                 cur.execute(query_one, [course_name, course_abbr,
                                         teaching_period, year])
@@ -241,6 +241,23 @@ def change_description(new_desc: str, course_id: int,
     except Exception as e:
         print(e)
         return {'status': "No Courses Found"}
+
+
+def change_course_name(new_name: str, course: int):
+    """ Changes the name for the course"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """UPDATE courses set coursename = %s
+                                WHERE courseid = %s"""
+                cur.execute(query_data, [new_name, course])
+        conn.close()
+
+    except Exception as e:
+        print(e)
+        raise Exception("Could not change name") from e
 
 
 def set_teacher_feedback(group_id: int, feedback: str, grade: bool,

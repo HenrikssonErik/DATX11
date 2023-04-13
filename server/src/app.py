@@ -540,3 +540,21 @@ def set_feedback():
         return make_response("", 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
+
+
+@app.route('/changeCourseName', methods=['POST'])
+def change_course_name():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    data = request.get_json()
+    new_name = data['Name']
+    course = data['Course']
+
+    if (user_id):
+        if (user_handler.check_admin_or_course_teacher(user_id, course)):
+            course_handler.change_course_name(new_name, course)
+            return make_response("", 200)
+        else:
+            return make_response(jsonify({'status': 'Not a course teacher'}), 401)
+    else:
+        return make_response(jsonify({'status': 'no_permission'}), 401)
