@@ -521,3 +521,22 @@ def get_overview():
         return make_response(jsonify(overview), 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
+
+
+@app.route('/setFeedback', methods=['POST'])
+def set_feedback():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course: int = int(data['Course'])
+    assignment: int = int(data['Assignment'])
+    submission: int = int(data['Date'])
+    feedback: str = str(data['Feedback'])
+    grade: bool = bool(data['Grade'])
+    group_id: int = int(data['Group'])
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
+        course_handler.set_teacher_feedback(group_id, feedback, grade, course, assignment, submission)
+        return make_response("", 200)
+    else:
+        return make_response(jsonify({"status": "no_permission"}), 401)

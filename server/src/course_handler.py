@@ -243,26 +243,24 @@ def change_description(new_desc: str, course_id: int,
         return {'status': "No Courses Found"}
 
 
-# TODO: not done or tested, returns statements must be fixed, takes grade and passed bools?!?!?
 def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
-                         passed: bool, course: int, assignment: int):
+                         course: int, assignment: int, submission: int):
     """Submission is set to 0 since a primary cannot be null.
     It will increment by default anyway."""
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """INSERT INTO AssignmentFeedback (groupId,
-                courseId, assignment, submission, teacherGrade,
-                teacherFeedback, testPassed)
-                VALUES (%s, %s, %s, 0, %s, %s, %s);"""
-                cur.execute(query_one, [group_id, course, assignment, 0, grade,
-                                        feedback, passed])
+                query_one = """UPDATE AssignmentFeedback SET
+                teacherFeedback = %s, teacherGrade = %s WHERE groupId = %s
+                AND courseId = %s AND submission = %s AND assignment = %s;"""
+                cur.execute(query_one, [feedback, grade, group_id, course,
+                                        submission, assignment])
         conn.close()
         return
     except Exception as e:
         print(e)
-        return {'status': 'Could Not update the feedback'}
+        raise Exception("Could not update feedback")
 
 
 # Not tested
@@ -283,7 +281,7 @@ def change_end_date(course: int, assignment: int,
             return
         except Exception as e:
             print(e)
-            return {'status': 'Something went wrong'}
+            raise Exception("Could not change end date")
     else:
         return {'status': 'End date has the wrong format, must be YYYY-MM-DD'}
 
