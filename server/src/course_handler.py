@@ -243,7 +243,7 @@ def change_description(new_desc: str, course_id: int,
         return {'status': "No Courses Found"}
 
 
-# TODO: not done or tested, returns statements must be fixed
+# TODO: not done or tested, returns statements must be fixed, takes grade and passed bools?!?!?
 def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
                          passed: bool, course: int, assignment: int):
     """Submission is set to 0 since a primary cannot be null.
@@ -400,3 +400,36 @@ def get_course_groups(course: int):
     except Exception as e:
         print(e)
         raise Exception("Error when getting course groups")
+
+# TODO:check so the query has the intended effect
+def get_assignment_overview(course: int, assignment: int) -> list[dict]:
+    """Returns a list with test status and grade for all the latest
+    submissions for a assignment"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
+                teacherGrade FROM AssignmentFeedback WHERE courseId = %s
+                AND assignment = %s ORDER BY groupId,
+                submission DESC;"""
+
+                cur.execute(query_data, [course, assignment])
+                data = cur.fetchall()
+                if not data:
+                    return []
+                
+                overview_list = []
+                for row in data:
+                    group_dict = {
+                        "groupid": row[0],
+                        "testpass": row[1],
+                        "grade": row[2]}
+                    overview_list.append(group_dict)
+        conn.close()
+        return overview_list
+
+    except Exception as e:
+        print(e)
+        raise Exception("Error when getting assignment overview")

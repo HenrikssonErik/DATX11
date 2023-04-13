@@ -507,6 +507,17 @@ def get_course_groups():
     else:
         return make_response("not_logged_in", 401)
 
-# TODO add endpoint to get all groups latest submission overviews
-# should receive, token, assignment, course,
-#  return list of [ (groupid, testPass, teachergrade)]
+
+@app.route('/assignmentsOverview', methods=['GET'])
+def get_overview():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = int(request.args.get('Course'))
+    assignment = int(request.args.get('Assignment'))
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
+        # create overview
+        overview = course_handler.get_assignment_overview(course, assignment)
+        return make_response(jsonify(overview), 200)
+    else:
+        return make_response(jsonify({"status": "no_permission"}), 401)
