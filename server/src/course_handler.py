@@ -68,6 +68,11 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
                             WHERE userid = %s AND courseid=%s"""
                 cur.execute(query_data, [user_id, course_id])
                 data = cur.fetchone()
+                query_two = """SELECT ud.fullName FROM UserData ud JOIN
+                UserInCourse uc ON uc.userId = ud.userId WHERE uc.courseId = %s
+                AND uc.userRole = 'Admin';"""
+                cur.execute(query_two, [course_id])
+                admin = cur.fetchone()
         conn.close()
         if not data:
             raise Exception("No Courses Found")
@@ -80,6 +85,8 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
         ordered_data["Year"] = data[5]
         ordered_data["StudyPeriod"] = data[6]
         ordered_data['Assignments'] = get_assignments(data[2])
+        if(admin):
+            ordered_data['Admin'] = admin[0]
         return ordered_data
 
     except Exception as e:
