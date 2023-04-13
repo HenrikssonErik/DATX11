@@ -63,10 +63,13 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
         response_items.append({"tested_file": res_object})
     if (res_code == 200):
         save_to_temp_and_database(files, response_items)
-        unittest_feedback = json.loads(run_unit_tests_in_container(
-            course_id,
-            assignment,
-            group_id))
+        unittest_feedback = json.loads(
+            run_unit_tests_in_container(
+                course_id,
+                assignment,
+                group_id
+            )
+        )
         passed = unittest_feedback["was_successful"]
         combined_feedback = {"general_tests_feedback": response_items,
                              "unittest_feedback": unittest_feedback}

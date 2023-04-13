@@ -16,6 +16,9 @@ from flask_mail import Mail, Message
 import jwt
 # from .podman.podman_runner import init_images
 
+# init basic image
+# init_images()
+
 # creating the Flask application
 app = Flask(__name__)
 CORS(app)
@@ -26,8 +29,6 @@ app.config.from_pyfile('mailconfig.cfg')
 mail = Mail(app)
 
 
-# init basic image
-# init_images()
 # creating private key for signing tokens
 create_key()
 
