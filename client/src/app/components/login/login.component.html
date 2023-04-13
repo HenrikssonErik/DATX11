@@ -8,9 +8,6 @@
             <h3 class="text-center text-muted mb-4" translate>
               Hydrant_Sign_Up
             </h3>
-            <h3 class="text-center text-muted mb-4" translate>
-              Hydrant_Sign_Up
-            </h3>
             <div class="form-group mb-3">
               <label for="cid" class="text-muted">Chalmers ID (CID)</label>
               <input
@@ -27,7 +24,6 @@
                 class="form-control focus-border"
                 id="cid"
                 placeholder="{{ 'Enter_Cid' | translate }}"
-                placeholder="{{ 'Enter_Cid' | translate }}"
                 (focus)="onInputFocus('cid', signUpForm)"
                 required
               />
@@ -38,14 +34,10 @@
             <div class="form-group mb-3">
               <label for="signUpEmail" class="text-muted" translate
                 >Email_address<span
-              <label for="signUpEmail" class="text-muted" translate
-                >Email_address<span
                   ><i
                     class="fa-regular fa-circle-question"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    data-bs-title="
-                      Only Chalmers email is allowed"
                     data-bs-title="
                       Only Chalmers email is allowed"
                   ></i></span
@@ -56,7 +48,6 @@
                   formControlName="signUpEmail"
                   class="form-control text-muted"
                   onfocus="this.blur()"
-                  placeholder="{{ 'same_as_cid' | translate }}"
                   placeholder="{{ 'same_as_cid' | translate }}"
                   id="signUpEmail"
                   [value]="cid"
@@ -119,17 +110,10 @@
                 for="termsAndCon"
                 translate
                 >I_agree_to_the
-              <label
-                class="form-check-label text-muted"
-                for="termsAndCon"
-                translate
-                >I_agree_to_the
                 <a
                   href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley"
                   style="color: inherit"
                   target="_blank"
-                  translate
-                  >Terms_and_Conditions</a
                   translate
                   >Terms_and_Conditions</a
                 ></label
@@ -140,14 +124,10 @@
               class="btn btn-primary btn-block mt-3 w-100"
               [disabled]="signUpForm.invalid"
               translate
-              translate
             >
-              Sign_Up_btn
               Sign_Up_btn
             </button>
             <div class="text-center">
-              <p class="mt-3 text-muted mb-0" translate>
-                Already_have_an_account
               <p class="mt-3 text-muted mb-0" translate>
                 Already_have_an_account
                 <a
@@ -156,8 +136,6 @@
                   style="color: inherit"
                   class="signUp-link"
                   href="/signup"
-                  translate
-                  >Login</a
                   translate
                   >Login</a
                 >
@@ -186,11 +164,7 @@
         <div class="container">
           <form (ngSubmit)="onSubmitLogin()" [formGroup]="loginForm">
             <h3 class="text-center text-muted mb-4" translate>HYDRANT_LOGIN</h3>
-            <h3 class="text-center text-muted mb-4" translate>HYDRANT_LOGIN</h3>
             <div class="form-group mb-3">
-              <label for="email" class="text-muted" translate
-                >Email_address</label
-              >
               <label for="email" class="text-muted" translate
                 >Email_address</label
               >
@@ -206,7 +180,6 @@
                 formControlName="email"
                 class="form-control focus-border"
                 id="email"
-                placeholder="{{ 'Enter_email' | translate }}"
                 placeholder="{{ 'Enter_email' | translate }}"
                 (focus)="onInputFocus('email', loginForm)"
                 required
@@ -264,11 +237,6 @@
                 for="rememberMe"
                 translate
                 >Remember_me</label
-              <label
-                class="form-check-label text-muted"
-                for="rememberMe"
-                translate
-                >Remember_me</label
               >
             </div>
             <button
@@ -276,12 +244,10 @@
               class="btn btn-primary btn-block mt-4 w-100"
               [disabled]="loginForm.invalid"
               translate
-              translate
             >
               Login
             </button>
             <p style="float: right" class="mt-2 mb-0 text-muted ml-auto">
-              <a style="color: inherit" href="#" translate>Forgot_Password?</a>
               <a style="color: inherit" href="#" translate>Forgot_Password?</a>
             </p>
             <div style="clear: both"></div>
@@ -289,20 +255,15 @@
               Please enter valid email and password.
             </div> -->
             <h2><span translate>Or</span></h2>
-            <h2><span translate>Or</span></h2>
             <button
               type="button"
               class="btn btn-secondary btn-block mt-3 w-100"
               translate
-              translate
             >
-              Login_with_Chalmers-SSO
               Login_with_Chalmers-SSO
             </button>
 
             <div class="text-center">
-              <p class="mt-3 text-muted mb-0" translate>
-                Need_an_account
               <p class="mt-3 text-muted mb-0" translate>
                 Need_an_account
                 <a
@@ -310,8 +271,6 @@
                   (click)="flipTo('signUp')"
                   class="signUp-link"
                   href="/signup"
-                  translate
-                  >Sign_Up</a
                   translate
                   >Sign_Up</a
                 >

@@ -82,11 +82,6 @@ export function HttpLoaderFactory(http: HttpClient) {
       multi: true,
     },
   ],
-      provide: HTTP_INTERCEPTORS,
-      useClass: LoadingInterceptor,
-      multi: true,
-    },
-  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
