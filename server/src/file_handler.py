@@ -20,8 +20,8 @@ __allowed_filenames = {"Test1.pdf", "test2.txt",
 __nr_of_files = 1
 
 # for DB, should be recieved from frontend(?) later on
-course_id = 2
-assignment = 2
+course_id = 1
+assignment = 1
 group_id = 2
 
 
@@ -70,7 +70,7 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
         combined_feedback = {"general_tests_feedback": response_items,
                              "unittest_feedback": unittest_feedback}
         save_feedback_to_db(course_id, assignment, group_id,
-                            combined_feedback, passed)
+                            json.dumps(combined_feedback), passed)
         
     return response_items, number_of_files, combined_feedback, res_code
 
@@ -353,11 +353,11 @@ def save_feedback_to_db(
             cur.execute(
                 """
                 INSERT INTO AssignmentFeedback (TestFeedback, TestPass)
+                    VALUES(%s, %s)
                     WHERE GroupId        = %s
                     AND   CourseId       = %s
-                    AND   \"assignment\"   = %s
-                    VALUES(%s, %s)
-                    ON CONFLICT (TestFeedback) DO UPDATE;
+                    AND   assignment   = %s
+                    ON CONFLICT (TestFeedback, TestPass) DO UPDATE;
                 """,
                 (group_id, course_id, assignment, feedback, passed)
             )
