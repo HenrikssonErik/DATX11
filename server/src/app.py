@@ -507,4 +507,6 @@ def get_course_groups():
     else:
         return make_response("not_logged_in", 401)
 
-# TODO add endpoint to get all groups latest submissions
+# TODO add endpoint to get all groups latest submission overviews
+# should receive, token, assignment, course,
+#  return list of [ (groupid, testPass, teachergrade)]
