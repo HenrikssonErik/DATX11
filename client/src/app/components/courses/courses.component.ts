@@ -16,6 +16,7 @@ export class CoursesComponent implements OnInit {
   user: User = {
     cid: '',
     email: '',
+    fullname: '',
   };
 
   constructor(

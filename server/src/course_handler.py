@@ -85,7 +85,7 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
         ordered_data["Year"] = data[5]
         ordered_data["StudyPeriod"] = data[6]
         ordered_data['Assignments'] = get_assignments(data[2])
-        if(admin):
+        if (admin):
             ordered_data['Admin'] = admin[0]
         return ordered_data
 
