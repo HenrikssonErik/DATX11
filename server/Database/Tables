@@ -8,7 +8,7 @@ CREATE TABLE AssignmentFeedback (
     groupId INTEGER NOT NULL,
     courseId SERIAL NOT NULL,
     assignment INTEGER NOT NULL,
-    submission SERIAL NOT NULL,
+    submission INTEGER NOT NULL,
     testFeedback JSON,
     teacherFeedback TEXT,
     testPass BOOLEAN NOT NULL DEFAULT FALSE,
@@ -21,7 +21,11 @@ CREATE TABLE AssignmentFeedback (
     CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
         REFERENCES assignments(courseid, assignment)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+	CONSTRAINT constraint_assignment_submission_fkey FOREIGN KEY (submission)
+		REFERENCES AssignmentFiles(submission)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 );
 
 CREATE OR REPLACE FUNCTION set_submission_number()
@@ -51,7 +55,7 @@ CREATE Table AssignmentFiles (
 		groupId INTEGER NOT NULL, 
 		courseId SERIAL NOT NULL,
 		assignment INTEGER NOT NULL,
-		submission SERIAL NOT NULL,
+		submission INTEGER NOT NULL,
 		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
 		fileType TEXT NOT NULL,
@@ -59,7 +63,7 @@ CREATE Table AssignmentFiles (
 		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
 			REFERENCES Groups (groupId) 
 			ON DELETE CASCADE 
-			ON UPDATE CASCADE
+			ON UPDATE CASCADE,
 		CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
 			REFERENCES Assignments(courseId, assignment) 
 			ON DELETE CASCADE 
@@ -135,6 +139,7 @@ CREATE TABLE UserData (
 	PRIMARY KEY (userId),
 	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
+
 
 CREATE TABLE Groups (
 	groupId SERIAL PRIMARY KEY,
