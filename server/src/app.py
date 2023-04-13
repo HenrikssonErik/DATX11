@@ -154,7 +154,8 @@ def post_files():
     else:
         return make_response({'status': 'not_logged_in'}, 401)
 
-# TODO: add course and assingmetn in post
+# TODO: add course and assignmetn in post,
+#  will be done when working on the teacher page
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
     files = request.files.getlist('files')
@@ -341,6 +342,7 @@ def create_course():
     else:
         return make_response("Not allowed to create course", 401)
 
+
 @app.route('/createGroup', methods=['POST'])
 def create_group():
     """Creates a group for the specified course and adds the user to it"""
@@ -357,6 +359,7 @@ def create_group():
             return make_response({'status': 'not_in_course'}, 401)
     else:
         return make_response({'status': 'not_in_course'}, 401)
+
 
 @app.route('/createAssignment', methods=['POST'])
 def create_assignment():

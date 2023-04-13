@@ -88,8 +88,9 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
 
 
 def add_group_to_course(course_id: int, user_id: int):
-    """Creates a  group to the specified course and adds the user to it, group number is set
-    to the following integer that isnt already used for that course"""
+    """Creates a  group to the specified course and adds the user to it,
+    group number is set to the following integer that isnt already used
+    for that course"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -127,8 +128,8 @@ def add_group_to_course(course_id: int, user_id: int):
 
 def _create_course(course_name: str, course_abbr: str, year: int,
                    teaching_period: int) -> int | tuple:
-    """Internal method to create a course, used by create_course method after verification of data
-    Returnsthe new course ID"""
+    """Internal method to create a course, used by create_course method after
+    verification of data. Returns the new course ID"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -155,8 +156,8 @@ def _create_course(course_name: str, course_abbr: str, year: int,
 
 def create_assignment(course_id: int, description: str, assignment_nr: int,
                       end_date: str, file_names: list) -> dict:
-    """Creates an assignment for a course, assignment number will not be incremented automatically,
-    thus must be provided by the creator"""
+    """Creates an assignment for a course, assignment number will not be
+    incremented automatically, thus must be provided by the creator"""
     res: dict = {}
     for name in file_names:
         if not (check_file_extension(name)):
@@ -189,7 +190,8 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
 
 
 def get_assignments(course_id: int) -> tuple:
-    """Returns a list of all assignments connected to a course, with their description and end date"""
+    """Returns a list of all assignments connected to a course, with their
+    description and end date"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -245,7 +247,8 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
         with conn:
             with conn.cursor() as cur:
                 query_one = """INSERT INTO AssignmentFeedback (groupId,
-                courseId, assignment, submission, teacherGrade, teacherFeedback, testPassed)
+                courseId, assignment, submission, teacherGrade,
+                teacherFeedback, testPassed)
                 VALUES (%s, %s, %s, 0, %s, %s, %s);"""
                 cur.execute(query_one, [group_id, course, assignment, 0, grade,
                                         feedback, passed])
@@ -332,33 +335,37 @@ def get_assignment_feedback(course: int, assignment: int,
                                 groupid = %s AND assignment = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
-                assignments: list[dict[str: str | int]] = []
-                for submission in data:
-                    try:
-                        testfeedback = submission[2]
-                    except IndexError:
-                        testfeedback = ""
-                    try:
-                        teacherfeedback = submission[3]
-                    except IndexError:
-                        testfeedback = ""
-                    try:
-                        grade = submission[4]
-                    except IndexError:
-                        grade = None
-                    assignments.append({'Submission': submission[0],
-                                        'testpass': submission[1],
-                                        'testfeedback': testfeedback,
-                                        'teacherfeedback': teacherfeedback,
-                                        'Grade': grade})
         conn.close()
         if not data:
             return []
-        return assignments
+        return _format_assignment_feedback(data)
 
     except Exception as e:
         print(e)
-        return {'status': "No feedback found"}
+        raise Exception("Could not retrieve feedback")
+
+
+def _format_assignment_feedback(db_output: list[tuple]) -> list:
+    assignments: list[dict[str: str | int]] = []
+    for submission in db_output:
+        try:
+            testfeedback = submission[2]
+        except IndexError:
+            testfeedback = ""
+        try:
+            teacherfeedback = submission[3]
+        except IndexError:
+            testfeedback = ""
+        try:
+            grade = submission[4]
+        except IndexError:
+            grade = None
+        assignments.append({'Submission': submission[0],
+                            'testpass': submission[1],
+                            'testfeedback': testfeedback,
+                            'teacherfeedback': teacherfeedback,
+                            'Grade': grade})
+        return assignments
 
 
 def get_course_groups(course: int):
