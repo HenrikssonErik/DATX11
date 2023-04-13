@@ -9,6 +9,20 @@
   color: #26734d;
 }
 
+.upcoming {
+  list-style: none;
+  background-color: rgb(225, 236, 228);
+  margin-bottom: 3px;
+  margin-left: -30px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding-right: 3px;
+  padding-left: 3px;
+}
+.upcoming:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 .iconRow {
   display: flex;
   align-items: center;
