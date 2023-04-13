@@ -188,7 +188,8 @@ def remove_existing_assignment(file_name: str, group_id: int, course_id: int,
                  AND   AssignmentFiles.submission = %s;
                  """
 
-            cur.execute(query, (file_name, group_id, course_id, assignment, submission))
+            cur.execute(query, (file_name, group_id, course_id,
+                                assignment, submission))
     conn.close()
 
 
@@ -257,7 +258,8 @@ def get_assignment_files_from_database(
                         AND   AssignmentFiles.submission = %s
                         """
 
-            cur.execute(query_data, (file_name, group_id, course, assignment, submission))
+            cur.execute(query_data, (file_name, group_id, course,
+                                     assignment, submission))
             data = cur.fetchall()
     conn.close()
 

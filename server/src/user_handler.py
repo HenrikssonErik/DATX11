@@ -18,8 +18,8 @@ def get_user(user_id: int) -> dict:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT cid, email, fullname FROM Userdata
-                            WHERE userid = %s"""
+                query_data = "SELECT cid, email, fullname FROM Userdata " +\
+                    "WHERE userid = %s"
                 cur.execute(query_data, (user_id,))
                 data = cur.fetchone()
         conn.close()
@@ -29,7 +29,7 @@ def get_user(user_id: int) -> dict:
 
     except Exception as e:
         print(e)
-        return {'status': "No User Found"}
+        raise Exception("No user found") from e
 
 
 def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
@@ -40,9 +40,9 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupid, groupnumber FROM
-                                userGroupCourseInfo
-                                WHERE userid = %s and courseid = %s"""
+                query_data = "SELECT groupid, groupnumber FROM " +\
+                    "userGroupCourseInfo " +\
+                    "WHERE userid = %s and courseid = %s"
                 cur.execute(query_data, (user_id, course_id))
                 data = cur.fetchone()
         conn.close()
@@ -50,16 +50,17 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
         if not data:
             raise Exception("No group for this user")
 
-        orderedData: dict = {}
-        orderedData["groupId"] = data[0]
-        orderedData["groupNumber"] = data[1]
+        ordered_data: dict = {}
+        ordered_data["groupId"] = data[0]
+        ordered_data["groupNumber"] = data[1]
         group_members = _get_group_members(data[0])
-        orderedData["groupMembers"] = group_members
-        return orderedData
+        print(group_members)
+        ordered_data["groupMembers"] = group_members
+        return ordered_data
 
     except Exception as e:
         print(e)
-        return {'status': "No Group Found"}
+        raise Exception("No group found") from e
 
 
 def _get_group_members(group_id: int) -> list:
@@ -83,7 +84,8 @@ def _get_group_members(group_id: int) -> list:
 
     except Exception as e:
         print(e)
-        raise Exception("Something went wrong when getting group members")
+        raise Exception(
+            "Something went wrong when getting group members") from e
 
 
 def add_user_to_group(user_id: int, group_id: int) -> None:
@@ -115,7 +117,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
 
     except Exception as e:
         print(e)
-        raise Exception("Error when adding user!")
+        raise Exception("Error when adding user!") from e
 
 
 def _get_course_id_from_group(group_id) -> int:
@@ -137,7 +139,7 @@ def _get_course_id_from_group(group_id) -> int:
 
     except Exception as e:
         print(e)
-        raise Exception("Error when getting course id!")
+        raise Exception("Error when getting course id!") from e
 
 
 def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
@@ -146,14 +148,14 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """INSERT into userincourse values
-                                (%s, %s, %s)"""
+                query_data = "INSERT into userincourse values " +\
+                    "(%s, %s, %s)"
                 cur.execute(query_data, [user_id, course_id, user_role.name])
         conn.close()
 
     except Exception as e:
         print(e)
-        raise Exception("Error when adding user to course!")
+        raise Exception("Error when adding user to course!") from e
 
 
 def remove_user_from_course(user_id: int, course_id) -> None:
@@ -169,7 +171,7 @@ def remove_user_from_course(user_id: int, course_id) -> None:
 
     except Exception as e:
         print(e)
-        raise Exception("Error when removing user from course!")
+        raise Exception("Error when removing user from course!") from e
 
 
 def remove_user_from_group(user_id: int, group_id: int) -> None:
@@ -192,7 +194,7 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
         conn.close()
     except Exception as e:
         print(e)
-        raise Exception("Error when removing user from group!")
+        raise Exception("Error when removing user from group!") from e
 
 
 def is_teacher_on_course(user_id: int, course_id: int) -> bool:
@@ -237,8 +239,8 @@ def get_global_role(user_id) -> str:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT globalrole FROM userdata
-                            WHERE userid = %s"""
+                query_data = "SELECT globalrole FROM userdata " + \
+                    "WHERE userid = %s"
                 cur.execute(query_data, [user_id])
                 data = cur.fetchone()
         conn.close()
@@ -249,7 +251,7 @@ def get_global_role(user_id) -> str:
 
     except Exception as e:
         print(e)
-        raise Exception("Error when finding the user!")
+        raise Exception("Error when finding the user!") from e
 
 
 def check_admin_or_course_teacher(user_id: int, course_id: int):
@@ -275,7 +277,7 @@ def change_role_on_course(new_role: str, user_id: int,
             conn.close()
         except Exception as e:
             print(e)
-            return {'status': "Could not  change the role"}
+            raise Exception("Could not change the role") from e
         return None
     else:
         return {'status': "Not an allowed role"}
@@ -309,4 +311,4 @@ def get_users_on_course(course: int) -> tuple:
 
     except Exception as e:
         print(e)
-        return {'status': "Something went wrong"}, 400
+        raise Exception("Could not get users in course") from e

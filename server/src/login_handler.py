@@ -86,7 +86,7 @@ def user_registration(data: Request.form) -> \
     res_query: tuple[dict[str, str], Literal[200, 406]
                      ] = registration_query(cid, email, hashed_pass,
                                             role[0], role[1])
-    res_object = (create_verification_token(cid)) if (
+    res_object = ({'token': create_verification_token(cid)}, 200) if (
         res_query[1] == 200) else (res_query)
 
     return res_object
@@ -107,9 +107,9 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
     with conn:
         with conn.cursor() as cur:
             try:
-                query = """INSERT INTO UserData
-                (cid, email, passphrase, globalRole, fullName)
-                VALUES (%s, %s, %s, %s, %s );"""
+                query = "INSERT INTO UserData " +\
+                    "(cid, email, passphrase, globalRole, fullName) " +\
+                    "VALUES (%s, %s, %s, %s, %s );"
                 cur.execute(query, (
                     cid,
                     email,
@@ -124,6 +124,32 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
                 res_code = 406
     conn.close()
     return {'status': status}, res_code
+
+
+def user_to_resend_verification(cid: str) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            try:
+                query_data = """SELECT email, verified
+                            FROM UserData
+                            WHERE userdata.cid = %s"""
+                cur.execute(query_data, (cid,))
+                data = cur.fetchone()
+                if not data:
+                    return {'status': 'no_user'}, 406
+                verified = data[1]
+                mail = data[0]
+
+                if not verified:
+                    response_object = {"email": mail}
+                    token = create_verification_token(cid)
+                    response_object.update({'token': token})
+                    return response_object, 200
+                else:
+                    return {"status": "already_verified"}, 406
+            except Exception:
+                return {"status": "unexpected_error"}, 500
 
 
 def log_in(email: str, password: str) -> tuple[dict[str, str],
@@ -162,7 +188,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         return {'status': "wrong_credentials"}, 401
 
 
-def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
+def create_verification_token(cid: str) -> str:
     """
     Creates a token to verify a User that is valid for 24 hours.
     This token is sent in the verification email to the user registering.
@@ -173,7 +199,7 @@ def create_verification_token(cid: str) -> tuple[dict[str, str], Literal[200]]:
         'exp': datetime.utcnow() + timedelta(hours=24)
     }
     token = jwt.encode(payload=data, key=__SECRET_KEY)
-    return {'Token': token}, 200
+    return token
 
 
 def verify_user_from_email_verification(token: str) -> \
