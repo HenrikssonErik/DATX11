@@ -21,8 +21,6 @@ def handle_files(files: list[FileStorage], course: int, group: int,
 
     __allowed_filenames: tuple = get_filenames(course, assignment)
     __nr_of_files = len(__allowed_filenames)
-    print(__allowed_filenames)
-    print(__nr_of_files)
 
     number_of_files = {}
     res_code = 200

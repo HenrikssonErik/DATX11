@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 import unittest
+from unittest import mock
 from unittest.mock import MagicMock, patch
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
@@ -51,11 +52,18 @@ class TestUserHandler(unittest.TestCase):
         user_id = 1
         group_id = 1
         mock_cursor = setup_mock_cursor(mock_connect)
+        mock_cursor.return_value = False
         user_handler.remove_user_from_group(user_id, group_id)
-
-        mock_cursor.execute.assert_called_once_with("""DELETE from useringroup
+        mock_cursor.execute.assert_has_calls([
+            mock.call("""DELETE from useringroup
                                 WHERE userid = %s AND groupid = %s """,
-                                                    [user_id, group_id])
+                      [user_id, group_id]),
+            mock.call("""SELECT (fullname IS NULL)
+                AS is_empty FROM GroupDetails WHERE groupid = %s;""",
+                      [group_id])
+])
+
+        
 
     @patch('src.user_handler.get_courses_info')
     def test_is_admin_on_course(self, mock_user_courses):
@@ -121,7 +129,7 @@ class TestUserHandler(unittest.TestCase):
         result = user_handler.get_user(user_id)
         mock_cursor.execute.assert_called_once_with("""SELECT cid, email, fullname FROM Userdata
                             WHERE userid = %s""", (user_id,))
-        self.assertEqual(result, {'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén'})
+        self.assertEqual(result, {'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén', 'id': 1})
 
     @patch('psycopg2.connect')
     def test_get_global_role(self, mock_connect):
