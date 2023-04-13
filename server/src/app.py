@@ -14,7 +14,7 @@ from .login_handler import user_registration, log_in, create_key, \
     verify_and_get_id
 from flask_mail import Mail, Message
 import jwt
-from .podman.podman_runner import init_images
+# from .podman.podman_runner import init_images
 
 # creating the Flask application
 app = Flask(__name__)

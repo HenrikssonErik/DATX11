@@ -8,19 +8,19 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 from src.podman.podman_runner import gen_requirements, copy_files, \
                                      build_image, create_container, \
                                      run_container  # noqa: E402
-from src.file_handler import run_unit_tests_in_container # noqa : E402
+from src.file_handler import run_unit_tests_in_container  # noqa : E402
 
 
 class TestGenRequirements(unittest.TestCase):
     def setUp(self):
         self.test_dir = os.path.join(os.path.dirname(__file__), 'test_dir')
         os.makedirs(self.test_dir, exist_ok=True)
-    
+
     def test_gen_requirements(self):
         gen_requirements(self.test_dir)
         self.assertTrue(os.path.exists(os.path.join(self.test_dir,
                                                     'requirements.txt')))
-    
+
     def tearDown(self):
         shutil.rmtree(self.test_dir)
 
@@ -30,7 +30,7 @@ class TestCopyFiles(unittest.TestCase):
     def test_copy_files(self, mock_subprocess):
         path = "/path/to/files"
         container_id = "container_id"
-        
+
         # Mock the subprocess.run() function
         mock_subprocess.return_value = MagicMock()
 
@@ -47,7 +47,7 @@ class TestBuildImage(unittest.TestCase):
     def test_build_image(self, mock_subprocess):
         image_name = "test-image"
         directory = "/path/to/dockerfile"
-        
+
         # Mock the subprocess.run() function
         mock_subprocess.return_value = MagicMock()
 
@@ -65,7 +65,7 @@ class TestCreateContainer(unittest.TestCase):
     def test_create_container(self, mock_subprocess):
         image_name = "test-image"
         container_id = "container_id"
-        
+
         # Mock the subprocess.run() function
         mock_subprocess.return_value = MagicMock()
         mock_subprocess.return_value.stdout = container_id
@@ -93,7 +93,7 @@ class TestRunContainer(unittest.TestCase):
         is_empty = False
         container_id = "container_id"
         feedback = "{'results': 'pass'}"
-        
+
         # Mock the create_container() function
         mock_create_container.return_value = container_id
 
@@ -124,6 +124,7 @@ class TestRunContainer(unittest.TestCase):
 class TestRunUnitTestsInContainer(unittest.TestCase):
     """Test to make sure that tests are being executed in a container
     without any errors"""
+
     def test_run_unit_tests_in_container(
         self,
     ):

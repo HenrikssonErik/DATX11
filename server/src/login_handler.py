@@ -37,7 +37,6 @@ def random_string() -> str:
 
 
 def check_data_input(cid: str, email: str, pwd: str,
-def check_data_input(cid: str, email: str, pwd: str,
                      user_exists: bool) -> tuple[str, Literal[200, 400]]:
     """Validates the inputs from the frontend. If any of these checks are
     not valid, return the appropriate error message and error code as a

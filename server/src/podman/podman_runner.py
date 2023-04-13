@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 
-def init_images(): 
+def init_images():
     cmd = ["podman", "build", "-t", "default",
            "-f", "Containerfile.basic", Path(__file__).absolute().parent]
     subprocess.run(cmd)

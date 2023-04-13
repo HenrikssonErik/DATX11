@@ -64,15 +64,15 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
     if (res_code == 200):
         save_to_temp_and_database(files, response_items)
         unittest_feedback = json.loads(run_unit_tests_in_container(
-                                                            course_id,
-                                                            assignment,
-                                                            group_id))
+            course_id,
+            assignment,
+            group_id))
         passed = unittest_feedback["was_successful"]
         combined_feedback = {"general_tests_feedback": response_items,
                              "unittest_feedback": unittest_feedback}
         save_feedback_to_db(course_id, assignment, group_id,
                             json.dumps(combined_feedback), passed)
-        
+
     return response_items, number_of_files, combined_feedback, res_code
 
 
@@ -354,7 +354,7 @@ def save_feedback_to_db(
         group_id: int,
         feedback: json,
         passed: bool,
-        ):
+):
 
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
