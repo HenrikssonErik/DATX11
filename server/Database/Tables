@@ -8,7 +8,7 @@ CREATE TABLE AssignmentFeedback (
     groupId INTEGER NOT NULL,
     courseId SERIAL NOT NULL,
     assignment INTEGER NOT NULL,
-    submission INTEGER NOT NULL,
+    submission SERIAL NOT NULL,
     testFeedback JSON,
     teacherFeedback TEXT,
     testPass BOOLEAN NOT NULL DEFAULT FALSE,
@@ -21,31 +21,40 @@ CREATE TABLE AssignmentFeedback (
     CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
         REFERENCES assignments(courseid, assignment)
         ON DELETE CASCADE
-        ON UPDATE CASCADE,
-	CONSTRAINT constraint_assignment_submission_fkey FOREIGN KEY (submission)
-		REFERENCES AssignmentFiles(submission)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+        ON UPDATE CASCADE
 );
 
-CREATE OR REPLACE FUNCTION set_submission_number()
+CREATE OR REPLACE FUNCTION set_submission_number_assignmentfeedback()
 RETURNS TRIGGER AS $$
+DECLARE
+    max_submission INTEGER;
 BEGIN
-  IF NEW.submission = 0 THEN
-    SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
-    FROM AssignmentFeedback
-    WHERE groupId = NEW.groupId
-      AND courseId = NEW.courseId
-      AND assignment = NEW.assignment;
-  END IF;
-  RETURN NEW;
+    IF NEW.submission = 0 THEN
+        SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+        FROM AssignmentFeedback
+        WHERE groupId = NEW.groupId
+            AND courseId = NEW.courseId
+            AND assignment = NEW.assignment;
+
+        IF max_submission > 0 THEN
+            NEW.submission := max_submission;
+        ELSE
+            SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
+            FROM AssignmentFeedback
+            WHERE groupId = NEW.groupId
+                AND courseId = NEW.courseId
+                AND assignment = NEW.assignment;
+        END IF;
+    END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER set_submission_trigger
+CREATE TRIGGER increment_submission_assignmentfeedback
 BEFORE INSERT ON AssignmentFeedback
 FOR EACH ROW
-EXECUTE FUNCTION set_submission_number();
+EXECUTE FUNCTION set_submission_number_assignmentfeedback();
+
 
 ---------------------------------------
 ---------------------------------------
@@ -55,7 +64,7 @@ CREATE Table AssignmentFiles (
 		groupId INTEGER NOT NULL, 
 		courseId SERIAL NOT NULL,
 		assignment INTEGER NOT NULL,
-		submission INTEGER NOT NULL,
+		submission SERIAL NOT NULL,
 		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
 		fileType TEXT NOT NULL,
@@ -72,16 +81,29 @@ CREATE Table AssignmentFiles (
 
 CREATE OR REPLACE FUNCTION set_submission_number_assignmentfiles()
 RETURNS TRIGGER AS $$
+DECLARE
+    max_submission INTEGER;
 BEGIN
-  IF NEW.submission = 0 THEN
-    SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
-    FROM AssignmentFiles
-    WHERE groupId = NEW.groupId
-      AND courseId = NEW.courseId
-      AND assignment = NEW.assignment
-      AND fileName = NEW.fileName;
-  END IF;
-  RETURN NEW;
+    IF NEW.submission = 0 THEN
+        SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+        FROM AssignmentFiles
+        WHERE groupId = NEW.groupId
+            AND courseId = NEW.courseId
+            AND assignment = NEW.assignment
+            AND fileName = NEW.fileName;
+
+        IF max_submission > 0 THEN
+            NEW.submission := max_submission;
+        ELSE
+            SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
+            FROM AssignmentFiles
+            WHERE groupId = NEW.groupId
+                AND courseId = NEW.courseId
+                AND assignment = NEW.assignment
+                AND fileName = NEW.fileName;
+        END IF;
+    END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -139,7 +161,6 @@ CREATE TABLE UserData (
 	PRIMARY KEY (userId),
 	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
-
 
 CREATE TABLE Groups (
 	groupId SERIAL PRIMARY KEY,
@@ -208,3 +229,9 @@ SELECT UserData.userId, UserData.cid, UserInGroup.groupId, Groups.groupNumber
 FROM UserData
 JOIN UserInGroup ON UserData.userId = UserInGroup.userId
 JOIN Groups ON UserInGroup.groupId = Groups.groupId;
+
+CREATE VIEW GroupDetails AS
+SELECT g.groupid, g.groupnumber, g.course, u.fullname
+FROM Groups g
+LEFT JOIN UserInGroup uig ON g.groupid = uig.groupid
+LEFT JOIN UserData u ON uig.userid = u.userid;
