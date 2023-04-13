@@ -11,7 +11,7 @@ from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
     user_to_resend_verification, verify_user_from_email_verification, \
-    verify_and_get_id
+    verify_and_get_id, create_temp_users
 from flask_mail import Mail, Message
 import jwt
 
@@ -312,20 +312,9 @@ def batch_add_to_course():
     (user_ids, none_existing_cids) = \
         user_handler.get_user_ids_from_cids(data["Cids"])
     user_handler.add_users_to_course(user_ids, course_id)
+
     if len(none_existing_cids) != 0:
-        newly_registered_cids = []
-        for cid in none_existing_cids:
-            user = {
-                "email": f"{cid}@chalmers.se",
-                "cid": cid,
-                # TODO: When we can use forgot password, We need to
-                #   change the password to use a randomly generated
-                #   string instead of cid.
-                "password": cid
-            }
-            reg_res = user_registration(user)
-            if reg_res[1] == 200:
-                newly_registered_cids.append(cid)
+        newly_registered_cids = create_temp_users(none_existing_cids)
         (user_ids, _) = \
             user_handler.get_user_ids_from_cids(newly_registered_cids)
         user_handler.add_users_to_course(user_ids, course_id)
