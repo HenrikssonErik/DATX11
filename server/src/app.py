@@ -159,11 +159,14 @@ def post_files():
     if (user_id):
         if (group_id == user_handler.get_group(user_id,
                                                course_id)["groupId"]):
-            res = handle_files(files, course_id, group_id, assignment_nr)
-            feedback_res = {}
-            feedback_res.update({"feedback": res[0]})
-            feedback_res.update(res[1])
-            return make_response(jsonify(feedback_res), res[2])
+            if not (course_handler.passed_deadline(course_id, assignment_nr)):
+                res = handle_files(files, course_id, group_id, assignment_nr)
+                feedback_res = {}
+                feedback_res.update({"feedback": res[0]})
+                feedback_res.update(res[1])
+                return make_response(jsonify(feedback_res), res[2])
+            else:
+                return make_response({'status': 'deadline_passed'}, 400)
         else:
             return make_response({'status': 'not_in_group'}, 401)
     else:

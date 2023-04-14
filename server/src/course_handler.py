@@ -455,3 +455,23 @@ def get_assignment_overview(course: int, assignment: int) -> list[dict]:
     except Exception as e:
         print(e)
         raise Exception("Error when getting assignment overview")
+
+
+def passed_deadline(course: int, assignment: int) -> bool:
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_one = """select enddate from assignments
+                    WHERE courseid = %s AND assignment = %s;"""
+                cur.execute(query_one, [course, assignment])
+                date: datetime = cur.fetchone()[0]
+        conn.close()
+        if date < datetime.date.today():
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(e)
+        raise Exception("Could not get the deadline from database") from e
