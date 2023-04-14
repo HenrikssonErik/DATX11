@@ -45,6 +45,7 @@ export class AssignmentsComponent implements OnInit {
     if (!isNaN(id)) {
       this.courseService.getCourse(id).subscribe((res: Course) => {
         this.course = res;
+        console.log(this.course);
       });
     }
 
@@ -191,9 +192,6 @@ export class AssignmentsComponent implements OnInit {
     if (new Date(date).getTime() > now.getTime()) {
       return false;
     }
-    console.log(now);
-    console.log('disable');
-    console.log(date);
     return true;
   }
 }
