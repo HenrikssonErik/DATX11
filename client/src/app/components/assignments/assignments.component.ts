@@ -184,6 +184,19 @@ export class AssignmentsComponent implements OnInit {
     return false;
   }
 
+  inGroup(groupid: number): boolean {
+    if (this.myGroup) {
+      if ('status' in this.myGroup) {
+        return false;
+      } else {
+        if (this.myGroup.groupId === groupid) {
+          return true;
+        } else return false;
+      }
+    }
+    return false;
+  }
+
   datePassed(date: Date): boolean {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
