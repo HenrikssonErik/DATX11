@@ -57,8 +57,44 @@ def check_data_input(cid: str, email: str, pwd: str,
     return "OK", 200
 
 
+def create_temp_users(cids: list[str]) -> list[str]:
+    cids_do_not_exit_in_chalmers = []
+    unallowed_cid = []
+    newly_registered = []
+    conn = psycopg2.connect(get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            query = "INSERT INTO UserData " +\
+                    "(cid, email, passphrase, globalRole, fullName) " +\
+                    "VALUES (%s, %s, %s, %s, %s ) " +\
+                    "on conflict do nothing;"
+            for cid in cids:
+                if not cid.isalpha():
+                    unallowed_cid.append(cid)
+                    continue
+                maybe_user = check_against_ldap(cid)
+                if maybe_user is None:
+                    cids_do_not_exit_in_chalmers.append(cid)
+                    continue
+                else:
+                    role, name = maybe_user
+                    cur.execute(
+                        query,
+                        (
+                            cid,
+                            f"{cid}@chalmers.se",
+                            None,
+                            role,
+                            name
+                        )
+                    )
+                    newly_registered.append(cid)
+    conn.close()
+    return newly_registered
+
+
 def user_registration(data: Request.form) -> \
-        tuple[dict[str, str], Literal[200, 400, 401, 406]]:
+        tuple[dict[str, str], Literal[200, 400, 401, 406, 500]]:
     """
     Registrates the user to the database, then logs in to the user.
     If success, return the token from log_in and success code.
@@ -71,25 +107,32 @@ def user_registration(data: Request.form) -> \
     cid: str = data['cid']
     pwd: str = data['password']
 
-    role = check_against_ldap(cid)
+    role_name = check_against_ldap(cid)
 
-    user_exists = False if (role[1] == "false") else True
+    # user_exists = False if (role_name[1] is None) else True
+    user_exists = role_name is not None
 
     data_check = check_data_input(cid, email, pwd, user_exists)
 
     if (data_check[1] != 200):
         return {'status': data_check[0]}, data_check[1]
+    if role_name is not None:
+        role, name = role_name
+        salt: bytes = bcrypt.gensalt()
+        hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
 
-    salt: bytes = bcrypt.gensalt()
-    hashed_pass: bytes = bcrypt.hashpw(pwd.encode('utf-8'), salt)
+        res_query: tuple[
+            dict[str, str], Literal[200, 406]
+        ] = registration_query(
+            cid, email, hashed_pass, role, name
+        )
+        res_object = ({'token': create_verification_token(cid)}, 200) if (
+            res_query[1] == 200) else (res_query)
 
-    res_query: tuple[dict[str, str], Literal[200, 406]
-                     ] = registration_query(cid, email, hashed_pass,
-                                            role[0], role[1])
-    res_object = ({'token': create_verification_token(cid)}, 200) if (
-        res_query[1] == 200) else (res_query)
-
-    return res_object
+        return res_object
+    else:
+        # Unreachable
+        return {'status': "Something went wrong"}, 500
 
 
 def registration_query(cid: str, email: str, hashed_pass: bytes,
@@ -107,9 +150,18 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
     with conn:
         with conn.cursor() as cur:
             try:
+                # query = "INSERT INTO UserData " +\
+                #     "(cid, email, passphrase, globalRole, fullName) " +\
+                #     "VALUES (%s, %s, %s, %s, %s ) "
+
                 query = "INSERT INTO UserData " +\
                     "(cid, email, passphrase, globalRole, fullName) " +\
-                    "VALUES (%s, %s, %s, %s, %s );"
+                    "VALUES (%s, %s, %s, %s, %s ) " +\
+                    "ON CONFLICT (cid) DO UPDATE " +\
+                    "SET passphrase = EXCLUDED.passphrase " +\
+                    "WHERE userdata.cid = EXCLUDED.cid and " +\
+                    "userdata.passphrase is null;"
+
                 cur.execute(query, (
                     cid,
                     email,
@@ -117,8 +169,13 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
                     role,
                     name
                 ))
-                status = 'success'
-                res_code = 200
+
+                if cur.rowcount == 0:
+                    status = 'already_registered'
+                    res_code = 406
+                else:
+                    status = 'success'
+                    res_code = 200
             except psycopg2.IntegrityError:
                 status = 'already_registered'
                 res_code = 406
@@ -133,7 +190,8 @@ def user_to_resend_verification(cid: str) -> tuple:
             try:
                 query_data = """SELECT email, verified
                             FROM UserData
-                            WHERE userdata.cid = %s"""
+                            WHERE userdata.cid = %s
+                                AND userdata.passphrase IS NOT NULL"""
                 cur.execute(query_data, (cid,))
                 data = cur.fetchone()
                 if not data:
@@ -165,7 +223,8 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
             with conn.cursor() as cur:
                 query_data = """SELECT userId, passphrase, globalrole, verified
                             FROM UserData
-                            WHERE userdata.email = %s"""
+                            WHERE userdata.email = %s
+                            AND userdata.passphrase IS NOT NULL"""
                 cur.execute(query_data, (email,))
                 data = cur.fetchone()
                 id = data[0]
@@ -175,6 +234,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         conn.close()
         if not data:
             raise Exception("Wrong Credentials")
+
         if (bcrypt.checkpw(password.encode('utf8'), passphrase)):
             return_dict: dict[str, str] = {"Token": create_token(id)}
             return_dict['GlobalRole'] = data[2]
@@ -247,9 +307,10 @@ def verify_user_in_db(cid: str) -> \
     with conn:
         with conn.cursor() as cur:
             try:
-                query = """UPDATE UserData
-                SET verified = TRUE
-                WHERE cid = %s"""
+                query = "UPDATE UserData " +\
+                    "SET verified = TRUE " +\
+                    "WHERE cid = %s " +\
+                    "AND passphrase IS NOT NULL"
                 cur.execute(query, (
                     cid,
                 ))
@@ -294,10 +355,12 @@ def verify_and_get_id(token: str) -> int:
         # If decoding was successful, return the user id
         return decoded_token['id']
 
-    except jwt.ExpiredSignatureError:
+    except jwt.ExpiredSignatureError as e:
         # If the token has expired, raise an exception
-        raise Exception('Invalid token')
+        e.add_note("Expired token")
+        raise e
 
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
         # If the token is invalid, raise an exception
-        raise Exception('Invalid token')
+        e.add_note("Invalid token")
+        raise e
