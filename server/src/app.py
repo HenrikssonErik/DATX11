@@ -6,7 +6,8 @@ from flask import Flask, Response, jsonify, make_response, render_template, \
 from flask_cors import CORS
 from .constants import DOMAIN
 from .file_handler import handle_files, \
-    handle_test_file, get_assignment_files_from_database
+    handle_test_file, get_assignment_files_from_database, \
+    get_assignment_test_feedback_from_database
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
@@ -149,13 +150,17 @@ def send_verification_email(to: str, token: str) -> None:
     mail.send(msg)
 
 
+# Upload assignment files to get tested
 @app.route('/files', methods=['POST'])
 def post_files():
     files = request.files.getlist('files')
-
+    data = request.get_json()
+    group_id = data['groupId']
+    course = data['course']
+    assignment = data['assignment']
     if not files:
         return "Files not found", 406
-    res = handle_files(files)
+    res = handle_files(files, course, assignment, group_id)
     feedback_res = {}
     feedback_res.update({"feedback": res[0]})
     feedback_res.update(res[1])
@@ -168,10 +173,30 @@ def post_files():
 def post_tests():
     files = request.files.getlist('files')
 
+    data = request.get_json()
+    course = data['course']
+    assignment = data['assignment']
     if not files:
         return "Files not found", 406
-    res = handle_test_file(files)
+    res = handle_test_file(files, course, assignment)
     return make_response(jsonify(res[0]), res[1])
+
+
+@app.route('/getAssignmentTestFeedback', methods=['POST'])
+def get_assignment_feedback():
+    data = request.get_json()
+    group_id = data['groupId']
+    course = data['course']
+    assignment = data['assignment']
+    (result, code) = get_assignment_test_feedback_from_database(
+        course,
+        assignment,
+        group_id
+    )
+    if code == 200:
+        return make_response(result, 200)
+    else:
+        return make_response("", code)
 
 
 @app.route('/getAssignmentFile', methods=['POST'])

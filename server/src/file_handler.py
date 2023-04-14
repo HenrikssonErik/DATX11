@@ -10,26 +10,28 @@ import shutil
 import json
 from .connector import get_conn_string
 
-
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 # TODO: temp variables, should be taken from database when it is implemented
 
 # TODO: load filenames from database
 __allowed_filenames = {"Test1.pdf", "test2.txt",
-                       "1ha1.py", "PythonFile.py", "my_testfile.py",
-                       "my_test_file_demo.py", "test_1_demo.py"}
+                       "1ha1.py", "PythonFile.py", "my_test_file.py",
+                       "my_test_file_demo.py", "test_1_demo.py",
+                       "test_1.py", "test_0.py"}
 __nr_of_files = 1
 
-# for DB, should be recieved from frontend(?) later on
-course_id = 1
-assignment = 1
-group_id = 2
 
-
-def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
-                                                    dict[str, str],
-                                                    dict[str, str],
-                                                    int]:
+def handle_files(
+        files: list[FileStorage],
+        course_id: int,
+        assignment: int,
+        group_id: int
+) -> tuple[
+    list[dict[str, str]],
+    dict[str, str],
+    dict[str, str],
+    int
+]:
     """Sanitizes files, checks for number of files,
     allowed file names and file types
     Returns: json object with feedback on submitted files
@@ -38,6 +40,7 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
                          "unittest_feedback": ""}
     number_of_files = {}
     res_code = 200
+
     file_amount, res_code = ("OK", res_code)  \
         if (len(files) == __nr_of_files) \
         else (f"Received {len(files)}, should be {__nr_of_files} files",
@@ -61,8 +64,11 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
         res_object.update({"file_type": file_type})
 
         response_items.append({"tested_file": res_object})
+
     if (res_code == 200):
-        save_to_temp_and_database(files, response_items)
+        save_to_temp_and_database(
+            files, response_items, course_id, assignment, group_id
+        )
         unittest_feedback = json.loads(
             run_unit_tests_in_container(
                 course_id,
@@ -70,6 +76,7 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
                 group_id
             )
         )
+
         passed = unittest_feedback["was_successful"]
         combined_feedback = {"general_tests_feedback": response_items,
                              "unittest_feedback": unittest_feedback}
@@ -81,7 +88,10 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
 
 def save_to_temp_and_database(
         files: list[FileStorage],
-        response_items: dict
+        response_items: dict,
+        course_id: int,
+        assignment: int,
+        group_id: int
 ) -> None:
     """Downloads the file to temp directory and then to saves into
     the database. Also checks pep8 and cyclomatic complexity.
@@ -122,7 +132,11 @@ def save_to_temp_and_database(
             response_items[count].update({"PEP8_results": pep8_result})
 
 
-def handle_test_file(files: list[FileStorage]) -> tuple[dict, int]:
+def handle_test_file(
+        files: list[FileStorage],
+        course_id: int,
+        assignment: int,
+) -> tuple[dict, int]:
     """Handles the incoming test files to check if the type is allowed"""
     response_args = {}
     res_code = 200
@@ -207,14 +221,29 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
     file_type = file_name.rsplit('.', 1)[1].lower()
     with conn:
         with conn.cursor() as cur:
-            query = """INSERT INTO AssignmentFiles
-                    (groupId, courseId, assignment, fileName,
-                     fileData, fileType, submission)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, 0);
-                    """
+            query = """
+            INSERT INTO AssignmentFiles (
+                groupid,
+                courseid,
+                \"assignment\",
+                filename,
+                filedata,
+                filetype
+            )
+            VALUES (%s, %s, %s, %s, %s, %s);
+            """
 
-            cur.execute(query, (group_id, course_id, assignment,
-                        file_name, binary, file_type, 0))
+            cur.execute(
+                query,
+                (
+                    group_id,
+                    course_id,
+                    assignment,
+                    file_name,
+                    binary,
+                    file_type,
+                )
+            )
     conn.close()
 
 
@@ -235,6 +264,28 @@ def remove_existing_test_file(
                  """
             cur.execute(query_data, (file_name, course_id, assignment))
     conn.close()
+
+
+def get_assignment_test_feedback_from_database(
+        course: int,
+        assignment: int,
+        group_id: int
+) -> tuple[list[tuple[int, str, bool]], int]:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            query_data = """
+            select submission, testfeedback, testpass
+            from assignmentfeedback where
+            groupid = %s and courseid = %s and \"assignment\" = %s
+            """
+
+            cur.execute(query_data, (group_id, course,
+                                     assignment))
+            data = cur.fetchall()
+    conn.close()
+
+    return data, 200
 
 
 def get_assignment_files_from_database(
@@ -333,6 +384,7 @@ def run_unit_tests_in_container(
 ) -> str:
     path = Path(__file__).absolute().parent/"podman"/"temp"
     path.mkdir(parents=True, exist_ok=True)
+
     files = get_unit_test_files_from_db(courseid, assignment)
     files.extend(get_all_assignment_files_from_db(courseid, assignment,
                                                   group_id))
@@ -358,19 +410,20 @@ def save_feedback_to_db(
         feedback: json,
         passed: bool,
 ):
-
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO AssignmentFeedback (TestFeedback, TestPass)
-                    VALUES(%s, %s)
-                    WHERE GroupId        = %s
-                    AND   CourseId       = %s
-                    AND   assignment   = %s
-                    ON CONFLICT (TestFeedback, TestPass) DO UPDATE;
+                INSERT INTO AssignmentFeedback (
+                        groupid,
+                        courseid,
+                        \"assignment\",
+                        testfeedback,
+                        testpass
+                    )
+                    VALUES(%s, %s, %s, %s, %s)
                 """,
                 (group_id, course_id, assignment, feedback, passed)
             )
-        conn.close()
+    conn.close()
