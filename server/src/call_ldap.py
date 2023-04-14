@@ -3,7 +3,7 @@ import pathlib
 from .user_handler import Role
 
 
-def check_against_ldap(cid: str):
+def check_against_ldap(cid: str) -> tuple[str, str] | None:
     output = subprocess.run(
         ['go', 'run', 'cidCheck.go', cid],
         capture_output=True,
@@ -19,8 +19,8 @@ def check_against_ldap(cid: str):
     name = result.split(",")[0]
 
     if (b_teacher and not b_ta):
-        return [Role.Teacher.name, name]
+        return Role.Teacher.name, name
     if (b_student):
-        return [Role.Student.name, name]
+        return Role.Student.name, name
     else:
-        return ["false", "false"]
+        return None

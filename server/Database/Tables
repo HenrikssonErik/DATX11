@@ -154,7 +154,7 @@ CREATE TABLE UserData (
 	userId SERIAL NOT NULL,
 	cid TEXT UNIQUE NOT NULL,
 	email TEXT NOT NULL,
-	passphrase BYTEA NOT NULL,
+	passphrase BYTEA,
 	verified BOOLEAN NOT NULL DEFAULT FALSE,
 	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher', 'Admin')),
 	fullName TEXT NOT NULL,
