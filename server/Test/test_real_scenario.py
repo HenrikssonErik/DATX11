@@ -4,7 +4,6 @@ if False:
     import sys
     import unittest
     from pathlib import Path
-    from pprint import pprint
     sys.path.append(str(Path(__file__).absolute().parent.parent))
     from src.file_handler import run_unit_tests_in_container, \
                                     save_test_to_db, \
