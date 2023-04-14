@@ -16,9 +16,9 @@
   margin-left: -30px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  display: inline-block;
-  padding-right: 3px;
-  padding-left: 3px;
+  cursor: pointer;
+  padding: 5px;
+  text-align: center;
 }
 .upcoming:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);

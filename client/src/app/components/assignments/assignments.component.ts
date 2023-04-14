@@ -182,4 +182,18 @@ export class AssignmentsComponent implements OnInit {
     }
     return false;
   }
+
+  datePassed(date: Date): boolean {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    //to reset timeframes smaller than days
+    // Check if the date has passed
+    if (new Date(date).getTime() > now.getTime()) {
+      return false;
+    }
+    console.log(now);
+    console.log('disable');
+    console.log(date);
+    return true;
+  }
 }

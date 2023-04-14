@@ -165,14 +165,22 @@
             ><span translate>Assignment </span>{{ assignment.AssignmentNr }}
           </h5>
           <!-- <h5><i class="fa-solid fa-ellipsis-vertical"></i></h5> -->
-          <button
-            class="btn btn-primary submitBtn"
-            (click)="
-              openModal(course.courseID, group.groupId, assignment.AssignmentNr)
-            "
-          >
-            Submit Assignment
-          </button>
+          <div>
+            <button
+              [disabled]="datePassed(assignment.DueDate)"
+              class="btn btn-primary submitBtn"
+              (click)="
+                openModal(
+                  course.courseID,
+                  group.groupId,
+                  assignment.AssignmentNr
+                )
+              "
+            >
+              Submit Assignment
+            </button>
+            <p *ngIf="datePassed(assignment.DueDate)">Deadline has passed</p>
+          </div>
         </div>
         <div class="row mt-2">
           <div class="col-md-2">
