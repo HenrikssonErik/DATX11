@@ -44,7 +44,7 @@ def get_user(user_id: int) -> dict:
         conn.close()
         if not data:
             raise Exception("No such user")
-        return {'cid': data[0], 'email': data[1], 'fullname': data[2]}
+        return {'cid': data[0], 'email': data[1], 'fullname': data[2], 'id': user_id}
 
     except Exception as e:
         print(e)
@@ -114,16 +114,23 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
 
     course_id = _get_course_id_from_group(group_id)
 
-    # add to group
     try:
         for course in user_courses:
             if course['courseID'] == course_id and \
                course['Role'] == Role.Student.name:
                 with conn:
                     with conn.cursor() as cur:
-                        query_data = """INSERT into useringroup VALUES
-                                       (%s, %s)"""
-                        cur.execute(query_data, [user_id, group_id])
+                        query_one = """SELECT EXISTS(SELECT 1 FROM
+                        usergroupcourseinfo WHERE courseid=%s AND userid=%s) as
+                        exists_row;"""
+                        cur.execute(query_one, [course_id, user_id])
+                        in_group = cur.fetchone()[0]
+                        if not (in_group):
+                            query_two = """INSERT into useringroup VALUES
+                                           (%s, %s)"""
+                            cur.execute(query_two, [user_id, group_id])
+                        else:
+                            raise Exception("Already in group")
                 conn.close()
 
     except Exception as e:
@@ -222,6 +229,13 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
                 query_data = """DELETE from useringroup
                                 WHERE userid = %s AND groupid = %s """
                 cur.execute(query_data, [user_id, group_id])
+                query_two = """SELECT (fullname IS NULL)
+                AS is_empty FROM GroupDetails WHERE groupid = %s;"""
+                cur.execute(query_two, [group_id])
+                emptyGroup: bool = cur.fetchone()[0]
+                if (emptyGroup):
+                    query_three = """delete from groups where groupid = %s """
+                    cur.execute(query_three, [group_id])
         conn.close()
     except Exception as e:
         print(e)
@@ -237,6 +251,16 @@ def is_teacher_on_course(user_id: int, course_id: int) -> bool:
            and course['Role'] == Role.Teacher.name:
             return True
 
+    return False
+
+
+def is_in_course(user_id: int, course_id: int) -> bool:
+    """Checks if a user is a member of the course
+    Returns True/False"""
+    courses = get_courses_info(user_id)
+    for course in courses:
+        if (course['courseID'] == course_id):
+            return True
     return False
 
 

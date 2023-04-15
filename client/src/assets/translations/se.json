@@ -70,5 +70,7 @@
   "Close": "Stäng",
   "Send_verification_link_title": "Skicka ny verifikationslänk",
   "Verify_text": "Behöver du verifiera dig?",
-  "Click_here_verification": "Klicka här"
+  "Click_here_verification": "Klicka här",
+  "Upload_File": "Ladda upp fil",
+  "Groups_Tab": "Grupper"
 }

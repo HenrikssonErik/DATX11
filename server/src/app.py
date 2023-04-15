@@ -153,22 +153,30 @@ def send_verification_email(to: str, token: str) -> None:
 # Upload assignment files to get tested
 @app.route('/files', methods=['POST'])
 def post_files():
+    token = extract_token(request)
+    user_id: int = verify_and_get_id(token)
     files = request.files.getlist('files')
-    data = request.get_json()
-    group_id = data['groupId']
-    course = data['course']
-    assignment = data['assignment']
+    course_id: int = int(request.form['Course'])
+    group_id: int = int(request.form['Group'])
+    assignment_nr: int = int(request.form['Assignment'])
+
     if not files:
         return "Files not found", 406
-    res = handle_files(files, course, assignment, group_id)
-    feedback_res = {}
-    feedback_res.update({"feedback": res[0]})
-    feedback_res.update(res[1])
-    feedback_res.update(res[2])
+    if (user_id):
+        if (group_id == user_handler.get_group(user_id,
+                                               course_id)["groupId"]):
+            res = handle_files(files, course_id, group_id, assignment_nr)
+            feedback_res = {}
+            feedback_res.update({"feedback": res[0]})
+            feedback_res.update(res[1])
+            return make_response(jsonify(feedback_res), res[2])
+        else:
+            return make_response({'status': 'not_in_group'}, 401)
+    else:
+        return make_response({'status': 'not_logged_in'}, 401)
 
-    return make_response(jsonify(feedback_res), res[3])
-
-
+# TODO: add course and assignmetn in post,
+#  will be done when working on the teacher page
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
     files = request.files.getlist('files')
@@ -395,7 +403,6 @@ def create_course():
     course: str = data['Course']
     year: int = data['Year']
     lp: int = data['TeachingPeriod']
-    groups: int = data['Groups']
     abbreviation: str = data['Abbreviation']
     role = user_handler.get_global_role(request_user_id)
 
@@ -406,12 +413,29 @@ def create_course():
         if (type(course_id) == tuple):
             return make_response(jsonify(course_id[0]), course_id[1])
         else:
-            course_handler.add_groups_to_course(groups, course_id)
             user_handler.add_user_to_course(request_user_id, course_id,
                                             user_handler.Role.Admin)
             return make_response(jsonify('Course Created'), 200)
     else:
         return make_response("Not allowed to create course", 401)
+
+
+@app.route('/createGroup', methods=['POST'])
+def create_group():
+    """Creates a group for the specified course and adds the user to it"""
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course_id = data['Course']
+
+    if (user_id):
+        if (user_handler.is_in_course(user_id, course_id)):
+            course_handler.add_group_to_course(course_id, user_id)
+            return make_response("", 200)
+        else:
+            return make_response({'status': 'not_in_course'}, 401)
+    else:
+        return make_response({'status': 'not_in_course'}, 401)
 
 
 @app.route('/createAssignment', methods=['POST'])
@@ -492,12 +516,6 @@ def get_users_in_course():
     else:
         return make_response("", 401)
 
-# TODO: remove course? mb not?, getGroupsInCourse (and members?,
-# and assignmentstatus?)
-# set teacher feedback, getAssignmentFeedback (and filenames, should be called
-# by the groumembers or teachers), getAllowedFilenames?
-# add date, course, token and assignment checks to post assignmentfiles
-
 
 @app.route('/changeAssignmentDate', methods=['POST'])
 def change_assignment_date():
@@ -517,3 +535,38 @@ def change_assignment_date():
             return make_response(jsonify(res), 401)
     else:
         return make_response(jsonify({'status': 'Not a course teacher'}), 401)
+
+
+@app.route('/getFeedback', methods=['GET'])
+def get_feedback():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = request.args.get('Course')
+    assignment = request.args.get('Assignment')
+
+    if (user_id):
+        group = user_handler.get_group(user_id, course)['groupId']
+        feedback = course_handler.get_assignment_feedback(course, assignment,
+                                                          group)
+        return make_response(jsonify(feedback), 200)
+
+    else:
+        return make_response({"status": 'not_logged_in'}, 401)
+
+
+@app.route('/getGroups', methods=['GET'])
+def get_course_groups():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = int(request.args.get('Course'))
+
+    if (user_id):
+        if (user_handler.is_in_course(user_id, course)):
+            groups = course_handler.get_course_groups(course)
+            return make_response(jsonify(groups), 200)
+        else:
+            return make_response("not_in_course", 401)
+    else:
+        return make_response("not_logged_in", 401)
+
+# TODO add endpoint to get all groups latest submissions

@@ -16,7 +16,6 @@ export class CreateCourseComponent {
   formData = {
     Course: null,
     Abbreviation: null,
-    Groups: null,
     TeachingPeriod: null,
     Year: this.minYear(),
   };

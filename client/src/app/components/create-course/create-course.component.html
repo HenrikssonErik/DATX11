@@ -76,33 +76,6 @@
         Cannot_be_a_previous_year
       </div>
     </div>
-    <div class="col-md-2">
-      <label for="groups" translate
-        >Groups
-        <span
-          ><i
-            class="fa-regular fa-circle-question"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            data-bs-title="
-            Number of student groups, more can be added later"
-          ></i></span
-      ></label>
-      <input
-        type="number"
-        class="form-control"
-        id="groups"
-        name="groups"
-        required
-        [(ngModel)]="formData.Groups"
-        min="0"
-        placeholder="E.g 0"
-        #GroupControl="ngModel"
-      />
-      <div class="error-message" *ngIf="GroupControl.errors?.['min']" translate>
-        Zero_or_larger
-      </div>
-    </div>
   </div>
   <button
     class="mt-3"

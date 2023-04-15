@@ -23,8 +23,13 @@ export class FileUploadComponent {
   files: File[] = [];
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
+  //TODO: Give types to these inputs
+  @Input() courseId: any;
+  @Input() assignmentNumber: any;
+  @Input() groupId: any;
 
-  @Input() config!: UploadFileConfigService | UploadUnitTestConfigService;
+  allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
+  allowedFileTypesForPrint = ['.py', '.pdf', '.txt'];
 
   testFeedBackArray: any[] = [];
 
@@ -69,7 +74,7 @@ export class FileUploadComponent {
    * @returns {void}
    */
   prepareFilesList(files: Array<File>): void {
-    const allowedTypes = this.config.allowedFileTypes;
+    const allowedTypes = this.allowedFileTypes;
     for (const file of files) {
       const index = this.files.findIndex((f) => f.name === file.name);
       if (allowedTypes.includes(file.type)) {
@@ -130,17 +135,24 @@ export class FileUploadComponent {
    * @returns {void}
    */
   uploadFiles(): void {
-    let header: HttpHeaders = new HttpHeaders();
-    header = header.append('Content-Type', 'application/json');
+    const headers: HttpHeaders = new HttpHeaders().append(
+      'Cookies',
+      document.cookie
+    );
 
     const formData = new FormData();
     this.files.forEach((file: File): void =>
       formData.append('files', file, file.name)
     );
 
+    formData.append('Course', this.courseId);
+    formData.append('Assignment', this.assignmentNumber);
+    formData.append('Group', this.groupId);
+
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + this.config.endpoint, formData, {
+      .post<HttpResponse<any>>(`${API_URL}/files`, formData, {
         observe: 'response',
+        headers: headers,
       })
       .subscribe({
         // TODO: Initiate loading

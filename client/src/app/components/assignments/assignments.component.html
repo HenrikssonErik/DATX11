@@ -1,4 +1,5 @@
-<app-spinner></app-spinner>
+<!--TODO: SOLVE ISSUE WITH THIS SPINNER-->
+<!-- <app-spinner></app-spinner> -->
 <div class="text-muted" *ngIf="course">
   <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
@@ -47,9 +48,94 @@
         <span translate>Assignment </span>{{ assignment.AssignmentNr }}
       </button>
     </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        [class.active]="selectedTab === -2"
+        [id]="'tab-groups'"
+        [attr.data-bs-toggle]="'tab'"
+        [attr.data-bs-target]="'#tab-pane-groups'"
+        type="button"
+        role="tab"
+        [attr.aria-controls]="'tab-pane-groups'"
+        [attr.aria-selected]="selectedTab === -2"
+        (click)="selectedTab = -2"
+        translate
+      >
+        Groups_Tab
+      </button>
+    </li>
   </ul>
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade" *ngIf="selectedTab === null"></div>
+    <div
+      class="tab-pane fade"
+      role="tabpanel"
+      [attr.aria-labelledby]="'tab-groups'"
+      [id]="'tab-pane-groups'"
+      [class.show]="selectedTab === -2"
+      [class.active]="selectedTab === -2"
+      *ngIf="selectedTab === -2"
+    >
+      <!--CONTENT FOR GROUPS-->
+      <div class="mb-3" style="display: flex; justify-content: space-between">
+        <h5>Groups</h5>
+
+        <button
+          *ngIf="!hasGroup()"
+          class="btn btn-primary"
+          (click)="createGroup(course.courseID)"
+        >
+          <span *ngIf="createGroupLoader" class="loader"></span>
+          <span *ngIf="!createGroupLoader">Create Group</span>
+        </button>
+      </div>
+      <ngb-accordion #groupAccordion="ngbAccordion">
+        <ngb-panel *ngFor="let group of courseGroups">
+          <ng-template ngbPanelTitle>
+            <div class="titleAccordion">
+              <span>Group {{ group.groupNumber }}</span>
+              <span
+                *ngIf="isLoadingMap.get(group.groupId)"
+                class="loader"
+              ></span>
+              <span
+                *ngIf="
+                  !(group.groupId === myGroup.groupId) &&
+                  !hasGroup() &&
+                  !isLoadingMap.get(group.groupId)
+                "
+                class="joinButton"
+                (click)="
+                  joinGroup(course.courseID, group.groupId);
+                  $event.stopPropagation()
+                "
+                >Join</span
+              >
+              <span
+                *ngIf="
+                  group.groupId === myGroup.groupId &&
+                  !isLoadingMap.get(group.groupId)
+                "
+                (click)="
+                  removeFromGroup(course.courseID, group.groupId);
+                  $event.stopPropagation()
+                "
+                class="leaveButton"
+                >Leave</span
+              >
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="row">
+              <div class="flex-container">
+                <p *ngFor="let member of group.users">{{ member }}</p>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-panel>
+      </ngb-accordion>
+    </div>
     <div
       class="tab-pane fade"
       [id]="'tab-pane-settings'"
@@ -78,7 +164,15 @@
             <span>{{ course.CourseName }} - {{ course.Course }} - </span
             ><span translate>Assignment </span>{{ assignment.AssignmentNr }}
           </h5>
-          <h5><i class="fa-solid fa-ellipsis-vertical courseIcon"></i></h5>
+          <!-- <h5><i class="fa-solid fa-ellipsis-vertical"></i></h5> -->
+          <button
+            class="btn btn-primary submitBtn"
+            (click)="
+              openModal(course.courseID, group.groupId, assignment.AssignmentNr)
+            "
+          >
+            Submit Assignment
+          </button>
         </div>
         <div class="row mt-2">
           <div class="col-md-2">
@@ -95,10 +189,10 @@
               }}</span>
             </p>
           </div>
-          <div class="col-md-3" *ngIf="group">
+          <!--TODO: HANDLE THE EMPTY GROUP BETTER-->
+          <div class="col-md-3" *ngIf="groupExists()">
             <h5>Group {{ group.groupId }}</h5>
-
-            <ng-container *ngIf="group.groupMembers.length > 0">
+            <ng-container>
               <p
                 style="padding: 0; margin: 0"
                 *ngFor="let member of group.groupMembers"
@@ -115,20 +209,66 @@
         </div>
       </div>
       <div class="row mt-3">
-        <div class="col-md-6">
-          <h4>Submission</h4>
-          <div class="card">
-            <p>Here I'll have the fileupload and submission status</p>
-            <button class="btn btn-primary">
-              Upload <i class="fa-solid fa-upload"></i>
-            </button>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <h4>Feedback</h4>
-          <div class="card">
-            <p>Here I'll have the feedback</p>
-          </div>
+        <div class="col-12">
+          <ngb-accordion #submissionAccordion="ngbAccordion">
+            <ngb-panel>
+              <ng-template ngbPanelTitle>
+                <div class="titleAccordion">
+                  <span>Submission 3</span>
+                  <span class="statusText passed">Passed</span>
+                </div>
+              </ng-template>
+              <ng-template ngbPanelContent>
+                <div class="row text-muted">
+                  <div class="col-md-4">
+                    <h6>Reviewed By</h6>
+                    <p class="statusText">Malte Carlstedt</p>
+                  </div>
+                  <div class="col-md-4">
+                    <h6>Status</h6>
+                    <p class="statusText passed">Passed</p>
+                  </div>
+                  <div class="col-md-4">
+                    <h6>Comments</h6>
+                    <div class="form-floating mb-3">
+                      <textarea
+                        class="form-control"
+                        placeholder="Leave a comment here"
+                        id="comments"
+                        style="height: 100px"
+                        disabled
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <app-test-feedback></app-test-feedback>
+                </div>
+              </ng-template>
+            </ngb-panel>
+            <ngb-panel>
+              <ng-template ngbPanelTitle>
+                <div class="titleAccordion">
+                  <span>Submission 2</span>
+                  <span class="statusText warning">Warnings</span>
+                </div>
+              </ng-template>
+              <ng-template ngbPanelContent>
+                <p>Content of panel 2</p>
+              </ng-template>
+            </ngb-panel>
+            <ngb-panel>
+              <ng-template ngbPanelTitle>
+                <div class="titleAccordion">
+                  <span>Submission 1</span>
+                  <span class="statusText failed">Failed</span>
+                </div>
+              </ng-template>
+              <ng-template ngbPanelContent>
+                <p>Content of panel 1</p>
+              </ng-template>
+            </ngb-panel>
+          </ngb-accordion>
         </div>
       </div>
     </div>

@@ -21,21 +21,17 @@ __allowed_filenames = {"Test1.pdf", "test2.txt",
 __nr_of_files = 1
 
 
-def handle_files(
-        files: list[FileStorage],
-        course_id: int,
-        assignment: int,
-        group_id: int
-) -> tuple[
-    list[dict[str, str]],
-    dict[str, str],
-    dict[str, str],
-    int
-]:
+def handle_files(files: list[FileStorage], course: int, group: int,
+                 assignment: int) -> tuple[list[dict[str, str]],
+                                           dict[str, str], int]:
     """Sanitizes files, checks for number of files,
     allowed file names and file types
     Returns: json object with feedback on submitted files
     """
+
+    __allowed_filenames: tuple = get_filenames(course, assignment)
+    __nr_of_files = len(__allowed_filenames)
+
     combined_feedback = {"general_tests_feedback": "",
                          "unittest_feedback": ""}
     number_of_files = {}
@@ -67,31 +63,51 @@ def handle_files(
 
     if (res_code == 200):
         save_to_temp_and_database(
-            files, response_items, course_id, assignment, group_id
+            files, response_items, group, course, assignment
         )
         unittest_feedback = json.loads(
             run_unit_tests_in_container(
-                course_id,
+                course,
                 assignment,
-                group_id
+                group
             )
         )
 
         passed = unittest_feedback["was_successful"]
         combined_feedback = {"general_tests_feedback": response_items,
                              "unittest_feedback": unittest_feedback}
-        save_feedback_to_db(course_id, assignment, group_id,
+        save_feedback_to_db(course, assignment, group,
                             json.dumps(combined_feedback), passed)
 
     return response_items, number_of_files, combined_feedback, res_code
 
 
+def get_filenames(course: int, assignment: int) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query = """SELECT filename FROM filenames
+                        WHERE filenames.courseId   = %s
+                        AND filenames.assignment = %s
+                        """
+
+                cur.execute(query, (course, assignment))
+                data = cur.fetchall()
+        conn.close()
+        return tuple(value[0] for value in data)
+
+    except Exception as e:
+        print(e)
+        return ()
+
+
 def save_to_temp_and_database(
         files: list[FileStorage],
         response_items: dict,
+        group_id: int,
         course_id: int,
-        assignment: int,
-        group_id: int
+        assignment: int
 ) -> None:
     """Downloads the file to temp directory and then to saves into
     the database. Also checks pep8 and cyclomatic complexity.
@@ -221,17 +237,11 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
     file_type = file_name.rsplit('.', 1)[1].lower()
     with conn:
         with conn.cursor() as cur:
-            query = """
-            INSERT INTO AssignmentFiles (
-                groupid,
-                courseid,
-                \"assignment\",
-                filename,
-                filedata,
-                filetype
-            )
-            VALUES (%s, %s, %s, %s, %s, %s);
-            """
+            query = """INSERT INTO AssignmentFiles
+                    (groupId, courseId, assignment, fileName,
+                    fileData, fileType, submission) 
+                    VALUES (%s, %s, %s, %s, %s, %s, 0);
+                    """
 
             cur.execute(
                 query,
