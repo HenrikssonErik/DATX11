@@ -167,9 +167,8 @@ def post_files():
                                                course_id)["groupId"]):
             res = handle_files(files, course_id, group_id, assignment_nr)
             feedback_res = {}
-            feedback_res.update({"feedback": res[0]})
-            feedback_res.update(res[1])
-            return make_response(jsonify(feedback_res), res[2])
+            feedback_res.update(res[2])
+            return make_response(jsonify(feedback_res), res[3])
         else:
             return make_response({'status': 'not_in_group'}, 401)
     else:
@@ -177,6 +176,8 @@ def post_files():
 
 # TODO: add course and assignmetn in post,
 #  will be done when working on the teacher page
+
+
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
     files = request.files.getlist('files')
