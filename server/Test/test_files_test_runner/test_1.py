@@ -18,7 +18,8 @@ class TestRunnerTests(unittest.TestCase):
                 my_test_file.mul(3, 5),
                 my_test_file.mul(5, 3)
             ),
-            3*5 + 5*3
+            3*5 + 5*3,
+            msg="Are you sure you used multiplication then addition"
         )
 
     def test_mul_add(self):
@@ -27,5 +28,9 @@ class TestRunnerTests(unittest.TestCase):
                 my_test_file.add(3, 5),
                 my_test_file.add(5, 3)
             ),
-            (3+5) * (5+3)
+            (3+5) * (5+3),
+            msg="""Are you sure you used addition then multiplication
+            
+            Testing with newlines too.
+            """
         )
