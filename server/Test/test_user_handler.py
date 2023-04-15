@@ -144,9 +144,7 @@ class TestUserHandler(unittest.TestCase):
             mock.call("""SELECT (fullname IS NULL)
                 AS is_empty FROM GroupDetails WHERE groupid = %s;""",
                       [group_id])
-])
-
-        
+        ])
 
     @patch('src.user_handler.get_courses_info')
     def test_is_admin_on_course(self, mock_user_courses):
@@ -214,9 +212,12 @@ class TestUserHandler(unittest.TestCase):
             'Sebastian Kvaldén'
         )
         result = user_handler.get_user(user_id)
-        mock_cursor.execute.assert_called_once_with("""SELECT cid, email, fullname FROM Userdata
-                            WHERE userid = %s""", (user_id,))
-        self.assertEqual(result, {'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén', 'id': 1})
+        mock_cursor.execute.assert_called_once_with(
+            "SELECT cid, email, fullname FROM Userdata " +
+            "WHERE userid = %s", (user_id,)
+        )
+        self.assertEqual(result, {
+                         'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén', 'id': 1})
 
     @patch('psycopg2.connect')
     def test_get_global_role(self, mock_connect):
