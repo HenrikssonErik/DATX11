@@ -141,7 +141,7 @@
       [class.active]="selectedTab === -1"
     >
       <!--CONTENT FOR SETTINGS-->
-      <p>Settings content goes here</p>
+      <app-teacher-settings></app-teacher-settings>
     </div>
     <div
       class="tab-pane fade"
@@ -172,9 +172,12 @@
                 )
               "
             >
-              Submit Assignment
+              <span *ngIf="!datePassed(assignment.DueDate)"
+                >Submit Assignment</span
+              ><span *ngIf="datePassed(assignment.DueDate)"
+                >Deadline has passed</span
+              >
             </button>
-            <p *ngIf="datePassed(assignment.DueDate)">Deadline has passed</p>
           </div>
         </div>
         <div class="row mt-2">

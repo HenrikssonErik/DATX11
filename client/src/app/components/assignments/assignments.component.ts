@@ -51,7 +51,6 @@ export class AssignmentsComponent implements OnInit {
 
     this.getGroup(id).subscribe((res: Course) => {
       //TODO: HANDLE THE EMPTY GROUP BETTER, THIS FIX IS DUMB
-
       this.group = res;
     });
 
