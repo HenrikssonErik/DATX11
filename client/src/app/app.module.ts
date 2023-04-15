@@ -33,6 +33,8 @@ import { CreateCourseComponent } from './components/create-course/create-course.
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
 import { FileUploadModalComponent } from './components/file-upload-modal/file-upload-modal.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { TeacherSettingsComponent } from './components/teacher-settings/teacher-settings.component';
+import { CreateAssignmentModalComponent } from './components/create-assignment-modal/create-assignment-modal.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -58,6 +60,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     CreateCourseComponent,
     VerifyEmailComponent,
     FileUploadModalComponent,
+    TeacherSettingsComponent,
+    CreateAssignmentModalComponent,
   ],
   imports: [
     BrowserModule,
