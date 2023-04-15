@@ -67,10 +67,11 @@
   "invalid_verification_token": "The link is invalid. Sign up again to receive a new verification email!",
   "no_user_to_verify": "Your user profile is not in our system. Sign up to create your account",
   "Upload_File": "Upload File",
-  "Groups_Tab" : "Groups",
+  "Groups_Tab": "Groups",
   "Send_verification_link_btn": "Send verification link",
   "Close": "Close",
   "Send_verification_link_title": "Send new verification link",
   "Verify_text": "Need to be verified?",
-  "Click_here_verification": "Click here"
+  "Click_here_verification": "Click here",
+  "Edit_Mode": "Edit mode"
 }
