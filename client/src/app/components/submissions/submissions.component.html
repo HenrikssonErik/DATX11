@@ -1,0 +1,42 @@
+<div *ngIf="isLoading" class="loader-container mt-3">
+  <div class="loader"></div>
+</div>
+<div *ngIf="submissions">
+  <ngb-accordion #submissionAccordion="ngbAccordion">
+    <ngb-panel *ngFor="let submission of submissions">
+      <ng-template ngbPanelTitle>
+        <div class="titleAccordion">
+          <span>Submission {{ submission.Submission }}</span>
+          <span class="statusText passed">Passed</span>
+        </div>
+      </ng-template>
+      <ng-template ngbPanelContent>
+        <div class="row text-muted">
+          <div class="col-md-4">
+            <h6>Reviewed By</h6>
+            <p class="statusText">Malte Carlstedt</p>
+          </div>
+          <div class="col-md-4">
+            <h6>Status</h6>
+            <p class="statusText passed">Passed</p>
+          </div>
+          <div class="col-md-4">
+            <h6>Comments</h6>
+            <div class="form-floating mb-3">
+              <textarea
+                class="form-control"
+                placeholder="Leave a comment here"
+                id="comments"
+                style="height: 100px"
+                disabled
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <h5 class="text-muted">Test results</h5>
+        </div>
+      </ng-template>
+    </ngb-panel>
+  </ngb-accordion>
+</div>
