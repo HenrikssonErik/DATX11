@@ -1,5 +1,5 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Course } from 'src/app/models/courses';
 import { CourseService } from 'src/app/services/course-service.service';
@@ -14,11 +14,13 @@ export class CreateAssignmentModalComponent {
   @Input() course!: Course;
   numOfFiles: number = 0;
   numOfFilesArray: Number[] = [];
+  fileControls: any;
 
   constructor(
     public activeModal: NgbActiveModal,
     private fb: FormBuilder,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private formBuilder: FormBuilder
   ) {}
 
   ngOnInit(): void {
@@ -27,6 +29,19 @@ export class CreateAssignmentModalComponent {
       dueDate: ['', Validators.required],
       description: ['', Validators.required],
       numOfFiles: [0, Validators.required],
+      fileInput: [''],
+      fileArray: this.formBuilder.array([]),
+    });
+
+    this.form.controls['numOfFiles'].valueChanges.subscribe((numFiles) => {
+      this.fileControls = [];
+      const fileArray = this.form.get('fileArray') as FormArray;
+      fileArray.clear();
+      for (let i = 0; i < numFiles; i++) {
+        const control = this.formBuilder.control('');
+        this.fileControls.push(control);
+        fileArray.push(control);
+      }
     });
   }
 
@@ -45,5 +60,10 @@ export class CreateAssignmentModalComponent {
 
   createAssignment(): void {
     console.log(this.form.value);
+  }
+
+  getFiles() {
+    const numFiles = this.form.controls['numOfFiles'].value;
+    return Array.from({ length: numFiles }, (_, i) => i);
   }
 }

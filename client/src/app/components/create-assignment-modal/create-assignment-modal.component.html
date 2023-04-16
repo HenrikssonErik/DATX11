@@ -70,9 +70,18 @@
         </div>
       </div>
     </div>
-    <div class="row mt-2" *ngFor="let i of numOfFilesArray">
+    <div class="row mt-2" *ngIf="form.controls['numOfFiles'].value">
       <div class="col-12">
-        <input type="text" class="form-control mb-3" placeholder="hej" />
+        <h6 class="text-muted">Submission File Names</h6>
+        <div formArrayName="fileArray">
+          <div *ngFor="let fileControl of fileControls; let i = index">
+            <input
+              type="text"
+              placeholder="PythonFile.py"
+              [formControlName]="i"
+            />
+          </div>
+        </div>
       </div>
     </div>
     <div class="row mt-2">
