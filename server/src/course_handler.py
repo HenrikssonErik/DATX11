@@ -363,6 +363,8 @@ def get_assignment_feedback(course: int, assignment: int,
                                 groupid = %s AND assignment = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
+                print("from db")
+                print(len(data))
         conn.close()
         if not data:
             return []
@@ -376,6 +378,8 @@ def get_assignment_feedback(course: int, assignment: int,
 def _format_assignment_feedback(db_output: list[tuple]) -> list:
     assignments: list[dict[str: str | int]] = []
     for submission in db_output:
+        print("in format loop")
+        print(submission)
         try:
             testfeedback = submission[2]
         except IndexError:
@@ -393,7 +397,7 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
                             'testfeedback': testfeedback,
                             'teacherfeedback': teacherfeedback,
                             'Grade': grade})
-        return assignments
+    return assignments
 
 
 def get_course_groups(course: int):
