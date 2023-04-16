@@ -76,6 +76,8 @@
         <div formArrayName="fileArray">
           <div *ngFor="let fileControl of fileControls; let i = index">
             <input
+              class="form-control"
+              style="margin: 3px"
               type="text"
               placeholder="PythonFile.py"
               [formControlName]="i"
