@@ -45,6 +45,7 @@ export class AssignmentsComponent implements OnInit {
       this.courseService.getCourse(id).subscribe((res: Course) => {
         this.course = res;
         console.log(this.course);
+        this.course.Assignments.sort((a, b) => a.AssignmentNr - b.AssignmentNr);
       });
     }
 
