@@ -27,6 +27,7 @@ export class FileUploadComponent {
   @Input() courseId: any;
   @Input() assignmentNumber: any;
   @Input() groupId: any;
+  isLoading: boolean = false;
 
   allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
   allowedFileTypesForPrint = ['.py', '.pdf', '.txt'];
@@ -135,6 +136,7 @@ export class FileUploadComponent {
    * @returns {void}
    */
   uploadFiles(): void {
+    this.isLoading = true;
     const headers: HttpHeaders = new HttpHeaders().append(
       'Cookies',
       document.cookie
@@ -165,6 +167,7 @@ export class FileUploadComponent {
           //console.log(tupleResponse.number_of_files);
 
           if (response.status == 200) {
+            this.isLoading = false;
             this.toastr.success(
               'The file was successfully uploaded',
               'Sucess!',
@@ -190,6 +193,7 @@ export class FileUploadComponent {
           //TODO: Handle the success response
         },
         error: (err) => {
+          this.isLoading = false;
           this.toastr.error(
             err.error.number_of_files,
             'Something went wrong!',
@@ -200,6 +204,7 @@ export class FileUploadComponent {
           console.log(err.error);
           //TODO: Handle the error
         },
+        complete() {},
       });
   }
 
