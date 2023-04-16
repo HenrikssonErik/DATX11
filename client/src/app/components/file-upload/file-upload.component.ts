@@ -13,6 +13,7 @@ import { UploadFileConfigService } from 'src/app/services/upload-test-file-confi
 import { UploadUnitTestConfigService } from 'src/app/services/upload-unit-test-config.service';
 import { API_URL } from 'src/environments/environment';
 import { EventEmitter } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-file-upload',
@@ -32,9 +33,13 @@ export class FileUploadComponent {
   allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
   allowedFileTypesForPrint = ['.py', '.pdf', '.txt'];
 
-  testFeedBackArray: any[] = [];
+  generalTestFeedback: any[] = [];
 
-  constructor(private http: HttpClient, private toastr: ToastrService) {}
+  constructor(
+    private http: HttpClient,
+    private toastr: ToastrService,
+    private modalService: NgbActiveModal
+  ) {}
 
   /**
    * Method to handle the file drop event and prepares the list of files
@@ -167,7 +172,6 @@ export class FileUploadComponent {
           //console.log(tupleResponse.number_of_files);
 
           if (response.status == 200) {
-            this.isLoading = false;
             this.toastr.success(
               'The file was successfully uploaded',
               'Sucess!',
@@ -176,24 +180,29 @@ export class FileUploadComponent {
               }
             );
 
-            //TODO: Stop loading.
+            //TODO: Handle this in complete() instead?
           }
 
-          console.log(response);
-
-          for (const file of response.body.feedback) {
-            const testFeedBackItem = {
+          for (const file of response.body.general_tests_feedback) {
+            const generalTestItem = {
               file: file.tested_file,
-              fileContent: file.PEP8_results,
+              pep8_results: file.PEP8_results,
             };
 
-            this.testFeedBackArray.push(testFeedBackItem);
+            this.generalTestFeedback.push(generalTestItem);
           }
+
+          console.log(this.generalTestFeedback);
+          console.log(response.body.unittest_feedback);
+
+          this.isLoading = false;
+          this.modalService.close();
 
           //TODO: Handle the success response
         },
         error: (err) => {
           this.isLoading = false;
+          this.modalService.close();
           this.toastr.error(
             err.error.number_of_files,
             'Something went wrong!',
