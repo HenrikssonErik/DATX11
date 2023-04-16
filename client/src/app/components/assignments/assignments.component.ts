@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { Assignment, Course } from 'src/app/models/courses';
 import { CourseService } from 'src/app/services/course-service.service';
 import { API_URL } from 'src/environments/environment';
@@ -53,10 +53,6 @@ export class AssignmentsComponent implements OnInit {
       this.group = res;
     });
 
-    this.submissionService.getSubmission(1, 1).subscribe((res) => {
-      console.log(res);
-    });
-
     this.groupService.getGroups(id).subscribe((res) => {
       this.courseGroups = res;
       console.log(this.courseGroups);
@@ -94,13 +90,17 @@ export class AssignmentsComponent implements OnInit {
 
   joinGroup(courseId: number, groupId: number): void {
     this.isLoadingMap.set(groupId, true);
-    this.userService.getUserData().subscribe((res) => {
-      console.log(res);
-      this.groupService.joinGroup(courseId, groupId, res.id).subscribe({
+    this.userService
+      .getUserData()
+      .pipe(
+        switchMap((res) =>
+          this.groupService.joinGroup(courseId, groupId, res.id)
+        )
+      )
+      .subscribe({
         next: (res) => {
           console.log(res);
         },
-
         error: (err) => {
           this.isLoadingMap.set(groupId, false);
           this.toastr.error('Could not join group', 'Error');
@@ -110,7 +110,6 @@ export class AssignmentsComponent implements OnInit {
           location.reload();
         },
       });
-    });
   }
 
   removeFromGroup(courseId: number, groupId: number) {

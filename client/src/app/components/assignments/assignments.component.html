@@ -216,65 +216,10 @@
       </div>
       <div class="row mt-3">
         <div class="col-12">
-          <ngb-accordion #submissionAccordion="ngbAccordion">
-            <ngb-panel>
-              <ng-template ngbPanelTitle>
-                <div class="titleAccordion">
-                  <span>Submission 3</span>
-                  <span class="statusText passed">Passed</span>
-                </div>
-              </ng-template>
-              <ng-template ngbPanelContent>
-                <div class="row text-muted">
-                  <div class="col-md-4">
-                    <h6>Reviewed By</h6>
-                    <p class="statusText">Malte Carlstedt</p>
-                  </div>
-                  <div class="col-md-4">
-                    <h6>Status</h6>
-                    <p class="statusText passed">Passed</p>
-                  </div>
-                  <div class="col-md-4">
-                    <h6>Comments</h6>
-                    <div class="form-floating mb-3">
-                      <textarea
-                        class="form-control"
-                        placeholder="Leave a comment here"
-                        id="comments"
-                        style="height: 100px"
-                        disabled
-                      ></textarea>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <app-test-feedback></app-test-feedback>
-                </div>
-              </ng-template>
-            </ngb-panel>
-            <ngb-panel>
-              <ng-template ngbPanelTitle>
-                <div class="titleAccordion">
-                  <span>Submission 2</span>
-                  <span class="statusText warning">Warnings</span>
-                </div>
-              </ng-template>
-              <ng-template ngbPanelContent>
-                <p>Content of panel 2</p>
-              </ng-template>
-            </ngb-panel>
-            <ngb-panel>
-              <ng-template ngbPanelTitle>
-                <div class="titleAccordion">
-                  <span>Submission 1</span>
-                  <span class="statusText failed">Failed</span>
-                </div>
-              </ng-template>
-              <ng-template ngbPanelContent>
-                <p>Content of panel 1</p>
-              </ng-template>
-            </ngb-panel>
-          </ngb-accordion>
+          <app-submissions
+            [assignmentNr]="assignment.AssignmentNr"
+            [courseId]="course.courseID"
+          ></app-submissions>
         </div>
       </div>
     </div>
