@@ -144,7 +144,6 @@ BEGIN
         SELECT COALESCE(MAX(assignment), 0) + 1 INTO max_assignment
         FROM Assignments
         WHERE courseId = NEW.courseId;
-
         IF max_assignment > 0 THEN
             NEW.assignment := max_assignment;
         ELSE
