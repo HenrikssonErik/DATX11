@@ -16,18 +16,14 @@ import { API_URL } from 'src/environments/environment';
 export class CreateAssignmentModalComponent {
   form!: FormGroup;
   @Input() course!: Course;
-  numOfFiles: number = 0;
-  numOfFilesArray: Number[] = [];
   fileControls: any;
   Files: File[] = [];
   fileDropEl!: ElementRef;
   allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
-  allowedFileTypesForPrint = ['.py', '.pdf', '.txt'];
 
   constructor(
     public activeModal: NgbActiveModal,
     private fb: FormBuilder,
-    private courseService: CourseService,
     private formBuilder: FormBuilder,
     private http: HttpClient,
     private toastr: ToastrService,
@@ -40,7 +36,6 @@ export class CreateAssignmentModalComponent {
       Date: ['', Validators.required],
       Description: ['', Validators.required],
       numOfFiles: [0, Validators.required],
-      fileInput: [''],
       fileNames: this.formBuilder.array([]),
       Course: this.course.courseID,
     });
@@ -55,13 +50,6 @@ export class CreateAssignmentModalComponent {
         fileArray.push(control);
       }
     });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['numOfFiles']) {
-      console.log('hej');
-      this.updateNumOfFilesArray();
-    }
   }
 
   fileBrowseHandler(files: Event): void {
@@ -98,21 +86,13 @@ export class CreateAssignmentModalComponent {
     this.fileDropEl.nativeElement.value = '';
   }
 
-  updateNumOfFilesArray(): void {
-    this.numOfFilesArray = Array(this.numOfFiles)
-      .fill(0)
-      .map((x, i) => i);
-  }
-
   createAssignment(): void {
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
 
     const formData = { ...this.form };
-    delete formData.value.fileInput;
     delete formData.value.numOfFiles;
-    console.log(this.course.courseID);
     const fileData = new FormData();
     this.Files.forEach((file: File): void =>
       fileData.append('files', file, file.name)
@@ -179,10 +159,5 @@ export class CreateAssignmentModalComponent {
           });
         },
       });
-  }
-
-  getFiles() {
-    const numFiles = this.form.controls['numOfFiles'].value;
-    return Array.from({ length: numFiles }, (_, i) => i);
   }
 }
