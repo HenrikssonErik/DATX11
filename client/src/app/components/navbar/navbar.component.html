@@ -11,7 +11,7 @@
     <div id="mainListDiv" class="main_list">
       <ul class="navlinks">
         <!-- TODO: Use routerLinkActive and [routerLink] when the links becomes active -->
-       <!-- <li><a href="#" class="text-muted" translate>Courses</a></li>
+        <!-- <li><a href="#" class="text-muted" translate>Courses</a></li>
         <li><a href="#" class="text-muted" translate>Assignments</a></li>
         <li><a href="#" class="text-muted" translate>My_Page</a></li>
         <li><a href="/login" class="text-muted" translate>Login</a></li> -->
@@ -53,7 +53,11 @@
           <a href="#" class="text-muted" translate>My_Page</a>
         </li>
         <li *ngIf="!isLoggedIn">
-          <a routerLink="/login" class="text-muted navbarLink" translate
+          <a
+            routerLink="/login"
+            routerLinkActive="active-link"
+            class="text-muted navbarLink"
+            translate
             >Login</a
           >
         </li>
