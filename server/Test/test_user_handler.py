@@ -143,8 +143,8 @@ class TestUserHandler(unittest.TestCase):
             'Sebastian Kvaldén'
         )
         result = user_handler.get_user(user_id)
-        mock_cursor.execute.assert_called_once_with("""SELECT cid, email, fullname FROM Userdata
-                            WHERE userid = %s""", (user_id,))
+        mock_cursor.execute.assert_called_once_with("SELECT cid, email, fullname FROM Userdata " +\
+                    "WHERE userid = %s", (user_id,))
         self.assertEqual(result, {'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén', 'id': 1})
 
     @patch('psycopg2.connect')
