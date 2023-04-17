@@ -35,7 +35,7 @@ export class CreateAssignmentModalComponent {
       AssignmentName: ['', Validators.required],
       Date: ['', Validators.required],
       Description: ['', Validators.required],
-      numOfFiles: [0, Validators.required],
+      numOfFiles: [0, [Validators.required, Validators.min(1)]],
       fileNames: this.formBuilder.array(
         [],
         Validators.pattern(/(\.pdf|\.py|\.txt)$/)
