@@ -105,7 +105,11 @@
     </div>
     <div class="row mt-3">
       <div class="col-12">
-        <button (click)="createAssignment()" class="btn btn-primary w-100">
+        <button
+          (click)="createAssignment()"
+          class="btn btn-primary w-100"
+          [ngClass]="{ disabled: form.invalid }"
+        >
           Create Assignment
         </button>
       </div>

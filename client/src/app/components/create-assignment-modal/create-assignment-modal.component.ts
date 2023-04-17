@@ -36,7 +36,10 @@ export class CreateAssignmentModalComponent {
       Date: ['', Validators.required],
       Description: ['', Validators.required],
       numOfFiles: [0, Validators.required],
-      fileNames: this.formBuilder.array([]),
+      fileNames: this.formBuilder.array(
+        [],
+        Validators.pattern(/(\.pdf|\.py|\.txt)$/)
+      ),
       Course: this.course.courseID,
     });
 
