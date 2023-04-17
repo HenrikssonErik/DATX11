@@ -27,10 +27,10 @@
           <input
             type="date"
             class="form-control"
-            id="dueDate"
-            formControlName="dueDate"
+            id="Date"
+            formControlName="Date"
           />
-          <label for="dueDate">Due Date</label>
+          <label for="Date">Due Date</label>
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@
             class="form-control"
             id="description"
             style="height: 150px"
-            formControlName="description"
+            formControlName="Description"
           ></textarea>
           <label for="description">Description</label>
         </div>
@@ -73,7 +73,7 @@
     <div class="row mt-2" *ngIf="form.controls['numOfFiles'].value">
       <div class="col-12">
         <h6 class="text-muted">Submission File Names</h6>
-        <div formArrayName="fileArray">
+        <div formArrayName="fileNames">
           <div *ngFor="let fileControl of fileControls; let i = index">
             <input
               class="form-control"
@@ -92,7 +92,14 @@
           <label for="formFile" class="form-label"
             >Upload unit test for this assignment</label
           >
-          <input class="form-control" type="file" id="formFile" />
+          <input
+            class="form-control"
+            type="file"
+            id="Files"
+            (change)="fileBrowseHandler($event)"
+            multiple
+          />
+          />
         </div>
       </div>
     </div>

@@ -177,10 +177,12 @@ def post_files():
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
     files = request.files.getlist('files')
+    course = int(request.form['Course'])
+    assignment = int(request.form['Assignment'])
 
     if not files:
         return "Files not found", 406
-    res = handle_test_file(files)
+    res = handle_test_file(files, course, assignment)
     return make_response(jsonify(res[0]), res[1])
 
 
@@ -387,18 +389,18 @@ def create_assignment():
     course_id = data['Course']
     description = data.get('Description', "")
     end_date = data['Date']
-    assignment_nr = data['AssignmentNr']
-    file_names = data.get('FileNames', [])
+    file_names = data.get('fileNames', [])
+    assignment_name = data.get('AssignmentName')
 
     if (user_handler.check_admin_or_course_teacher(request_user_id,
                                                    course_id)):
         res = course_handler.create_assignment(course_id, description,
-                                               assignment_nr, end_date,
+                                               assignment_name, end_date,
                                                file_names)
         if not (len(res) == 0):
             return make_response(jsonify(res), 400)
         else:
-            make_response("", 200)
+            return make_response("", 200)
 
 
 @app.route('/changeUserRole', methods=['POST'])

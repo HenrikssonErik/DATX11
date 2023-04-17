@@ -161,7 +161,7 @@ def _create_course(course_name: str, course_abbr: str, year: int,
         return {'status': "course_exists"}, 400
 
 
-def create_assignment(course_id: int, description: str, assignment_nr: int,
+def create_assignment(course_id: int, description: str, assignment_name: int,
                       end_date: str, file_names: list) -> dict:
     """Creates an assignment for a course, assignment number will not be
     incremented automatically, thus must be provided by the creator"""
@@ -181,25 +181,36 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = "INSERT INTO Assignments VALUES " +\
-                    "(%s, %s, %s, %s);"
+                query_one = """SELECT MAX(assignment) as max_assignment FROM
+                Assignments WHERE courseid = %s;"""
+                cur.execute(query_one, [course_id])
+                data = cur.fetchone()
+                print(data)
+                if data[0] is None:
+                    assignment_nr = 1
+                else:
+                    # since the "select max" call is done before insert we
+                    # need to increment by 1
+                    assignment_nr = data[0] + 1
+                query_two = """INSERT INTO Assignments (courseid, assignment,
+                enddate, description, name) VALUES
+                    (%s, 0, %s, %s, %s);"""
                 cur.execute(
-                    query_one,
+                    query_two,
                     [
                         course_id,
-                        assignment_nr,
-                        description, end_date
+                        end_date,
+                        description,
+                        assignment_name
                     ]
                 )
         conn.close()
-
         add_filenames(file_names, course_id, assignment_nr)
-
         return res
 
     except Exception as e:
         print(e)
-        return {'status': 'Insert failed'}
+        raise Exception("Could not create assignment") from e
 
 
 def get_assignments(course_id: int) -> tuple:
