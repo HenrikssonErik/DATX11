@@ -18,6 +18,7 @@ export class HandleUsersModalComponent {
   @Input() users!: User[];
   @Input() course!: Course;
   csvData: string[] = [];
+  newCid: string = '';
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -29,6 +30,10 @@ export class HandleUsersModalComponent {
   ) {}
 
   ngOnInit(): void {
+    this.updateUsers();
+  }
+
+  updateUsers() {
     this.user_service.getUsersInCourse(this.course.courseID).subscribe(
       (res: User[]) => {
         console.log(res);
@@ -44,7 +49,6 @@ export class HandleUsersModalComponent {
     const files = (event.target as HTMLInputElement).files;
     const reader = new FileReader();
     const file = files!.item(0);
-    console.log(file?.text);
     reader.onload = () => {
       const text = reader.result as string;
       this.csvData = text.split('\r\n');
@@ -52,24 +56,18 @@ export class HandleUsersModalComponent {
     reader.readAsText(file!);
   }
 
-  createAssignment(): void {
-    const headers = new HttpHeaders()
-      .append('Cookies', document.cookie)
-      .set('Cache-Control', 'public, max-age=3600');
-
-    console.log(this.users);
-  }
-
   submitCSV(): void {
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
 
-    const formData = this.formBuilder.group({
+    const formData = {
       Course: this.course.courseID,
-    });
+      Cids: this.csvData,
+    };
+
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/createAssignment`, formData.value, {
+      .post<HttpResponse<any>>(`${API_URL}/batchAddToCourse`, formData, {
         observe: 'response',
         headers: headers,
       })
@@ -77,8 +75,10 @@ export class HandleUsersModalComponent {
         next: (response: any) => {
           try {
             if (response.status == 200) {
-              this.toastr.success('Users Added', response.body);
-              //location.reload();
+              this.toastr.success('Users added', response.body);
+              this.csvData = [];
+              this.newCid = '';
+              this.updateUsers();
             }
           } catch {
             throw new Error('unexpected_error');
@@ -95,5 +95,91 @@ export class HandleUsersModalComponent {
       });
   }
 
-  submitCid(): void {}
+  submitCid(): void {
+    this.csvData = [this.newCid];
+    this.submitCSV();
+  }
+
+  updateRole(user: User): void {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    const formData = {
+      Course: this.course.courseID,
+      User: user.id,
+      Role: user.role,
+    };
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/changeUserRole`, formData, {
+        observe: 'response',
+        headers: headers,
+      })
+      .subscribe({
+        next: (response: any) => {
+          try {
+            if (response.status == 200) {
+              this.toastr.success(
+                'Changed role for:' + user.fullname + ' Role:' + user.role,
+                response.body
+              );
+              const index: number = this.users.indexOf(user);
+              this.users.splice(index, 1);
+            }
+          } catch {
+            throw new Error('unexpected_error');
+          }
+        },
+        error: (err) => {
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+      });
+  }
+
+  removeUser(user: User): void {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    const formData = {
+      Course: this.course.courseID,
+      User: user.id,
+    };
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/removeFromCourse`, formData, {
+        observe: 'response',
+        headers: headers,
+      })
+      .subscribe({
+        next: (response: any) => {
+          try {
+            if (response.status == 200) {
+              this.toastr.success(
+                'Removed' + user.fullname + ' Cid:' + user.cid,
+                response.body
+              );
+              const index: number = this.users.indexOf(user);
+              this.users.splice(index, 1);
+            }
+          } catch {
+            throw new Error('unexpected_error');
+          }
+        },
+        error: (err) => {
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+      });
+  }
 }

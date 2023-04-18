@@ -9,7 +9,7 @@
     ></i>
   </div>
   <div class="modal-body">
-    <div class="row mb-3">
+    <div class="row form mb-3">
       <div class="col-md-5">
         <label for="file-upload" class="custom-file-upload">
           <i class="fa fa-cloud-upload"> Add CSV</i>
@@ -19,45 +19,59 @@
           id="file-upload"
           (change)="handleFileInput($event)"
         />
-        <button class="btn btn-primary w-20" (click)="submitCSV()">
+        <button
+          class="btn btn-primary w-20"
+          [disabled]="csvData.length === 0"
+          (click)="submitCSV()"
+        >
           Submit
         </button>
       </div>
 
       <div class="col-md-3">
-        <input class="form-control" type="text" id="newCID" placeholder="CID" />
+        <input
+          class="form-control"
+          type="text"
+          id="newCID"
+          placeholder="CID"
+          [(ngModel)]="newCid"
+        />
       </div>
       <div class="col-md-3">
-        <button class="btn btn-primary w-20" (click)="submitCid()">
+        <button
+          class="btn btn-primary w-20"
+          [disabled]="newCid === ''"
+          (click)="submitCid()"
+        >
           Submit
         </button>
       </div>
     </div>
     <div>
-      <ul>
-        <li>
+      <ul class="list-group-flush">
+        <li class="list-group-item">
           <div class="row">
-            <div class="col-md-4">
-              <p>Name</p>
+            <div class="col-md-5">
+              <p style="font-weight: bold">Name</p>
             </div>
-            <div class="col-md-2">
-              <p>Cid</p>
+            <div class="col-md-3">
+              <p style="font-weight: bold">Cid</p>
             </div>
-            <div class="col-md-4">
-              <p>Role</p>
+            <div class="col-md-3">
+              <p style="font-weight: bold">Role</p>
             </div>
           </div>
         </li>
-        <li *ngFor="let user of users">
+        <li class="list-group-item" *ngFor="let user of users">
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-5">
               <p>{{ user.fullname }}</p>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
               <p>{{ user.cid }}</p>
             </div>
             <div class="col-md-3">
-              <select [(ngModel)]="user.role">
+              <select [(ngModel)]="user.role" (change)="updateRole(user)">
                 <option
                   value="Admin"
                   [selected]="user.role === 'Admin' ? true : false"
@@ -78,8 +92,9 @@
                 </option>
               </select>
             </div>
-            <div class="col-md-2">
-              <button class="btn btn-danger w-10">&times;</button>
+
+            <div class="col-md-1">
+              <button class="remove" (click)="removeUser(user)">X</button>
             </div>
           </div>
         </li>
@@ -89,9 +104,7 @@
   </div>
   <div class="row mt-3">
     <div class="col-12">
-      <button (click)="createAssignment()" class="btn btn-primary w-100">
-        Create Assignment
-      </button>
+      <button class="btn btn-primary w-100">Create Assignment</button>
     </div>
   </div>
 </div>
