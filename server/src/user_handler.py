@@ -11,6 +11,25 @@ class Role(Enum):
     Student = 'Student'
 
 
+def get_user_ids_from_cids(cids: list[str]) -> tuple[list[int], list[str]]:
+    """Returns a tuple of existing user_ids and none existing cids"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            query_data = """
+            SELECT userid, cid FROM userdata where cid IN ({})
+            """.format(",".join(['%s']*len(cids)))
+            cur.execute(query_data, cids)
+            res = cur.fetchall()
+    conn.close()
+    user_ids = [e[0] for e in res]
+
+    not_user_cids = [] if len(cids) == len(res) \
+        else list(set(cids).difference(e[1] for e in res))
+
+    return (user_ids, not_user_cids)
+
+
 def get_user(user_id: int) -> dict:
     """Returns a dict with information on the user to the userId"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -140,6 +159,33 @@ def _get_course_id_from_group(group_id) -> int:
     except Exception as e:
         print(e)
         raise Exception("Error when getting course id!") from e
+
+
+def add_users_to_course(user_ids: list[int], course_id: int):
+    """Adds all the users in `user_ids` to the specified course"""
+    if len(user_ids) > 0:
+        conn = psycopg2.connect(dsn=get_conn_string())
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    query_data = "insert into userincourse values " + \
+                        "(%s,%s,%s) on conflict do nothing;"
+
+                    for id in user_ids:
+                        cur.execute(query_data, [id, course_id, 'Student'])
+        except psycopg2.IntegrityError as e:
+            raise \
+                Exception(
+                    f"Could not add users {user_ids} to course {course_id} "
+                    "because either the course or a student do not exist"
+                ) from e
+        except Exception as e:
+            raise \
+                Exception(
+                    f"Could not add users {user_ids} to course {course_id}"
+                ) from e
+        finally:
+            conn.close()
 
 
 def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
