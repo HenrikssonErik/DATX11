@@ -30,7 +30,15 @@ export class HandleUsersModalComponent {
   ) {}
 
   ngOnInit(): void {
-    this.updateUsers();
+    this.user_service.getUsersInCourse(this.course.courseID).subscribe(
+      (res: User[]) => {
+        console.log(res);
+        this.users = res;
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
   }
 
   updateUsers() {
