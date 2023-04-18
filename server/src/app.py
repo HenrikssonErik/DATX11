@@ -451,11 +451,10 @@ def edit_desc():
 def get_users_in_course():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
-    course = request.args.get('Course')
-
+    course = int(request.args.get('Course'))
     if (user_handler.is_admin_on_course(request_user_id, course)):
         res = user_handler.get_users_on_course(course)
-        return make_response(jsonify(res[0]), res[1])
+        return make_response(jsonify({"Users":res[0]}), res[1])
     else:
         return make_response("", 401)
 

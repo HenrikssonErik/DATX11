@@ -305,8 +305,8 @@ def get_users_on_course(course: int) -> tuple:
 
         users: list[dict] = []
         for user in data:
-            users.append({'Id': user[0], 'Cid': user[1], 'Name': user[2],
-                          'Email': user[3], 'Role': user[4]})
+            users.append({'id': user[0], 'cid': user[1], 'fullname': user[2],
+                          'email': user[3], 'role': user[4]})
         return users, 200
 
     except Exception as e:
