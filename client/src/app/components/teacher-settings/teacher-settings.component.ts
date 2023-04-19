@@ -18,8 +18,8 @@ import { HandleUsersModalComponent } from '../handle-users-modal/handle-users-mo
 export class TeacherSettingsComponent {
   form: FormGroup = new FormGroup({
     editMode: new FormControl(false),
-    Name: new FormControl(''),
-    Course: new FormControl(''),
+    Name: new FormControl({ value: '', disabled: true }),
+    Course: new FormControl({ value: '', disabled: true }),
   });
   course: Course = {} as Course;
 
@@ -35,7 +35,6 @@ export class TeacherSettingsComponent {
     if (!isNaN(id)) {
       this.courseService.getCourse(id).subscribe((res: Course) => {
         this.course = res;
-
         this.form.get('Name')?.setValue(this.course.CourseName);
         this.form.get('Course')?.setValue(this.course.Course);
       });
@@ -44,6 +43,12 @@ export class TeacherSettingsComponent {
 
   resetName(): void {
     this.form.get('Name')?.setValue(this.course.CourseName);
+
+    if (this.form.get('editMode')?.value) {
+      this.form.get('Name')?.enable();
+    } else {
+      this.form.get('Name')?.disable();
+    }
   }
 
   openCreateAssignmentModal(): void {

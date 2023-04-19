@@ -1,0 +1,28 @@
+<div class="card" [formGroup]="form">
+  <div class="header">
+    <h5><span>Assignment </span> <span>1</span></h5>
+  </div>
+  <div class="body">
+    <div class="form-floating mb-3">
+      <input
+        type="text"
+        class="form-control"
+        id="floatingAssignmentName"
+        placeholder="Assignment Name"
+        formControlName="AssignmentName"
+      />
+      <label for="floatingAssignmentName">Assignment Name</label>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="form-floating mb-3">
+      <input
+        type="date"
+        class="form-control"
+        id="Date"
+        formControlName="Date"
+      />
+      <label for="Date">Due Date</label>
+    </div>
+  </div>
+</div>
