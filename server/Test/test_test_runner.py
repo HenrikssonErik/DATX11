@@ -52,6 +52,18 @@ class TestRunnerTests(unittest.TestCase):
         result = json.loads(test_runner(self.tmp_dir_path))
 
         self.assertTrue(result["was_successful"])
+        self.assertEqual(result["tests_run"], len(result["successes"]))
+        self.assertEqual(len(result["successes"]), 4)
+
+    def test_amount_of_tests_was_successful_with_failiurs(self):
+        move_test_file(self.test_file_dir/"my_test_file.py", self.tmp_dir_path)
+        move_test_file(self.test_file_dir/"test_0.py", self.tmp_dir_path)
+        move_test_file(self.test_file_dir/"test_1.py", self.tmp_dir_path)
+
+        result = json.loads(test_runner(self.tmp_dir_path))
+
+        self.assertEqual(len(result["successes"]), 5)
+        self.assertGreater(result["tests_run"], len(result["successes"]))
 
     def test_caught_fail(self):
         move_test_file(self.test_file_dir/"my_test_file.py", self.tmp_dir_path)
