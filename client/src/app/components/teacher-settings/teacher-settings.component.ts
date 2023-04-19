@@ -41,7 +41,7 @@ export class TeacherSettingsComponent {
     }
   }
 
-  resetName(): void {
+  editToggle(): void {
     this.form.get('Name')?.setValue(this.course.CourseName);
 
     if (this.form.get('editMode')?.value) {

@@ -12,7 +12,7 @@
         formControlName="editMode"
         class="form-check-input"
         id="editMode"
-        (change)="resetName()"
+        (change)="editToggle()"
       />
       <label class="form-check-label text-muted" for="editMode" translate
         >Edit_Mode</label
@@ -26,7 +26,6 @@
           type="text"
           class="form-control"
           id="floatingCourseName"
-          [disabled]="!form.get('editMode')?.value"
           formControlName="Name"
         />
         <button

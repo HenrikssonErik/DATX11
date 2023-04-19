@@ -1,28 +1,67 @@
-<div class="card" [formGroup]="form">
+<div class="card row-md-12" [formGroup]="form">
   <div class="header">
     <h5><span>Assignment </span> <span>1</span></h5>
+    <div class="form-group form-check">
+      <input
+        type="checkbox"
+        formControlName="editMode"
+        class="form-check-input"
+        id="editMode"
+      />
+      <label class="form-check-label text-muted" for="editMode" translate
+        >Edit_Mode</label
+      >
+    </div>
   </div>
   <div class="body">
-    <div class="form-floating mb-3">
-      <input
-        type="text"
-        class="form-control"
-        id="floatingAssignmentName"
-        placeholder="Assignment Name"
-        formControlName="AssignmentName"
-      />
-      <label for="floatingAssignmentName">Assignment Name</label>
+    <div class="row">
+      <div class="form-floating col-md-10">
+        <input
+          type="text"
+          class="form-control"
+          id="floatingAssignmentName"
+          placeholder="Assignment Name"
+          formControlName="AssignmentName"
+        />
+        <label for="floatingAssignmentName">Assignment Name</label>
+      </div>
     </div>
-  </div>
-  <div class="col-md-6">
-    <div class="form-floating mb-3">
-      <input
-        type="date"
-        class="form-control"
-        id="Date"
-        formControlName="Date"
-      />
-      <label for="Date">Due Date</label>
+    <div class="row">
+      <div class="col-md-5">
+        <div class="form-floating">
+          <input
+            type="date"
+            class="form-control"
+            id="Date"
+            formControlName="Date"
+          />
+          <label for="Date">Due Date</label>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <label for="formFile" class="form-label">Replace tests</label>
+        <input class="form-control" type="file" id="Files" multiple />
+      </div>
+      <!-- add (change)="fileBrowseHandler($event)"  to input-->
     </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="form-floating">
+          <textarea
+            class="form-control"
+            id="description"
+            formControlName="Description"
+          ></textarea>
+          <label for="description">Description</label>
+        </div>
+      </div>
+    </div>
+    <button
+      style="float: right"
+      *ngIf="form.get('editMode')?.value"
+      class="btn btn-primary mt-2"
+    >
+      Save
+    </button>
   </div>
 </div>
