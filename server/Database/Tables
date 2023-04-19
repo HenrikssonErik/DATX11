@@ -69,10 +69,11 @@ CREATE Table AssignmentFiles (
 			REFERENCES Groups (groupId) 
 			ON DELETE CASCADE 
 			ON UPDATE CASCADE,
-		CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
-			REFERENCES Assignments(courseId, assignment) 
+		CONSTRAINT constraint_filename_assignment_course_fkey 
+			FOREIGN KEY (filename, courseid, assignment) 
+			REFERENCES filenames(filename, courseid, assignment) 
 			ON DELETE CASCADE 
-			ON UPDATE CASCADE
+			ON UPDATE CASCADE;
 	);
 
 CREATE OR REPLACE FUNCTION set_submission_number_assignmentfiles()
@@ -104,7 +105,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER increment_submission_assignmentfiles
-BEFORE INSERT ON AssignmentFiles
+BEFORE INSERT ON AssignmvaentFiles
 FOR EACH ROW
 EXECUTE FUNCTION set_submission_number_assignmentfiles();
 
