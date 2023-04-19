@@ -16,7 +16,11 @@ import { HandleUsersModalComponent } from '../handle-users-modal/handle-users-mo
   styleUrls: ['./teacher-settings.component.scss'],
 })
 export class TeacherSettingsComponent {
-  form!: FormGroup;
+  form: FormGroup = new FormGroup({
+    editMode: new FormControl(false),
+    Name: new FormControl(''),
+    Course: new FormControl(''),
+  });
   course: Course = {} as Course;
 
   constructor(
@@ -27,21 +31,19 @@ export class TeacherSettingsComponent {
   ) {}
 
   ngOnInit(): void {
-    this.form = new FormGroup({
-      editMode: new FormControl(false),
-      CourseName: new FormControl({
-        value: this.course.CourseName,
-        disabled: true,
-      }),
-      Course: new FormControl({ value: this.course.Course, disabled: true }),
-    });
-
     const id = parseInt(this.route.snapshot.paramMap?.get('id') || '', 10);
     if (!isNaN(id)) {
       this.courseService.getCourse(id).subscribe((res: Course) => {
         this.course = res;
+
+        this.form.get('Name')?.setValue(this.course.CourseName);
+        this.form.get('Course')?.setValue(this.course.Course);
       });
     }
+  }
+
+  resetName(): void {
+    this.form.get('Name')?.setValue(this.course.CourseName);
   }
 
   openCreateAssignmentModal(): void {
@@ -53,19 +55,23 @@ export class TeacherSettingsComponent {
   openHandleUsersModal(): void {
     const modalRef = this.modalService.open(HandleUsersModalComponent);
     modalRef.componentInstance.name = 'HandleUsersModal';
-    modalRef.componentInstance.course = this.course; //remove
+    modalRef.componentInstance.course = this.course;
   }
 
   changeCourseName(): void {
-    if (this.form.get('CourseName')?.value == this.course.CourseName) {
+    if (this.form.get('Name')?.value == this.course.CourseName) {
       return;
     } else {
-      const newName = this.form.get('CourseName')?.value;
+      const newName = this.form.get('Name')?.value;
       this.courseService
         .changeCourseName(newName, this.course.courseID)
         .subscribe({
           next: (response: any) => {
             console.log(response);
+            if (response.status == 200) {
+              this.course.CourseName = this.form.get('Name')?.value;
+              this.form.get('editMode')?.setValue(false);
+            }
           },
           error: (error: any) => {
             this.toastr.error('', error.error);
