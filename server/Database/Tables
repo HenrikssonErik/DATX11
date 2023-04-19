@@ -178,7 +178,7 @@ CREATE Table TestFiles (
 CREATE Table FileNames (
 	nameId SERIAL NOT NULL,
 	courseId SERIAL NOT NULL,
-	assignment INTEGER, 
+	assignment INTEGER NOT NULL, 
 	filename TEXT NOT NULL,
 	UNIQUE (courseId, assignment, filename),
 	PRIMARY KEY(nameId),
