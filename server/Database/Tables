@@ -122,7 +122,7 @@ CREATE Table Courses (
 
 ------------------------------------------------------------------------------
 CREATE Table Assignments(
-	courseId SERIAL,
+	courseId SERIAL NOT NULL,
 	assignment INTEGER NOT NULL CHECK (assignment > 0),
 	endDate DATE NOT NULL,
 	description TEXT NOT NULL DEFAULT '',
