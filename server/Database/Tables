@@ -180,6 +180,7 @@ CREATE Table FileNames (
 	courseId SERIAL NOT NULL,
 	assignment INTEGER, 
 	filename TEXT NOT NULL,
+	UNIQUE (courseId, assignment, filename),
 	PRIMARY KEY(nameId),
 	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
 		REFERENCES Assignments(courseId, assignment) 
@@ -205,7 +206,7 @@ CREATE TABLE Groups (
 	groupId SERIAL PRIMARY KEY,
 	groupNumber INTEGER NOT NULL,
 	course INTEGER NOT NULL,
-	UNIQUE (groupNumber, course)
+	UNIQUE (groupNumber, course),
 	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (course) 
 	REFERENCES Courses(courseid) 
 	ON DELETE CASCADE 
