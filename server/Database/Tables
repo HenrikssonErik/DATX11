@@ -191,7 +191,7 @@ CREATE Table FileNames (
 CREATE TABLE UserData (
 	userId SERIAL NOT NULL,
 	cid TEXT UNIQUE NOT NULL,
-	email TEXT NOT NULL,
+	email TEXT UNIQUE NOT NULL,
 	passphrase BYTEA,
 	verified BOOLEAN NOT NULL DEFAULT FALSE,
 	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher', 'Admin')),
