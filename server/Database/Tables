@@ -148,6 +148,18 @@ CREATE Table TestFiles (
 		ON UPDATE CASCADE 
 		ON DELETE CASCADE
 );
+------------------------------------------------------------------------------
+CREATE Table FileNames (
+	nameId SERIAL NOT NULL,
+	courseId SERIAL NOT NULL,
+	assignment INTEGER, 
+	filename TEXT NOT NULL,
+	PRIMARY KEY(nameId),
+	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
+		REFERENCES Assignments(courseId, assignment) 
+		ON UPDATE CASCADE 
+		ON DELETE CASCADE
+);
 
 
 CREATE TABLE UserData (
