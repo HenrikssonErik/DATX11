@@ -63,14 +63,15 @@ CREATE Table AssignmentFiles (
 		submission SERIAL NOT NULL,
 		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
-		fileType TEXT NOT NULL,
+		fileType TEXT,
 		PRIMARY KEY(groupId, courseId, assignment, fileName, submission),
 		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
 			REFERENCES Groups (groupId) 
 			ON DELETE CASCADE 
 			ON UPDATE CASCADE,
-		CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
-			REFERENCES Assignments(courseId, assignment) 
+		CONSTRAINT constraint_filename_assignment_course_fkey 
+			FOREIGN KEY (filename, courseid, assignment) 
+			REFERENCES filenames(filename, courseid, assignment) 
 			ON DELETE CASCADE 
 			ON UPDATE CASCADE
 	);
@@ -122,7 +123,7 @@ CREATE Table Courses (
 
 ------------------------------------------------------------------------------
 CREATE Table Assignments(
-	courseId SERIAL,
+	courseId SERIAL NOT NULL,
 	assignment INTEGER NOT NULL CHECK (assignment > 0),
 	endDate DATE NOT NULL,
 	description TEXT NOT NULL DEFAULT '',
@@ -143,7 +144,6 @@ BEGIN
         SELECT COALESCE(MAX(assignment), 0) + 1 INTO max_assignment
         FROM Assignments
         WHERE courseId = NEW.courseId;
-
         IF max_assignment > 0 THEN
             NEW.assignment := max_assignment;
         ELSE
@@ -174,12 +174,25 @@ CREATE Table TestFiles (
 		ON UPDATE CASCADE 
 		ON DELETE CASCADE
 );
+------------------------------------------------------------------------------
+CREATE Table FileNames (
+	nameId SERIAL NOT NULL,
+	courseId SERIAL NOT NULL,
+	assignment INTEGER NOT NULL, 
+	filename TEXT NOT NULL,
+	UNIQUE (courseId, assignment, filename),
+	PRIMARY KEY(nameId),
+	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
+		REFERENCES Assignments(courseId, assignment) 
+		ON UPDATE CASCADE 
+		ON DELETE CASCADE
+);
 
 ------------------------------------------------------------------------------
 CREATE TABLE UserData (
 	userId SERIAL NOT NULL,
 	cid TEXT UNIQUE NOT NULL,
-	email TEXT NOT NULL,
+	email TEXT UNIQUE NOT NULL,
 	passphrase BYTEA,
 	verified BOOLEAN NOT NULL DEFAULT FALSE,
 	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher', 'Admin')),
@@ -193,7 +206,7 @@ CREATE TABLE Groups (
 	groupId SERIAL PRIMARY KEY,
 	groupNumber INTEGER NOT NULL,
 	course INTEGER NOT NULL,
-	UNIQUE (groupNumber, course)
+	UNIQUE (groupNumber, course),
 	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (course) 
 	REFERENCES Courses(courseid) 
 	ON DELETE CASCADE 
