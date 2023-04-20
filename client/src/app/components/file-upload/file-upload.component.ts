@@ -1,18 +1,8 @@
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import {
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
-import { link } from 'fs';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+
 import { ToastrService } from 'ngx-toastr';
-import { UploadFileConfigService } from 'src/app/services/upload-test-file-config.service';
-import { UploadUnitTestConfigService } from 'src/app/services/upload-unit-test-config.service';
 import { API_URL } from 'src/environments/environment';
-import { EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-file-upload',
@@ -23,8 +13,16 @@ export class FileUploadComponent {
   files: File[] = [];
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
+  @Input() courseId!: number;
+  @Input() assignmentNumber!: number;
+  @Input() groupId!: number;
 
-  @Input() config!: UploadFileConfigService | UploadUnitTestConfigService;
+  allowedFileTypes: string[] = [
+    'text/x-python',
+    'application/pdf',
+    'text/plain',
+  ];
+  allowedFileTypesForPrint: string[] = ['.py', '.pdf', '.txt'];
 
   testFeedBackArray: any[] = [];
 
@@ -69,7 +67,7 @@ export class FileUploadComponent {
    * @returns {void}
    */
   prepareFilesList(files: Array<File>): void {
-    const allowedTypes = this.config.allowedFileTypes;
+    const allowedTypes = this.allowedFileTypes;
     for (const file of files) {
       const index = this.files.findIndex((f) => f.name === file.name);
       if (allowedTypes.includes(file.type)) {
@@ -130,17 +128,24 @@ export class FileUploadComponent {
    * @returns {void}
    */
   uploadFiles(): void {
-    let header: HttpHeaders = new HttpHeaders();
-    header = header.append('Content-Type', 'application/json');
+    const headers: HttpHeaders = new HttpHeaders().append(
+      'Cookies',
+      document.cookie
+    );
 
     const formData = new FormData();
     this.files.forEach((file: File): void =>
       formData.append('files', file, file.name)
     );
 
+    formData.append('Course', this.courseId.toString());
+    formData.append('Assignment', this.assignmentNumber.toString());
+    formData.append('Group', this.groupId.toString());
+
     this.http
-      .post<HttpResponse<any>>(`${API_URL}/` + this.config.endpoint, formData, {
+      .post<HttpResponse<any>>(`${API_URL}/files`, formData, {
         observe: 'response',
+        headers: headers,
       })
       .subscribe({
         // TODO: Initiate loading

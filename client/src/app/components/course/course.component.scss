@@ -19,6 +19,16 @@
 :host {
   display: inline-block; /* display the app-course components in a single row */
   margin-right: 16px; /* add some space between app-course components */
+  margin-bottom: 16px;
+}
+
+.courseIconElippsis {
+  padding: 7px;
+}
+
+.courseIconElippsis:hover {
+  background-color: #ccc;
+  border-radius: 100px;
 }
 
 .roleText {

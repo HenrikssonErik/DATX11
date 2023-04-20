@@ -9,25 +9,19 @@ from .connector import get_conn_string
 
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
-# TODO: temp variables, should be taken from database when it is implemented
-
-# TODO: load filenames from database
-__allowed_filenames = {"Test1.pdf", "test2.txt",
-                       "1ha1.py", "PythonFile.py"}
-__nr_of_files = 1
-
-# for DB, should be recieved from frontend(?) later on
-course_id = 6
-assignment = 6
-group_id = 1
 
 
-def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
-                                                    dict[str, str], int]:
+def handle_files(files: list[FileStorage], course: int, group: int,
+                 assignment: int) -> tuple[list[dict[str, str]],
+                                           dict[str, str], int]:
     """Sanitizes files, checks for number of files,
     allowed file names and file types
     Returns: json object with feedback on submitted files
     """
+
+    __allowed_filenames: tuple = get_filenames(course, assignment)
+    __nr_of_files = len(__allowed_filenames)
+
     number_of_files = {}
     res_code = 200
     file_amount, res_code = ("OK", res_code)  \
@@ -55,14 +49,37 @@ def handle_files(files: list[FileStorage]) -> tuple[list[dict[str, str]],
         response_items.append({"tested_file": res_object})
 
     if (res_code == 200):
-        save_to_temp_and_database(files, response_items)
+        save_to_temp_and_database(files, response_items, group, course, assignment)
 
     return response_items, number_of_files, res_code
 
 
+def get_filenames(course: int, assignment: int) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query = """SELECT filename FROM filenames
+                        WHERE filenames.courseId   = %s
+                        AND filenames.assignment = %s
+                        """
+
+                cur.execute(query, (course, assignment))
+                data = cur.fetchall()
+        conn.close()
+        return tuple(value[0] for value in data)
+
+    except Exception as e:
+        print(e)
+        return ()
+
+
 def save_to_temp_and_database(
         files: list[FileStorage],
-        response_items: dict
+        response_items: dict,
+        group_id: int,
+        course_id: int,
+        assignment: int
 ) -> None:
     """Downloads the file to temp directory and then to saves into
     the database. Also checks pep8 and cyclomatic complexity.
@@ -105,7 +122,8 @@ def save_to_temp_and_database(
             response_items[count].update({"PEP8_results": pep8_result})
 
 
-def handle_test_file(files: list[FileStorage]) -> tuple[dict, int]:
+def handle_test_file(files: list[FileStorage], course_id: int,
+                     assignment: int) -> tuple[dict, int]:
     """Handles the incoming test files to check if the type is allowed"""
     response_args = {}
     res_code = 200
@@ -181,7 +199,7 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
 
     Removed previous file if it exists
     """
-    # We do not need to delete an assignment with several submission anymore.
+    # We do not need to delete an assignment with several submission anymore. 
     # remove_existing_assignment(file_name, group_id, course_id, assignment)
     binary = psycopg2.Binary(file_data)
 
@@ -191,8 +209,8 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
         with conn.cursor() as cur:
             query = """INSERT INTO AssignmentFiles
                     (groupId, courseId, assignment, fileName,
-                     fileData, submission)
-                    VALUES (%s, %s, %s, %s, %s, %s, 0);
+                     fileData, fileType, submission)
+                    VALUES (%s, %s, %s, %s, %s, 0);
                     """
 
             cur.execute(query, (group_id, course_id, assignment,

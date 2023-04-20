@@ -31,6 +31,8 @@ import { CoursePickerComponent } from './components/course-picker/course-picker.
 import { AssignmentsComponent } from './components/assignments/assignments.component';
 import { CreateCourseComponent } from './components/create-course/create-course.component';
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
+import { FileUploadModalComponent } from './components/file-upload-modal/file-upload-modal.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -55,6 +57,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AssignmentsComponent,
     CreateCourseComponent,
     VerifyEmailComponent,
+    FileUploadModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -66,6 +69,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ToastrModule.forRoot(),
     ReactiveFormsModule,
     MatTabsModule,
+    NgbModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

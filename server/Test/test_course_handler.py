@@ -91,13 +91,13 @@ class TestCourseHandler(unittest.TestCase):
             )
 
     @patch('psycopg2.connect')
-    def test_add_groups_to_course(self, mock_connect):
+    def test_add_group_to_course(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
-        mock_cursor.fetchone.return_value = [4]
+        mock_cursor.fetchone.side_effect = [[False], [3], None, None]
         course_id = 1
-        nr_of_groups = 2
-        course_handler.add_groups_to_course(nr_of_groups, course_id)
-        assert 3 == mock_cursor.execute.call_count
+        user_id = 1
+        course_handler.add_group_to_course(course_id, user_id)
+        assert 4 == mock_cursor.execute.call_count
 
     @patch('psycopg2.connect')
     def test_get_assignments(self, mock_connect):

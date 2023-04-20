@@ -4,7 +4,8 @@ html,
 body {
   width: auto !important;
   overflow-x: hidden !important;
-  background-color: #f5f5f5 !important;
+  /*  background-color: #f5f5f5 !important; */
+  background-color: #f6f9f9 !important;
 }
 
 .btn-primary {
@@ -15,4 +16,9 @@ body {
 .btn-primary:hover {
   background-color: #216b42 !important;
   border-color: #216b42 !important;
+}
+
+/* Fix for modal shifting the background */
+body.modal-open {
+  padding-left: 17px;
 }
