@@ -387,22 +387,13 @@ def get_assignment_feedback(course: int, assignment: int,
 
 
 def _format_assignment_feedback(db_output: list[tuple]) -> list:
-    assignments: list[dict[str: str | int]] = []
+    assignments: list[dict[str, str | int]] = []
     for submission in db_output:
-        print("in format loop")
-        print(submission)
-        try:
-            testfeedback = submission[2]
-        except IndexError:
-            testfeedback = ""
-        try:
-            teacherfeedback = submission[3]
-        except IndexError:
-            testfeedback = ""
-        try:
-            grade = submission[4]
-        except IndexError:
-            grade = None
+        testfeedback = "" if (x := submission[2]) is None else x
+
+        teacherfeedback = "" if (x := submission[3]) is None else x
+
+        grade = None if (x := submission[4]) is None else x
         assignments.append({'Submission': submission[0],
                             'testpass': submission[1],
                             'testfeedback': testfeedback,

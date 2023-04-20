@@ -24,29 +24,51 @@ CREATE TABLE AssignmentFeedback (
         ON UPDATE CASCADE
 );
 
-CREATE OR REPLACE FUNCTION set_submission_number()
+CREATE OR REPLACE FUNCTION set_submission_number_assignmentfeedback_assignmentfeedback()
 RETURNS TRIGGER AS $$
+DECLARE
+    max_submission INTEGER;
+DECLARE
+    max_submission INTEGER;
 BEGIN
-  IF NEW.submission = 0 THEN
-    SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
-    FROM AssignmentFeedback
-    WHERE groupId = NEW.groupId
-      AND courseId = NEW.courseId
-      AND assignment = NEW.assignment;
-  END IF;
-  RETURN NEW;
+      IF NEW.submission = 0 THEN
+        SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+        FROM AssignmentFeedback
+        WHERE groupId = NEW.groupId
+            AND courseId = NEW.courseId
+            AND assignment = NEW.assignment;
+
+        IF max_submission > 0 THEN
+            NEW.submission := max_submission;
+        ELSE
+                SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+        FROM AssignmentFeedback
+        WHERE groupId = NEW.groupId
+            AND courseId = NEW.courseId
+            AND assignment = NEW.assignment;
+
+        IF max_submission > 0 THEN
+            NEW.submission := max_submission;
+        ELSE
+            SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
+                    FROM AssignmentFeedback
+                    WHERE groupId = NEW.groupId
+                          AND courseId = NEW.courseId
+                          AND assignment = NEW.assignment;
+              END IF;
+    END IF;
+      END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER set_submission_trigger
+CREATE TRIGGER increment_submission_assignmentfeedback
+CREATE TRIGGER increment_submission_assignmentfeedback
 BEFORE INSERT ON AssignmentFeedback
 FOR EACH ROW
-EXECUTE FUNCTION set_submission_number();
+EXECUTE FUNCTION set_submission_number_assignmentfeedback();
 
----------------------------------------
----------------------------------------
-
-
+------------------------------------------------------------------------------
 CREATE Table AssignmentFiles (
 		groupId INTEGER NOT NULL, 
 		courseId SERIAL NOT NULL,
@@ -54,30 +76,57 @@ CREATE Table AssignmentFiles (
 		submission SERIAL NOT NULL,
 		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
-		fileType TEXT NOT NULL,
+		fileType TEXT,
 		PRIMARY KEY(groupId, courseId, assignment, fileName, submission),
 		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
 			REFERENCES Groups (groupId) 
 			ON DELETE CASCADE 
-			ON UPDATE CASCADE
-		CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
-			REFERENCES Assignments(courseId, assignment) 
+			ON UPDATE CASCADE,
+		CONSTRAINT constraint_filename_assignment_course_fkey 
+			FOREIGN KEY (filename, courseid, assignment) 
+			REFERENCES filenames(filename, courseid, assignment) 
 			ON DELETE CASCADE 
 			ON UPDATE CASCADE
 	);
 
 CREATE OR REPLACE FUNCTION set_submission_number_assignmentfiles()
 RETURNS TRIGGER AS $$
+DECLARE
+    max_submission INTEGER;
+DECLARE
+    max_submission INTEGER;
 BEGIN
-  IF NEW.submission = 0 THEN
-    SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
-    FROM AssignmentFiles
-    WHERE groupId = NEW.groupId
-      AND courseId = NEW.courseId
-      AND assignment = NEW.assignment
-      AND fileName = NEW.fileName;
-  END IF;
-  RETURN NEW;
+      IF NEW.submission = 0 THEN
+        SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+        FROM AssignmentFiles
+        WHERE groupId = NEW.groupId
+            AND courseId = NEW.courseId
+            AND assignment = NEW.assignment
+            AND fileName = NEW.fileName;
+
+        IF max_submission > 0 THEN
+            NEW.submission := max_submission;
+        ELSE
+                SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+        FROM AssignmentFiles
+        WHERE groupId = NEW.groupId
+            AND courseId = NEW.courseId
+            AND assignment = NEW.assignment
+            AND fileName = NEW.fileName;
+
+        IF max_submission > 0 THEN
+            NEW.submission := max_submission;
+        ELSE
+            SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
+                    FROM AssignmentFiles
+                    WHERE groupId = NEW.groupId
+                          AND courseId = NEW.courseId
+                          AND assignment = NEW.assignment
+                          AND fileName = NEW.fileName;
+              END IF;
+    END IF;
+      END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -85,6 +134,8 @@ CREATE TRIGGER increment_submission_assignmentfiles
 BEFORE INSERT ON AssignmentFiles
 FOR EACH ROW
 EXECUTE FUNCTION set_submission_number_assignmentfiles();
+
+------------------------------------------------------------------------------
 --USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
 CREATE Table Courses (
 	courseId SERIAL PRIMARY KEY,
@@ -96,12 +147,13 @@ CREATE Table Courses (
 	UNIQUE ( course, teachingPeriod, courseYear)
 );
 
-
+------------------------------------------------------------------------------
 CREATE Table Assignments(
-	courseId SERIAL,
+	courseId SERIAL NOT NULL,
 	assignment INTEGER NOT NULL CHECK (assignment > 0),
 	endDate DATE NOT NULL,
-	description TEXT NOT NULL,
+	description TEXT NOT NULL DEFAULT '',
+	name TEXT NOT NULL DEFAULT '',
 	PRIMARY KEY (courseId, assignment),
 	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (courseId) 
 			REFERENCES Courses(courseId) 
@@ -109,7 +161,33 @@ CREATE Table Assignments(
 			ON UPDATE CASCADE
 );
 
+CREATE OR REPLACE FUNCTION set_assignment_number_assignments()
+RETURNS TRIGGER AS $$
+DECLARE
+    max_assignment INTEGER;
+BEGIN
+    IF NEW.assignment = 0 THEN
+        SELECT COALESCE(MAX(assignment), 0) + 1 INTO max_assignment
+        FROM Assignments
+        WHERE courseId = NEW.courseId;
+        IF max_assignment > 0 THEN
+            NEW.assignment := max_assignment;
+        ELSE
+            SELECT COALESCE(MAX(assignment), 0) + 1 INTO NEW.assignment
+            FROM Assignments
+            WHERE courseId = NEW.courseId;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE TRIGGER increment_assignment_assignments
+BEFORE INSERT ON Assignments
+FOR EACH ROW
+EXECUTE FUNCTION set_assignment_number_assignments();
+
+------------------------------------------------------------------------------
 --for unittests
 CREATE Table TestFiles (
 	courseId SERIAL NOT NULL,
@@ -122,13 +200,26 @@ CREATE Table TestFiles (
 		ON UPDATE CASCADE 
 		ON DELETE CASCADE
 );
+------------------------------------------------------------------------------
+CREATE Table FileNames (
+	nameId SERIAL NOT NULL,
+	courseId SERIAL NOT NULL,
+	assignment INTEGER NOT NULL, 
+	filename TEXT NOT NULL,
+	UNIQUE (courseId, assignment, filename),
+	PRIMARY KEY(nameId),
+	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
+		REFERENCES Assignments(courseId, assignment) 
+		ON UPDATE CASCADE 
+		ON DELETE CASCADE
+);
 
-
+------------------------------------------------------------------------------
 CREATE TABLE UserData (
 	userId SERIAL NOT NULL,
 	cid TEXT UNIQUE NOT NULL,
-	email TEXT NOT NULL,
-	passphrase BYTEA NOT NULL,
+	email TEXT UNIQUE NOT NULL,
+	passphrase BYTEA,
 	verified BOOLEAN NOT NULL DEFAULT FALSE,
 	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher', 'Admin')),
 	fullName TEXT NOT NULL,
@@ -136,18 +227,19 @@ CREATE TABLE UserData (
 	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
 
+------------------------------------------------------------------------------
 CREATE TABLE Groups (
 	groupId SERIAL PRIMARY KEY,
 	groupNumber INTEGER NOT NULL,
 	course INTEGER NOT NULL,
-	UNIQUE (groupNumber, course)
+	UNIQUE (groupNumber, course),
 	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (course) 
 	REFERENCES Courses(courseid) 
 	ON DELETE CASCADE 
 	ON UPDATE CASCADE,
 );
 
-
+------------------------------------------------------------------------------
 CREATE TABLE UserInGroup (
 	userId INTEGER,
 	groupId INTEGER,
@@ -162,7 +254,7 @@ CREATE TABLE UserInGroup (
 		ON UPDATE CASCADE
 );
 
-
+------------------------------------------------------------------------------
 CREATE TABLE UserInCourse (
 	userId INTEGER,
 	courseId INTEGER,
@@ -178,7 +270,7 @@ CREATE TABLE UserInCourse (
 		ON UPDATE CASCADE
 );
 
-
+------------------------------------------------------------------------------
 --View for user and course data can be called for course inf from specific user:
 --To Call do: select * from user_course_info where userId = 'id int';
 
@@ -187,7 +279,7 @@ SELECT uic.userId, uic.userRole, c.courseId, c.courseName, c.course, c.teachingP
 FROM UserInCourse uic
 JOIN Courses c ON uic.courseId = c.courseId;
 
-
+------------------------------------------------------------------------------
 --This view shows user and its courses with corresponding groups. Useful to get group info if user and course id is known
 
 CREATE OR REPLACE VIEW UserGroupCourseInfo AS
@@ -196,7 +288,7 @@ FROM UserInGroup uig
 JOIN Groups g ON uig.groupId = g.groupId
 JOIN Courses c ON g.course = c.courseId;
 
-
+------------------------------------------------------------------------------
 --This view shows all user and group information, eg. used to get all groupmember cids from your group 
 CREATE OR REPLACE VIEW UserGroupInfo AS
 SELECT UserData.userId, UserData.cid, UserInGroup.groupId, Groups.groupNumber
@@ -204,6 +296,7 @@ FROM UserData
 JOIN UserInGroup ON UserData.userId = UserInGroup.userId
 JOIN Groups ON UserInGroup.groupId = Groups.groupId;
 
+------------------------------------------------------------------------------
 CREATE VIEW GroupDetails AS
 SELECT g.groupid, g.groupnumber, g.course, u.fullname
 FROM Groups g

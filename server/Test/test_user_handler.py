@@ -22,6 +22,77 @@ class TestUserHandler(unittest.TestCase):
         self.test_file_dir = Path(__file__).parent/"test_files_user_handler"
 
     @patch('psycopg2.connect')
+    def test_add_users_to_course_in_batch_with_no_users(self, mock_connect):
+        mock_cursor = setup_mock_cursor(mock_connect)
+
+        user_ids = []
+        course_id = 1
+        user_handler.add_users_to_course(user_ids, course_id)
+        mock_cursor.execute.assert_not_called()
+
+    @patch('psycopg2.connect')
+    def test_add_users_to_course_in_batch_with_users(self, mock_connect):
+        mock_cursor = setup_mock_cursor(mock_connect)
+
+        user_ids = [1, 2]
+        course_id = 1
+        user_handler.add_users_to_course(user_ids, course_id)
+
+        mock_cursor.execute.assert_called_with(
+            "insert into userincourse values "
+            "(%s,%s,%s) on conflict do nothing;",
+            [user_ids[1], course_id, "Student"]
+        )
+        self.assertEqual(2, len(mock_cursor.mock_calls))
+
+    @patch('psycopg2.connect')
+    def test_get_user_ids_from_cids_exist_and_not_exist(self, mock_connect):
+        valid_uid_and_cid = [(1, "test1"), (2, "test2")]
+        mock_cursor = setup_mock_cursor(mock_connect)
+        mock_cursor.fetchall.return_value = valid_uid_and_cid
+
+        res = user_handler.get_user_ids_from_cids(
+            ["test1", "test2", "not_exist1", "not_exist2"]
+        )
+
+        self.assertEqual(len(res[0]), 2)
+        self.assertEqual(len(res[1]), 2)
+        self.assertIn(1, res[0])
+        self.assertIn(2, res[0])
+        self.assertIn('not_exist1', res[1])
+        self.assertIn('not_exist2', res[1])
+
+    @patch('psycopg2.connect')
+    def test_get_user_ids_from_cids_only_not_exist(self, mock_connect):
+        valid_uid_and_cid = []
+        mock_cursor = setup_mock_cursor(mock_connect)
+        mock_cursor.fetchall.return_value = valid_uid_and_cid
+
+        res = user_handler.get_user_ids_from_cids(
+            ["not_exist1", "not_exist2"]
+        )
+
+        self.assertEqual(len(res[0]), 0)
+        self.assertEqual(len(res[1]), 2)
+        self.assertIn('not_exist1', res[1])
+        self.assertIn('not_exist2', res[1])
+
+    @patch('psycopg2.connect')
+    def test_get_user_ids_from_cids_only_exist(self, mock_connect):
+        valid_uid_and_cid = [(1, "test1"), (2, "test2")]
+        mock_cursor = setup_mock_cursor(mock_connect)
+        mock_cursor.fetchall.return_value = valid_uid_and_cid
+
+        res = user_handler.get_user_ids_from_cids(
+            ["test1", "test2"]
+        )
+
+        self.assertEqual(len(res[0]), 2)
+        self.assertEqual(len(res[1]), 0)
+        self.assertIn(1, res[0])
+        self.assertIn(2, res[0])
+
+    @patch('psycopg2.connect')
     def test_get_group(self, mock_connect):
         with patch.object(user_handler, '_get_group_members') as mock_groups:
             mock_cursor = setup_mock_cursor(mock_connect)
