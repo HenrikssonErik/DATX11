@@ -130,7 +130,7 @@ def add_group_to_course(course_id: int, user_id: int):
 
     except Exception as e:
         print(e)
-        raise Exception("Could not create group")
+        raise Exception("Could not create group") from e
 
 
 def _create_course(course_name: str, course_abbr: str, year: int,
@@ -295,7 +295,7 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
         return
     except Exception as e:
         print(e)
-        raise Exception("Could not update feedback")
+        raise Exception("Could not update feedback") from e
 
 
 # Not tested
@@ -316,7 +316,7 @@ def change_end_date(course: int, assignment: int,
             return
         except Exception as e:
             print(e)
-            raise Exception("Could not change end date")
+            raise Exception("Could not change end date") from e
     else:
         return {'status': 'End date has the wrong format, must be YYYY-MM-DD'}
 
@@ -383,7 +383,7 @@ def get_assignment_feedback(course: int, assignment: int,
 
     except Exception as e:
         print(e)
-        raise Exception("Could not retrieve feedback")
+        raise Exception("Could not retrieve feedback") from e
 
 
 def _format_assignment_feedback(db_output: list[tuple]) -> list:
@@ -427,7 +427,7 @@ def get_course_groups(course: int):
 
     except Exception as e:
         print(e)
-        raise Exception("Error when getting course groups")
+        raise Exception("Error when getting course groups") from e
 
 # TODO:check so the query has the intended effect
 def get_assignment_overview(course: int, assignment: int) -> list[dict]:
@@ -460,7 +460,7 @@ def get_assignment_overview(course: int, assignment: int) -> list[dict]:
 
     except Exception as e:
         print(e)
-        raise Exception("Error when getting assignment overview")
+        raise Exception("Error when getting assignment overview") from e
 
 
 def passed_deadline(course: int, assignment: int) -> bool:
