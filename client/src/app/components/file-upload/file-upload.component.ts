@@ -1,18 +1,8 @@
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import {
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
-import { link } from 'fs';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+
 import { ToastrService } from 'ngx-toastr';
-import { UploadFileConfigService } from 'src/app/services/upload-test-file-config.service';
-import { UploadUnitTestConfigService } from 'src/app/services/upload-unit-test-config.service';
 import { API_URL } from 'src/environments/environment';
-import { EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-file-upload',
@@ -23,13 +13,16 @@ export class FileUploadComponent {
   files: File[] = [];
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
-  //TODO: Give types to these inputs
-  @Input() courseId: any;
-  @Input() assignmentNumber: any;
-  @Input() groupId: any;
+  @Input() courseId!: number;
+  @Input() assignmentNumber!: number;
+  @Input() groupId!: number;
 
-  allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
-  allowedFileTypesForPrint = ['.py', '.pdf', '.txt'];
+  allowedFileTypes: string[] = [
+    'text/x-python',
+    'application/pdf',
+    'text/plain',
+  ];
+  allowedFileTypesForPrint: string[] = ['.py', '.pdf', '.txt'];
 
   testFeedBackArray: any[] = [];
 
@@ -145,9 +138,9 @@ export class FileUploadComponent {
       formData.append('files', file, file.name)
     );
 
-    formData.append('Course', this.courseId);
-    formData.append('Assignment', this.assignmentNumber);
-    formData.append('Group', this.groupId);
+    formData.append('Course', this.courseId.toString());
+    formData.append('Assignment', this.assignmentNumber.toString());
+    formData.append('Group', this.groupId.toString());
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/files`, formData, {
