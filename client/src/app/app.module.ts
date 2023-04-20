@@ -35,6 +35,7 @@ import { FileUploadModalComponent } from './components/file-upload-modal/file-up
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TeacherSettingsComponent } from './components/teacher-settings/teacher-settings.component';
 import { CreateAssignmentModalComponent } from './components/create-assignment-modal/create-assignment-modal.component';
+import { HandleUsersModalComponent } from './components/handle-users-modal/handle-users-modal.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -62,6 +63,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     FileUploadModalComponent,
     TeacherSettingsComponent,
     CreateAssignmentModalComponent,
+    HandleUsersModalComponent,
   ],
   imports: [
     BrowserModule,

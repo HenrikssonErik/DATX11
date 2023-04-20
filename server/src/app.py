@@ -178,10 +178,7 @@ def post_files():
     else:
         return make_response({'status': 'not_logged_in'}, 401)
 
-# TODO: add course and assignmetn in post,
-#  will be done when working on the teacher page
-
-
+# TODO: add check token
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
     files = request.files.getlist('files')
@@ -515,11 +512,10 @@ def edit_desc():
 def get_users_in_course():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
-    course = request.args.get('Course')
-
+    course = int(request.args.get('Course'))
     if (user_handler.is_admin_on_course(request_user_id, course)):
         res = user_handler.get_users_on_course(course)
-        return make_response(jsonify(res[0]), res[1])
+        return make_response(jsonify({"Users":res[0]}), res[1])
     else:
         return make_response("", 401)
 
@@ -599,7 +595,7 @@ def set_feedback():
     data = request.get_json()
     course: int = int(data['Course'])
     assignment: int = int(data['Assignment'])
-    submission: int = int(data['Date'])
+    submission: int = int(data['Submission'])
     feedback: str = str(data['Feedback'])
     grade: bool = bool(data['Grade'])
     group_id: int = int(data['Group'])

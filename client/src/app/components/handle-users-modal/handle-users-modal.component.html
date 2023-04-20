@@ -1,0 +1,111 @@
+<app-spinner></app-spinner>
+<div class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title text-muted" translate>
+      Handle Users in {{ course.Course }}
+    </h4>
+    <i
+      class="fa-solid fa-xmark close"
+      (click)="activeModal.dismiss('Cross click')"
+    ></i>
+  </div>
+  <div class="modal-body">
+    <div class="row form mb-3">
+      <div class="col-md-5">
+        <label for="file-upload" class="custom-file-upload">
+          <i class="fa fa-cloud-upload"> Add CSV</i>
+        </label>
+        <input
+          type="file"
+          id="file-upload"
+          (change)="handleFileInput($event)"
+        />
+        <button
+          class="btn btn-primary w-20"
+          [disabled]="csvData.length === 0"
+          (click)="submitCSV()"
+        >
+          Submit
+        </button>
+      </div>
+
+      <div class="col-md-3">
+        <input
+          class="form-control"
+          type="text"
+          id="newCID"
+          placeholder="CID"
+          [(ngModel)]="newCid"
+        />
+      </div>
+      <div class="col-md-3">
+        <button
+          class="btn btn-primary w-20"
+          [disabled]="newCid === ''"
+          (click)="submitCid()"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+    <div>
+      <ul class="list-group-flush">
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col-md-5">
+              <p style="font-weight: bold">Name</p>
+            </div>
+            <div class="col-md-3">
+              <p style="font-weight: bold">Cid</p>
+            </div>
+            <div class="col-md-3">
+              <p style="font-weight: bold">Role</p>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item" *ngFor="let user of users">
+          <div class="row">
+            <div class="col-md-5">
+              <p>{{ user.fullname }}</p>
+            </div>
+            <div class="col-md-3">
+              <p>{{ user.cid }}</p>
+            </div>
+            <div class="col-md-3">
+              <select [(ngModel)]="user.role" (change)="updateRole(user)">
+                <option
+                  value="Admin"
+                  [selected]="user.role === 'Admin' ? true : false"
+                >
+                  Admin
+                </option>
+                <option
+                  value="Student"
+                  [selected]="user.role === 'Student' ? true : false"
+                >
+                  Student
+                </option>
+                <option
+                  value="Teacher"
+                  [selected]="user.role === 'Teacher' ? true : false"
+                >
+                  Teacher
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-1">
+              <button class="remove" (click)="removeUser(user)">X</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="row"></div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-12">
+      <button class="btn btn-primary w-100">Create Assignment</button>
+    </div>
+  </div>
+</div>

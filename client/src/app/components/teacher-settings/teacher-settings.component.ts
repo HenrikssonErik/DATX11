@@ -8,6 +8,7 @@ import { Course } from 'src/app/models/courses';
 import { CourseService } from 'src/app/services/course-service.service';
 import { API_URL } from 'src/environments/environment';
 import { CreateAssignmentModalComponent } from '../create-assignment-modal/create-assignment-modal.component';
+import { HandleUsersModalComponent } from '../handle-users-modal/handle-users-modal.component';
 
 @Component({
   selector: 'app-teacher-settings',
@@ -47,6 +48,12 @@ export class TeacherSettingsComponent {
     const modalRef = this.modalService.open(CreateAssignmentModalComponent);
     modalRef.componentInstance.name = 'CreateAssignmentModal';
     modalRef.componentInstance.course = this.course;
+  }
+
+  openHandleUsersModal(): void {
+    const modalRef = this.modalService.open(HandleUsersModalComponent);
+    modalRef.componentInstance.name = 'HandleUsersModal';
+    modalRef.componentInstance.course = this.course; //remove
   }
 
   changeCourseName(): void {
