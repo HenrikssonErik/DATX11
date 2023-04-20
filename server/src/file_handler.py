@@ -234,14 +234,14 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
 
     conn = psycopg2.connect(dsn=get_conn_string())
 
-    file_type = file_name.rsplit('.', 1)[1].lower()
     with conn:
         with conn.cursor() as cur:
             query = """INSERT INTO AssignmentFiles
                     (groupId, courseId, assignment, fileName,
-                    fileData, fileType, submission) 
-                    VALUES (%s, %s, %s, %s, %s, %s, 0);
+                     fileData, submission)
+                    VALUES (%s, %s, %s, %s, %s, 0);
                     """
+
 
             cur.execute(
                 query,
@@ -251,9 +251,10 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
                     assignment,
                     file_name,
                     binary,
-                    file_type,
+                    0
                 )
             )
+
     conn.close()
 
 

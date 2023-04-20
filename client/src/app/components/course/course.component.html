@@ -20,7 +20,7 @@
             <i class="fa-solid fa-ellipsis-vertical courseIconElippsis"></i></h5
         ></span>
       </a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" (click)="$event.stopPropagation()">
         <li *ngFor="let color of cardColors">
           <a
             class="dropdown-item text-muted ml-2"
