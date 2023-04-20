@@ -26,6 +26,21 @@ export class AuthService {
     }
   }
 
+  isAdminOrTeacher() {
+    if (document.cookie.includes('Role')) {
+      const roleCookie = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('Role'));
+      const role = roleCookie ? roleCookie.split('=')[1] : null;
+      if (role === 'Admin' || role === 'Teacher') {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false;
+  }
+
   logOut() {
     if (document.cookie.includes('Token')) {
       document.cookie = 'Token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
