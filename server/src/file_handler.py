@@ -5,8 +5,10 @@ from . import general_tests
 import psycopg2
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
+from .podman.podman_runner import gen_requirements, run_container, build_image
+import shutil
+import json
 from .connector import get_conn_string
-
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 
@@ -22,8 +24,11 @@ def handle_files(files: list[FileStorage], course: int, group: int,
     __allowed_filenames: tuple = get_filenames(course, assignment)
     __nr_of_files = len(__allowed_filenames)
 
+    combined_feedback = {"general_tests_feedback": "",
+                         "unittest_feedback": ""}
     number_of_files = {}
     res_code = 200
+
     file_amount, res_code = ("OK", res_code)  \
         if (len(files) == __nr_of_files) \
         else (f"Received {len(files)}, should be {__nr_of_files} files",
@@ -49,9 +54,24 @@ def handle_files(files: list[FileStorage], course: int, group: int,
         response_items.append({"tested_file": res_object})
 
     if (res_code == 200):
-        save_to_temp_and_database(files, response_items, group, course, assignment)
+        save_to_temp_and_database(
+            files, response_items, group, course, assignment
+        )
+        unittest_feedback = json.loads(
+            run_unit_tests_in_container(
+                course,
+                assignment,
+                group
+            )
+        )
 
-    return response_items, number_of_files, res_code
+        passed = unittest_feedback["was_successful"]
+        combined_feedback = {"general_tests_feedback": response_items,
+                             "unittest_feedback": unittest_feedback}
+        save_feedback_to_db(course, assignment, group,
+                            json.dumps(combined_feedback), passed)
+
+    return response_items, number_of_files, combined_feedback, res_code
 
 
 def get_filenames(course: int, assignment: int) -> tuple:
@@ -113,17 +133,18 @@ def save_to_temp_and_database(
             if file_path.suffix == ".py":
                 f_name = pep8_test_dir/file_path.name
                 f_name.write_bytes(file_path.read_bytes())
-
                 pep8_result = general_tests.pep8_check(
                     pep8_test_dir,
                     filename_patterns=["./" + str(file_path.name)]
                 )
-
             response_items[count].update({"PEP8_results": pep8_result})
 
 
-def handle_test_file(files: list[FileStorage], course_id: int,
-                     assignment: int) -> tuple[dict, int]:
+def handle_test_file(
+        files: list[FileStorage],
+        course_id: int,
+        assignment: int,
+) -> tuple[dict, int]:
     """Handles the incoming test files to check if the type is allowed"""
     response_args = {}
     res_code = 200
@@ -155,7 +176,7 @@ def allowed_file(filename: str) -> bool:
 def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
     """Saves the teacher's tests to the database"""
 
-    file.filename = file.filename + 'TestFile.py'
+    file.filename = 'test_' + file.filename
     remove_existing_test_file(file.filename, course_id, assignment)
     binary = psycopg2.Binary(file.stream.read())
 
@@ -199,7 +220,7 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
 
     Removed previous file if it exists
     """
-    # We do not need to delete an assignment with several submission anymore. 
+    # We do not need to delete an assignment with several submission anymore.
     # remove_existing_assignment(file_name, group_id, course_id, assignment)
     binary = psycopg2.Binary(file_data)
 
@@ -209,12 +230,23 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
         with conn.cursor() as cur:
             query = """INSERT INTO AssignmentFiles
                     (groupId, courseId, assignment, fileName,
-                     fileData, fileType, submission)
+                     fileData, submission)
                     VALUES (%s, %s, %s, %s, %s, 0);
                     """
 
-            cur.execute(query, (group_id, course_id, assignment,
-                        file_name, binary, 0))
+
+            cur.execute(
+                query,
+                (
+                    group_id,
+                    course_id,
+                    assignment,
+                    file_name,
+                    binary,
+                    0
+                )
+            )
+
     conn.close()
 
 
@@ -235,6 +267,28 @@ def remove_existing_test_file(
                  """
             cur.execute(query_data, (file_name, course_id, assignment))
     conn.close()
+
+
+def get_assignment_test_feedback_from_database(
+        course: int,
+        assignment: int,
+        group_id: int
+) -> tuple[list[tuple[int, str, bool]], int]:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            query_data = """
+            select submission, testfeedback, testpass
+            from assignmentfeedback where
+            groupid = %s and courseid = %s and \"assignment\" = %s
+            """
+
+            cur.execute(query_data, (group_id, course,
+                                     assignment))
+            data = cur.fetchall()
+    conn.close()
+
+    return data, 200
 
 
 def get_assignment_files_from_database(
@@ -264,3 +318,115 @@ def get_assignment_files_from_database(
 
     file_binary = io.BytesIO(data[0][0].tobytes())
     return file_binary
+
+
+def get_unit_test_files_from_db(
+        courseid: int,
+        assignment: int
+) -> list[tuple[str, io.BytesIO]]:
+    """Gets all the unit-tests for a specific assignment in a specific course.
+    """
+
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    files: list[tuple[str, io.BytesIO]] = []
+
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT filename, filedata FROM testfiles
+                    WHERE testfiles.courseid     = %s
+                    AND testfiles.\"assignment\" = %s;
+                """,
+                (courseid, assignment)
+            )
+            for (filename, filedata) in cur:
+                files.append(
+                    (filename, io.BytesIO(filedata.tobytes()))
+                )
+
+    conn.close()
+    return files
+
+
+def get_all_assignment_files_from_db(
+        course_id: int,
+        assignment: int,
+        group_id: int
+) -> list[tuple[str, io.BytesIO]]:
+    """Gets all the unit-tests for a specific assignment in a specific course.
+    """
+    conn = psycopg2.connect(dsn=get_conn_string())
+    files: list[tuple[str, io.BytesIO]] = []
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT filename, filedata FROM AssignmentFiles
+                    WHERE GroupId        = %s
+                    AND   CourseId       = %s
+                    AND   FileType     NOT LIKE 'pdf'
+                    AND   \"assignment\"   = %s;
+                """,
+                (group_id, course_id, assignment)
+            )
+            for (filename, filedata) in cur:
+                files.append(
+                    (filename, io.BytesIO(filedata.tobytes()))
+                )
+
+    conn.close()
+    return files
+
+
+def run_unit_tests_in_container(
+        courseid: int,
+        assignment: int,
+        group_id: int,
+) -> str:
+    path = Path(__file__).absolute().parent/"podman"/"temp"
+    path.mkdir(parents=True, exist_ok=True)
+
+    files = get_unit_test_files_from_db(courseid, assignment)
+    files.extend(get_all_assignment_files_from_db(courseid, assignment,
+                                                  group_id))
+    for (name, data) in files:
+        with open(path/name, "wb") as f:
+            f.write(data.read())
+    is_empty = gen_requirements(str(path))
+    if (is_empty):
+        json_feedback = run_container("default", str(path), is_empty)
+
+    else:
+        build_image("podman_test_executer", str(path.parent))
+        json_feedback = run_container("podman_test_executer",
+                                      str(path), is_empty)
+    shutil.rmtree(str(path))
+    return json_feedback
+
+
+def save_feedback_to_db(
+        course_id: int,
+        assignment: int,
+        group_id: int,
+        feedback: json,
+        passed: bool,
+):
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO AssignmentFeedback (
+                        groupid,
+                        courseid,
+                        \"assignment\",
+                        testfeedback,
+                        testpass
+                    )
+                    VALUES(%s, %s, %s, %s, %s)
+                """,
+                (group_id, course_id, assignment, feedback, passed)
+            )
+    conn.close()

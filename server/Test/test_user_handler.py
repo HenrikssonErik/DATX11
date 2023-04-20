@@ -144,9 +144,7 @@ class TestUserHandler(unittest.TestCase):
             mock.call("""SELECT (fullname IS NULL)
                 AS is_empty FROM GroupDetails WHERE groupid = %s;""",
                       [group_id])
-])
-
-        
+        ])
 
     @patch('src.user_handler.get_courses_info')
     def test_is_admin_on_course(self, mock_user_courses):
