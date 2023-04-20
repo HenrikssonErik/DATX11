@@ -70,11 +70,7 @@
       tabindex="0"
     >
       <div class="mt-3">
-        <app-course
-          (click)="goToCourse(course.courseID)"
-          [data]="course"
-          *ngFor="let course of courses"
-        ></app-course>
+        <app-course [data]="course" *ngFor="let course of courses"></app-course>
       </div>
     </div>
     <div

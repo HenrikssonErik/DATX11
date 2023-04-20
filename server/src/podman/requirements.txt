@@ -1,0 +1,9 @@
+pandas
+numpy
+keras
+tensorflow
+scikit-learn
+eli5
+scipy 
+lightgbm
+Theano

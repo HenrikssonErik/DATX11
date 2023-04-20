@@ -1,5 +1,10 @@
 <!--TODO: If we have no courses we get a status. We should check for that-->
-<div class="card" [style.background-color]="primaryColor">
+<div
+  class="card"
+  *ngIf="data"
+  (click)="goToCourse(data.courseID)"
+  [style.background-color]="primaryColor"
+>
   <div class="header">
     <h3><i class="fa fa-chalkboard-user courseIcon"></i></h3>
     <div class="dropdown">
@@ -8,16 +13,18 @@
         type="button"
         data-bs-toggle="dropdown"
         aria-expanded="false"
+        (click)="$event.stopPropagation()"
       >
         <span
-          ><h5><i class="fa-solid fa-ellipsis-vertical courseIcon"></i></h5
+          ><h5>
+            <i class="fa-solid fa-ellipsis-vertical courseIconElippsis"></i></h5
         ></span>
       </a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" (click)="$event.stopPropagation()">
         <li *ngFor="let color of cardColors">
           <a
             class="dropdown-item text-muted ml-2"
-            (click)="changeCardColor(color)"
+            (click)="changeCardColor(color); $event.stopPropagation()"
             ><div class="color-box" [style.backgroundColor]="color.value"></div>
             <span>{{ color.name }}</span></a
           >
