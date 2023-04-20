@@ -1,18 +1,10 @@
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import {
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
-import { link } from 'fs';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { UploadFileConfigService } from 'src/app/services/upload-test-file-config.service';
-import { UploadUnitTestConfigService } from 'src/app/services/upload-unit-test-config.service';
 import { API_URL } from 'src/environments/environment';
 import { EventEmitter } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
 
 @Component({
   selector: 'app-file-upload',
@@ -23,17 +15,28 @@ export class FileUploadComponent {
   files: File[] = [];
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
-  //TODO: Give types to these inputs
-  @Input() courseId: any;
-  @Input() assignmentNumber: any;
-  @Input() groupId: any;
 
-  allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
-  allowedFileTypesForPrint = ['.py', '.pdf', '.txt'];
 
-  testFeedBackArray: any[] = [];
+  @Input() courseId!: number;
+  @Input() assignmentNumber!: number;
+  @Input() groupId!: number;
+  isLoading: boolean = false;
 
-  constructor(private http: HttpClient, private toastr: ToastrService) {}
+
+  allowedFileTypes: string[] = [
+    'text/x-python',
+    'application/pdf',
+    'text/plain',
+  ];
+  allowedFileTypesForPrint: string[] = ['.py', '.pdf', '.txt'];
+
+  generalTestFeedback: any[] = [];
+
+  constructor(
+    private http: HttpClient,
+    private toastr: ToastrService,
+    private modalService: NgbActiveModal
+  ) {}
 
   /**
    * Method to handle the file drop event and prepares the list of files
@@ -135,6 +138,7 @@ export class FileUploadComponent {
    * @returns {void}
    */
   uploadFiles(): void {
+    this.isLoading = true;
     const headers: HttpHeaders = new HttpHeaders().append(
       'Cookies',
       document.cookie
@@ -145,9 +149,9 @@ export class FileUploadComponent {
       formData.append('files', file, file.name)
     );
 
-    formData.append('Course', this.courseId);
-    formData.append('Assignment', this.assignmentNumber);
-    formData.append('Group', this.groupId);
+    formData.append('Course', this.courseId.toString());
+    formData.append('Assignment', this.assignmentNumber.toString());
+    formData.append('Group', this.groupId.toString());
 
     this.http
       .post<HttpResponse<any>>(`${API_URL}/files`, formData, {
@@ -173,23 +177,29 @@ export class FileUploadComponent {
               }
             );
 
-            //TODO: Stop loading.
+            //TODO: Handle this in complete() instead?
           }
 
-          console.log(response);
-
-          for (const file of response.body.feedback) {
-            const testFeedBackItem = {
+          for (const file of response.body.general_tests_feedback) {
+            const generalTestItem = {
               file: file.tested_file,
-              fileContent: file.PEP8_results,
+              pep8_results: file.PEP8_results,
             };
 
-            this.testFeedBackArray.push(testFeedBackItem);
+            this.generalTestFeedback.push(generalTestItem);
           }
+
+          console.log(this.generalTestFeedback);
+          console.log(response.body.unittest_feedback);
+
+          this.isLoading = false;
+          this.modalService.close();
 
           //TODO: Handle the success response
         },
         error: (err) => {
+          this.isLoading = false;
+          this.modalService.close();
           this.toastr.error(
             err.error.number_of_files,
             'Something went wrong!',
@@ -200,6 +210,7 @@ export class FileUploadComponent {
           console.log(err.error);
           //TODO: Handle the error
         },
+        complete() {},
       });
   }
 

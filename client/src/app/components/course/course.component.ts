@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Course } from 'src/app/models/courses';
 
 @Component({
@@ -8,6 +9,8 @@ import { Course } from 'src/app/models/courses';
 })
 export class CourseComponent implements OnInit {
   @Input() data: Course | undefined;
+
+  constructor(private router: Router) {}
 
   cardColors = [
     { name: 'Green', value: '#e1ece4' },
@@ -22,6 +25,10 @@ export class CourseComponent implements OnInit {
 
   ngOnInit(): void {
     console.log(this.data);
+  }
+
+  goToCourse(id: number) {
+    this.router.navigate([`courses/${id}`]);
   }
 
   changeCardColor(color: any) {

@@ -73,7 +73,6 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
         ordered_data["groupId"] = data[0]
         ordered_data["groupNumber"] = data[1]
         group_members = _get_group_members(data[0])
-        print(group_members)
         ordered_data["groupMembers"] = group_members
         return ordered_data
 

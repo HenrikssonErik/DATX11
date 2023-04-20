@@ -6,7 +6,8 @@ from flask import Flask, Response, jsonify, make_response, render_template, \
 from flask_cors import CORS
 from .constants import DOMAIN
 from .file_handler import handle_files, \
-    handle_test_file, get_assignment_files_from_database
+    handle_test_file, get_assignment_files_from_database, \
+    get_assignment_test_feedback_from_database
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
@@ -14,6 +15,10 @@ from .login_handler import user_registration, log_in, create_key, \
     verify_and_get_id, create_temp_users
 from flask_mail import Mail, Message
 import jwt
+# from .podman.podman_runner import init_images
+
+# init basic image
+# init_images()
 
 # creating the Flask application
 app = Flask(__name__)
@@ -145,6 +150,7 @@ def send_verification_email(to: str, token: str) -> None:
     mail.send(msg)
 
 
+# Upload assignment files to get tested
 @app.route('/files', methods=['POST'])
 def post_files():
     token = extract_token(request)
@@ -179,12 +185,32 @@ def post_tests():
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
 
+    data = request.get_json()
+    course = data['course']
+    assignment = data['assignment']
     if not files:
         return "Files not found", 406
     res = handle_test_file(files, course, assignment)
     return make_response(jsonify(res[0]), res[1])
 
-# TODO: add token check
+
+@app.route('/getAssignmentTestFeedback', methods=['POST'])
+def get_assignment_feedback():
+    data = request.get_json()
+    group_id = data['groupId']
+    course = data['course']
+    assignment = data['assignment']
+    (result, code) = get_assignment_test_feedback_from_database(
+        course,
+        assignment,
+        group_id
+    )
+    if code == 200:
+        return make_response(result, 200)
+    else:
+        return make_response("", code)
+
+
 @app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
     """

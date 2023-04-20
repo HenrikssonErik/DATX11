@@ -130,7 +130,7 @@ def add_group_to_course(course_id: int, user_id: int):
 
     except Exception as e:
         print(e)
-        raise Exception("Could not create group")
+        raise Exception("Could not create group") from e
 
 
 def _create_course(course_name: str, course_abbr: str, year: int,
@@ -296,7 +296,7 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
         return
     except Exception as e:
         print(e)
-        raise Exception("Could not update feedback")
+        raise Exception("Could not update feedback") from e
 
 
 # Not tested
@@ -317,7 +317,7 @@ def change_end_date(course: int, assignment: int,
             return
         except Exception as e:
             print(e)
-            raise Exception("Could not change end date")
+            raise Exception("Could not change end date") from e
     else:
         return {'status': 'End date has the wrong format, must be YYYY-MM-DD'}
 
@@ -384,26 +384,17 @@ def get_assignment_feedback(course: int, assignment: int,
 
     except Exception as e:
         print(e)
-        raise Exception("Could not retrieve feedback")
+        raise Exception("Could not retrieve feedback") from e
 
 
 def _format_assignment_feedback(db_output: list[tuple]) -> list:
-    assignments: list[dict[str: str | int]] = []
+    assignments: list[dict[str, str | int]] = []
     for submission in db_output:
-        print("in format loop")
-        print(submission)
-        try:
-            testfeedback = submission[2]
-        except IndexError:
-            testfeedback = ""
-        try:
-            teacherfeedback = submission[3]
-        except IndexError:
-            testfeedback = ""
-        try:
-            grade = submission[4]
-        except IndexError:
-            grade = None
+        testfeedback = "" if (x := submission[2]) is None else x
+
+        teacherfeedback = "" if (x := submission[3]) is None else x
+
+        grade = None if (x := submission[4]) is None else x
         assignments.append({'Submission': submission[0],
                             'testpass': submission[1],
                             'testfeedback': testfeedback,
@@ -437,7 +428,7 @@ def get_course_groups(course: int):
 
     except Exception as e:
         print(e)
-        raise Exception("Error when getting course groups")
+        raise Exception("Error when getting course groups") from e
 
 # TODO:check so the query has the intended effect
 def get_assignment_overview(course: int, assignment: int) -> list[dict]:
@@ -470,7 +461,7 @@ def get_assignment_overview(course: int, assignment: int) -> list[dict]:
 
     except Exception as e:
         print(e)
-        raise Exception("Error when getting assignment overview")
+        raise Exception("Error when getting assignment overview") from e
 
 
 def passed_deadline(course: int, assignment: int) -> bool:

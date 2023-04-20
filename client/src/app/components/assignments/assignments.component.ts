@@ -11,6 +11,7 @@ import { SubmissionService } from 'src/app/services/submission.service';
 import { GroupService } from 'src/app/services/group.service';
 import { UserService } from 'src/app/services/user-service.service';
 import { ToastrService } from 'ngx-toastr';
+import { Group } from 'src/app/models/group';
 
 @Component({
   selector: 'app-assignments',
@@ -20,13 +21,11 @@ import { ToastrService } from 'ngx-toastr';
 export class AssignmentsComponent implements OnInit {
   course: Course = {} as Course;
   selectedTab: number = 0;
-  //TODO: Create a Model for group
-  group: any;
-  courseGroups: { groupId: number; groupNumber: number; users: string[] }[] =
-    [];
+  group!: Group;
+  courseGroups: Group[] = [];
 
-  myGroup: any;
-  isLoadingMap = new Map<number, boolean>();
+  myGroup!: Group;
+  isLoadingMap: Map<number, boolean> = new Map<number, boolean>();
   createGroupLoader: boolean = false;
 
   constructor(
@@ -49,7 +48,7 @@ export class AssignmentsComponent implements OnInit {
       });
     }
 
-    this.getGroup(id).subscribe((res: Course) => {
+    this.groupService.getMyGroup(id).subscribe((res) => {
       //TODO: HANDLE THE EMPTY GROUP BETTER, THIS FIX IS DUMB
       this.group = res;
     });
@@ -89,14 +88,6 @@ export class AssignmentsComponent implements OnInit {
     modalRef.componentInstance.assignmentNumber = assignmentNumber;
   }
 
-  getGroup(id: number): Observable<Course> {
-    const headers = new HttpHeaders()
-      .append('Cookies', document.cookie)
-      .set('Cache-Control', 'public, max-age=3600');
-    return this.http.get<Course>(`${API_URL}/getMyGroup?Course=${id}`, {
-      headers,
-    });
-  }
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('sv-SE');
   }
@@ -162,8 +153,6 @@ export class AssignmentsComponent implements OnInit {
   groupExists(): boolean {
     if (this.group) {
       if ('status' in this.group) {
-        return false;
-      } else if (this.group.length === 0) {
         return false;
       } else {
         return true;
