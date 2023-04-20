@@ -10,6 +10,7 @@ export interface Course {
   StudyPeriod: number;
   Year: number;
   courseID: number;
+  Admin: string;
 }
 
 export interface Assignment {

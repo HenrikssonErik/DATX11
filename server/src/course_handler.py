@@ -68,6 +68,11 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
                             WHERE userid = %s AND courseid=%s"""
                 cur.execute(query_data, [user_id, course_id])
                 data = cur.fetchone()
+                query_two = """SELECT ud.fullName FROM UserData ud JOIN
+                UserInCourse uc ON uc.userId = ud.userId WHERE uc.courseId = %s
+                AND uc.userRole = 'Admin';"""
+                cur.execute(query_two, [course_id])
+                admin = cur.fetchone()
         conn.close()
         if not data:
             raise Exception("No Courses Found")
@@ -80,6 +85,8 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
         ordered_data["Year"] = data[5]
         ordered_data["StudyPeriod"] = data[6]
         ordered_data['Assignments'] = get_assignments(data[2])
+        if (admin):
+            ordered_data['Admin'] = admin[0]
         return ordered_data
 
     except Exception as e:
@@ -123,7 +130,7 @@ def add_group_to_course(course_id: int, user_id: int):
 
     except Exception as e:
         print(e)
-        raise Exception("Could not create group")
+        raise Exception("Could not create group") from e
 
 
 def _create_course(course_name: str, course_abbr: str, year: int,
@@ -136,7 +143,7 @@ def _create_course(course_name: str, course_abbr: str, year: int,
         with conn:
             with conn.cursor() as cur:
                 query_one = """Insert into Courses
-                                (coursename,course, teachingperiod, courseyear)
+                                (coursename, course, teachingperiod, courseyear)
                                 values (%s,%s,%s,%s) """
                 cur.execute(query_one, [course_name, course_abbr,
                                         teaching_period, year])
@@ -154,7 +161,7 @@ def _create_course(course_name: str, course_abbr: str, year: int,
         return {'status': "course_exists"}, 400
 
 
-def create_assignment(course_id: int, description: str, assignment_nr: int,
+def create_assignment(course_id: int, description: str, assignment_name: int,
                       end_date: str, file_names: list) -> dict:
     """Creates an assignment for a course, assignment number will not be
     incremented automatically, thus must be provided by the creator"""
@@ -174,25 +181,36 @@ def create_assignment(course_id: int, description: str, assignment_nr: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = "INSERT INTO Assignments VALUES " +\
-                    "(%s, %s, %s, %s);"
+                query_one = """SELECT MAX(assignment) as max_assignment FROM
+                Assignments WHERE courseid = %s;"""
+                cur.execute(query_one, [course_id])
+                data = cur.fetchone()
+                print(data)
+                if data[0] is None:
+                    assignment_nr = 1
+                else:
+                    # since the "select max" call is done before insert we
+                    # need to increment by 1
+                    assignment_nr = data[0] + 1
+                query_two = """INSERT INTO Assignments (courseid, assignment,
+                enddate, description, name) VALUES
+                    (%s, 0, %s, %s, %s);"""
                 cur.execute(
-                    query_one,
+                    query_two,
                     [
                         course_id,
-                        assignment_nr,
-                        description, end_date
+                        end_date,
+                        description,
+                        assignment_name
                     ]
                 )
         conn.close()
-
         add_filenames(file_names, course_id, assignment_nr)
-
         return res
 
     except Exception as e:
         print(e)
-        return {'status': 'Insert failed'}
+        raise Exception("Could not create assignment") from e
 
 
 def get_assignments(course_id: int) -> tuple:
@@ -243,26 +261,41 @@ def change_description(new_desc: str, course_id: int,
         return {'status': "No Courses Found"}
 
 
-# TODO: not done or tested, returns statements must be fixed
+def change_course_name(new_name: str, course: int):
+    """ Changes the name for the course"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """UPDATE courses set coursename = %s
+                                WHERE courseid = %s"""
+                cur.execute(query_data, [new_name, course])
+        conn.close()
+
+    except Exception as e:
+        print(e)
+        raise Exception("Could not change name") from e
+
+
 def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
-                         passed: bool, course: int, assignment: int):
+                         course: int, assignment: int, submission: int):
     """Submission is set to 0 since a primary cannot be null.
     It will increment by default anyway."""
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """INSERT INTO AssignmentFeedback (groupId,
-                courseId, assignment, submission, teacherGrade,
-                teacherFeedback, testPassed)
-                VALUES (%s, %s, %s, 0, %s, %s, %s);"""
-                cur.execute(query_one, [group_id, course, assignment, 0, grade,
-                                        feedback, passed])
+                query_one = """UPDATE AssignmentFeedback SET
+                teacherFeedback = %s, teacherGrade = %s WHERE groupId = %s
+                AND courseId = %s AND submission = %s AND assignment = %s;"""
+                cur.execute(query_one, [feedback, grade, group_id, course,
+                                        submission, assignment])
         conn.close()
         return
     except Exception as e:
         print(e)
-        return {'status': 'Could Not update the feedback'}
+        raise Exception("Could not update feedback") from e
 
 
 # Not tested
@@ -283,7 +316,7 @@ def change_end_date(course: int, assignment: int,
             return
         except Exception as e:
             print(e)
-            return {'status': 'Something went wrong'}
+            raise Exception("Could not change end date") from e
     else:
         return {'status': 'End date has the wrong format, must be YYYY-MM-DD'}
 
@@ -341,6 +374,8 @@ def get_assignment_feedback(course: int, assignment: int,
                                 groupid = %s AND assignment = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
+                print("from db")
+                print(len(data))
         conn.close()
         if not data:
             return []
@@ -348,7 +383,7 @@ def get_assignment_feedback(course: int, assignment: int,
 
     except Exception as e:
         print(e)
-        raise Exception("Could not retrieve feedback")
+        raise Exception("Could not retrieve feedback") from e
 
 
 def _format_assignment_feedback(db_output: list[tuple]) -> list:
@@ -392,4 +427,57 @@ def get_course_groups(course: int):
 
     except Exception as e:
         print(e)
-        raise Exception("Error when getting course groups")
+        raise Exception("Error when getting course groups") from e
+
+# TODO:check so the query has the intended effect
+def get_assignment_overview(course: int, assignment: int) -> list[dict]:
+    """Returns a list with test status and grade for all the latest
+    submissions for a assignment"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
+                teacherGrade FROM AssignmentFeedback WHERE courseId = %s
+                AND assignment = %s ORDER BY groupId,
+                submission DESC;"""
+
+                cur.execute(query_data, [course, assignment])
+                data = cur.fetchall()
+                if not data:
+                    return []
+                
+                overview_list = []
+                for row in data:
+                    group_dict = {
+                        "groupid": row[0],
+                        "testpass": row[1],
+                        "grade": row[2]}
+                    overview_list.append(group_dict)
+        conn.close()
+        return overview_list
+
+    except Exception as e:
+        print(e)
+        raise Exception("Error when getting assignment overview") from e
+
+
+def passed_deadline(course: int, assignment: int) -> bool:
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_one = """select enddate from assignments
+                    WHERE courseid = %s AND assignment = %s;"""
+                cur.execute(query_one, [course, assignment])
+                date: datetime = cur.fetchone()[0]
+        conn.close()
+        if date < datetime.date.today():
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(e)
+        raise Exception("Could not get the deadline from database") from e

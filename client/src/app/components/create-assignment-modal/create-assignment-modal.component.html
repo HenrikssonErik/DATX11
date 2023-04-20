@@ -1,0 +1,117 @@
+<div class="modal-content" [formGroup]="form">
+  <div class="modal-header">
+    <h4 class="modal-title text-muted" translate>
+      Create Assignment for: {{ course.Course }}
+    </h4>
+    <i
+      class="fa-solid fa-xmark close"
+      (click)="activeModal.dismiss('Cross click')"
+    ></i>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            class="form-control"
+            id="floatingAssignmentName"
+            placeholder="Assignment Name"
+            formControlName="AssignmentName"
+          />
+          <label for="floatingAssignmentName">Assignment Name</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-floating mb-3">
+          <input
+            type="date"
+            class="form-control"
+            id="Date"
+            formControlName="Date"
+          />
+          <label for="Date">Due Date</label>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="form-floating">
+          <textarea
+            class="form-control"
+            id="description"
+            style="height: 150px"
+            formControlName="Description"
+          ></textarea>
+          <label for="description">Description</label>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-2">
+      <div class="col-12">
+        <h6 class="text-muted">Number of files needed in submission</h6>
+        <div class="input-group mb-3">
+          <select
+            class="form-select"
+            id="inputGroupSelect01"
+            formControlName="numOfFiles"
+          >
+            <option selected></option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-2" *ngIf="form.controls['numOfFiles'].value">
+      <div class="col-12">
+        <h6 class="text-muted">Submission File Names</h6>
+        <div formArrayName="fileNames">
+          <div *ngFor="let fileControl of fileControls; let i = index">
+            <input
+              class="form-control"
+              style="margin: 3px"
+              type="text"
+              placeholder="PythonFile.py"
+              [formControlName]="i"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-2">
+      <div class="col-md-12">
+        <div class="mb-3">
+          <label for="formFile" class="form-label"
+            >Upload unit test for this assignment</label
+          >
+          <input
+            class="form-control"
+            type="file"
+            id="Files"
+            (change)="fileBrowseHandler($event)"
+            multiple
+          />
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-12">
+        <button
+          (click)="createAssignment()"
+          class="btn btn-primary w-100"
+          [ngClass]="{ disabled: form.invalid }"
+        >
+          Create Assignment
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

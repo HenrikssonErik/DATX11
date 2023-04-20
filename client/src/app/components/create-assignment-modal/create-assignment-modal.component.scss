@@ -1,0 +1,39 @@
+.close {
+  color: #6c757d;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #000;
+}
+
+.modal-header {
+  border-bottom: none;
+}
+
+.modal-footer {
+  border-top: none;
+}
+
+.modal-content {
+  background-color: #fff;
+}
+
+.form-control:focus {
+  border-color: rgba(38, 115, 77, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
+}
+
+.form-control {
+  color: #6c757d;
+}
+
+label {
+  color: #6c757d;
+}
+
+.error-message {
+  color: #8b0000;
+  margin-top: 5px;
+  font-size: smaller;
+}

@@ -100,11 +100,7 @@
                 class="loader"
               ></span>
               <span
-                *ngIf="
-                  !(group.groupId === myGroup.groupId) &&
-                  !hasGroup() &&
-                  !isLoadingMap.get(group.groupId)
-                "
+                *ngIf="!hasGroup() && !isLoadingMap.get(group.groupId)"
                 class="joinButton"
                 (click)="
                   joinGroup(course.courseID, group.groupId);
@@ -114,8 +110,7 @@
               >
               <span
                 *ngIf="
-                  group.groupId === myGroup.groupId &&
-                  !isLoadingMap.get(group.groupId)
+                  inGroup(group.groupId) && !isLoadingMap.get(group.groupId)
                 "
                 (click)="
                   removeFromGroup(course.courseID, group.groupId);
@@ -146,7 +141,7 @@
       [class.active]="selectedTab === -1"
     >
       <!--CONTENT FOR SETTINGS-->
-      <p>Settings content goes here</p>
+      <app-teacher-settings></app-teacher-settings>
     </div>
     <div
       class="tab-pane fade"
@@ -165,19 +160,30 @@
             ><span translate>Assignment </span>{{ assignment.AssignmentNr }}
           </h5>
           <!-- <h5><i class="fa-solid fa-ellipsis-vertical"></i></h5> -->
-          <button
-            class="btn btn-primary submitBtn"
-            (click)="
-              openModal(course.courseID, group.groupId, assignment.AssignmentNr)
-            "
-          >
-            Submit Assignment
-          </button>
+          <div>
+            <button
+              [disabled]="datePassed(assignment.DueDate)"
+              class="btn btn-primary submitBtn"
+              (click)="
+                openModal(
+                  course.courseID,
+                  group.groupId,
+                  assignment.AssignmentNr
+                )
+              "
+            >
+              <span *ngIf="!datePassed(assignment.DueDate)"
+                >Submit Assignment</span
+              ><span *ngIf="datePassed(assignment.DueDate)"
+                >Deadline has passed</span
+              >
+            </button>
+          </div>
         </div>
         <div class="row mt-2">
           <div class="col-md-2">
             <h5>Teacher</h5>
-            <p>Livets Hårda Skola</p>
+            <p>{{ course.Admin }}</p>
           </div>
           <div class="col-md-2">
             <h5>Due Date</h5>
@@ -190,7 +196,7 @@
             </p>
           </div>
           <!--TODO: HANDLE THE EMPTY GROUP BETTER-->
-          <div class="col-md-3" *ngIf="groupExists()">
+          <div class="col-md-2" *ngIf="groupExists()">
             <h5>Group {{ group.groupId }}</h5>
             <ng-container>
               <p
@@ -202,7 +208,7 @@
             </ng-container>
           </div>
 
-          <div class="col-md-5">
+          <div class="col-md-6">
             <h5>Description</h5>
             <p>{{ assignment.Description }}</p>
           </div>

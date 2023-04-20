@@ -165,10 +165,14 @@ def post_files():
     if (user_id):
         if (group_id == user_handler.get_group(user_id,
                                                course_id)["groupId"]):
-            res = handle_files(files, course_id, group_id, assignment_nr)
-            feedback_res = {}
-            feedback_res.update(res[2])
-            return make_response(jsonify(feedback_res), res[3])
+            if not (course_handler.passed_deadline(course_id, assignment_nr)):
+                res = handle_files(files, course_id, group_id, assignment_nr)
+                feedback_res = {}
+                feedback_res.update({"feedback": res[0]})
+                feedback_res.update(res[1])
+                return make_response(jsonify(feedback_res), res[2])
+            else:
+                return make_response({'status': 'deadline_passed'}, 400)
         else:
             return make_response({'status': 'not_in_group'}, 401)
     else:
@@ -181,6 +185,8 @@ def post_files():
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
     files = request.files.getlist('files')
+    course = int(request.form['Course'])
+    assignment = int(request.form['Assignment'])
 
     data = request.get_json()
     course = data['course']
@@ -447,18 +453,18 @@ def create_assignment():
     course_id = data['Course']
     description = data.get('Description', "")
     end_date = data['Date']
-    assignment_nr = data['AssignmentNr']
-    file_names = data.get('FileNames', [])
+    file_names = data.get('fileNames', [])
+    assignment_name = data.get('AssignmentName')
 
     if (user_handler.check_admin_or_course_teacher(request_user_id,
                                                    course_id)):
         res = course_handler.create_assignment(course_id, description,
-                                               assignment_nr, end_date,
+                                               assignment_name, end_date,
                                                file_names)
         if not (len(res) == 0):
             return make_response(jsonify(res), 400)
         else:
-            make_response("", 200)
+            return make_response("", 200)
 
 
 @app.route('/changeUserRole', methods=['POST'])
@@ -570,4 +576,55 @@ def get_course_groups():
     else:
         return make_response("not_logged_in", 401)
 
-# TODO add endpoint to get all groups latest submissions
+
+@app.route('/assignmentsOverview', methods=['GET'])
+def get_overview():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = int(request.args.get('Course'))
+    assignment = int(request.args.get('Assignment'))
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
+        # create overview
+        overview = course_handler.get_assignment_overview(course, assignment)
+        return make_response(jsonify(overview), 200)
+    else:
+        return make_response(jsonify({"status": "no_permission"}), 401)
+
+
+@app.route('/setFeedback', methods=['POST'])
+def set_feedback():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    data = request.get_json()
+    course: int = int(data['Course'])
+    assignment: int = int(data['Assignment'])
+    submission: int = int(data['Date'])
+    feedback: str = str(data['Feedback'])
+    grade: bool = bool(data['Grade'])
+    group_id: int = int(data['Group'])
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
+        course_handler.set_teacher_feedback(group_id, feedback, grade, course, assignment, submission)
+        return make_response("", 200)
+    else:
+        return make_response(jsonify({"status": "no_permission"}), 401)
+
+
+@app.route('/changeCourseName', methods=['POST'])
+def change_course_name():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    data = request.get_json()
+    new_name = data['Name']
+    course = data['Course']
+
+    if (user_id):
+        if (user_handler.check_admin_or_course_teacher(user_id, course)):
+            course_handler.change_course_name(new_name, course)
+            return make_response("", 200)
+        else:
+            return make_response(jsonify({'status': 'Not a course teacher'}),
+                                 401)
+    else:
+        return make_response(jsonify({'status': 'no_permission'}), 401)

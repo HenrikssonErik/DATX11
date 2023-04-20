@@ -28,4 +28,38 @@ export class CourseService {
       headers,
     });
   }
+
+  changeCourseName(newName: string, courseId: number): Observable<any> {
+    const headers = new HttpHeaders().append('Cookies', document.cookie);
+    return this.http.post<Course>(
+      `${API_URL}/changeCourseName`,
+      { Name: newName, Course: courseId },
+      {
+        observe: 'response',
+        headers: headers,
+      }
+    );
+  }
+
+  createAssignment(
+    assignmentNr: string,
+    description: string,
+    courseId: number,
+    deadline: Date
+  ): Observable<any> {
+    const headers = new HttpHeaders().append('Cookies', document.cookie);
+    return this.http.post<any>(
+      `${API_URL}/createAssignment`,
+      {
+        AssignmentNr: assignmentNr,
+        Description: description,
+        Course: courseId,
+        Date: deadline,
+      },
+      {
+        observe: 'response',
+        headers: headers,
+      }
+    );
+  }
 }

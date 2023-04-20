@@ -1,0 +1,80 @@
+<h3 class="text-muted mt-3" translate>Settings</h3>
+<div class="card" [formGroup]="form">
+  <div class="header">
+    <h5>
+      <span
+        ><span>Course: </span>{{ course.CourseName }} - {{ course.Course }}
+      </span>
+    </h5>
+    <div class="form-group form-check">
+      <input
+        type="checkbox"
+        formControlName="editMode"
+        class="form-check-input"
+        id="editMode"
+      />
+      <label class="form-check-label text-muted" for="editMode" translate
+        >Edit_Mode</label
+      >
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-floating mb-3">
+        <input
+          type="text"
+          class="form-control"
+          id="floatingCourseName"
+          [disabled]="!form.get('editMode')?.value"
+          [value]="course.CourseName"
+        />
+        <button
+          style="float: right"
+          *ngIf="form.get('editMode')?.value"
+          class="btn btn-primary mt-2"
+          (click)="changeCourseName()"
+          [disabled]="form.get('CourseName')?.value != course.CourseName"
+        >
+          Save
+        </button>
+        <label for="floatingCourseName">Course Name</label>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-floating mb-3">
+        <input
+          type="text"
+          class="form-control"
+          id="floatingCourseCode"
+          disabled
+          [value]="course.Course"
+        />
+        <label for="floatingCourseCode">Course Code</label>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h5>Assignments</h5>
+      <button
+        class="btn btn-primary w-100"
+        (click)="openCreateAssignmentModal()"
+      >
+        Create Assignment
+      </button>
+    </div>
+    <div class="col-md-6">
+      <h5>Members</h5>
+      <button class="btn btn-primary w-100">Handle Members</button>
+    </div>
+  </div>
+</div>
+<div class="row mt-3">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="header">
+        <h5>Assignment</h5>
+      </div>
+    </div>
+  </div>
+</div>
