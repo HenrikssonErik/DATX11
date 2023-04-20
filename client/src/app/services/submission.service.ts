@@ -19,4 +19,7 @@ export class SubmissionService {
       { headers }
     );
   }
+
+  /* getAssignmentOverView(courseId: number): Observable<any> {
+  } */
 }
