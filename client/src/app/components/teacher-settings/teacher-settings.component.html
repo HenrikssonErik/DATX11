@@ -1,5 +1,5 @@
 <h3 class="text-muted mt-3" translate>Settings</h3>
-<div class="card" [formGroup]="form">
+<div class="card row" [formGroup]="form">
   <div class="header">
     <h5>
       <span
@@ -72,7 +72,10 @@
   </div>
 </div>
 <div class="row mt-3">
-  <div class="col-md-6">
-    <app-assignemnt-card></app-assignemnt-card>
+  <div
+    class="col-md-6 card-container mb-2"
+    *ngFor="let assignment of this.course.Assignments"
+  >
+    <app-assignemnt-card [Assignment]="assignment"></app-assignemnt-card>
   </div>
 </div>

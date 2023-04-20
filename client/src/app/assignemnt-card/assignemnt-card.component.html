@@ -1,12 +1,15 @@
-<div class="card row-md-12" [formGroup]="form">
+<div class="card" [formGroup]="form">
   <div class="header">
-    <h5><span>Assignment </span> <span>1</span></h5>
+    <h5>
+      <span>Assignment </span> <span>{{ Assignment.AssignmentNr }}</span>
+    </h5>
     <div class="form-group form-check">
       <input
         type="checkbox"
         formControlName="editMode"
         class="form-check-input"
         id="editMode"
+        (click)="editToggle()"
       />
       <label class="form-check-label text-muted" for="editMode" translate
         >Edit_Mode</label
@@ -20,7 +23,6 @@
           type="text"
           class="form-control"
           id="floatingAssignmentName"
-          placeholder="Assignment Name"
           formControlName="AssignmentName"
         />
         <label for="floatingAssignmentName">Assignment Name</label>
@@ -39,8 +41,16 @@
         </div>
       </div>
       <div class="col-md-7">
-        <label for="formFile" class="form-label">Replace tests</label>
-        <input class="form-control" type="file" id="Files" multiple />
+        <label for="formFile" class="form-label" style="font-size: small"
+          >Replace tests</label
+        >
+        <input
+          class="form-control"
+          type="file"
+          id="Files"
+          (change)="fileBrowseHandler($event)"
+          multiple
+        />
       </div>
       <!-- add (change)="fileBrowseHandler($event)"  to input-->
     </div>
@@ -60,6 +70,7 @@
       style="float: right"
       *ngIf="form.get('editMode')?.value"
       class="btn btn-primary mt-2"
+      (click)="onSubmit()"
     >
       Save
     </button>

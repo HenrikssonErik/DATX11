@@ -26,3 +26,7 @@
   border-color: rgba(38, 115, 77, 0.25);
   box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
 }
+
+.card-container {
+  flex-direction: column;
+}
