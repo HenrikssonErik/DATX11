@@ -76,6 +76,9 @@
     class="col-md-6 card-container mb-2"
     *ngFor="let assignment of this.course.Assignments"
   >
-    <app-assignemnt-card [Assignment]="assignment"></app-assignemnt-card>
+    <app-assignemnt-card
+      [Assignment]="assignment"
+      [courseID]="course.courseID"
+    ></app-assignemnt-card>
   </div>
 </div>

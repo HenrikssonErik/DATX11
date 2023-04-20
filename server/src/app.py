@@ -492,10 +492,10 @@ def change_user_role():
 def edit_desc():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
-    data = request.get_json()
+    data = request.form
     new_desc = data['Desc']
-    course = data['Course']
-    assignment = data['Assignment']
+    course = int(data['Course'])
+    assignment = int(data['Assignment'])
 
     if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
         res = course_handler.change_description(new_desc, course, assignment)
@@ -506,6 +506,9 @@ def edit_desc():
             return make_response(jsonify(res), 401)
     else:
         return make_response(jsonify({'status': 'Not a course teacher'}), 401)
+
+
+# create change Assignment name
 
 
 @app.route('/getUsersInCourse', methods=['GET'])
@@ -524,9 +527,9 @@ def get_users_in_course():
 def change_assignment_date():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
-    data = request.get_json()
-    course: int = data['Course']
-    assignment: int = data['Assignment']
+    data = request.form
+    course: int = int(data['Course'])
+    assignment: int = int(data['Assignment'])
     new_date: str = data['Date']
 
     if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
@@ -613,7 +616,7 @@ def change_course_name():
     user_id = verify_and_get_id(token)
     data = request.get_json()
     new_name = data['Name']
-    course = data['Course']
+    course = int(data['Course'])
 
     if (user_id):
         if (user_handler.check_admin_or_course_teacher(user_id, course)):

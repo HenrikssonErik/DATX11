@@ -1,8 +1,11 @@
 import { Component, ElementRef, Input } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { CourseService } from '../services/course-service.service';
+import { CourseService } from '../../services/course-service.service';
 import { ToastrService } from 'ngx-toastr';
-import { Assignment } from '../models/courses';
+import { Assignment } from '../../models/courses';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { API_URL } from 'src/environments/environment';
+import { ToastrResponseService } from 'src/app/services/toastr-response.service';
 
 @Component({
   selector: 'app-assignemnt-card',
@@ -27,7 +30,9 @@ export class AssignemntCardComponent {
 
   constructor(
     private courseService: CourseService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private http: HttpClient,
+    private toastrResponse: ToastrResponseService
   ) {}
 
   ngOnInit() {
@@ -101,18 +106,86 @@ export class AssignemntCardComponent {
     }
     if (this.form.get('Description')?.value != this.Assignment.Description) {
       console.log(this.form.get('Description')?.value);
+      this.changeDesc();
       //make call here
     }
     if (this.form.get('Date')?.value != this.formatedDate) {
-      console.log(typeof this.Assignment.DueDate);
-      console.log(this.form.get('Date')?.value);
+      this.changeDate();
       //make call here
     }
   }
   //TODO:
-  changeDesc() {}
+  changeDesc() {
+    const formData = new FormData();
+    formData.append('Desc', this.form.get('Description')?.value);
+    formData.append('Course', this.courseID.toString());
+    formData.append('Assignment', this.Assignment.AssignmentNr.toString());
+
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/editDescription`, formData, {
+        observe: 'response',
+        headers: headers,
+      })
+      .subscribe({
+        next: (response: any) => {
+          try {
+            if (response.status == 200) {
+              this.toastr.success('Description Updated', response.body);
+            }
+          } catch {
+            throw new Error('unexpected_error');
+          }
+        },
+        error: (err) => {
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+      });
+  }
   changeName() {}
-  changeDate() {}
+  changeDate() {
+    const formData = new FormData();
+    formData.append('Date', this.form.get('Date')?.value);
+    formData.append('Course', this.courseID.toString());
+    formData.append('Assignment', this.Assignment.AssignmentNr.toString());
+
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/changeAssignmentDate`, formData, {
+        observe: 'response',
+        headers: headers,
+      })
+      .subscribe({
+        next: (response: any) => {
+          try {
+            if (response.status == 200) {
+              this.toastr.success('Due Date Updated', response.body);
+            }
+          } catch {
+            throw new Error('unexpected_error');
+          }
+        },
+        error: (err) => {
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+      });
+  }
 
   changeTests() {}
 }

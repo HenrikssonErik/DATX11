@@ -36,7 +36,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TeacherSettingsComponent } from './components/teacher-settings/teacher-settings.component';
 import { CreateAssignmentModalComponent } from './components/create-assignment-modal/create-assignment-modal.component';
 import { HandleUsersModalComponent } from './components/handle-users-modal/handle-users-modal.component';
-import { AssignemntCardComponent } from './assignemnt-card/assignemnt-card.component';
+import { AssignemntCardComponent } from './components/assignemnt-card/assignemnt-card.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
