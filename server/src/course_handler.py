@@ -130,7 +130,7 @@ def add_group_to_course(course_id: int, user_id: int):
 
     except Exception as e:
         print(e)
-        raise Exception("Could not create group")
+        raise Exception("Could not create group") from e
 
 
 def _create_course(course_name: str, course_abbr: str, year: int,
@@ -295,7 +295,7 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
         return
     except Exception as e:
         print(e)
-        raise Exception("Could not update feedback")
+        raise Exception("Could not update feedback") from e
 
 
 # Not tested
@@ -316,7 +316,7 @@ def change_end_date(course: int, assignment: int,
             return
         except Exception as e:
             print(e)
-            raise Exception("Could not change end date")
+            raise Exception("Could not change end date") from e
     else:
         return {'status': 'End date has the wrong format, must be YYYY-MM-DD'}
 
