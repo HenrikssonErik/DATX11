@@ -11,14 +11,6 @@ import json
 from .connector import get_conn_string
 
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
-# TODO: temp variables, should be taken from database when it is implemented
-
-# TODO: load filenames from database
-__allowed_filenames = {"Test1.pdf", "test2.txt",
-                       "1ha1.py", "PythonFile.py", "my_test_file.py",
-                       "my_test_file_demo.py", "test_1_demo.py",
-                       "test_1.py", "test_0.py"}
-__nr_of_files = 1
 
 
 def handle_files(files: list[FileStorage], course: int, group: int,
