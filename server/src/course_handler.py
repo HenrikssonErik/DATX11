@@ -383,7 +383,7 @@ def get_assignment_feedback(course: int, assignment: int,
 
     except Exception as e:
         print(e)
-        raise Exception("Could not retrieve feedback")
+        raise Exception("Could not retrieve feedback") from e
 
 
 def _format_assignment_feedback(db_output: list[tuple]) -> list:
@@ -427,7 +427,7 @@ def get_course_groups(course: int):
 
     except Exception as e:
         print(e)
-        raise Exception("Error when getting course groups")
+        raise Exception("Error when getting course groups") from e
 
 # TODO:check so the query has the intended effect
 def get_assignment_overview(course: int, assignment: int) -> list[dict]:
@@ -460,7 +460,7 @@ def get_assignment_overview(course: int, assignment: int) -> list[dict]:
 
     except Exception as e:
         print(e)
-        raise Exception("Error when getting assignment overview")
+        raise Exception("Error when getting assignment overview") from e
 
 
 def passed_deadline(course: int, assignment: int) -> bool:
