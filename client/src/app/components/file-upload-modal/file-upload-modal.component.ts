@@ -7,10 +7,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./file-upload-modal.component.scss'],
 })
 export class FileUploadModalComponent {
-  //TODO: Give types to these inputs
-  @Input() courseId: any;
-  @Input() assignmentNumber: any;
-  @Input() groupId: any;
+  @Input() courseId!: number;
+  @Input() assignmentNumber!: number;
+  @Input() groupId!: number;
 
   constructor(public activeModal: NgbActiveModal) {}
 }

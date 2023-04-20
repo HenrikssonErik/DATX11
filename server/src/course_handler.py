@@ -352,7 +352,7 @@ def get_assignment_feedback(course: int, assignment: int,
 
 
 def _format_assignment_feedback(db_output: list[tuple]) -> list:
-    assignments: list[dict[str: str | int]] = []
+    assignments: list[dict[str, str | int]] = []
     for submission in db_output:
         testfeedback = "" if (x := submission[2]) is None else x
 
