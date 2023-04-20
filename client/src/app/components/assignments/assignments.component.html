@@ -65,6 +65,23 @@
         Groups_Tab
       </button>
     </li>
+    <li class="nav-item" role="presentation" *ngIf="isAdmin">
+      <button
+        class="nav-link"
+        [class.active]="selectedTab === -3"
+        [id]="'tab-settings'"
+        [attr.data-bs-toggle]="'tab'"
+        [attr.data-bs-target]="'#tab-pane-gradeing'"
+        type="button"
+        role="tab"
+        [attr.aria-controls]="'tab-pane-gradeing'"
+        [attr.aria-selected]="selectedTab === -3"
+        (click)="selectedTab = -3"
+        translate
+      >
+        Gradeing
+      </button>
+    </li>
   </ul>
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade" *ngIf="selectedTab === null"></div>
@@ -142,6 +159,18 @@
     >
       <!--CONTENT FOR SETTINGS-->
       <app-teacher-settings></app-teacher-settings>
+    </div>
+    <div
+      class="tab-pane fade"
+      [id]="'tab-pane-gradeing'"
+      *ngIf="selectedTab === -3"
+      role="tabpanel"
+      [attr.aria-labelledby]="'tab-gradeing'"
+      [class.show]="selectedTab === -3"
+      [class.active]="selectedTab === -3"
+    >
+      <!--CONTENT FOR Gradeing-->
+      <p>Gradeing content goes here</p>
     </div>
     <div
       class="tab-pane fade"

@@ -46,6 +46,10 @@ export class AssignmentsComponent implements OnInit {
         this.course = res;
         console.log(this.course);
         this.course.Assignments.sort((a, b) => a.AssignmentNr - b.AssignmentNr);
+        if (this.isAdmin) {
+          //TODO: Move admins to "gradeing" tab. Ugly but wokrs for now
+          this.selectedTab = -3;
+        }
       });
     }
 
