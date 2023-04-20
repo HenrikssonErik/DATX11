@@ -182,8 +182,8 @@
         </div>
         <div class="row mt-2">
           <div class="col-md-2">
-            <h5>Teacher</h5>
-            <p>{{ course.Admin }}</p>
+            <h5>Teachers</h5>
+            <p *ngFor="let teacher of assignment.Teachers" style="margin: 0">{{ teacher }}</p>
           </div>
           <div class="col-md-2">
             <h5>Due Date</h5>

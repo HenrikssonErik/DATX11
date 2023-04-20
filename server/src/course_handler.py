@@ -215,12 +215,19 @@ def create_assignment(course_id: int, description: str, assignment_name: int,
 
 def get_assignments(course_id: int) -> tuple:
     """Returns a list of all assignments connected to a course, with their
-    description and end date"""
+       description and end date"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
         with conn:
             with conn.cursor() as cur:
+                query_teacher = """SELECT fullname FROM TeacherInCourse
+                                          WHERE courseId = %s"""
+                cur.execute(query_teacher, [course_id])
+                
+                teachers = cur.fetchall()
+                teacher_names = [str(name[0]) for name in teachers]
+                
                 query_data = "SELECT assignment, enddate, Description FROM " +\
                     "assignments WHERE courseid = %s"
                 cur.execute(query_data, [course_id])
@@ -230,7 +237,8 @@ def get_assignments(course_id: int) -> tuple:
                 for assignment_row in data:
                     assignments.append({'AssignmentNr': assignment_row[0],
                                         'DueDate': assignment_row[1],
-                                        'Description': assignment_row[2]})
+                                        'Description': assignment_row[2],
+                                        'Teachers': teacher_names})
         conn.close()
         if not data:
             return []
