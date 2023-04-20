@@ -364,7 +364,7 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
                             'testfeedback': testfeedback,
                             'teacherfeedback': teacherfeedback,
                             'Grade': grade})
-        return assignments
+    return assignments
 
 
 def get_course_groups(course: int):
