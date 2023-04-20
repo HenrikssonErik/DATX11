@@ -11,7 +11,7 @@ from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
     user_to_resend_verification, verify_user_from_email_verification, \
-    verify_and_get_id
+    verify_and_get_id, create_temp_users
 from flask_mail import Mail, Message
 import jwt
 
@@ -29,14 +29,15 @@ mail = Mail(app)
 create_key()
 
 
-def extract_token(request) -> str:
+def extract_token(request) -> str | None:
     cookies = request.headers.get('Cookies')
-    separated_cookies = cookies.split('; ')
-    for cookie in separated_cookies:
-        name, value = cookie.split('=')
-        if name == 'Token':
-            return value
-    return ""
+    if cookies is not None:
+        separated_cookies = cookies.split('; ')
+        for cookie in separated_cookies:
+            name, value = cookie.split('=')
+            if name == 'Token':
+                return value
+    return None
 
 
 @app.route('/login', methods=['POST'])
@@ -61,7 +62,6 @@ def sign_up() -> Response:
     """
     response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
         user_registration(request.form)
-
     if (response[1] == 200):
         send_verification_email(
             request.form['email'], response[0]['token'])
@@ -300,6 +300,40 @@ def remove_from_group():
     return make_response("", 401)
 
 
+@app.route('/batchAddToCourse', methods=['POST'])
+def batch_add_to_course():
+    """
+    Gets a list of cids that needs to be added to a course and
+    in the case of the user not existing, the user should be created
+    with a random temp password.
+    """
+    token = extract_token(request)
+    if token is None:
+        return make_response("Missing token", 401)
+    try:
+        request_user_id = verify_and_get_id(token)
+    except jwt.InvalidTokenError:
+        return make_response("Invalid token", 400)
+    data = request.get_json()
+    course_id: int = data['Course']
+    if not (user_handler.check_admin_or_course_teacher(
+        request_user_id,
+        course_id
+    )):
+        return make_response("", 401)
+
+    (user_ids, none_existing_cids) = \
+        user_handler.get_user_ids_from_cids(data["Cids"])
+    user_handler.add_users_to_course(user_ids, course_id)
+
+    if len(none_existing_cids) != 0:
+        newly_registered_cids = create_temp_users(none_existing_cids)
+        (user_ids, _) = \
+            user_handler.get_user_ids_from_cids(newly_registered_cids)
+        user_handler.add_users_to_course(user_ids, course_id)
+    return make_response("", 200)
+
+
 # Should probably be redone to take a list of users, redo how singup works
 # as well with cid/email being added to the list first
 @app.route('/addToCourse', methods=['POST'])
@@ -311,8 +345,10 @@ def add_to_course():
     user_to_add: int = data['User']
     role = data['Role']
 
-    if (user_handler.check_admin_or_course_teacher(request_user_id,
-                                                   course_id)):
+    if (user_handler.check_admin_or_course_teacher(
+        request_user_id,
+        course_id
+    )):
         user_handler.add_user_to_course(user_to_add, course_id, role)
         return make_response("", 200)
     return make_response("", 401)

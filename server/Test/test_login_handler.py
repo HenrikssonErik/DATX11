@@ -9,7 +9,7 @@ import bcrypt
 from psycopg2 import IntegrityError
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_verification_token, verify_user_in_db, verify_user_from_email_verification, user_to_resend_verification  # noqa: E402, E501
+from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_verification_token, verify_user_in_db, verify_user_from_email_verification, user_to_resend_verification, create_temp_users  # noqa: E402, E501
 
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
@@ -55,6 +55,35 @@ class TestFileHandler(unittest.TestCase):
             'abc', 'abc@chalmers.se', 'أَلِف', True), ('pass_not_ok', 400))
 
     @patch('psycopg2.connect')
+    def test_create_temp_users(self, mock_connect):
+        mock_cursor = setup_mock_cursor(mock_connect)
+        cids = ["alebru", "erhen", "gabhags"]
+
+        res = create_temp_users(cids)
+
+        expected_last_cid = "gabhags"
+        expected_last_email = "gabhags@chalmers.se"
+        expected_last_passphrase = None
+        expected_last_global_role = "Student"
+        expected_last_fullname = "Gabriel Hagström"
+
+        mock_cursor.execute.assert_called_with(
+            "INSERT INTO UserData " +
+            "(cid, email, passphrase, globalRole, fullName) " +
+            "VALUES (%s, %s, %s, %s, %s ) " +
+            "on conflict do nothing;",
+            (
+                expected_last_cid,
+                expected_last_email,
+                expected_last_passphrase,
+                expected_last_global_role,
+                expected_last_fullname
+            )
+        )
+        self.assertEqual(3, len(mock_cursor.mock_calls))
+        self.assertEqual(cids, res)
+
+    @patch('psycopg2.connect')
     def test_user_registration_success(self, mock_connect):
         with patch.object(bcrypt, 'gensalt') as mock_gensalt:
             mock_gensalt.return_value = b'$2b$12$5OYDyM.lB5wBLwMhFJj42O'
@@ -89,9 +118,13 @@ class TestFileHandler(unittest.TestCase):
 
         result = registration_query(cid, email, hashed_pass, role, name)
         mock_cursor.execute.assert_called_once_with(
-            "INSERT INTO UserData "
-            "(cid, email, passphrase, globalRole, fullName) "
-            "VALUES (%s, %s, %s, %s, %s );",
+            "INSERT INTO UserData " +
+            "(cid, email, passphrase, globalRole, fullName) " +
+            "VALUES (%s, %s, %s, %s, %s ) " +
+            "ON CONFLICT (cid) DO UPDATE " +
+            "SET passphrase = EXCLUDED.passphrase " +
+            "WHERE userdata.cid = EXCLUDED.cid and " +
+            "userdata.passphrase is null;",
             (cid, email, hashed_pass, role, name)
         )
 
@@ -115,9 +148,13 @@ class TestFileHandler(unittest.TestCase):
         result = registration_query(cid, email, hashed_pass, role, name)
 
         mock_cursor.execute.assert_called_once_with(
-            "INSERT INTO UserData "
-            "(cid, email, passphrase, globalRole, fullName) "
-            "VALUES (%s, %s, %s, %s, %s );",
+            "INSERT INTO UserData " +
+            "(cid, email, passphrase, globalRole, fullName) " +
+            "VALUES (%s, %s, %s, %s, %s ) " +
+            "ON CONFLICT (cid) DO UPDATE " +
+            "SET passphrase = EXCLUDED.passphrase " +
+            "WHERE userdata.cid = EXCLUDED.cid and " +
+            "userdata.passphrase is null;",
             (cid, email, hashed_pass, role, name)
         )
 
@@ -163,9 +200,15 @@ class TestFileHandler(unittest.TestCase):
         response = verify_user_in_db(random_cid)
         self.assertTupleEqual(
             tuple(expected_tuple), tuple(response))
-        mock_cur.execute.assert_called_once_with("""UPDATE UserData
-                SET verified = TRUE
-                WHERE cid = %s""", (random_cid,))
+        mock_cur.execute.assert_called_once_with(
+            "UPDATE UserData " +
+            "SET verified = TRUE " +
+            "WHERE cid = %s " +
+            "AND passphrase IS NOT NULL",
+            (
+                random_cid,
+            )
+        )
 
     @patch('psycopg2.connect')
     def test_verify_user_in_db_no_user_updated_fail(self, mock_connect):
@@ -180,9 +223,13 @@ class TestFileHandler(unittest.TestCase):
 
         self.assertTupleEqual(
             tuple(expected_tuple), tuple(response))
-        mock_cur.execute.assert_called_once_with("""UPDATE UserData
-                SET verified = TRUE
-                WHERE cid = %s""", (random_cid,))
+        mock_cur.execute.assert_called_once_with(
+            "UPDATE UserData " +
+            "SET verified = TRUE " +
+            "WHERE cid = %s " +
+            "AND passphrase IS NOT NULL",
+            (random_cid,)
+        )
 
     @patch('psycopg2.connect')
     def test_verify_user_in_db_uncaught_error(self, mock_connect):
@@ -196,9 +243,13 @@ class TestFileHandler(unittest.TestCase):
         response = verify_user_in_db(random_cid)
         self.assertTupleEqual(
             tuple(expected_tuple), tuple(response))
-        mock_cur.execute.assert_called_once_with("""UPDATE UserData
-                SET verified = TRUE
-                WHERE cid = %s""", (random_cid,))
+        mock_cur.execute.assert_called_once_with(
+            "UPDATE UserData " +
+            "SET verified = TRUE " +
+            "WHERE cid = %s " +
+            "AND passphrase IS NOT NULL",
+            (random_cid,)
+        )
 
     def test_verify_user_from_email_verification_success(self):
         random_cid = random_cid_generator()
