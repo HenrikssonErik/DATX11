@@ -1,8 +1,10 @@
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-
 import { ToastrService } from 'ngx-toastr';
 import { API_URL } from 'src/environments/environment';
+import { EventEmitter } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
 
 @Component({
   selector: 'app-file-upload',
@@ -13,9 +15,13 @@ export class FileUploadComponent {
   files: File[] = [];
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
+
+
   @Input() courseId!: number;
   @Input() assignmentNumber!: number;
   @Input() groupId!: number;
+  isLoading: boolean = false;
+
 
   allowedFileTypes: string[] = [
     'text/x-python',
@@ -24,9 +30,13 @@ export class FileUploadComponent {
   ];
   allowedFileTypesForPrint: string[] = ['.py', '.pdf', '.txt'];
 
-  testFeedBackArray: any[] = [];
+  generalTestFeedback: any[] = [];
 
-  constructor(private http: HttpClient, private toastr: ToastrService) {}
+  constructor(
+    private http: HttpClient,
+    private toastr: ToastrService,
+    private modalService: NgbActiveModal
+  ) {}
 
   /**
    * Method to handle the file drop event and prepares the list of files
@@ -128,6 +138,7 @@ export class FileUploadComponent {
    * @returns {void}
    */
   uploadFiles(): void {
+    this.isLoading = true;
     const headers: HttpHeaders = new HttpHeaders().append(
       'Cookies',
       document.cookie
@@ -166,23 +177,29 @@ export class FileUploadComponent {
               }
             );
 
-            //TODO: Stop loading.
+            //TODO: Handle this in complete() instead?
           }
 
-          console.log(response);
-
-          for (const file of response.body.feedback) {
-            const testFeedBackItem = {
+          for (const file of response.body.general_tests_feedback) {
+            const generalTestItem = {
               file: file.tested_file,
-              fileContent: file.PEP8_results,
+              pep8_results: file.PEP8_results,
             };
 
-            this.testFeedBackArray.push(testFeedBackItem);
+            this.generalTestFeedback.push(generalTestItem);
           }
+
+          console.log(this.generalTestFeedback);
+          console.log(response.body.unittest_feedback);
+
+          this.isLoading = false;
+          this.modalService.close();
 
           //TODO: Handle the success response
         },
         error: (err) => {
+          this.isLoading = false;
+          this.modalService.close();
           this.toastr.error(
             err.error.number_of_files,
             'Something went wrong!',
@@ -193,6 +210,7 @@ export class FileUploadComponent {
           console.log(err.error);
           //TODO: Handle the error
         },
+        complete() {},
       });
   }
 
