@@ -358,7 +358,7 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
 
         teacherfeedback = "" if (x := submission[3]) is None else x
 
-        grade = None if (x := submission[2]) is None else x
+        grade = None if (x := submission[4]) is None else x
         assignments.append({'Submission': submission[0],
                             'testpass': submission[1],
                             'testfeedback': testfeedback,
