@@ -10,8 +10,7 @@ class Deadline {
 
   constructor(course: string, date: Date) {
     this.Course = course;
-    console.log(typeof date);
-    this.Date = date.toISOString().substring(0, 10);
+    this.Date = new Date(date).toLocaleDateString('sv-SE');
   }
 }
 
