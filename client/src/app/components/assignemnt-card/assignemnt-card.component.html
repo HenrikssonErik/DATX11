@@ -42,13 +42,14 @@
       </div>
       <div class="col-md-7">
         <label for="formFile" class="form-label" style="font-size: small"
-          >Replace tests</label
+          >Replace tests (replaces file with same name)</label
         >
         <input
           class="form-control"
           type="file"
           id="Files"
           (change)="fileBrowseHandler($event)"
+          [disabled]="!form.get('editMode')?.value"
           multiple
         />
       </div>

@@ -178,21 +178,24 @@ def post_files():
     else:
         return make_response({'status': 'not_logged_in'}, 401)
 
-# TODO: add check token
+
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+
     files = request.files.getlist('files')
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
+    
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
 
-    data = request.get_json()
-    course = data['course']
-    assignment = data['assignment']
-    if not files:
-        return "Files not found", 406
-    res = handle_test_file(files, course, assignment)
-    return make_response(jsonify(res[0]), res[1])
-
+        if not files:
+            return "Files not found", 406
+        res = handle_test_file(files, course, assignment)
+        return make_response(jsonify(res[0]), res[1])
+    else: 
+        make_response("", 401)
 
 @app.route('/getAssignmentTestFeedback', methods=['POST'])
 def get_assignment_feedback():
@@ -210,7 +213,7 @@ def get_assignment_feedback():
     else:
         return make_response("", code)
 
-
+# TODO: add token checks
 @app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
     """
@@ -508,7 +511,24 @@ def edit_desc():
         return make_response(jsonify({'status': 'Not a course teacher'}), 401)
 
 
-# create change Assignment name
+@app.route('/editAssignmentName', methods=['POST'])
+def edit_name():
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    data = request.form
+    new_name = data['Name']
+    course = int(data['Course'])
+    assignment = int(data['Assignment'])
+
+    if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
+        res = course_handler.change_assignment_name(new_name, course, assignment)
+
+        if res is None:
+            return make_response("", 200)
+        else:
+            return make_response(jsonify(res), 401)
+    else:
+        return make_response(jsonify({'status': 'Not a course teacher'}), 401)
 
 
 @app.route('/getUsersInCourse', methods=['GET'])

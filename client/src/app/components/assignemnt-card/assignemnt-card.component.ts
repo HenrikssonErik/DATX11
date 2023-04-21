@@ -15,8 +15,12 @@ import { ToastrResponseService } from 'src/app/services/toastr-response.service'
 export class AssignemntCardComponent {
   Files: File[] = [];
   fileDropEl!: ElementRef;
-  allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
+  allowedFileTypes = ['text/x-python'];
   formatedDate!: string;
+
+  headers = new HttpHeaders()
+    .append('Cookies', document.cookie)
+    .set('Cache-Control', 'public, max-age=3600');
 
   form: FormGroup = new FormGroup({
     editMode: new FormControl(false),
@@ -51,10 +55,17 @@ export class AssignemntCardComponent {
     return `${year}-${month}-${day}`;
   }
   editToggle() {
-    this.form.get('AssignmentName')?.enable();
-    this.form.get('Description')?.enable();
-    this.form.get('Date')?.enable();
-    this.form.get('Files')?.enable();
+    if (this.form.get('editMode')?.value) {
+      this.form.get('AssignmentName')?.disable();
+      this.form.get('Description')?.disable();
+      this.form.get('Date')?.disable();
+      this.form.get('Files')?.disable();
+    } else {
+      this.form.get('AssignmentName')?.enable();
+      this.form.get('Description')?.enable();
+      this.form.get('Date')?.enable();
+      this.form.get('Files')?.enable();
+    }
   }
 
   fileBrowseHandler(files: Event): void {
@@ -92,43 +103,30 @@ export class AssignemntCardComponent {
   }
 
   onSubmit() {
-    const fileData = new FormData();
-    this.Files.forEach((file: File): void =>
-      fileData.append('files', file, file.name)
-    );
     if (this.Files.length > 0) {
-      console.log(fileData.get('files'));
-      //make call here,change how unittest files works
+      this.changeTests();
     }
     if (this.form.get('AssignmentName')?.value != this.Assignment.Name) {
-      console.log(this.form.get('AssignmentName')?.value);
-      //make call here, create endpoint
+      this.changeName();
     }
     if (this.form.get('Description')?.value != this.Assignment.Description) {
-      console.log(this.form.get('Description')?.value);
       this.changeDesc();
-      //make call here
     }
     if (this.form.get('Date')?.value != this.formatedDate) {
       this.changeDate();
-      //make call here
     }
   }
-  //TODO:
+
   changeDesc() {
     const formData = new FormData();
     formData.append('Desc', this.form.get('Description')?.value);
     formData.append('Course', this.courseID.toString());
     formData.append('Assignment', this.Assignment.AssignmentNr.toString());
 
-    const headers = new HttpHeaders()
-      .append('Cookies', document.cookie)
-      .set('Cache-Control', 'public, max-age=3600');
-
     this.http
       .post<HttpResponse<any>>(`${API_URL}/editDescription`, formData, {
         observe: 'response',
-        headers: headers,
+        headers: this.headers,
       })
       .subscribe({
         next: (response: any) => {
@@ -150,21 +148,48 @@ export class AssignemntCardComponent {
         },
       });
   }
-  changeName() {}
+  changeName() {
+    const formData = new FormData();
+    formData.append('Name', this.form.get('AssignmentName')?.value);
+    formData.append('Course', this.courseID.toString());
+    formData.append('Assignment', this.Assignment.AssignmentNr.toString());
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/editAssignmentName`, formData, {
+        observe: 'response',
+        headers: this.headers,
+      })
+      .subscribe({
+        next: (response: any) => {
+          try {
+            if (response.status == 200) {
+              this.toastr.success('Name Updated', response.body);
+            }
+          } catch {
+            throw new Error('unexpected_error');
+          }
+        },
+        error: (err) => {
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+      });
+  }
+
   changeDate() {
     const formData = new FormData();
     formData.append('Date', this.form.get('Date')?.value);
     formData.append('Course', this.courseID.toString());
     formData.append('Assignment', this.Assignment.AssignmentNr.toString());
 
-    const headers = new HttpHeaders()
-      .append('Cookies', document.cookie)
-      .set('Cache-Control', 'public, max-age=3600');
-
     this.http
       .post<HttpResponse<any>>(`${API_URL}/changeAssignmentDate`, formData, {
         observe: 'response',
-        headers: headers,
+        headers: this.headers,
       })
       .subscribe({
         next: (response: any) => {
@@ -187,5 +212,38 @@ export class AssignemntCardComponent {
       });
   }
 
-  changeTests() {}
+  changeTests() {
+    const fileData = new FormData();
+    this.Files.forEach((file: File): void =>
+      fileData.append('files', file, file.name)
+    );
+
+    fileData.append('Course', this.courseID.toString());
+    fileData.append('Assignment', this.Assignment.AssignmentNr.toString());
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/unitTest`, fileData, {
+        observe: 'response',
+        headers: this.headers,
+      })
+      .subscribe({
+        next: (response: any) => {
+          try {
+            if (response.status == 200) {
+              this.toastr.success('Unittests Updated', response.body);
+              //location.reload();
+            }
+          } catch {
+            throw new Error('unexpected_error');
+          }
+        },
+        error: (err) => {
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrRepsonse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+      });
+  }
 }

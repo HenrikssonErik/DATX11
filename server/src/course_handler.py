@@ -260,6 +260,25 @@ def change_description(new_desc: str, course_id: int,
     except Exception as e:
         print(e)
         return {'status': "No Courses Found"}
+    
+def change_assignment_name(new_name: str, course_id: int,
+                       assignment: int) -> dict | None:
+    """ Changes the description for the a assignment"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """UPDATE assignments set name = %s
+                                WHERE courseid = %s and assignment = %s"""
+                cur.execute(query_data, [new_name, course_id, assignment])
+
+        conn.close()
+        return None
+
+    except Exception as e:
+        print(e)
+        raise Exception("could not change name") from e
 
 
 def change_course_name(new_name: str, course: int):
