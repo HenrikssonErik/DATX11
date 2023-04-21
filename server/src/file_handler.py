@@ -242,8 +242,7 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
                     course_id,
                     assignment,
                     file_name,
-                    binary,
-                    0
+                    binary
                 )
             )
 
@@ -366,7 +365,6 @@ def get_all_assignment_files_from_db(
                 SELECT filename, filedata FROM AssignmentFiles
                     WHERE GroupId        = %s
                     AND   CourseId       = %s
-                    AND   FileType     NOT LIKE 'pdf'
                     AND   \"assignment\"   = %s;
                 """,
                 (group_id, course_id, assignment)
