@@ -1,0 +1,44 @@
+.form-check-input:checked {
+  background-color: #216b42 !important;
+  border-color: #216b42;
+}
+
+.form-check-input:focus {
+  border-color: #28a745;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgb(40 167 69 / 25%);
+}
+
+.form-control:focus {
+  border-color: rgba(38, 115, 77, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
+}
+
+.form-outline input[type="search"]::-webkit-search-cancel-button {
+  filter: invert(50%);
+  cursor: pointer;
+}
+
+.hydrantDropdown {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin-right: 10px;
+  font-weight: 500;
+  transition: box-shadow 0.3s ease, color 0.3s ease, border 0.3s ease;
+}
+
+.hydrantDropdown:hover {
+  box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.1);
+}
+
+.hydrantDropdown:focus {
+  outline: none;
+}
+
+.hydrantDropdown:focus,
+.hydrantDropdown:active {
+  border: 1px solid #216b42;
+  color: #216b42 !important;
+}
