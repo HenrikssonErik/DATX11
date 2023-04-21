@@ -20,6 +20,17 @@ export class SubmissionService {
     );
   }
 
-  /* getAssignmentOverView(courseId: number): Observable<any> {
-  } */
+  getAssignmentOverView(
+    courseId: number,
+    assignmentNr: number
+  ): Observable<any> {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    return this.http.get<any>(
+      `${API_URL}/assignmentsOverview?Course=${courseId}&Assignment=${assignmentNr}`,
+      { headers }
+    );
+  }
 }
