@@ -9,7 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-file-upload',
   templateUrl: './file-upload.component.html',
-  styleUrls: ['./file-upload.component.css'],
+  styleUrls: ['./file-upload.component.scss'],
 })
 export class FileUploadComponent {
   files: File[] = [];
@@ -170,7 +170,7 @@ export class FileUploadComponent {
 
           if (response.status == 200) {
             this.toastr.success(
-              'The file was successfully uploaded',
+              'The assignment was succesfully submitted',
               'Sucess!',
               {
                 closeButton: true,
@@ -180,6 +180,7 @@ export class FileUploadComponent {
             //TODO: Handle this in complete() instead?
           }
 
+          // TODO: This can be removed unless we want to use it directly.
           for (const file of response.body.general_tests_feedback) {
             const generalTestItem = {
               file: file.tested_file,
@@ -189,11 +190,7 @@ export class FileUploadComponent {
             this.generalTestFeedback.push(generalTestItem);
           }
 
-          console.log(this.generalTestFeedback);
-          console.log(response.body.unittest_feedback);
-
-          this.isLoading = false;
-          this.modalService.close();
+          console.log(response);
 
           //TODO: Handle the success response
         },
@@ -210,7 +207,12 @@ export class FileUploadComponent {
           console.log(err.error);
           //TODO: Handle the error
         },
-        complete() {},
+        complete: () => {
+          this.isLoading = false;
+          this.modalService.close();
+          //TODO: Handle the updated feedback without reloading the page
+          location.reload();
+        },
       });
   }
 

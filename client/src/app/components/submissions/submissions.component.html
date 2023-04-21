@@ -1,0 +1,162 @@
+<div *ngIf="isLoading" class="loader-container mt-3">
+  <div class="loader"></div>
+</div>
+<div *ngIf="submissions">
+  <ngb-accordion #submissionAccordion="ngbAccordion">
+    <ngb-panel *ngFor="let submission of submissions">
+      <ng-template ngbPanelTitle>
+        <div class="titleAccordion">
+          <span>Submission {{ submission.Submission }}</span>
+          <span class="statusText passed" *ngIf="submission.Grade === true"
+            >Passed</span
+          >
+          <span class="statusText failed" *ngIf="submission.Grade === false"
+            >Failed</span
+          >
+          <span class="statusText warning" *ngIf="submission.Grade === null"
+            >Waiting for review</span
+          >
+        </div>
+      </ng-template>
+      <ng-template ngbPanelContent>
+        <div class="row text-muted">
+          <div class="col-md-2">
+            <h6>Test results</h6>
+            <p>
+              <span
+                *ngIf="submission.testfeedback.unittest_feedback.was_successful"
+                class="passed"
+                >Passed</span
+              >
+              <span
+                *ngIf="
+                  !submission.testfeedback.unittest_feedback.was_successful
+                "
+                class="failed"
+                >Failed</span
+              >
+            </p>
+          </div>
+          <div class="col-md-2">
+            <h6>Test ran</h6>
+            <p>
+              {{ submission.testfeedback.unittest_feedback.tests_run }}
+            </p>
+          </div>
+          <div class="col-md-2">
+            <h6>Grade</h6>
+            <span class="statusText passed" *ngIf="submission.Grade === true"
+              >Passed</span
+            >
+            <span class="statusText failed" *ngIf="submission.Grade === false"
+              >Failed</span
+            >
+            <span class="statusText warning" *ngIf="submission.Grade === null"
+              >Waiting for review</span
+            >
+          </div>
+          <div class="col-md-2" *ngIf="false">
+            <h6>Reviewed By</h6>
+            <p class="statusText">Malte Carlstedt</p>
+          </div>
+          <div class="col-md-4" *ngIf="submission.teacherfeedback != null">
+            <h6>Comments</h6>
+            <div class="form-floating mb-3">
+              <textarea
+                class="form-control"
+                placeholder="Leave a comment here"
+                id="comments"
+                style="height: 100px"
+                disabled
+                [value]="submission.teacherfeedback"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="row"
+          *ngIf="submission.testfeedback.unittest_feedback.errors.length > 0"
+        >
+          <div class="col-12">
+            <h6 class="text-muted">Errors:</h6>
+            <div
+              *ngFor="
+                let errors of submission.testfeedback.unittest_feedback.errors
+              "
+            >
+              <div class="card errors">
+                <p class="text-muted">{{ parseErrors(errors[1]) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="row"
+          *ngIf="submission.testfeedback.unittest_feedback.failures.length > 0"
+        >
+          <div class="col-12">
+            <h6 class="text-muted">Failed Tests</h6>
+            <div
+              *ngFor="
+                let failures of submission.testfeedback.unittest_feedback
+                  .failures
+              "
+            >
+              <div
+                class="card unitTest"
+                *ngFor="
+                  let unitTestFailures of parseUnitTest(
+                    failures[0],
+                    failures[1]
+                  )
+                "
+              >
+                <div class="text-muted">
+                  <p>Test: {{ unitTestFailures.test }}</p>
+                  <p>{{ unitTestFailures.error }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="row"
+          *ngIf="submission.testfeedback.general_tests_feedback[0].PEP8_results"
+        >
+          <h6 class="text-muted mt-2 mb-2">Pep8 Results</h6>
+          <div class="col-12">
+            <div
+              *ngFor="
+                let generalTestResult of submission.testfeedback
+                  .general_tests_feedback
+              "
+            >
+              <div
+                *ngFor="
+                  let parsedError of parseGeneralTest(
+                    generalTestResult.PEP8_results
+                  )
+                "
+                class="card generalTest"
+              >
+                <p class="text-muted">
+                  File: {{ generalTestResult.tested_file.file }}, error on line:
+                  <span>{{ parsedError.lineNum }}</span
+                  ><span>, column: {{ parsedError.colNum }}</span>
+                </p>
+                <p class="text-muted">
+                  {{ parsedError.message }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ngb-panel>
+  </ngb-accordion>
+</div>
+<!-- <ng-template #noSubmissions>
+  <p class="noSubmissions mt-2">No submissions yet</p>
+</ng-template> -->
