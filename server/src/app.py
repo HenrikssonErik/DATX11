@@ -578,11 +578,10 @@ def get_overview():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
-    assignment = int(request.args.get('Assignment'))
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         # create overview
-        overview = course_handler.get_assignment_overview(course, assignment)
+        overview = course_handler.get_assignment_overview(course)
         return make_response(jsonify(overview), 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)

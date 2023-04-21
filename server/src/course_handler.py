@@ -429,8 +429,8 @@ def get_course_groups(course: int):
         print(e)
         raise Exception("Error when getting course groups") from e
 
-# TODO:check so the query has the intended effect
-def get_assignment_overview(course: int, assignment: int) -> list[dict]:
+
+def get_assignment_overview(course: int) -> list[dict]:
     """Returns a list with test status and grade for all the latest
     submissions for a assignment"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -438,25 +438,32 @@ def get_assignment_overview(course: int, assignment: int) -> list[dict]:
     try:
         with conn:
             with conn.cursor() as cur:
+                query_one = """ select assignment from assignments where
+                courseid = %s"""
+                cur.execute(query_one, [course])
+
+                assignments = cur.fetchall()
+
                 query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
                 teacherGrade FROM AssignmentFeedback WHERE courseId = %s
                 AND assignment = %s ORDER BY groupId,
                 submission DESC;"""
-
-                cur.execute(query_data, [course, assignment])
-                data = cur.fetchall()
-                if not data:
-                    return []
-                
-                overview_list = []
-                for row in data:
-                    group_dict = {
-                        "groupid": row[0],
-                        "testpass": row[1],
-                        "grade": row[2]}
-                    overview_list.append(group_dict)
+                return_list = []
+                for assignment in assignments:
+                    overview_list = []
+                    cur.execute(query_data, [course, assignment[0]])
+                    data = cur.fetchall()
+                    if data:
+                        for row in data:
+                            group_dict = {
+                                "groupid": row[0],
+                                "testpass": row[1],
+                                "grade": row[2]}
+                            overview_list.append(group_dict)
+                    return_list.append({"Assignment": assignment[0],
+                                        "Submissions": overview_list})
         conn.close()
-        return overview_list
+        return return_list
 
     except Exception as e:
         print(e)
