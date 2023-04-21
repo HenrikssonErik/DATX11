@@ -421,9 +421,10 @@ def save_feedback_to_db(
                         courseid,
                         \"assignment\",
                         testfeedback,
-                        testpass
+                        testpass,
+                        submission
                     )
-                    VALUES(%s, %s, %s, %s, %s)
+                    VALUES(%s, %s, %s, %s, %s, 0)
                 """,
                 (group_id, course_id, assignment, feedback, passed)
             )
