@@ -13,7 +13,7 @@ CREATE TABLE AssignmentFeedback (
     teacherFeedback TEXT,
     testPass BOOLEAN NOT NULL DEFAULT FALSE,
     teacherGrade BOOLEAN,
-	feedbackDate DATE /*NOT NULL*/, --Add NOT NULL when implemented in database 
+	feedbackDate TIMESTAMP /*NOT NULL*/, --Add NOT NULL when implemented in database 
     PRIMARY KEY (groupId, courseId, assignment, submission),
     CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId)
         REFERENCES groups(groupId)
@@ -78,7 +78,7 @@ CREATE Table AssignmentFiles (
 		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
 		fileType TEXT,
-		submissionDate DATE /*NOT NULL*/, --Add NOT NULL when implemented in database 
+		submissionDate TIMESTAMP /*NOT NULL*/, --Add NOT NULL when implemented in database 
 		PRIMARY KEY(groupId, courseId, assignment, fileName, submission),
 		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
 			REFERENCES Groups (groupId) 
