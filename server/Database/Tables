@@ -51,7 +51,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER increment_submission_assignmentfeedback
-CREATE TRIGGER increment_submission_assignmentfeedback
 BEFORE INSERT ON AssignmentFeedback
 FOR EACH ROW
 EXECUTE FUNCTION set_submission_number_assignmentfeedback();
