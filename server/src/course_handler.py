@@ -287,8 +287,10 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
         with conn:
             with conn.cursor() as cur:
                 query_one = """UPDATE AssignmentFeedback SET
-                teacherFeedback = %s, teacherGrade = %s WHERE groupId = %s
-                AND courseId = %s AND submission = %s AND assignment = %s;"""
+                teacherFeedback = %s, teacherGrade = %s, 
+                feedbackdate = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm')
+                WHERE groupId = %s AND courseId = %s 
+                AND submission = %s AND assignment = %s;"""
                 cur.execute(query_one, [feedback, grade, group_id, course,
                                         submission, assignment])
         conn.close()
