@@ -31,7 +31,7 @@ DECLARE
     max_submission INTEGER;
 BEGIN
     IF NEW.submission = 0 THEN
-        SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+        SELECT COUNT(submission) + 1 INTO max_submission
         FROM AssignmentFeedback
         WHERE groupId = NEW.groupId
             AND courseId = NEW.courseId
@@ -39,7 +39,7 @@ BEGIN
         IF max_submission > 0 THEN
             NEW.submission := max_submission;
         ELSE
-            SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
+            SELECT COUNT(submission) + 1 INTO NEW.submission
             FROM AssignmentFeedback
             WHERE groupId = NEW.groupId
                 AND courseId = NEW.courseId
@@ -50,7 +50,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER increment_submission_assignmentfeedback
+CREATE OR REPLACE TRIGGER increment_submission_assignmentfeedback
 BEFORE INSERT ON AssignmentFeedback
 FOR EACH ROW
 EXECUTE FUNCTION set_submission_number_assignmentfeedback();
@@ -83,7 +83,7 @@ DECLARE
     max_submission INTEGER;
 BEGIN
     IF NEW.submission = 0 THEN
-        SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+        SELECT COUNT(submission) + 1 INTO max_submission
         FROM AssignmentFiles
         WHERE groupId = NEW.groupId
             AND courseId = NEW.courseId
@@ -92,7 +92,7 @@ BEGIN
         IF max_submission > 0 THEN
             NEW.submission := max_submission;
         ELSE
-            SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
+            SELECT COUNT(submission) + 1 INTO NEW.submission
             FROM AssignmentFiles
             WHERE groupId = NEW.groupId
                 AND courseId = NEW.courseId
@@ -104,7 +104,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER increment_submission_assignmentfiles
+CREATE OR REPLACE TRIGGER increment_submission_assignmentfiles
 BEFORE INSERT ON AssignmentFiles
 FOR EACH ROW
 EXECUTE FUNCTION set_submission_number_assignmentfiles();
