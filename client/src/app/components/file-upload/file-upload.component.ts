@@ -208,7 +208,7 @@ export class FileUploadComponent {
           this.isLoading = false;
           this.modalService.close();
           //TODO: Handle the updated feedback without reloading the page
-          //location.reload();
+          location.reload();
         },
       });
   }
