@@ -41,11 +41,17 @@ export class AuthService {
     return false;
   }
 
-  logOut() {
+  async logOut() {
     if (document.cookie.includes('Token')) {
+      console.log('inIf');
       document.cookie = 'Token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
       this.isAuthenticated$.next(false);
+      await this.delay(500);
       location.reload();
     }
+  }
+
+  delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
