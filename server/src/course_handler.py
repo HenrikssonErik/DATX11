@@ -440,7 +440,7 @@ def get_course_groups(course: int):
                     group_dict = {
                         "groupNumber": row[0],
                         "groupId": row[1],
-                        "users": row[2]}
+                        "groupMembers": row[2]}
                     group_list.append(group_dict)
         conn.close()
         return group_list
