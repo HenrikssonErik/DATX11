@@ -1,4 +1,4 @@
-export interface Submission {
+export interface TestResult {
   Grade: null | boolean;
   Submission: number;
   teacherfeedback: null | string;
@@ -22,4 +22,15 @@ export interface Submission {
     };
   };
   testpass: boolean;
+}
+
+export interface AssignmentSubmission {
+  grade: number | null;
+  groupid: number;
+  testpass: boolean;
+}
+
+export interface Submission {
+  Assignment: number;
+  Submissions: AssignmentSubmission[];
 }
