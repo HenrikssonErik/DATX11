@@ -170,7 +170,7 @@ def post_files():
                 feedback_res = {}
                 feedback_res.update({"feedback": res[0]})
                 feedback_res.update(res[1])
-                return make_response(jsonify(feedback_res), res[2])
+                return make_response(jsonify(feedback_res), res[3])
             else:
                 return make_response({'status': 'deadline_passed'}, 400)
         else:

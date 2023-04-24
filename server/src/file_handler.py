@@ -29,10 +29,9 @@ def handle_files(files: list[FileStorage], course: int, group: int,
     number_of_files = {}
     res_code = 200
 
-    file_amount, res_code = ("OK", res_code)  \
+    file_amount, res_code = ("OK", res_code) \
         if (len(files) == __nr_of_files) \
-        else (f"Received {len(files)}, should be {__nr_of_files} files",
-              406)
+        else (f"Received {len(files)}, should be {__nr_of_files} files", 406)
 
     number_of_files.update({"number_of_files": file_amount})
     response_items = []
