@@ -6,13 +6,14 @@
 -- CourseInstance, group and lab assignment and submission should be primary key here
 CREATE TABLE AssignmentFeedback (
     groupId INTEGER NOT NULL,
-    courseId SERIAL NOT NULL,
+    courseId SERIAL NOT NULL,  
     assignment INTEGER NOT NULL,
     submission SERIAL NOT NULL,
     testFeedback JSON,
     teacherFeedback TEXT,
     testPass BOOLEAN NOT NULL DEFAULT FALSE,
     teacherGrade BOOLEAN,
+	feedbackDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'), 
     PRIMARY KEY (groupId, courseId, assignment, submission),
     CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId)
         REFERENCES groups(groupId)
@@ -24,46 +25,32 @@ CREATE TABLE AssignmentFeedback (
         ON UPDATE CASCADE
 );
 
-CREATE OR REPLACE FUNCTION set_submission_number_assignmentfeedback_assignmentfeedback()
+CREATE OR REPLACE FUNCTION set_submission_number_assignmentfeedback()
 RETURNS TRIGGER AS $$
 DECLARE
     max_submission INTEGER;
-DECLARE
-    max_submission INTEGER;
 BEGIN
-      IF NEW.submission = 0 THEN
-        SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+    IF NEW.submission = 0 THEN
+        SELECT COUNT(submission) + 1 INTO max_submission
         FROM AssignmentFeedback
         WHERE groupId = NEW.groupId
             AND courseId = NEW.courseId
             AND assignment = NEW.assignment;
-
         IF max_submission > 0 THEN
             NEW.submission := max_submission;
         ELSE
-                SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
-        FROM AssignmentFeedback
-        WHERE groupId = NEW.groupId
-            AND courseId = NEW.courseId
-            AND assignment = NEW.assignment;
-
-        IF max_submission > 0 THEN
-            NEW.submission := max_submission;
-        ELSE
-            SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
-                    FROM AssignmentFeedback
-                    WHERE groupId = NEW.groupId
-                          AND courseId = NEW.courseId
-                          AND assignment = NEW.assignment;
-              END IF;
+            SELECT COUNT(submission) + 1 INTO NEW.submission
+            FROM AssignmentFeedback
+            WHERE groupId = NEW.groupId
+                AND courseId = NEW.courseId
+                AND assignment = NEW.assignment;
+        END IF;
     END IF;
-      END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER increment_submission_assignmentfeedback
-CREATE TRIGGER increment_submission_assignmentfeedback
+CREATE OR REPLACE TRIGGER increment_submission_assignmentfeedback
 BEFORE INSERT ON AssignmentFeedback
 FOR EACH ROW
 EXECUTE FUNCTION set_submission_number_assignmentfeedback();
@@ -77,6 +64,7 @@ CREATE Table AssignmentFiles (
 		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
 		fileType TEXT,
+		submissionDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'), 
 		PRIMARY KEY(groupId, courseId, assignment, fileName, submission),
 		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
 			REFERENCES Groups (groupId) 
@@ -93,44 +81,30 @@ CREATE OR REPLACE FUNCTION set_submission_number_assignmentfiles()
 RETURNS TRIGGER AS $$
 DECLARE
     max_submission INTEGER;
-DECLARE
-    max_submission INTEGER;
 BEGIN
-      IF NEW.submission = 0 THEN
-        SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
+    IF NEW.submission = 0 THEN
+        SELECT COUNT(submission) + 1 INTO max_submission
         FROM AssignmentFiles
         WHERE groupId = NEW.groupId
             AND courseId = NEW.courseId
             AND assignment = NEW.assignment
             AND fileName = NEW.fileName;
-
         IF max_submission > 0 THEN
             NEW.submission := max_submission;
         ELSE
-                SELECT COALESCE(MAX(submission), 0) + 1 INTO max_submission
-        FROM AssignmentFiles
-        WHERE groupId = NEW.groupId
-            AND courseId = NEW.courseId
-            AND assignment = NEW.assignment
-            AND fileName = NEW.fileName;
-
-        IF max_submission > 0 THEN
-            NEW.submission := max_submission;
-        ELSE
-            SELECT COALESCE(MAX(submission), 0) + 1 INTO NEW.submission
-                    FROM AssignmentFiles
-                    WHERE groupId = NEW.groupId
-                          AND courseId = NEW.courseId
-                          AND assignment = NEW.assignment
-                          AND fileName = NEW.fileName;
-              END IF;
+            SELECT COUNT(submission) + 1 INTO NEW.submission
+            FROM AssignmentFiles
+            WHERE groupId = NEW.groupId
+                AND courseId = NEW.courseId
+                AND assignment = NEW.assignment
+                AND fileName = NEW.fileName;
+        END IF;
     END IF;
-      END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER increment_submission_assignmentfiles
+CREATE OR REPLACE TRIGGER increment_submission_assignmentfiles
 BEFORE INSERT ON AssignmentFiles
 FOR EACH ROW
 EXECUTE FUNCTION set_submission_number_assignmentfiles();
