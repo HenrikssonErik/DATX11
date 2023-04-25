@@ -46,7 +46,6 @@ export class AuthService {
       console.log('inIf');
       document.cookie = 'Token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
       this.isAuthenticated$.next(false);
-      await this.delay(500);
       location.reload();
     }
   }
