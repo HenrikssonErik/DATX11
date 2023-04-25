@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { SubmissionService } from 'src/app/services/submission.service';
-import { Submission } from 'src/app/models/submission';
+import { TestResult } from 'src/app/models/submission';
 
 @Component({
   selector: 'app-submissions',
@@ -10,7 +10,7 @@ import { Submission } from 'src/app/models/submission';
 export class SubmissionsComponent {
   @Input() assignmentNr!: number;
   @Input() courseId!: number;
-  submissions!: Submission[];
+  submissions!: TestResult[];
   generalTest!: any[];
   isLoading: boolean = false;
   constructor(private submissionService: SubmissionService) {}
@@ -24,7 +24,7 @@ export class SubmissionsComponent {
     this.submissionService
       .getSubmission(this.courseId, this.assignmentNr)
       .subscribe({
-        next: (res: Submission[]) => {
+        next: (res: TestResult[]) => {
           this.submissions = res;
           this.submissions.sort((a, b) => b.Submission - a.Submission);
         },
