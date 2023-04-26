@@ -28,6 +28,7 @@ export interface AssignmentSubmission {
   grade: number | null;
   groupid: number;
   testpass: boolean;
+  Submission: number;
 }
 
 export interface Submission {

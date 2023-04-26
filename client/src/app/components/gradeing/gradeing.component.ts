@@ -108,7 +108,7 @@ export class GradeingComponent {
     }
   }
 
-  /*   setSubmissionGrade(
+  setSubmissionGrade(
     submission: AssignmentSubmission,
     assignmentNr: number,
     grade: boolean
@@ -117,7 +117,7 @@ export class GradeingComponent {
       .setFeedback(
         this.course.courseID,
         assignmentNr,
-        submission.submissionid,
+        submission.Submission,
         this.commentText,
         grade,
         submission.groupid
@@ -133,5 +133,5 @@ export class GradeingComponent {
           console.log('done');
         },
       });
-  } */
+  }
 }
