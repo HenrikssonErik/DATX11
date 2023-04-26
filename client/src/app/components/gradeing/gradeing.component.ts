@@ -108,7 +108,7 @@ export class GradeingComponent {
     }
   }
 
-  setSubmissionGrade(
+  /*   setSubmissionGrade(
     submission: AssignmentSubmission,
     assignmentNr: number,
     grade: boolean
@@ -133,5 +133,5 @@ export class GradeingComponent {
           console.log('done');
         },
       });
-  }
+  } */
 }
