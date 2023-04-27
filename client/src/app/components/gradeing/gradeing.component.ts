@@ -117,7 +117,7 @@ export class GradeingComponent {
       .setFeedback(
         this.course.courseID,
         assignmentNr,
-        submission.submissionid,
+        submission.Submission,
         this.commentText,
         grade,
         submission.groupid
