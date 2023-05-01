@@ -42,7 +42,7 @@
   "Nothing_new": "Inget Nytt",
   "No_deadlines": "Inga tidsfrister, illgött ju!",
   "Log_Out": "Logga ut",
-  "Create_Course": "Skapa kurs!",
+  "Create_Course": "Skapa Kurs",
   "Coming_Up": "Kommande",
   "Recent_Events": "Senaste händelserna",
   "Labs": "Labbar",
@@ -73,5 +73,8 @@
   "Click_here_verification": "Klicka här",
   "Upload_File": "Ladda upp fil",
   "Groups_Tab": "Grupper",
-  "Edit_Mode": "Redigerings läge"
+  "Edit_Mode": "Redigerings läge",
+  "Current_Courses": "Nuvarande Kurser",
+  "Upcoming": "Kommande",
+  "Completed": "Avklarade"
 }
