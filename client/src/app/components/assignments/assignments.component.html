@@ -184,9 +184,8 @@
       <!--CONTENT FOR ASSIGNMENTS-->
       <div class="card mt-3">
         <div class="header">
-          <h5>
-            <span>{{ course.CourseName }} - {{ course.Course }} - </span
-            ><span translate>Assignment </span>{{ assignment.AssignmentNr }}
+          <h5 translate>
+            Assignment {{ assignment.AssignmentNr }} - {{ assignment.Name }}
           </h5>
           <!-- <h5><i class="fa-solid fa-ellipsis-vertical"></i></h5> -->
           <div>
@@ -209,6 +208,7 @@
             </button>
           </div>
         </div>
+        <h6>{{ course.CourseName }} - {{ course.Course }}</h6>
         <div class="row mt-2">
           <div class="col-md-2">
             <h5>Teacher</h5>
