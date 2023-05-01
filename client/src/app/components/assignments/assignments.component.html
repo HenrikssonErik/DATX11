@@ -96,7 +96,7 @@
     >
       <!--CONTENT FOR GROUPS-->
       <div class="mb-3" style="display: flex; justify-content: space-between">
-        <h5>Groups</h5>
+        <h5 translate>Groups</h5>
 
         <button
           *ngIf="!hasGroup()"
@@ -104,14 +104,14 @@
           (click)="createGroup(course.courseID)"
         >
           <span *ngIf="createGroupLoader" class="loader"></span>
-          <span *ngIf="!createGroupLoader">Create Group</span>
+          <span *ngIf="!createGroupLoader" translate>Create_Group</span>
         </button>
       </div>
       <ngb-accordion #groupAccordion="ngbAccordion">
         <ngb-panel *ngFor="let group of courseGroups">
           <ng-template ngbPanelTitle>
             <div class="titleAccordion">
-              <span>Group {{ group.groupNumber }}</span>
+              <span translate>Group {{ group.groupNumber }}</span>
               <span
                 *ngIf="isLoadingMap.get(group.groupId)"
                 class="loader"
@@ -123,6 +123,7 @@
                   joinGroup(course.courseID, group.groupId);
                   $event.stopPropagation()
                 "
+                translate
                 >Join</span
               >
               <span
@@ -134,6 +135,7 @@
                   $event.stopPropagation()
                 "
                 class="leaveButton"
+                translate
                 >Leave</span
               >
             </div>
@@ -200,10 +202,10 @@
                 )
               "
             >
-              <span *ngIf="!datePassed(assignment.DueDate)"
-                >Submit Assignment</span
-              ><span *ngIf="datePassed(assignment.DueDate)"
-                >Deadline has passed</span
+              <span *ngIf="!datePassed(assignment.DueDate)" translate
+                >Submit_Assignment</span
+              ><span *ngIf="datePassed(assignment.DueDate)" translate
+                >Deadline_Passed</span
               >
             </button>
           </div>
@@ -211,11 +213,11 @@
         <h6>{{ course.CourseName }} - {{ course.Course }}</h6>
         <div class="row mt-2">
           <div class="col-md-2">
-            <h5>Teacher</h5>
+            <h5 translate>Teacher</h5>
             <p>{{ course.Admin }}</p>
           </div>
           <div class="col-md-2">
-            <h5>Due Date</h5>
+            <h5 translate>Due_Date</h5>
             <p>
               <span class="due-date-icon"
                 ><i class="fa-regular fa-calendar-days"></i></span
@@ -226,7 +228,7 @@
           </div>
           <!--TODO: HANDLE THE EMPTY GROUP BETTER-->
           <div class="col-md-2" *ngIf="groupExists()">
-            <h5>Group {{ group.groupId }}</h5>
+            <h5 translate>Group {{ group.groupId }}</h5>
             <ng-container>
               <p
                 style="padding: 0; margin: 0"
@@ -238,7 +240,7 @@
           </div>
 
           <div class="col-md-6">
-            <h5>Description</h5>
+            <h5 translate>Description</h5>
             <p>{{ assignment.Description }}</p>
           </div>
         </div>

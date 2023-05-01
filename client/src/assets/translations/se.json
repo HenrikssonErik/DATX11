@@ -76,5 +76,14 @@
   "Edit_Mode": "Redigerings läge",
   "Current_Courses": "Nuvarande Kurser",
   "Upcoming": "Kommande",
-  "Completed": "Avklarade"
+  "Completed": "Avklarade",
+  "Create_Group": "Skapa Grupp",
+  "Join": "Gå Med",
+  "Leave": "Lämna",
+  "Submit_Assignment": "Lämna In Uppgift",
+  "Deadline_Passed": "Inlämningsdatum Passerat",
+  "Teacher": "Lärare",
+  "Due_Date": "Tillgänglig Till",
+  "Description": "Beskrivning",
+  "Group": "Grupp"
 }

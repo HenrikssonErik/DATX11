@@ -76,5 +76,14 @@
   "Edit_Mode": "Edit mode",
   "Current_Courses": "Current Courses",
   "Upcoming": "Upcoming",
-  "Completed": "Completed"
+  "Completed": "Completed",
+  "Create_Group": "Create Group",
+  "Join": "Join",
+  "Leave": "Leave",
+  "Submit_Assignment": "Submit Assignment",
+  "Deadline_Passed": "Deadline Has Passed",
+  "Teacher": "Teacher",
+  "Due_Date": "Due Date",
+  "Description": "Description",
+  "Group": "Group"
 }
