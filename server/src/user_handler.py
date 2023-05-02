@@ -50,6 +50,25 @@ def get_user(user_id: int) -> dict:
         print(e)
         raise Exception("No user found") from e
 
+def get_fullname(user_id: int) -> dict:
+    """Returns a string with information on the user's fullname"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = "SELECT fullname FROM Userdata " +\
+                    "WHERE userid = %s"
+                cur.execute(query_data, [user_id])
+                data = cur.fetchone()
+        conn.close()
+        if not data:
+            raise Exception("No such user")
+        return data[0]
+
+    except Exception as e:
+        print(e)
+        raise Exception("No user found") from e
 
 def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
     """Returns group ID and group number associated with the users group

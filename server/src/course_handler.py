@@ -1,6 +1,7 @@
 from .connector import get_conn_string
 import psycopg2
 import datetime
+import user_handler
 
 
 def create_course(course_name: str, course_abbr: str, year: int,
@@ -473,7 +474,7 @@ def get_assignment_overview(course: int) -> list[dict]:
                 assignments = cur.fetchall()
 
                 query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
-                teacherGrade, submission, score,  teacherfeedback  FROM AssignmentFeedback WHERE courseId = %s
+                teacherGrade, submission, score,  teacherfeedback, userid FROM AssignmentFeedback WHERE courseId = %s
                 AND assignment = %s ORDER BY groupId,
                 submission DESC;"""
                 return_list = []
@@ -489,7 +490,8 @@ def get_assignment_overview(course: int) -> list[dict]:
                                 "grade": row[2],
                                 'Submission': row[3],
                                 "Score": row[4],
-                                "Feedback": row[5]}
+                                "Feedback": row[5],
+                                "GradedBy": user_handler.get_fullname(row[6])}
                             overview_list.append(group_dict)
                     return_list.append({"Assignment": assignment[0],
                                         "Submissions": overview_list})
