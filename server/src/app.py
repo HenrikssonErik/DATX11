@@ -573,6 +573,23 @@ def get_course_groups():
         return make_response("not_logged_in", 401)
 
 
+@app.route('/getGroup', methods=['GET'])
+def get_course_group():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = int(request.args.get('Course'))
+    group_id = int(request.args.get('GroupId'))
+
+    if (user_id):
+        if (user_handler.is_in_course(user_id, course)):
+            group = course_handler.get_course_group(course, group_id)
+            return make_response(jsonify(group), 200)
+        else:
+            return make_response("not_in_course", 401)
+    else:
+        return make_response("not_logged_in", 401)
+
+
 @app.route('/assignmentsOverview', methods=['GET'])
 def get_overview():
     token = extract_token(request)

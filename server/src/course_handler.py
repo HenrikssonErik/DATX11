@@ -399,7 +399,7 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
                             'testpass': submission[1],
                             'testfeedback': testfeedback,
                             'teacherfeedback': teacherfeedback,
-                            'Grade': grade,})
+                            'Grade': grade})
     return assignments
 
 
@@ -425,6 +425,31 @@ def get_course_groups(course: int):
                     group_list.append(group_dict)
         conn.close()
         return group_list
+
+    except Exception as e:
+        print(e)
+        raise Exception("Error when getting course groups") from e
+
+
+def get_course_group(course: int, group_id: int):
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT groupnumber,
+                array_agg(fullname) FROM GroupDetails WHERE course = %s and
+                groupid = %s GROUP BY groupid, groupnumber"""
+                cur.execute(query_data, [course, group_id])
+                data = cur.fetchone()
+                if not data:
+                    return {}
+                group_dict = {
+                    "groupNumber": data[0],
+                    "groupId": data[1],
+                    "users": data[2]}
+        conn.close()
+        return group_dict
 
     except Exception as e:
         print(e)
