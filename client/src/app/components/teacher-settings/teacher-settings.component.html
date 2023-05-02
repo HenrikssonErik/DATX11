@@ -1,5 +1,5 @@
 <h3 class="text-muted mt-3" translate>Settings</h3>
-<div class="card row" [formGroup]="form">
+<div class="card" [formGroup]="form">
   <div class="header">
     <h5>
       <span
@@ -14,7 +14,10 @@
         id="editMode"
         (change)="editToggle()"
       />
-      <label class="form-check-label text-muted" for="editMode" translate
+      <label
+        class="form-check-label text-muted editBtn"
+        for="editMode"
+        translate
         >Edit_Mode</label
       >
     </div>
