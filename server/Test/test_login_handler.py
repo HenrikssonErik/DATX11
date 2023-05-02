@@ -9,7 +9,7 @@ import bcrypt
 from psycopg2 import IntegrityError
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_verification_token, verify_user_in_db, verify_user_from_email_verification, user_to_send_email, create_temp_users  # noqa: E402, E501
+from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_cid_token, verify_user_in_db, verify_user_from_email_verification, user_to_send_email, create_temp_users  # noqa: E402, E501
 
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
@@ -253,7 +253,7 @@ class TestFileHandler(unittest.TestCase):
 
     def test_verify_user_from_email_verification_success(self):
         random_cid = random_cid_generator()
-        test_token = create_verification_token(random_cid)
+        test_token = create_cid_token(random_cid)
         # with patch.object(bcrypt, 'gensalt') as mock_gensalt:
         mock_response = {'status': 'success'}, 200
         with patch(
@@ -270,9 +270,9 @@ class TestFileHandler(unittest.TestCase):
         mock_cur = setup_mock_cursor(mock_connect)
         cid = random_cid_generator()
         mock_cur.fetchone.return_value = [cid + '@chalmers.se', False]
-        new_verification_token = create_verification_token(cid)
+        new_verification_token = create_cid_token(cid)
         with patch(
-            'src.login_handler.create_verification_token',
+            'src.login_handler.create_cid_token',
             return_value=new_verification_token
         ):
             actual_response = user_to_send_email(cid)
