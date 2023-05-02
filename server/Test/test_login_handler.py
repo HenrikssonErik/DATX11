@@ -9,7 +9,7 @@ import bcrypt
 from psycopg2 import IntegrityError
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_cid_token, verify_user_in_db, verify_user_from_email_verification, user_to_send_email, create_temp_users  # noqa: E402, E501
+from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_cid_token, verify_user_in_db, verify_and_get_cid, user_to_send_email, create_temp_users  # noqa: E402, E501
 
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
@@ -261,7 +261,7 @@ class TestFileHandler(unittest.TestCase):
             return_value=mock_response
         ):
             # verify_result.return_value = {'status': 'success'}, 200
-            verification_response = verify_user_from_email_verification(
+            verification_response = verify_and_get_cid(
                 test_token)
             self.assertEqual(random_cid, verification_response[0].get('cid'))
 

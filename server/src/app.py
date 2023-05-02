@@ -11,7 +11,7 @@ from .file_handler import handle_files, \
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
-    user_to_send_email, verify_user_from_email_verification, \
+    user_to_send_email, verify_and_get_cid, \
     verify_and_get_id, create_temp_users
 from flask_mail import Mail, Message
 import jwt
@@ -113,7 +113,7 @@ def verify_email() -> Response:
     try:
         verify: tuple[dict[str, str],
                       Literal[200, 406, 500]] = \
-            verify_user_from_email_verification(token)
+            verify_and_get_cid(token)
         response = make_response(verify)
         return response
     except jwt.ExpiredSignatureError:
@@ -122,6 +122,12 @@ def verify_email() -> Response:
     except jwt.InvalidTokenError:
         res = make_response({'status': 'invalid_verification_token'}, 400)
         return res
+
+
+@app.route('/forgot_pwd', methods=['POST'])
+def update_password() -> Response:
+
+    return make_response({}, 200)
 
 
 def send_forgotpwd_email(to: str, token: str) -> None:
