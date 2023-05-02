@@ -546,7 +546,7 @@ def get_feedback():
     user_id = verify_and_get_id(token)
     course = request.args.get('Course')
     assignment = request.args.get('Assignment')
-
+    
     if (user_id):
         group = user_handler.get_group(user_id, course)['groupId']
         feedback = course_handler.get_assignment_feedback(course, assignment,
@@ -555,6 +555,23 @@ def get_feedback():
 
     else:
         return make_response({"status": 'not_logged_in'}, 401)
+
+
+@app.route('/getTestingFeedback', methods=['GET'])
+def get_testing_feedback():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = request.args.get('Course')
+    assignment = request.args.get('Assignment')
+    group_id = request.args.get('Group')
+
+    if (user_handler.is_teacher_on_course(user_id, course)):
+        feedback = course_handler.get_assignment_feedback(course, assignment,
+                                                          group_id)
+        return make_response(jsonify(feedback), 200)
+
+    else:
+        return make_response({"status": 'not_teacher_in_course'}, 401)
 
 
 @app.route('/getGroups', methods=['GET'])
