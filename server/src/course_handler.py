@@ -162,7 +162,7 @@ def _create_course(course_name: str, course_abbr: str, year: int,
 
 
 def create_assignment(course_id: int, description: str, assignment_name: int,
-                      end_date: str, file_names: list) -> dict:
+                      end_date: str, file_names: list, max_score: int, pass_score: int) -> dict:
     """Creates an assignment for a course, assignment number will not be
     incremented automatically, thus must be provided by the creator"""
     res: dict = {}
@@ -193,15 +193,17 @@ def create_assignment(course_id: int, description: str, assignment_name: int,
                     # need to increment by 1
                     assignment_nr = data[0] + 1
                 query_two = """INSERT INTO Assignments (courseid, assignment,
-                enddate, description, name) VALUES
-                    (%s, 0, %s, %s, %s);"""
+                enddate, description, name, maxscore, passscore) VALUES
+                    (%s, 0, %s, %s, %s, %s, %s);"""
                 cur.execute(
                     query_two,
                     [
                         course_id,
                         end_date,
                         description,
-                        assignment_name
+                        assignment_name,
+                        max_score,
+                        pass_score
                     ]
                 )
         conn.close()

@@ -35,6 +35,15 @@ export class CreateAssignmentModalComponent {
       AssignmentName: ['', Validators.required],
       Date: ['', Validators.required],
       Description: ['', Validators.required],
+      MaxScore: [
+        0,
+        [
+          Validators.required,
+          Validators.min(1),
+          Validators.min(this.form?.controls['PassScore'].value),
+        ],
+      ],
+      PassScore: [0, [Validators.required, Validators.min(1)]],
       numOfFiles: [0, [Validators.required, Validators.min(1)]],
       fileNames: this.formBuilder.array(
         [],
@@ -53,6 +62,17 @@ export class CreateAssignmentModalComponent {
         fileArray.push(control);
       }
     });
+  }
+
+  changeMinVal() {
+    console.log(typeof this.form?.controls['PassScore'].value);
+    this.form.controls['MaxScore'].clearValidators();
+    this.form.controls['MaxScore'].addValidators([
+      Validators.required,
+      Validators.min(this.form?.controls['PassScore'].value),
+    ]);
+    this.form.controls['MaxScore'].updateValueAndValidity();
+    console.log(this.form.controls['MaxScore'].valid);
   }
 
   fileBrowseHandler(files: Event): void {
@@ -93,7 +113,7 @@ export class CreateAssignmentModalComponent {
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
-
+    console.log('create');
     const formData = { ...this.form };
     delete formData.value.numOfFiles;
     const fileData = new FormData();

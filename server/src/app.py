@@ -461,12 +461,15 @@ def create_assignment():
     end_date = data['Date']
     file_names = data.get('fileNames', [])
     assignment_name = data.get('AssignmentName')
+    max_score = data.get('MaxScore')
+    pass_score = data.get('PassScore')
 
     if (user_handler.check_admin_or_course_teacher(request_user_id,
                                                    course_id)):
         res = course_handler.create_assignment(course_id, description,
                                                assignment_name, end_date,
-                                               file_names)
+                                               file_names, max_score,
+                                               pass_score)
         if not (len(res) == 0):
             return make_response(jsonify(res), 400)
         else:
