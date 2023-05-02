@@ -105,6 +105,10 @@
                   >Assignment {{ gradeingSubmission.Assignment }} - Group
                   {{ submission.groupid }}</span
                 >
+                <span class="statusText" *ngIf="submission.grade">Graded</span>
+                <span class="statusText" *ngIf="!submission.grade"
+                  >Not Graded</span
+                >
               </div>
             </ng-template>
             <ng-template ngbPanelContent>
