@@ -58,7 +58,7 @@
     <div class="row">
       <p translate>Test_Files</p>
       <div class="col" *ngFor="let file of filenames">
-        <a href="#" (click)="downloadTest(file)">{{ file }} &#x2193;</a>
+        <p class="files" (click)="downloadTest(file)">{{ file }} &#x2193;</p>
       </div>
     </div>
     <div class="row">

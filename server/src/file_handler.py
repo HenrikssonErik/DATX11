@@ -312,6 +312,7 @@ def get_assignment_test_feedback_from_database(
 
     return data, 200
 
+
 def get_test_file(course: int, assignment: int, file_name: str):
     """Retrieves file from database"""
 
@@ -321,13 +322,12 @@ def get_test_file(course: int, assignment: int, file_name: str):
             query_data = """SELECT FileData FROM testFiles
                         WHERE fileName   = %s AND courseId = %s
                         AND assignment = %s"""
-
-            cur.execute(query_data, (file_name, course,
+            cur.execute(query_data, (('test_' + file_name), course,
                                      assignment))
-            data = cur.fetchall()
+            data = cur.fetchone()
     conn.close()
 
-    file_binary = io.BytesIO(data[0][0].tobytes())
+    file_binary = io.BytesIO(data[0].tobytes())
     return file_binary
 
 
