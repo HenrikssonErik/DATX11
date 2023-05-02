@@ -50,7 +50,8 @@ def get_user(user_id: int) -> dict:
         print(e)
         raise Exception("No user found") from e
 
-def get_fullname(user_id: int) -> dict:
+
+def get_fullname(user_id: int) -> str:
     """Returns a string with information on the user's fullname"""
     conn = psycopg2.connect(dsn=get_conn_string())
 

@@ -1,7 +1,7 @@
 from .connector import get_conn_string
 import psycopg2
 import datetime
-import user_handler
+from . import user_handler
 
 
 def create_course(course_name: str, course_abbr: str, year: int,
@@ -378,8 +378,8 @@ def get_assignment_feedback(course: int, assignment: int,
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT submission, testpass,
-                testfeedback, teacherfeedback, teachergrade, userid FROM
-                                assignmentfeedback, feedbackdate WHERE courseid = %s AND
+                testfeedback, teacherfeedback, teachergrade, userid, feedbackdate FROM
+                                assignmentfeedback WHERE courseid = %s AND
                                 groupid = %s AND assignment = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
@@ -494,6 +494,7 @@ def get_assignment_overview(course: int) -> list[dict]:
                     data = cur.fetchall()
                     if data:
                         for row in data:
+                            teacher = "" if (x := row[6]) is None else user_handler.get_fullname(row[6])
                             group_dict = {
                                 "groupid": row[0],
                                 "testpass": row[1],
@@ -501,7 +502,7 @@ def get_assignment_overview(course: int) -> list[dict]:
                                 'Submission': row[3],
                                 "Score": row[4],
                                 "Feedback": row[5],
-                                "GradedBy": user_handler.get_fullname(row[6]),
+                                "GradedBy": teacher,
                                 'Date': row[7]}
                             overview_list.append(group_dict)
                     return_list.append({"Assignment": assignment[0],
