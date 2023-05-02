@@ -473,7 +473,7 @@ def get_assignment_overview(course: int) -> list[dict]:
                 assignments = cur.fetchall()
 
                 query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
-                teacherGrade, submission, score FROM AssignmentFeedback WHERE courseId = %s
+                teacherGrade, submission, score,  teacherfeedback  FROM AssignmentFeedback WHERE courseId = %s
                 AND assignment = %s ORDER BY groupId,
                 submission DESC;"""
                 return_list = []
@@ -488,7 +488,8 @@ def get_assignment_overview(course: int) -> list[dict]:
                                 "testpass": row[1],
                                 "grade": row[2],
                                 'Submission': row[3],
-                                "Score": row[4]}
+                                "Score": row[4],
+                                "Feedback": row[5]}
                             overview_list.append(group_dict)
                     return_list.append({"Assignment": assignment[0],
                                         "Submissions": overview_list})
