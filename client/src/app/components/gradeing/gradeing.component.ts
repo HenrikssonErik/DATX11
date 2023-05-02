@@ -23,6 +23,7 @@ export class GradeingComponent {
   allAssignments?: Submission[];
   searchText: string = '';
   commentText: string = '';
+  fileNames?: string[];
 
   constructor(
     private submissionService: SubmissionService,
@@ -57,6 +58,7 @@ export class GradeingComponent {
         (assignment: Submission): boolean =>
           assignment.Assignment === assignmentNr
       )!;
+      this.setFileNames(assignmentNr);
     }
     //TODO: handle if it was not found
     if (this.gradeingSubmission) {
@@ -65,6 +67,10 @@ export class GradeingComponent {
     } else {
       // Assignment was not found
     }
+  }
+
+  setFileNames(assignmentNr: number) {
+    this.getFileNames(assignmentNr);
   }
 
   openFeedBackModal(group: number, assignmentNr: number) {
@@ -146,5 +152,34 @@ export class GradeingComponent {
           console.log('done');
         },
       });
+  }
+
+  getFileNames(assignmentNr: number) {
+    this.submissionService
+      .getFileNames(this.course.courseID, assignmentNr)
+      .subscribe({
+        next: (data: any) => {
+          this.fileNames = data.Filenames;
+        },
+        error: (err) => {
+          console.log(err);
+        },
+        complete: () => {},
+      });
+  }
+
+  downloadSubmissionFile(
+    groupId: number,
+    assignmentNr: number,
+    submissionId: number,
+    fileName: string
+  ) {
+    this.submissionService.downloadSubmissionFile(
+      this.course.courseID,
+      groupId,
+      assignmentNr,
+      submissionId,
+      fileName
+    );
   }
 }
