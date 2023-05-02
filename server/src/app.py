@@ -92,6 +92,22 @@ def resend_verification_email() -> Response:
         return make_response(user_lookup)
 
 
+@app.route('/reset_pwd_email', methods=['POST'])
+def reset_pwd() -> Response:
+    data = request.form
+    cid = data['cid']
+
+    user_lookup = user_to_send_email(cid)
+
+    if (user_lookup[1] == 200):
+        email = user_lookup[0]['email']
+        token = user_lookup[0]['token']
+        send_forgotpwd_email(email, token)
+        return make_response({'status': "success"}, 200)
+    else:
+        return make_response(user_lookup)
+
+
 @app.route('/verify_email', methods=['POST'])
 def verify_email() -> Response:
     """
@@ -124,7 +140,7 @@ def verify_email() -> Response:
         return res
 
 
-@app.route('/forgot_pwd', methods=['POST'])
+@app.route('/new_pwd_reset', methods=['POST'])
 def update_password() -> Response:
 
     return make_response({}, 200)
