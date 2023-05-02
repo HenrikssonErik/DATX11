@@ -7,7 +7,7 @@ from flask_cors import CORS
 from .constants import DOMAIN
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database, \
-    get_assignment_test_feedback_from_database
+    get_assignment_test_feedback_from_database, get_test_filenames, get_test_file
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
@@ -241,6 +241,29 @@ def get_files():
     res.headers = headers
     return res
 
+
+@app.route('/DownloadTestFile', methods=['POST'])
+def get_tests():
+    """
+    Takes in information from the frontend about a specific course assignment
+      test file to then return its file content.
+    Input data structure:
+    Returns a file to be downloaded
+    """
+    data = request.get_json()
+    course = data['course']
+    assignment = data['assignment']
+    filename = data['filename']  
+    result = get_test_file(course, assignment, filename)
+
+    res = make_response(send_file(path_or_file=result,
+                                  download_name=filename, as_attachment=True))
+
+    headers = {"Access-Control-Expose-Headers": "Content-Disposition",
+               'Content-Disposition': 'attachment; filename={}'
+               .format(filename)}
+    res.headers = headers
+    return res
 
 @app.route('/getUserInfo', methods=['GET'])
 def get_user_info():
@@ -629,6 +652,20 @@ def set_feedback():
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
 
+
+@app.route('/getTestFileNames', methods=['GET'])
+def get_test_file_names():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = int(request.args.get('Course'))
+    assignment = int(request.args.get('Assignment'))
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
+        # create overview
+        overview = get_test_filenames(course, assignment)
+        return make_response(jsonify(overview), 200)
+    else:
+        return make_response(jsonify({"status": "no_permission"}), 401)
 
 @app.route('/changeCourseName', methods=['POST'])
 def change_course_name():

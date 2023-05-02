@@ -29,6 +29,18 @@ export class CourseService {
     });
   }
 
+  getTestFileNames(course: number, assignment: number): Observable<string[]> {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+    return this.http.get<string[]>(
+      `${API_URL}/getTestFileNames?Course=${course}&Assignment=${assignment}`,
+      {
+        headers,
+      }
+    );
+  }
+
   changeCourseName(newName: string, courseId: number): Observable<any> {
     const headers = new HttpHeaders().append('Cookies', document.cookie);
     return this.http.post<Course>(

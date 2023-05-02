@@ -17,6 +17,7 @@ export class AssignemntCardComponent {
   fileDropEl!: ElementRef;
   allowedFileTypes = ['text/x-python'];
   formatedDate!: string;
+  filenames: string[] = [];
 
   headers = new HttpHeaders()
     .append('Cookies', document.cookie)
@@ -45,6 +46,20 @@ export class AssignemntCardComponent {
 
     this.form.get('Date')?.setValue(this.formatedDate);
     this.form.get('Description')?.setValue(this.Assignment.Description);
+    this.courseService
+      .getTestFileNames(this.courseID, this.Assignment.AssignmentNr)
+      .subscribe({
+        next: (response: string[]) => {
+          console.log(response);
+          this.filenames = response;
+        },
+        error: (error: any) => {
+          this.toastr.error('', error.error);
+        },
+        complete() {
+          console.log('complete');
+        },
+      });
   }
 
   formatDate(dateObj: Date): string {
@@ -243,6 +258,51 @@ export class AssignemntCardComponent {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+        },
+      });
+  }
+
+  downloadTest(name: string): void {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    this.http
+      .post(
+        `${API_URL}/DownloadTestFile`,
+
+        // replace fixed values with dynamic user input, when that is implemented
+        {
+          course: this.courseID,
+          assignment: this.Assignment.AssignmentNr,
+          filename: name,
+        },
+        {
+          observe: 'response',
+          responseType: 'blob',
+          headers,
+        }
+      )
+      .subscribe({
+        next: (response) => {
+          const contentDispositionHeader = response.headers.getAll(
+            'Content-Disposition'
+          )![0];
+          const filename = contentDispositionHeader
+            .split(';')[1]
+            .split('=')[1]
+            .replace(/"/g, '')
+            .trim();
+          var file = new File([response.body!], 'test');
+
+          const url = URL.createObjectURL(file);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          link.click();
+        },
+        error: (err) => {
+          //TODO: Handle the error
         },
       });
   }

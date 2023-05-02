@@ -56,6 +56,12 @@
       <!-- add (change)="fileBrowseHandler($event)"  to input-->
     </div>
     <div class="row">
+      <p translate>Test_Files</p>
+      <div class="col" *ngFor="let file of filenames">
+        <a href="#" (click)="downloadTest(file)">{{ file }} &#x2193;</a>
+      </div>
+    </div>
+    <div class="row">
       <div class="col-12">
         <div class="form-floating">
           <textarea
