@@ -283,7 +283,7 @@ def change_course_name(new_name: str, course: int):
 
 
 def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
-                         course: int, assignment: int, submission: int):
+                         course: int, assignment: int, submission: int, teacher: int):
     """Submission is set to 0 since a primary cannot be null.
     It will increment by default anyway."""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -291,9 +291,9 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
         with conn:
             with conn.cursor() as cur:
                 query_one = """UPDATE AssignmentFeedback SET
-                teacherFeedback = %s, teacherGrade = %s WHERE groupId = %s
+                teacherFeedback = %s, teacherGrade = %s, userid = %s WHERE groupId = %s
                 AND courseId = %s AND submission = %s AND assignment = %s;"""
-                cur.execute(query_one, [feedback, grade, group_id, course,
+                cur.execute(query_one, [feedback, grade, teacher, group_id, course,
                                         submission, assignment])
         conn.close()
         return

@@ -646,7 +646,8 @@ def set_feedback():
     group_id: int = int(data['Group'])
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
-        course_handler.set_teacher_feedback(group_id, feedback, grade, course, assignment, submission)
+        course_handler.set_teacher_feedback(group_id, feedback, grade, course,
+                                            assignment, submission, user_id)
         return make_response("", 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
