@@ -379,7 +379,7 @@ def get_assignment_feedback(course: int, assignment: int,
             with conn.cursor() as cur:
                 query_data = """SELECT submission, testpass,
                 testfeedback, teacherfeedback, teachergrade, userid FROM
-                                assignmentfeedback WHERE courseid = %s AND
+                                assignmentfeedback, feedbackdate WHERE courseid = %s AND
                                 groupid = %s AND assignment = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
@@ -411,7 +411,8 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
                             'testfeedback': testfeedback,
                             'teacherfeedback': teacherfeedback,
                             'Grade': grade,
-                            'GradedBy': teacher})
+                            'GradedBy': teacher,
+                            'Date': submission[6]})
     return assignments
 
 
