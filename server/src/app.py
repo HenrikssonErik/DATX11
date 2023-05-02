@@ -565,7 +565,7 @@ def get_testing_feedback():
     assignment = request.args.get('Assignment')
     group_id = request.args.get('Group')
 
-    if (user_handler.is_teacher_on_course(user_id, course)):
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
         feedback = course_handler.get_assignment_feedback(course, assignment,
                                                           group_id)
         return make_response(jsonify(feedback), 200)
