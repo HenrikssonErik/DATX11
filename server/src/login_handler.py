@@ -183,7 +183,7 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
     return {'status': status}, res_code
 
 
-def user_to_resend_verification(cid: str) -> tuple:
+def user_to_send_email(cid: str) -> tuple:
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:

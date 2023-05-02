@@ -11,7 +11,7 @@ from .file_handler import handle_files, \
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
-    user_to_resend_verification, verify_user_from_email_verification, \
+    user_to_send_email, verify_user_from_email_verification, \
     verify_and_get_id, create_temp_users
 from flask_mail import Mail, Message
 import jwt
@@ -82,7 +82,7 @@ def resend_verification_email() -> Response:
     data = request.form
     cid = data['cid']
 
-    user_lookup = user_to_resend_verification(cid)
+    user_lookup = user_to_send_email(cid)
     if (user_lookup[1] == 200):
         email = user_lookup[0]['email']
         token = user_lookup[0]['token']

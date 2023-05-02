@@ -9,7 +9,7 @@ import bcrypt
 from psycopg2 import IntegrityError
 
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_verification_token, verify_user_in_db, verify_user_from_email_verification, user_to_resend_verification, create_temp_users  # noqa: E402, E501
+from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_verification_token, verify_user_in_db, verify_user_from_email_verification, user_to_send_email, create_temp_users  # noqa: E402, E501
 
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
@@ -266,7 +266,7 @@ class TestFileHandler(unittest.TestCase):
             self.assertEqual(random_cid, verification_response[0].get('cid'))
 
     @patch('psycopg2.connect')
-    def test_user_to_resend_verification_success(self, mock_connect):
+    def test_user_to_send_email_success(self, mock_connect):
         mock_cur = setup_mock_cursor(mock_connect)
         cid = random_cid_generator()
         mock_cur.fetchone.return_value = [cid + '@chalmers.se', False]
@@ -275,35 +275,35 @@ class TestFileHandler(unittest.TestCase):
             'src.login_handler.create_verification_token',
             return_value=new_verification_token
         ):
-            actual_response = user_to_resend_verification(cid)
+            actual_response = user_to_send_email(cid)
         expected_response = {"email": cid + "@chalmers.se",
                              "token": new_verification_token}, 200
         self.assertEqual(actual_response, expected_response)
 
     @patch('psycopg2.connect')
-    def test_user_to_resend_verification_no_user(self, mock_connect):
+    def test_user_to_send_email_no_user(self, mock_connect):
         mock_cur = setup_mock_cursor(mock_connect)
         cid = random_cid_generator()
         mock_cur.fetchone.return_value = None
-        actual_response = user_to_resend_verification(cid)
+        actual_response = user_to_send_email(cid)
         expected_response = {"status": "no_user"}, 406
         self.assertEqual(actual_response, expected_response)
 
     @patch('psycopg2.connect')
-    def test_user_to_resend_verification_already_verified(self, mock_connect):
+    def test_user_to_send_email_already_verified(self, mock_connect):
         mock_cur = setup_mock_cursor(mock_connect)
         cid = random_cid_generator()
         mock_cur.fetchone.return_value = [cid + "@chalmers.se", True]
-        actual_response = user_to_resend_verification(cid)
+        actual_response = user_to_send_email(cid)
         expected_response = {"status": "already_verified"}, 406
         self.assertEqual(actual_response, expected_response)
 
     @patch('psycopg2.connect')
-    def test_user_to_resend_verification_unexpected_error(self, mock_connect):
+    def test_user_to_send_email_unexpected_error(self, mock_connect):
         mock_cur = setup_mock_cursor(mock_connect)
         mock_cur.execute.side_effect = Exception("Generic uncaught exception")
         cid = random_cid_generator()
         mock_cur.fetchone.return_value = None
-        actual_response = user_to_resend_verification(cid)
+        actual_response = user_to_send_email(cid)
         expected_response = {"status": "unexpected_error"}, 500
         self.assertEqual(actual_response, expected_response)
