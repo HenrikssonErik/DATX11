@@ -211,7 +211,7 @@ def get_assignment_feedback():
         return make_response("", code)
 
 
-@app.route('/getAssignmentFile', methods=['POST'])
+@app.route('/getAssignmentFile', methods=['GET'])
 def get_files():
     """
     Takes in information from the frontend about a specific course assignment
@@ -220,11 +220,11 @@ def get_files():
     { groupId: number, course: number, assignment: number, filename: string }
     Returns a file to be downloaded
     """
-    data = request.get_json()
+    data = request.args
     group_id = data['groupId']
     course = data['course']
     assignment = data['assignment']
-    filename = data['filename']  # should also be imported from frontend
+    filename = data['filename']
     submission = data['submission']
     result = get_assignment_files_from_database(
         group_id, course, assignment, filename, submission)
