@@ -6,7 +6,6 @@
       hydrantDropdown
       data-bs-toggle="dropdown"
       aria-expanded="false"
-      translate
     >
       Assignment <i class="fa-solid fa-chalkboard-user"></i>
     </button>
@@ -25,7 +24,6 @@
             (click)="filterAssignments(assignment); $event.stopPropagation()"
             class="form-check-label text-muted"
             for="assignmentCheckbox"
-            translate
           >
             Assignment {{ assignment }}
           </label>
@@ -37,7 +35,6 @@
       type="button"
       data-bs-toggle="dropdown"
       aria-expanded="false"
-      translate
     >
       Graded <i class="fa-solid fa-graduation-cap"></i>
     </button>
@@ -50,7 +47,7 @@
             value=""
             id="checkbox1"
           />
-          <label class="form-check-label" for="checkbox1" translate> No </label>
+          <label class="form-check-label" for="checkbox1"> No </label>
         </div>
       </li>
       <li>
@@ -61,9 +58,7 @@
             value=""
             id="checkbox2"
           />
-          <label class="form-check-label" for="checkbox2" translate>
-            Yes
-          </label>
+          <label class="form-check-label" for="checkbox2"> Yes </label>
         </div>
       </li>
     </ul>
@@ -72,16 +67,13 @@
       type="button"
       data-bs-toggle="dropdown"
       aria-expanded="false"
-      translate
     >
       Date <i class="fa-solid fa-clock"></i>
     </button>
     <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="#" translate>Action</a></li>
-      <li><a class="dropdown-item" href="#" translate>Another action</a></li>
-      <li>
-        <a class="dropdown-item" href="#" translate>Something else here</a>
-      </li>
+      <li><a class="dropdown-item" href="#">Action</a></li>
+      <li><a class="dropdown-item" href="#">Another action</a></li>
+      <li><a class="dropdown-item" href="#">Something else here</a></li>
     </ul>
   </div>
   <div class="dropdown"></div>
@@ -109,7 +101,7 @@
           <ngb-panel *ngFor="let submission of gradeingSubmission.Submissions">
             <ng-template ngbPanelTitle>
               <div class="titleAccordion">
-                <span translate
+                <span
                   >Assignment {{ gradeingSubmission.Assignment }} - Group
                   {{ submission.groupid }}</span
                 >
@@ -118,15 +110,28 @@
             <ng-template ngbPanelContent>
               <div class="row text-muted">
                 <div class="col-md-2">
-                  <p class="header" translate>Test_Result</p>
-                  <p>{{ submission.grade || "Not yet graded" }}</p>
+                  <p class="header">Test Result</p>
+                  <p>
+                    {{ submission.grade || "Not yet graded" }}
+                    <span class="testResult"
+                      ><i
+                        (click)="
+                          openFeedBackModal(
+                            submission.groupid,
+                            gradeingSubmission.Assignment
+                          )
+                        "
+                        class="fa-solid fa-up-right-from-square"
+                      ></i
+                    ></span>
+                  </p>
                 </div>
                 <div class="col-md-2">
-                  <p class="header" translate>Time_Submitted</p>
+                  <p class="header">Time Submitted</p>
                   <p>2023-04-01 at 23:49</p>
                 </div>
                 <div class="col-md-3">
-                  <p class="header" translate>Files_Submitted</p>
+                  <p class="header">Files submitted</p>
                   <p
                     style="
                       text-decoration: underline;
@@ -155,8 +160,9 @@
                     DAT111_Assignment2.txt
                   </p>
                 </div>
+
                 <div class="col-md-5">
-                  <p class="header" translate>Leave_Comment</p>
+                  <p class="header">Leave a comment</p>
                   <textarea
                     class="form-control"
                     placeholder="Leave a comment here"
@@ -204,5 +210,5 @@
   </div>
 </div>
 <ng-template #noSubmissions>
-  <p translate>No_Assignments_Found</p>
+  <p>No assignments found.</p>
 </ng-template>

@@ -4,6 +4,8 @@ import { SubmissionService } from 'src/app/services/submission.service';
 import { AssignmentSubmission, Submission } from 'src/app/models/submission';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FeedbackTeacherViewModalComponent } from '../feedback-teacher-view-modal/feedback-teacher-view-modal.component';
 
 @Component({
   selector: 'app-gradeing',
@@ -22,7 +24,10 @@ export class GradeingComponent {
   searchText: string = '';
   commentText: string = '';
 
-  constructor(private submissionService: SubmissionService) {}
+  constructor(
+    private submissionService: SubmissionService,
+    private modalService: NgbModal
+  ) {}
 
   ngOnInit(): void {
     this.submissionService
@@ -62,8 +67,16 @@ export class GradeingComponent {
     }
   }
 
+  openFeedBackModal(group: number, assignmentNr: number) {
+    const modalRef = this.modalService.open(FeedbackTeacherViewModalComponent);
+    modalRef.componentInstance.name = 'feedbackTeacherViewModalComponent';
+    modalRef.componentInstance.group = group;
+    modalRef.componentInstance.assignmentNr = assignmentNr;
+    modalRef.componentInstance.courseId = this.course.courseID;
+  }
+
   setAssignmentToGrade(assignment: Submission) {
-    //Todo: Make sure that the init with 1 is ok. It probably is not.
+    //TODO: Make sure that the init with 1 is ok. It probably is not.
     this.filterAssignments(1);
     this.gradeingSubmission = assignment;
   }

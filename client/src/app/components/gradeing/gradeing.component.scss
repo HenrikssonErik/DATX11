@@ -19,6 +19,15 @@
   cursor: pointer;
 }
 
+.testResult {
+  margin-left: 5px;
+}
+
+.testResult:hover {
+  color: #000;
+  cursor: pointer;
+}
+
 .hydrantDropdown {
   background-color: #fff;
   border: 1px solid #ced4da;
