@@ -570,7 +570,7 @@ def get_feedback():
 def get_testing_feedback():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
-    course = request.args.get('Course')
+    course = int(request.args.get('Course'))
     assignment = request.args.get('Assignment')
     group_id = request.args.get('Group')
 
