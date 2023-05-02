@@ -38,6 +38,7 @@ import { CreateAssignmentModalComponent } from './components/create-assignment-m
 import { HandleUsersModalComponent } from './components/handle-users-modal/handle-users-modal.component';
 import { AssignemntCardComponent } from './components/assignemnt-card/assignemnt-card.component';
 import { SubmissionsComponent } from './components/submissions/submissions.component';
+import { ForgotPwdComponent } from './components/forgot-pwd/forgot-pwd.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -68,6 +69,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     HandleUsersModalComponent,
     AssignemntCardComponent,
     SubmissionsComponent,
+    ForgotPwdComponent,
   ],
   imports: [
     BrowserModule,
