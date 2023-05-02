@@ -85,6 +85,7 @@ export class AssignmentsComponent implements OnInit {
     const modalRef = this.modalService.open(FileUploadModalComponent);
     modalRef.componentInstance.name = 'fileUpload';
     modalRef.componentInstance.courseId = courseId;
+    modalRef.componentInstance.groupNr = groupId;
     modalRef.componentInstance.groupId = groupId;
     modalRef.componentInstance.assignmentNumber = assignmentNumber;
   }
