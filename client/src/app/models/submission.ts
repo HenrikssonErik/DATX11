@@ -14,6 +14,7 @@ export interface TestResult {
     unittest_feedback: {
       errors: [string, string][];
       expected_failures: never[];
+      successes: never[];
       failures: never[];
       skipped: never[];
       tests_run: number;
