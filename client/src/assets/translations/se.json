@@ -85,5 +85,15 @@
   "Teacher": "Lärare",
   "Due_Date": "Tillgänglig Till",
   "Description": "Beskrivning",
-  "Group": "Grupp"
+  "Group": "Grupp",
+  "Gradeing": "Bedömningar",
+  "Graded": "Betygsatt",
+  "No": "Nej",
+  "Yes": "Ja",
+  "Date": "Datum",
+  "Test_Result": "Test Resultat",
+  "Time_Submitted": "Tid för inlämning",
+  "Files_Submitted": "Inlämnade Filer",
+  "Leave_Comment": "Lämna en Kommentar",
+  "No_Assignments_Found": "Inga Inlämningar Hittades"
 }

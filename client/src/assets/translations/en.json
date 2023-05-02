@@ -85,5 +85,15 @@
   "Teacher": "Teacher",
   "Due_Date": "Due Date",
   "Description": "Description",
-  "Group": "Group"
+  "Group": "Group",
+  "Gradeing": "Gradeing",
+  "Graded": "Graded",
+  "No": "No",
+  "Yes": "Yes",
+  "Date": "Date",
+  "Test_Result": "Test Result",
+  "Time_Submitted": "Time Submitted",
+  "Files_Submitted": "Files Submitted",
+  "Leave_Comment": "Leave a Comment",
+  "No_Assignments_Found": "No Assignments Found"
 }
