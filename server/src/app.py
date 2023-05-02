@@ -553,8 +553,8 @@ def change_assignment_date():
 def get_feedback():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
-    course = request.args.get('Course')
-    assignment = request.args.get('Assignment')
+    course = int(request.args.get('Course'))
+    assignment = int(request.args.get('Assignment'))
     
     if (user_id):
         group = user_handler.get_group(user_id, course)['groupId']
@@ -571,8 +571,8 @@ def get_testing_feedback():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
-    assignment = request.args.get('Assignment')
-    group_id = request.args.get('Group')
+    assignment = int(request.args.get('Assignment'))
+    group_id = int(request.args.get('Group'))
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         feedback = course_handler.get_assignment_feedback(course, assignment,
