@@ -7,7 +7,7 @@ from flask_cors import CORS
 from .constants import DOMAIN
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database, \
-    get_assignment_test_feedback_from_database
+    get_assignment_test_feedback_from_database, get_filenames
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
@@ -636,6 +636,21 @@ def set_feedback():
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         course_handler.set_teacher_feedback(group_id, feedback, grade, course, assignment, submission)
         return make_response("", 200)
+    else:
+        return make_response(jsonify({"status": "no_permission"}), 401)
+
+
+@app.route('/getFilenames', methods=['GET'])
+def get_file_names():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = int(request.args.get('Course'))
+    assignment = int(request.args.get('Assignment'))
+
+    if (user_handler.is_in_course(user_id, course)):
+        # create overview
+        filenames = get_filenames(course, assignment)
+        return make_response(jsonify({'Filenames': filenames}), 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
 
