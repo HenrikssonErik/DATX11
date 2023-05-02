@@ -38,6 +38,7 @@ import { CreateAssignmentModalComponent } from './components/create-assignment-m
 import { HandleUsersModalComponent } from './components/handle-users-modal/handle-users-modal.component';
 import { SubmissionsComponent } from './components/submissions/submissions.component';
 import { GradeingComponent } from './components/gradeing/gradeing.component';
+import { FeedbackTeacherViewModalComponent } from './components/feedback-teacher-view-modal/feedback-teacher-view-modal.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -68,6 +69,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     HandleUsersModalComponent,
     SubmissionsComponent,
     GradeingComponent,
+    FeedbackTeacherViewModalComponent,
   ],
   imports: [
     BrowserModule,
