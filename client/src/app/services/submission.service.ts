@@ -42,7 +42,7 @@ export class SubmissionService {
     const headers = new HttpHeaders().append('Cookies', document.cookie);
 
     return this.http.post<HttpResponse<any>>(
-      `${API_URL}/removeFromGroup`,
+      `${API_URL}/setFeedback`,
       {
         Course: course,
         Assignment: assignmentNr,
