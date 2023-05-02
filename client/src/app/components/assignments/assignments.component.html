@@ -228,7 +228,9 @@
           </div>
           <!--TODO: HANDLE THE EMPTY GROUP BETTER-->
           <div class="col-md-2" *ngIf="groupExists()">
-            <h5 translate>Group {{ group.groupNumber }}</h5>
+            <h5 translate>
+              Group <span>{{ group.groupNumber }}</span>
+            </h5>
             <ng-container>
               <p
                 style="padding: 0; margin: 0"
