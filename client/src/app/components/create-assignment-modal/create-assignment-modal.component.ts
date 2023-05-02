@@ -44,6 +44,7 @@ export class CreateAssignmentModalComponent {
         ],
       ],
       PassScore: [0, [Validators.required, Validators.min(1)]],
+      PassFail: [false],
       numOfFiles: [0, [Validators.required, Validators.min(1)]],
       fileNames: this.formBuilder.array(
         [],
@@ -65,7 +66,6 @@ export class CreateAssignmentModalComponent {
   }
 
   changeMinVal() {
-    console.log(typeof this.form?.controls['PassScore'].value);
     this.form.controls['MaxScore'].clearValidators();
     this.form.controls['MaxScore'].addValidators([
       Validators.required,

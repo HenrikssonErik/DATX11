@@ -48,26 +48,38 @@
       </div>
     </div>
     <div class="row mt-2">
-      <div class="form-group col-md-6">
-        <label for="num1">Max Score:</label>
+      <div class="form-group col-md-4">
+        <label for="maxScore">Max Score:</label>
         <input
           type="number"
           class="form-control"
           id="maxScore"
           name="maxScore"
           formControlName="MaxScore"
+          min="1"
         />
       </div>
-      <div class="form-group col-md-6">
-        <label for="num2" translate>Passing_Score</label>
+      <div class="form-group col-md-4">
+        <label for="passScore" translate>Passing_Score</label>
         <input
           type="number"
           class="form-control"
           id="passScore"
-          name="passCore"
+          name="passScore"
+          min="1"
           formControlName="PassScore"
           (change)="changeMinVal()"
         />
+      </div>
+      <div class="form-group col-md-4">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          id="passFail"
+          name="passFail"
+          formControlName="PassFail"
+        />
+        <label class="form-check-label" for="passFail">Pass/Fail</label>
       </div>
       <div class="row mt-2">
         <div class="col-12">
