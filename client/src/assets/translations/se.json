@@ -135,5 +135,7 @@
   "Members": "Medlemmar",
   "Testfile_Template": "Mall för Testfil",
   "Download_Template": "Ladda Ner Mall",
-  "Graded_Failed": "Graded: Underkänd"
+  "Graded_Failed": "Graded: Underkänd",
+  "Forgot_pwd_title": "Glömt lösenord",
+  "Forgot_pwd_btn": "Skicka återställningsmail"
 }

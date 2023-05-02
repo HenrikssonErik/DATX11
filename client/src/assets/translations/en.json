@@ -135,5 +135,7 @@
   "Handle_Members": "Handle_Members",
   "Members": "Members",
   "Testfile_Template": "Testfile Template",
-  "Download_Template": "Download Template"
+  "Download_Template": "Download Template",
+  "Forgot_pwd_title": "Forgot Password",
+  "Forgot_pwd_btn": "Send reset password email"
 }
