@@ -74,5 +74,6 @@
   "Upload_File": "Ladda upp fil",
   "Groups_Tab": "Grupper",
   "Edit_Mode": "Redigerings läge",
-  "Test_Files": "Testfiler:"
+  "Test_Files": "Testfiler:",
+  "Upload_Tests": "Ladda Upp Test (ersätter fil med samma namn)"
 }
