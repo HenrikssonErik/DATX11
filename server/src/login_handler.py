@@ -126,7 +126,7 @@ def user_registration(data: Request.form) -> \
         ] = registration_query(
             cid, email, hashed_pass, role, name
         )
-        res_object = ({'token': create_verification_token(cid)}, 200) if (
+        res_object = ({'token': create_cid_token(cid)}, 200) if (
             res_query[1] == 200) else (res_query)
 
         return res_object
@@ -201,7 +201,7 @@ def user_to_send_email(cid: str) -> tuple:
 
                 if not verified:
                     response_object = {"email": mail}
-                    token = create_verification_token(cid)
+                    token = create_cid_token(cid)
                     response_object.update({'token': token})
                     return response_object, 200
                 else:
@@ -248,7 +248,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         return {'status': "wrong_credentials"}, 401
 
 
-def create_verification_token(cid: str) -> str:
+def create_cid_token(cid: str) -> str:
     """
     Creates a token to verify a User that is valid for 24 hours.
     This token is sent in the verification email to the user registering.
