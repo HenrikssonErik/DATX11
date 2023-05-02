@@ -40,6 +40,7 @@ import { AssignmentCardComponent } from './components/assignment-card/assignment
 import { SubmissionsComponent } from './components/submissions/submissions.component';
 import { GradeingComponent } from './components/gradeing/gradeing.component';
 import { FeedbackTeacherViewModalComponent } from './components/feedback-teacher-view-modal/feedback-teacher-view-modal.component';
+import { ForgotPwdComponent } from './components/forgot-pwd/forgot-pwd.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -72,6 +73,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     SubmissionsComponent,
     GradeingComponent,
     FeedbackTeacherViewModalComponent,
+    ForgotPwdComponent,
   ],
   imports: [
     BrowserModule,
