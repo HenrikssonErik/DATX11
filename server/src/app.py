@@ -231,11 +231,11 @@ def get_file():
     user_id: int = verify_and_get_id(token)
 
     data = request.args
-    group_id = data['groupId']
-    course = data['course']
-    assignment = data['assignment']
+    group_id = int(data['groupId'])
+    course = int(data['course'])
+    assignment = int(data['assignment'])
     filename = data['filename']
-    submission = data['submission']
+    submission = int(data['submission'])
     headers = {"Access-Control-Expose-Headers": "Content-Disposition",
                'Content-Disposition': 'attachment; filename={}'
                .format(filename)}
@@ -665,6 +665,7 @@ def set_feedback():
 def get_file_names():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
+    print(request.args.get('Course'))
     course = int(request.args.get('Course'))
     assignment = int(request.args.get('Assignment'))
 
