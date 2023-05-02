@@ -124,6 +124,33 @@ def verify_email() -> Response:
         return res
 
 
+def send_forgotpwd_email(to: str, token: str) -> None:
+    """
+    Sends a forgot password email to a user.
+    This email is in an HTML format, with a working link sending
+    the user directly to the correct endpoint in the frontend
+    (To be updated whenever the website is launched to not link to localhost)
+
+
+    Args:
+        to (str): The recipient's email address, which has been verified
+        in login_handler's check_data_input to be a valid email.
+        token_dict (dict): The jwt-generated token from login_handler's
+        create_verification_token-function.
+    """
+
+    msg = Message('Forgot password?',
+                  sender='temphydrant@gmail.com', recipients=[to])
+
+    endpoint: str = "/forgotPwd/" + token
+
+    url: str = DOMAIN + endpoint
+
+    msg.html = render_template("forgotPwdTemplate.html", link=url, raw_url=url)
+
+    mail.send(msg)
+
+
 def send_verification_email(to: str, token: str) -> None:
     """
     Sends a verification email to the specific user signing up.
@@ -187,6 +214,7 @@ def post_tests():
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
 
+
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
 
         if not files:
@@ -195,8 +223,8 @@ def post_tests():
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         res = handle_test_file(files, course, assignment)
         return make_response(jsonify(res[0]), res[1])
-    else:
-        return make_response({'status': 'Not_a_course_teacher'}, 401)
+    else: 
+        return make_response("", 401)
 
 
 """
