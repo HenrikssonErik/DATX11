@@ -53,7 +53,7 @@ export class SubmissionService {
     feedback: string,
     grade: boolean,
     groupId: number
-  ) {
+  ): Observable<any> {
     const headers = new HttpHeaders().append('Cookies', document.cookie);
 
     return this.http.post<HttpResponse<any>>(
@@ -71,5 +71,42 @@ export class SubmissionService {
         headers: headers,
       }
     );
+  }
+
+  getFileNames(courseId: number, assignmentNr: number): Observable<any> {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    return this.http.get<any>(
+      `${API_URL}/getFilenames?Course=${courseId}&Assignment=${assignmentNr}`,
+      { headers }
+    );
+  }
+
+  downloadSubmissionFile(
+    courseId: number,
+    groupId: number,
+    assignmentNr: number,
+    submissionId: number,
+    filename: string
+  ): void {
+    const headers = new HttpHeaders().append('Cookies', document.cookie);
+
+    this.http
+      .get(
+        `${API_URL}/getAssignmentFile?course=${courseId}&groupId=${groupId}&assignment=${assignmentNr}&submission=${submissionId}&filename=${filename}`,
+        { headers, responseType: 'blob' }
+      )
+      .subscribe((response) => {
+        const blob = new Blob([response], { type: response.type });
+        const objectUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = objectUrl;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+      });
   }
 }
