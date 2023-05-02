@@ -224,7 +224,7 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT assignment, enddate, Description, name FROM " +\
+                query_data = "SELECT assignment, enddate, Description, name, maxscore, passscore FROM " +\
                     "assignments WHERE courseid = %s"
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
@@ -234,7 +234,9 @@ def get_assignments(course_id: int) -> tuple:
                     assignments.append({'AssignmentNr': assignment_row[0],
                                         'DueDate': assignment_row[1],
                                         'Description': assignment_row[2],
-                                        'Name': assignment_row[3]})
+                                        'Name': assignment_row[3],
+                                        'MaxScore': assignment_row[4],
+                                        'PassScore': assignment_row[5]})
         conn.close()
         if not data:
             return []

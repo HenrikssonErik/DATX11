@@ -193,7 +193,7 @@ def post_tests():
     res = handle_test_file(files, course, assignment)
     return make_response(jsonify(res[0]), res[1])
 
-
+"""
 @app.route('/getAssignmentTestFeedback', methods=['POST'])
 def get_assignment_feedback():
     data = request.get_json()
@@ -209,7 +209,7 @@ def get_assignment_feedback():
         return make_response(result, 200)
     else:
         return make_response("", code)
-
+"""
 
 @app.route('/getAssignmentFile', methods=['GET'])
 def get_file():
