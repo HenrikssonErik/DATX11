@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit {
   cid: string = '';
   passwordVisible: boolean = false;
   verificationCidForm: UntypedFormGroup = new UntypedFormGroup({});
+  forgotPwdForm: UntypedFormGroup = new UntypedFormGroup({});
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -51,6 +52,9 @@ export class LoginComponent implements OnInit {
 
   private initCid(): void {
     this.verificationCidForm = this.fb.group({
+      cid: ['', [Validators.required]],
+    });
+    this.forgotPwdForm = this.fb.group({
       cid: ['', [Validators.required]],
     });
   }
@@ -253,7 +257,12 @@ export class LoginComponent implements OnInit {
       });
   }
 
+  onSubmitForgotPwd(): void {}
+
   openVerificationModal(): void {
+    this.verificationCidForm.reset();
+  }
+  openPwdModal(): void {
     this.verificationCidForm.reset();
   }
 }
