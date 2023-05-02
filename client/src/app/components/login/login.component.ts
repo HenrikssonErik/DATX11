@@ -257,7 +257,44 @@ export class LoginComponent implements OnInit {
       });
   }
 
-  onSubmitForgotPwd(): void {}
+  onSubmitForgotPwd(): void {
+    if (this.forgotPwdForm.invalid) {
+      return;
+    }
+
+    const cidForm = new FormData();
+    const cid = this.forgotPwdForm.get('cid');
+    if (cid) {
+      cidForm.append('cid', cid.value);
+    } else {
+      return;
+    }
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/reset_pwd_email`, cidForm, {
+        observe: 'response',
+      })
+      .subscribe({
+        next: (response: any) => {},
+        error: (err) => {
+          let statusMsg = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrResponse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+        complete: () => {
+          this.toastr.success(
+            'Click the link in the email to reset your password!',
+            'Password reset mail has been sent!',
+            {
+              closeButton: true,
+            }
+          );
+        },
+      });
+  }
 
   openVerificationModal(): void {
     this.verificationCidForm.reset();

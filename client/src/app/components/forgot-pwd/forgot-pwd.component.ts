@@ -46,16 +46,11 @@ export class ForgotPwdComponent implements OnInit {
           const cid: string = response['cid'];
           this.tokenValid = Promise.resolve(true);
           this.initializePwdForm(cid);
+          console.log(cid);
         },
         error: (error) => {
+          console.log(error);
           this.tokenValid = Promise.resolve(false);
-          // this.responseMessage = error.error.status;
-          // console.log(this.responseMessage);
-          // setTimeout(() => {
-          //   this.errorCaught = Promise.resolve(true);
-          //   this.imgPath = 'errorVerification';
-          // }, 1500);
-          // console.log(error);
         },
         complete: () => {},
       });
