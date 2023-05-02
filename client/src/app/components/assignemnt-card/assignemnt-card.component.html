@@ -1,0 +1,79 @@
+<div class="card" [formGroup]="form">
+  <div class="header">
+    <h5>
+      <span>Assignment </span> <span>{{ Assignment.AssignmentNr }}</span>
+    </h5>
+    <div class="form-group form-check">
+      <input
+        type="checkbox"
+        formControlName="editMode"
+        class="form-check-input"
+        id="editMode"
+        (click)="editToggle()"
+      />
+      <label class="form-check-label text-muted" for="editMode" translate
+        >Edit_Mode</label
+      >
+    </div>
+  </div>
+  <div class="body">
+    <div class="row">
+      <div class="form-floating col-md-10">
+        <input
+          type="text"
+          class="form-control"
+          id="floatingAssignmentName"
+          formControlName="AssignmentName"
+        />
+        <label for="floatingAssignmentName">Assignment Name</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        <div class="form-floating">
+          <input
+            type="date"
+            class="form-control"
+            id="Date"
+            formControlName="Date"
+          />
+          <label for="Date">Due Date</label>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <label for="formFile" class="form-label" style="font-size: small"
+          >Replace tests (replaces file with same name)</label
+        >
+        <input
+          class="form-control"
+          type="file"
+          id="Files"
+          (change)="fileBrowseHandler($event)"
+          [disabled]="!form.get('editMode')?.value"
+          multiple
+        />
+      </div>
+      <!-- add (change)="fileBrowseHandler($event)"  to input-->
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="form-floating">
+          <textarea
+            class="form-control"
+            id="description"
+            formControlName="Description"
+          ></textarea>
+          <label for="description">Description</label>
+        </div>
+      </div>
+    </div>
+    <button
+      style="float: right"
+      *ngIf="form.get('editMode')?.value"
+      class="btn btn-primary mt-2"
+      (click)="onSubmit()"
+    >
+      Save
+    </button>
+  </div>
+</div>

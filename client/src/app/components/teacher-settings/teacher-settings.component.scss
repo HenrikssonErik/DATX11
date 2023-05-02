@@ -26,3 +26,18 @@
   border-color: rgba(38, 115, 77, 0.25);
   box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
 }
+
+.card-container {
+  flex-direction: column;
+}
+
+a {
+  color: white;
+}
+
+.editBtn {
+  font-size: small;
+  margin-bottom: 3px;
+  padding-top: -5px;
+  font-weight: 600;
+}

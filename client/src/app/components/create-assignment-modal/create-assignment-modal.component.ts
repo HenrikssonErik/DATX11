@@ -112,7 +112,7 @@ export class CreateAssignmentModalComponent {
             if (response.status == 200) {
               this.toastr.success('Assignment Created', response.body);
               this.postUnittests(fileData, headers);
-              //location.reload();
+              location.reload();
             }
           } catch {
             throw new Error('unexpected_error');
@@ -121,7 +121,7 @@ export class CreateAssignmentModalComponent {
         error: (err) => {
           let statusMsg: string = err.error.status;
           const [errorMessage, errorTitle]: string[] =
-            this.toastrResponse.getToastrRepsonse(statusMsg);
+            this.toastrResponse.getToastrResponse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
@@ -156,11 +156,14 @@ export class CreateAssignmentModalComponent {
         error: (err) => {
           let statusMsg: string = err.error.status;
           const [errorMessage, errorTitle]: string[] =
-            this.toastrResponse.getToastrRepsonse(statusMsg);
+            this.toastrResponse.getToastrResponse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
         },
       });
   }
+  /**closeModal() {
+    this.activeModal.close();
+  } */
 }

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -8,7 +9,7 @@ export class AuthService {
   private isAuthenticated$: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
 
-  constructor() {
+  constructor(private router: Router) {
     this.isLoggedIn();
   }
 
@@ -41,11 +42,17 @@ export class AuthService {
     return false;
   }
 
-  logOut() {
+  async logOut() {
     if (document.cookie.includes('Token')) {
       document.cookie = 'Token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
       this.isAuthenticated$.next(false);
-      location.reload();
+      this.router.navigate(['login']);
+
+      //location.reload();
     }
+  }
+
+  delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

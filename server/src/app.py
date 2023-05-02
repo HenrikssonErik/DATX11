@@ -170,7 +170,7 @@ def post_files():
                 feedback_res = {}
                 feedback_res.update({"feedback": res[0]})
                 feedback_res.update(res[1])
-                return make_response(jsonify(feedback_res), res[2])
+                return make_response(jsonify(feedback_res), res[3])
             else:
                 return make_response({'status': 'deadline_passed'}, 400)
         else:
@@ -178,21 +178,24 @@ def post_files():
     else:
         return make_response({'status': 'not_logged_in'}, 401)
 
-# TODO: add check token
+
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+
     files = request.files.getlist('files')
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
+    
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
 
-    data = request.get_json()
-    course = data['course']
-    assignment = data['assignment']
-    if not files:
-        return "Files not found", 406
-    res = handle_test_file(files, course, assignment)
-    return make_response(jsonify(res[0]), res[1])
-
+        if not files:
+            return "Files not found", 406
+        res = handle_test_file(files, course, assignment)
+        return make_response(jsonify(res[0]), res[1])
+    else: 
+        make_response("", 401)
 
 @app.route('/getAssignmentTestFeedback', methods=['POST'])
 def get_assignment_feedback():
@@ -210,7 +213,7 @@ def get_assignment_feedback():
     else:
         return make_response("", code)
 
-
+# TODO: add token checks
 @app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
     """
@@ -492,13 +495,33 @@ def change_user_role():
 def edit_desc():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
-    data = request.get_json()
+    data = request.form
     new_desc = data['Desc']
-    course = data['Course']
-    assignment = data['Assignment']
+    course = int(data['Course'])
+    assignment = int(data['Assignment'])
 
     if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
         res = course_handler.change_description(new_desc, course, assignment)
+
+        if res is None:
+            return make_response("", 200)
+        else:
+            return make_response(jsonify(res), 401)
+    else:
+        return make_response(jsonify({'status': 'Not a course teacher'}), 401)
+
+
+@app.route('/editAssignmentName', methods=['POST'])
+def edit_name():
+    token = extract_token(request)
+    request_user_id = verify_and_get_id(token)
+    data = request.form
+    new_name = data['Name']
+    course = int(data['Course'])
+    assignment = int(data['Assignment'])
+
+    if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
+        res = course_handler.change_assignment_name(new_name, course, assignment)
 
         if res is None:
             return make_response("", 200)
@@ -524,9 +547,9 @@ def get_users_in_course():
 def change_assignment_date():
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
-    data = request.get_json()
-    course: int = data['Course']
-    assignment: int = data['Assignment']
+    data = request.form
+    course: int = int(data['Course'])
+    assignment: int = int(data['Assignment'])
     new_date: str = data['Date']
 
     if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
@@ -613,7 +636,7 @@ def change_course_name():
     user_id = verify_and_get_id(token)
     data = request.get_json()
     new_name = data['Name']
-    course = data['Course']
+    course = int(data['Course'])
 
     if (user_id):
         if (user_handler.check_admin_or_course_teacher(user_id, course)):

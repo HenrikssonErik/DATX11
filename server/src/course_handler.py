@@ -221,7 +221,7 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT assignment, enddate, Description FROM " +\
+                query_data = "SELECT assignment, enddate, Description, Name FROM " +\
                     "assignments WHERE courseid = %s"
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
@@ -230,7 +230,8 @@ def get_assignments(course_id: int) -> tuple:
                 for assignment_row in data:
                     assignments.append({'AssignmentNr': assignment_row[0],
                                         'DueDate': assignment_row[1],
-                                        'Description': assignment_row[2]})
+                                        'Description': assignment_row[2],
+                                        'Name': assignment_row[3]})
         conn.close()
         if not data:
             return []
@@ -259,6 +260,25 @@ def change_description(new_desc: str, course_id: int,
     except Exception as e:
         print(e)
         return {'status': "No Courses Found"}
+    
+def change_assignment_name(new_name: str, course_id: int,
+                       assignment: int) -> dict | None:
+    """ Changes the description for the a assignment"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """UPDATE assignments set name = %s
+                                WHERE courseid = %s and assignment = %s"""
+                cur.execute(query_data, [new_name, course_id, assignment])
+
+        conn.close()
+        return None
+
+    except Exception as e:
+        print(e)
+        raise Exception("could not change name") from e
 
 
 def change_course_name(new_name: str, course: int):
@@ -422,7 +442,7 @@ def get_course_groups(course: int):
                     group_dict = {
                         "groupNumber": row[0],
                         "groupId": row[1],
-                        "users": row[2]}
+                        "groupMembers": row[2]}
                     group_list.append(group_dict)
         conn.close()
         return group_list
