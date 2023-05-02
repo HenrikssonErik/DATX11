@@ -283,7 +283,8 @@ def change_course_name(new_name: str, course: int):
 
 
 def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
-                         course: int, assignment: int, submission: int, teacher: int):
+                         course: int, assignment: int, submission: int,
+                         teacher: int, score: int):
     """Submission is set to 0 since a primary cannot be null.
     It will increment by default anyway."""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -291,9 +292,11 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
         with conn:
             with conn.cursor() as cur:
                 query_one = """UPDATE AssignmentFeedback SET
-                teacherFeedback = %s, teacherGrade = %s, userid = %s WHERE groupId = %s
-                AND courseId = %s AND submission = %s AND assignment = %s;"""
-                cur.execute(query_one, [feedback, grade, teacher, group_id, course,
+                teacherFeedback = %s, teacherGrade = %s, score = %s
+                userid = %s WHERE groupId = %s AND courseId = %s AND
+                submission = %s AND assignment = %s;"""
+                cur.execute(query_one, [feedback, grade, score, teacher,
+                                        group_id, course,
                                         submission, assignment])
         conn.close()
         return
@@ -400,7 +403,7 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
         grade = None if (x := submission[4]) is None else x
 
         teacher = "" if (x := submission[5]) is None else user_handler.get_fullname(submission[5])
-        
+
         assignments.append({'Submission': submission[0],
                             'testpass': submission[1],
                             'testfeedback': testfeedback,
