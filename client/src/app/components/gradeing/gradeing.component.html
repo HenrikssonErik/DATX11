@@ -111,18 +111,25 @@
               <div class="row text-muted">
                 <div class="col-md-2">
                   <p class="header">Test Result</p>
-                  <p>
-                    {{ submission.grade || "Not yet graded" }}
-                    <span class="testResult"
-                      ><i
-                        (click)="
-                          openFeedBackModal(
-                            submission.groupid,
-                            gradeingSubmission.Assignment
-                          )
-                        "
-                        class="fa-solid fa-up-right-from-square"
-                      ></i
+
+                  <p
+                    (click)="
+                      openFeedBackModal(
+                        submission.groupid,
+                        gradeingSubmission.Assignment
+                      )
+                    "
+                    class="testResult"
+                    [ngStyle]="{
+                      color: submission.testpass ? '#006c5c' : '#8b0000'
+                    }"
+                  >
+                    <ng-container *ngIf="submission.testpass; else failed">
+                      Passed
+                    </ng-container>
+                    <ng-template #failed> Failed </ng-template>
+                    <span
+                      ><i class="fa-solid fa-up-right-from-square"></i
                     ></span>
                   </p>
                 </div>
