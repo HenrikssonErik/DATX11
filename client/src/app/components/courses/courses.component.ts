@@ -64,8 +64,23 @@ export class CoursesComponent implements OnInit {
 
     this.labs = tempLabs;
     this.deadlines = tempDeadlines;
+    this.sortDeadlines();
   }
 
+  sortDeadlines() {
+    this.deadlines.sort((a, b) => {
+      const dateA = new Date(a.Date);
+      const dateB = new Date(b.Date);
+
+      if (dateA < dateB) {
+        return -1;
+      } else if (a > b) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
   findUpcomingAssignments(assignments: any[], course: string): Deadline[] {
     const deadlines: Deadline[] = [];
     for (let i = 0; i < assignments.length; i++) {
