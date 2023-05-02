@@ -50,11 +50,17 @@ def check_data_input(cid: str, email: str, pwd: str,
         return "wrong_format", 400
     if not user_exists:
         return "cid_does_not_exist", 400
+    if not allowed_password:
+        return "pass_not_ok", 400
+    return "OK", 200
+
+
+def allowed_password(pwd: str) -> bool:
     allowed_characters = set(string.ascii_letters + string.digits +
                              string.punctuation)
     if not set(pwd) <= allowed_characters:
-        return "pass_not_ok", 400
-    return "OK", 200
+        return False
+    return True
 
 
 def create_temp_users(cids: list[str]) -> list[str]:
@@ -91,6 +97,56 @@ def create_temp_users(cids: list[str]) -> list[str]:
                     newly_registered.append(cid)
     conn.close()
     return newly_registered
+
+
+def new_password(token, password):
+
+    try:
+        cid: str = verify_and_get_cid(token)[0]['cid']
+    except Exception as e:
+        raise Exception("Invalid token") from e
+
+    if not allowed_password(password):
+        return {"status": "pass_not_ok"}, 400
+    else:
+        salt: bytes = bcrypt.gensalt()
+        hashed_pass: bytes = bcrypt.hashpw(password.encode('utf-8'), salt)
+
+        update_status = update_pwd_in_db(cid, hashed_pass)
+
+        return update_status
+
+
+def update_pwd_in_db(cid: str, pwd: bytes):
+    conn = psycopg2.connect(get_conn_string())
+
+    with conn:
+        with conn.cursor() as cur:
+            try:
+
+                query = "UPDATE UserData " +\
+                        "SET passphrase = %s " +\
+                        "WHERE cid = %s;"
+
+                cur.execute(query, (
+                    pwd,
+                    cid
+                ))
+
+                if cur.rowcount == 0:  # Does this work?
+                    print("In if-statement in update_pwd_query")
+                    status = 'user_not_found'
+                    res_code = 406
+                else:
+                    print("In else in update_pwd_query")
+                    status = 'success'
+                    res_code = 200
+            except Exception:
+                print("In exception in update_pwd_query")
+                status = 'uncaught_error'
+                res_code = 500
+    conn.close()
+    return {'status': status}, res_code
 
 
 def user_registration(data: Request.form) -> \
@@ -262,7 +318,7 @@ def create_cid_token(cid: str) -> str:
     return token
 
 
-def verify_user_from_email_verification(token: str) -> \
+def verify_and_get_cid(token: str) -> \
         tuple[dict[str, str], Literal[200, 406, 500]]:
     """
     Verifies if a token is issued by this system and if it is still valid.
