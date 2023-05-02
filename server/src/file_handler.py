@@ -291,7 +291,7 @@ def get_assignment_test_feedback_from_database(
     return data, 200
 
 
-def get_assignment_files_from_database(
+def get_assignment_file_from_database(
         group_id: int,
         course: int,
         assignment: int,

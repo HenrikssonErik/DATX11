@@ -6,7 +6,7 @@ from flask import Flask, Response, jsonify, make_response, render_template, \
 from flask_cors import CORS
 from .constants import DOMAIN
 from .file_handler import handle_files, \
-    handle_test_file, get_assignment_files_from_database, \
+    handle_test_file, get_assignment_file_from_database, \
     get_assignment_test_feedback_from_database, get_filenames
 from . import user_handler
 from . import course_handler
@@ -212,7 +212,7 @@ def get_assignment_feedback():
 
 
 @app.route('/getAssignmentFile', methods=['GET'])
-def get_files():
+def get_file():
     """
     Takes in information from the frontend about a specific course assignment
       file to then return its file content.
@@ -220,23 +220,32 @@ def get_files():
     { groupId: number, course: number, assignment: number, filename: string }
     Returns a file to be downloaded
     """
+    token = extract_token(request)
+    user_id: int = verify_and_get_id(token)
+
     data = request.args
     group_id = data['groupId']
     course = data['course']
     assignment = data['assignment']
     filename = data['filename']
     submission = data['submission']
-    result = get_assignment_files_from_database(
-        group_id, course, assignment, filename, submission)
-
-    res = make_response(send_file(path_or_file=result,
-                                  download_name=filename, as_attachment=True))
-
     headers = {"Access-Control-Expose-Headers": "Content-Disposition",
                'Content-Disposition': 'attachment; filename={}'
                .format(filename)}
-    res.headers = headers
-    return res
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course) or user_handler.get_group(user_id, course)['groupId'] == group_id):
+
+        result = get_assignment_file_from_database(
+                group_id, course, assignment, filename, submission)
+
+        res = make_response(send_file(path_or_file=result,
+                                      download_name=filename,
+                                      as_attachment=True))
+
+        res.headers = headers
+        return res
+    else:
+        return make_response({'status': 'No_Access'}, 401)
 
 
 @app.route('/getUserInfo', methods=['GET'])
