@@ -137,34 +137,21 @@
                   <p class="header">Time Submitted</p>
                   <p>2023-04-01 at 23:49</p>
                 </div>
-                <div class="col-md-3">
+                <div *ngIf="fileNames" class="col-md-3">
                   <p class="header">Files submitted</p>
                   <p
-                    style="
-                      text-decoration: underline;
-                      cursor: pointer;
-                      margin-bottom: 5px;
+                    *ngFor="let file of fileNames"
+                    class="submissionFiles"
+                    (click)="
+                      downloadSubmissionFile(
+                        submission.groupid,
+                        gradeingSubmission.Assignment,
+                        submission.Submission,
+                        file
+                      )
                     "
                   >
-                    DAT111_Assignment2.py
-                  </p>
-                  <p
-                    style="
-                      text-decoration: underline;
-                      cursor: pointer;
-                      margin-bottom: 5px;
-                    "
-                  >
-                    DAT111_Assignment2.pdf
-                  </p>
-                  <p
-                    style="
-                      text-decoration: underline;
-                      cursor: pointer;
-                      margin-bottom: 5px;
-                    "
-                  >
-                    DAT111_Assignment2.txt
+                    {{ file }}
                   </p>
                 </div>
 
