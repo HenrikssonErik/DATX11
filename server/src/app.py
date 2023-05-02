@@ -124,6 +124,33 @@ def verify_email() -> Response:
         return res
 
 
+def send_forgotpwd_email(to: str, token: str) -> None:
+    """
+    Sends a forgot password email to a user.
+    This email is in an HTML format, with a working link sending
+    the user directly to the correct endpoint in the frontend
+    (To be updated whenever the website is launched to not link to localhost)
+
+
+    Args:
+        to (str): The recipient's email address, which has been verified
+        in login_handler's check_data_input to be a valid email.
+        token_dict (dict): The jwt-generated token from login_handler's
+        create_verification_token-function.
+    """
+
+    msg = Message('Forgot password?',
+                  sender='temphydrant@gmail.com', recipients=[to])
+
+    endpoint: str = "/forgotPwd/" + token
+
+    url: str = DOMAIN + endpoint
+
+    msg.html = render_template("forgotPwdTemplate.html", link=url, raw_url=url)
+
+    mail.send(msg)
+
+
 def send_verification_email(to: str, token: str) -> None:
     """
     Sends a verification email to the specific user signing up.
@@ -187,15 +214,16 @@ def post_tests():
     files = request.files.getlist('files')
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
-    
+
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
 
         if not files:
             return "Files not found", 406
         res = handle_test_file(files, course, assignment)
         return make_response(jsonify(res[0]), res[1])
-    else: 
+    else:
         make_response("", 401)
+
 
 @app.route('/getAssignmentTestFeedback', methods=['POST'])
 def get_assignment_feedback():
@@ -214,6 +242,8 @@ def get_assignment_feedback():
         return make_response("", code)
 
 # TODO: add token checks
+
+
 @app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
     """
@@ -521,7 +551,8 @@ def edit_name():
     assignment = int(data['Assignment'])
 
     if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
-        res = course_handler.change_assignment_name(new_name, course, assignment)
+        res = course_handler.change_assignment_name(
+            new_name, course, assignment)
 
         if res is None:
             return make_response("", 200)
@@ -538,7 +569,7 @@ def get_users_in_course():
     course = int(request.args.get('Course'))
     if (user_handler.is_admin_on_course(request_user_id, course)):
         res = user_handler.get_users_on_course(course)
-        return make_response(jsonify({"Users":res[0]}), res[1])
+        return make_response(jsonify({"Users": res[0]}), res[1])
     else:
         return make_response("", 401)
 
@@ -624,7 +655,8 @@ def set_feedback():
     group_id: int = int(data['Group'])
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
-        course_handler.set_teacher_feedback(group_id, feedback, grade, course, assignment, submission)
+        course_handler.set_teacher_feedback(
+            group_id, feedback, grade, course, assignment, submission)
         return make_response("", 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
