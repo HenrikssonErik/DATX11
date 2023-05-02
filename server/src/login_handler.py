@@ -239,7 +239,7 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
     return {'status': status}, res_code
 
 
-def user_to_send_email(cid: str) -> tuple:
+def user_to_resend_verification_email(cid: str) -> tuple:
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
@@ -262,6 +262,30 @@ def user_to_send_email(cid: str) -> tuple:
                     return response_object, 200
                 else:
                     return {"status": "already_verified"}, 406
+            except Exception:
+                return {"status": "unexpected_error"}, 500
+
+
+def user_to_send_reset_pwd_email(cid: str) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            try:
+                query_data = """SELECT email
+                            FROM UserData
+                            WHERE userdata.cid = %s
+                                AND userdata.passphrase IS NOT NULL"""
+                cur.execute(query_data, (cid,))
+                data = cur.fetchone()
+                if not data:
+                    return {'status': 'no_user'}, 406
+                mail = data[0]
+
+                response_object = {"email": mail}
+                token = create_cid_token(cid)
+                response_object.update({'token': token})
+                return response_object, 200
+
             except Exception:
                 return {"status": "unexpected_error"}, 500
 
