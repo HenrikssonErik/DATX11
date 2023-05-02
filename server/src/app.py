@@ -178,9 +178,11 @@ def post_files():
     else:
         return make_response({'status': 'not_logged_in'}, 401)
 
-# TODO: add check token
+
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
+    token = extract_token(request)
+    user_id: int = verify_and_get_id(token)
     files = request.files.getlist('files')
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
@@ -190,8 +192,13 @@ def post_tests():
     assignment = data['assignment']
     if not files:
         return "Files not found", 406
-    res = handle_test_file(files, course, assignment)
-    return make_response(jsonify(res[0]), res[1])
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
+        res = handle_test_file(files, course, assignment)
+        return make_response(jsonify(res[0]), res[1])
+    else:
+        return make_response({'status': 'Not_a_course_teacher'}, 401)
+
 
 """
 @app.route('/getAssignmentTestFeedback', methods=['POST'])
