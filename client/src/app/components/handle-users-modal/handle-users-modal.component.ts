@@ -202,9 +202,14 @@ export class HandleUsersModalComponent {
       ignoreLocation: true,
       includeScore: true,
     };
+    console.log(this.searchString);
 
-    const fuse = new Fuse(this.users, options);
-    const result = fuse.search(this.searchString);
-    this.usersList = result.map((r) => r.item);
+    if (this.searchString == '') {
+      this.usersList = this.users;
+    } else {
+      const fuse = new Fuse(this.users, options);
+      const result = fuse.search(this.searchString);
+      this.usersList = result.map((r) => r.item);
+    }
   }
 }
