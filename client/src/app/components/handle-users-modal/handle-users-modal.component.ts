@@ -8,6 +8,7 @@ import { User } from 'src/app/models/user';
 import { ToastrResponseService } from 'src/app/services/toastr-response.service';
 import { UserService } from 'src/app/services/user-service.service';
 import { API_URL } from 'src/environments/environment';
+import Fuse from 'fuse.js';
 
 @Component({
   selector: 'app-handle-users-modal',
@@ -195,12 +196,15 @@ export class HandleUsersModalComponent {
   }
 
   search() {
-    this.usersList = this.users.slice();
-    this.usersList = this.users.filter(
-      (user) =>
-        user.cid.toLowerCase().includes(this.searchString.toLowerCase()) ||
-        user.email.toLowerCase().includes(this.searchString.toLowerCase()) ||
-        user.fullname.toLowerCase().includes(this.searchString.toLowerCase())
-    );
+    const options = {
+      keys: ['cid', 'email', 'fullname'],
+      threshold: 0.3, // Adjust this value to control the "fuzziness" of the search
+      ignoreLocation: true,
+      includeScore: true,
+    };
+
+    const fuse = new Fuse(this.users, options);
+    const result = fuse.search(this.searchString);
+    this.usersList = result.map((r) => r.item);
   }
 }
