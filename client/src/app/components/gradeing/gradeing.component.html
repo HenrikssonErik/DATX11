@@ -71,9 +71,16 @@
       Date <i class="fa-solid fa-clock"></i>
     </button>
     <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="#">Action</a></li>
-      <li><a class="dropdown-item" href="#">Another action</a></li>
-      <li><a class="dropdown-item" href="#">Something else here</a></li>
+      <li>
+        <a class="dropdown-item" href="#"
+          >Ascending <i class="fa-solid fa-sort-up"></i>
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="#"
+          >Descending <i class="fa-solid fa-sort-down"></i> action</a
+        >
+      </li>
     </ul>
   </div>
   <div class="dropdown"></div>
@@ -123,7 +130,6 @@
                       class="form-check-input"
                       formControlName="gradeAgain"
                       id="gradeAgain"
-                      (click)="testMethod(submission.grade)"
                     />
                     <label
                       class="form-check-label text-muted"
@@ -135,27 +141,64 @@
                   </div>
                 </div>
               </div>
-              <div class="row text-muted" *ngIf="submission.grade">
-                <div class="col-md-3">
-                  <p>Graded by</p>
-                  <p>Malte</p>
-                </div>
-                <div class="col-md-3">
-                  <p>Date Graded</p>
-                  <p>2020-12-13</p>
-                </div>
-                <div class="col-md-3">
-                  <p>Score</p>
-                  <p>12/20</p>
-                </div>
-                <div class="col-md-3">
-                  <p>Passed</p>
-                  <p>True</p>
+              <div class="card mt-2 mb-3 text-muted" *ngIf="submission.grade">
+                <div class="row">
+                  <div class="col-auto gradedIconCol">
+                    <i class="fa-regular fa-comment-dots gradedIcon"></i>
+                  </div>
+                  <div class="col-md-5 p-0">
+                    <span class="headerTitle">
+                      {{ course.CourseName }} Assignment
+                      {{ gradeingSubmission.Assignment }}
+                    </span>
+                    <br />
+                    <span
+                      >Graded By
+                      <span style="text-decoration: underline">{{
+                        submission.GradedBy
+                      }}</span></span
+                    >
+
+                    <div class="row mt-2">
+                      <div class="col-auto">
+                        <p class="header">Grade</p>
+                        <span
+                          [ngStyle]="{
+                            color: submission.grade ? '#006c5c' : '#8b0000'
+                          }"
+                          class="resultText"
+                          *ngIf="submission.grade"
+                          >Passed</span
+                        >
+                        <span
+                          [ngStyle]="{
+                            color: submission.grade ? '#006c5c' : '#8b0000'
+                          }"
+                          class="resultText"
+                          *ngIf="!submission.grade"
+                          >Not Passed</span
+                        >
+                      </div>
+                      <div
+                        class="col-auto"
+                        *ngIf="getMaxScore(gradeingSubmission.Assignment) > 1"
+                      >
+                        <p class="header">Score</p>
+                        <span class="resultText">{{ submission.Score }}</span>
+                      </div>
+                      <div class="col flex-grow">
+                        <p class="header">Comment</p>
+                        <span class="resultText">{{
+                          submission.Feedback
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div class="row text-muted">
-                <div class="col-md-2">
+                <div class="col-auto">
                   <p class="header">Test Result</p>
 
                   <p
@@ -165,7 +208,7 @@
                         gradeingSubmission.Assignment
                       )
                     "
-                    class="testResult"
+                    class="testResult resultText"
                     [ngStyle]="{
                       color: submission.testpass ? '#006c5c' : '#8b0000'
                     }"
@@ -179,42 +222,87 @@
                     ></span>
                   </p>
                 </div>
-                <div class="col-md-2">
+                <div class="col-auto">
                   <p class="header">Time Submitted</p>
-                  <p>2023-04-01 at 23:49</p>
+                  <p class="resultText">{{ getDate(submission.Date) }}</p>
                 </div>
-                <div *ngIf="fileNames" class="col-md-3">
-                  <p class="header">Files submitted</p>
-                  <p
-                    *ngFor="let file of fileNames"
-                    class="submissionFiles"
-                    (click)="
-                      downloadSubmissionFile(
-                        submission.groupid,
-                        gradeingSubmission.Assignment,
-                        submission.Submission,
-                        file
-                      )
-                    "
-                  >
-                    {{ file }}
+                <div class="col-auto">
+                  <p class="header">
+                    Files submitted
+                    <span
+                      ><i
+                        class="fa-regular fa-circle-question"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="
+                        Click to download the student submitted file"
+                      ></i
+                    ></span>
                   </p>
+                  <ng-container *ngIf="fileNames">
+                    <p
+                      *ngFor="let file of fileNames"
+                      class="submissionFiles resultText"
+                      (click)="
+                        downloadSubmissionFile(
+                          submission.groupid,
+                          gradeingSubmission.Assignment,
+                          submission.Submission,
+                          file
+                        )
+                      "
+                    >
+                      {{ file }}
+                    </p>
+                  </ng-container>
+                </div>
+                <div
+                  class="col-md-3"
+                  *ngIf="getMaxScore(gradeingSubmission.Assignment) > 1"
+                >
+                  <p class="header">Score</p>
+                  <div class="input-group mb-3">
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="Score"
+                      aria-label="Score"
+                      [(ngModel)]="score"
+                      [disabled]="
+                        (!form.get('gradeAgain')?.value &&
+                          submission.grade !== null) ||
+                        (submission.grade === null &&
+                          form.get('gradeAgain')?.value)
+                      "
+                    />
+                    <span class="input-group-text">/</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="Total"
+                      aria-label="Total"
+                      disabled
+                      [value]="getMaxScore(gradeingSubmission.Assignment)"
+                    />
+                  </div>
                 </div>
 
-                <div class="col-md-5">
+                <div class="col flex-grow">
                   <p class="header">Leave a comment</p>
                   <fieldset
                     [disabled]="
-                      !form.get('gradeAgain')?.value ||
-                      submission.grade !== null
+                      (!form.get('gradeAgain')?.value &&
+                        submission.grade !== null) ||
+                      (submission.grade === null &&
+                        form.get('gradeAgain')?.value)
                     "
                   >
                     <textarea
                       class="form-control"
                       placeholder="Leave a comment here"
                       id="comments"
-                      style="height: 175px"
-                      [value]="submission.Feedback"
+                      style="height: 165px"
+                      [(ngModel)]="commentText"
                     ></textarea>
                   </fieldset>
                 </div>
@@ -222,7 +310,12 @@
               <div class="row mt-2 justify-content-end">
                 <div class="col-md-3">
                   <button
-                    [disabled]="!form.get('gradeAgain')?.value"
+                    [disabled]="
+                      (!form.get('gradeAgain')?.value &&
+                        submission.grade !== null) ||
+                      (submission.grade === null &&
+                        form.get('gradeAgain')?.value)
+                    "
                     style="float: right"
                     class="btn btn-primary"
                     (click)="
@@ -236,7 +329,12 @@
                     Pass
                   </button>
                   <button
-                    [disabled]="!form.get('gradeAgain')?.value"
+                    [disabled]="
+                      (!form.get('gradeAgain')?.value &&
+                        submission.grade !== null) ||
+                      (submission.grade === null &&
+                        form.get('gradeAgain')?.value)
+                    "
                     style="float: right; margin-right: 5px"
                     class="btn btn-danger"
                     (click)="
