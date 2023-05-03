@@ -17,8 +17,10 @@ import { API_URL } from 'src/environments/environment';
 export class HandleUsersModalComponent {
   @Input() users!: User[];
   @Input() course!: Course;
+  usersList: User[] = [];
   csvData: string[] = [];
   newCid: string = '';
+  searchString: string = '';
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -34,6 +36,7 @@ export class HandleUsersModalComponent {
       (res: User[]) => {
         console.log(res);
         this.users = res;
+        this.usersList = this.users;
       },
       (error) => {
         console.error(error);
@@ -189,5 +192,15 @@ export class HandleUsersModalComponent {
           });
         },
       });
+  }
+
+  search() {
+    this.usersList = this.users.slice();
+    this.usersList = this.users.filter(
+      (user) =>
+        user.cid.toLowerCase().includes(this.searchString.toLowerCase()) ||
+        user.email.toLowerCase().includes(this.searchString.toLowerCase()) ||
+        user.fullname.toLowerCase().includes(this.searchString.toLowerCase())
+    );
   }
 }

@@ -48,6 +48,17 @@
         </button>
       </div>
     </div>
+    <div class="row">
+      <input
+        [(ngModel)]="searchString"
+        type="text"
+        class="form-control"
+        placeholder="Search"
+        aria-label="Search"
+        aria-describedby="basic-addon2"
+        (input)="search()"
+      />
+    </div>
     <div>
       <ul class="list-group-flush">
         <li class="list-group-item">
@@ -63,7 +74,7 @@
             </div>
           </div>
         </li>
-        <li class="list-group-item" *ngFor="let user of users">
+        <li class="list-group-item" *ngFor="let user of usersList">
           <div class="row">
             <div class="col-md-5">
               <p>{{ user.fullname }}</p>
