@@ -189,10 +189,20 @@ export class GradeingComponent {
       });
   }
 
-  /*  getGroupMembers(group: number): string[] {
-    
+  getGroupMembers(group: number): string[] {
+    this.groupService.getGroupMembers(group, this.course.courseID).subscribe({
+      next: (data: any) => {
+        console.log(data);
+        return data;
+      },
+      error: (err) => {
+        console.log(err);
+        return [];
+      },
+    });
 
-  } */
+    return [];
+  }
 
   getFileNames(assignmentNr: number) {
     this.submissionService
