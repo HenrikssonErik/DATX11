@@ -74,6 +74,7 @@
   "Verify_text": "Need to be verified?",
   "Click_here_verification": "Click here",
   "Edit_Mode": "Edit mode",
-  "Test_Files": "Test Files:",
-  "Upload_Tests": "Upload Test (replaces file with same name)"
+  "Test_Files": "Current Test Files:",
+  "Upload_Tests": "Upload Test (replaces file with same name)",
+  "No_Tests": "No Test Files Uploaded"
 }

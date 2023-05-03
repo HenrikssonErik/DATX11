@@ -1,8 +1,7 @@
 <div class="card" [formGroup]="form">
   <div class="header">
     <h5>
-      <span translate>Assignment </span>
-      <span>{{ Assignment.AssignmentNr }}</span>
+      <span translate>Assignment {{ Assignment.AssignmentNr }}</span>
     </h5>
     <div class="form-group form-check">
       <input
@@ -65,6 +64,7 @@
       <div class="col" *ngFor="let file of filenames">
         <p class="files" (click)="downloadTest(file)">{{ file }} &#x2193;</p>
       </div>
+      <div *ngIf="filenames.length == 0"><p translate>No_Tests</p></div>
     </div>
     <div class="row">
       <div class="col-12">

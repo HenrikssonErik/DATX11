@@ -56,9 +56,6 @@ export class AssignemntCardComponent {
         error: (error: any) => {
           this.toastr.error('', error.error);
         },
-        complete() {
-          console.log('complete');
-        },
       });
   }
 
@@ -262,7 +259,7 @@ export class AssignemntCardComponent {
       });
   }
 
-  downloadTest(name: string): void {
+  downloadTest(filename: string): void {
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
@@ -275,7 +272,7 @@ export class AssignemntCardComponent {
         {
           course: this.courseID,
           assignment: this.Assignment.AssignmentNr,
-          filename: name,
+          filename: filename,
         },
         {
           observe: 'response',
@@ -302,7 +299,7 @@ export class AssignemntCardComponent {
           link.click();
         },
         error: (err) => {
-          //TODO: Handle the error
+          this.toastr.error('Could Not Download');
         },
       });
   }
