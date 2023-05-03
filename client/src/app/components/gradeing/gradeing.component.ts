@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FeedbackTeacherViewModalComponent } from '../feedback-teacher-view-modal/feedback-teacher-view-modal.component';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-gradeing',
@@ -24,6 +25,7 @@ export class GradeingComponent {
   searchText: string = '';
   commentText: string = '';
   fileNames?: string[];
+  form!: FormGroup;
 
   constructor(
     private submissionService: SubmissionService,
@@ -31,6 +33,10 @@ export class GradeingComponent {
   ) {}
 
   ngOnInit(): void {
+    this.form = new FormGroup({
+      gradeAgain: new FormControl(false),
+    });
+
     this.submissionService
       .getAssignmentOverView(this.course.courseID)
       .subscribe({
@@ -48,6 +54,11 @@ export class GradeingComponent {
           }
         },
       });
+  }
+
+  testMethod(submission: any) {
+    console.log('Checkbox: ', !this.form.get('gradeAgain')?.value);
+    console.log('Grade', submission !== null);
   }
 
   filterAssignments(assignmentNr: number) {
