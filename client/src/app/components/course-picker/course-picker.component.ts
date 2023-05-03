@@ -8,6 +8,8 @@ import { CourseService } from 'src/app/services/course-service.service';
 })
 export class CoursePickerComponent implements OnInit {
   courses: Course[] = [];
+  currentCourses: Course[] = [];
+  passedCourses: Course[] = [];
 
   constructor(private courseService: CourseService) {}
 
@@ -15,7 +17,25 @@ export class CoursePickerComponent implements OnInit {
     //TODO: FIX so that we dont have to call this twice. Once here and once in courses.component.ts
     this.courseService.getCourses().subscribe((res: Course[]) => {
       this.courses = res;
+      this.sortCourses();
     });
+  }
+
+  sortCourses() {
+    const now = new Date();
+
+    for (const course of this.courses) {
+      // Check if all assignments in the course have due dates in the past
+      const allAssignmentsPassed = course.Assignments.every(
+        (assignment) => new Date(assignment.DueDate) < now
+      );
+
+      if (allAssignmentsPassed) {
+        this.passedCourses.push(course);
+      } else {
+        this.currentCourses.push(course);
+      }
+    }
   }
 
   isTeacher(): boolean {
