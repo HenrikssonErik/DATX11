@@ -13,7 +13,7 @@
       <li *ngFor="let assignment of assignmentNumbers">
         <div class="form-check">
           <input
-            class="form-check-input"
+            class="form-check-input text-muted"
             type="checkbox"
             value="assignment"
             id="{{ 'assignmentCheckbox-' + assignment }}"
@@ -47,7 +47,9 @@
             value=""
             id="checkbox1"
           />
-          <label class="form-check-label" for="checkbox1"> No </label>
+          <label class="form-check-label text-muted" for="checkbox1">
+            No
+          </label>
         </div>
       </li>
       <li>
@@ -58,7 +60,9 @@
             value=""
             id="checkbox2"
           />
-          <label class="form-check-label" for="checkbox2"> Yes </label>
+          <label class="form-check-label text-muted" for="checkbox2">
+            Yes
+          </label>
         </div>
       </li>
     </ul>
@@ -72,14 +76,14 @@
     </button>
     <ul class="dropdown-menu">
       <li>
-        <a class="dropdown-item" href="#"
+        <a class="dropdown-item text-muted" href="#"
           >Ascending <i class="fa-solid fa-sort-up"></i>
         </a>
       </li>
       <li>
-        <a class="dropdown-item" href="#"
-          >Descending <i class="fa-solid fa-sort-down"></i> action</a
-        >
+        <a class="dropdown-item text-muted" href="#"
+          >Descending <i class="fa-solid fa-sort-down"></i
+        ></a>
       </li>
     </ul>
   </div>
