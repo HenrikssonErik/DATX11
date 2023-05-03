@@ -80,7 +80,7 @@ export class GroupService {
       .set('Cache-Control', 'public, max-age=3600');
 
     return this.http.get<any>(
-      `${API_URL}/groupMembers?Course=${courseId}&groupId=${groupId}`,
+      `${API_URL}/groupMembers?Course=${courseId}&GroupId=${groupId}`,
       {
         headers,
       }
