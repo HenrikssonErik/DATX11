@@ -8,6 +8,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FeedbackTeacherViewModalComponent } from '../feedback-teacher-view-modal/feedback-teacher-view-modal.component';
 import { FormControl, FormGroup } from '@angular/forms';
 import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-gradeing',
@@ -32,7 +33,8 @@ export class GradeingComponent {
   constructor(
     private submissionService: SubmissionService,
     private modalService: NgbModal,
-    private tooltipEnabler: TooltipEnablerService
+    private tooltipEnabler: TooltipEnablerService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -59,8 +61,6 @@ export class GradeingComponent {
           }
         },
       });
-
-    console.log;
   }
 
   private enableTooltips(): void {
@@ -168,14 +168,19 @@ export class GradeingComponent {
         this.score
       )
       .subscribe({
-        next: (data: any) => {
-          console.log(data);
-        },
+        next: (data: any) => {},
         error: (err) => {
           console.log(err);
+          this.toastr.error('Something went wrong!', 'Error!');
         },
         complete: () => {
-          console.log('done');
+          this.toastr.success(
+            'The assignment was succesfully graded!',
+            'Sucess!',
+            {
+              closeButton: true,
+            }
+          );
         },
       });
   }
