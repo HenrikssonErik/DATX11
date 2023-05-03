@@ -15,6 +15,7 @@ import { API_URL } from 'src/environments/environment';
 })
 export class ForgotPwdComponent implements OnInit {
   passwordForm: UntypedFormGroup = new UntypedFormGroup({});
+  imgSrc: string = 'pwd_success';
 
   tokenValid!: Promise<Boolean>;
 
@@ -46,13 +47,31 @@ export class ForgotPwdComponent implements OnInit {
           const cid: string = response['cid'];
           this.tokenValid = Promise.resolve(true);
           this.initializePwdForm(cid);
+          this.imgSrc = 'pwd_success';
           console.log(cid);
         },
         error: (error) => {
           console.log(error);
+          this.imgSrc = 'pwd_error';
           this.tokenValid = Promise.resolve(false);
         },
         complete: () => {},
       });
   }
+
+  onInputFocus(input: string, form: UntypedFormGroup): void {
+    const control = form.get(input);
+
+    if (control) {
+      const isValid = control.valid;
+      const isInvalid = control.invalid && (control.dirty || control.touched);
+      const el = document.getElementById(input);
+
+      el?.classList.toggle('success', isValid);
+      el?.classList.toggle('error', isInvalid);
+      el?.classList.toggle('success', !isInvalid && !isValid);
+    }
+  }
+
+  onNewPassword(): void {}
 }
