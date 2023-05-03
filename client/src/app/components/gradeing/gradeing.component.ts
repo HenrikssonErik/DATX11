@@ -9,6 +9,7 @@ import { FeedbackTeacherViewModalComponent } from '../feedback-teacher-view-moda
 import { FormControl, FormGroup } from '@angular/forms';
 import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
 import { ToastrService } from 'ngx-toastr';
+import { GroupService } from 'src/app/services/group.service';
 
 @Component({
   selector: 'app-gradeing',
@@ -34,7 +35,8 @@ export class GradeingComponent {
     private submissionService: SubmissionService,
     private modalService: NgbModal,
     private tooltipEnabler: TooltipEnablerService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private groupService: GroupService
   ) {}
 
   ngOnInit(): void {
@@ -168,7 +170,9 @@ export class GradeingComponent {
         this.score
       )
       .subscribe({
-        next: (data: any) => {},
+        next: (data: any) => {
+          //TODO: ADD TO SUBMISSIONS?
+        },
         error: (err) => {
           console.log(err);
           this.toastr.error('Something went wrong!', 'Error!');
@@ -185,6 +189,11 @@ export class GradeingComponent {
       });
   }
 
+  /*  getGroupMembers(group: number): string[] {
+    
+
+  } */
+
   getFileNames(assignmentNr: number) {
     this.submissionService
       .getFileNames(this.course.courseID, assignmentNr)
@@ -195,7 +204,6 @@ export class GradeingComponent {
         error: (err) => {
           console.log(err);
         },
-        complete: () => {},
       });
   }
 
