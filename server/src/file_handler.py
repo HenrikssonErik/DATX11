@@ -257,7 +257,6 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
                     VALUES (%s, %s, %s, %s, %s, 0);
                     """
 
-
             cur.execute(
                 query,
                 (

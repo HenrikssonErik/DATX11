@@ -7,7 +7,8 @@ from flask_cors import CORS
 from .constants import DOMAIN
 from .file_handler import handle_files, \
     handle_test_file, get_assignment_files_from_database, \
-    get_assignment_test_feedback_from_database, get_test_filenames, get_test_file
+    get_assignment_test_feedback_from_database, get_test_filenames,\
+    get_test_file
 from . import user_handler
 from . import course_handler
 from .login_handler import user_registration, log_in, create_key, \
@@ -187,15 +188,16 @@ def post_tests():
     files = request.files.getlist('files')
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
-    
+
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
 
         if not files:
             return "Files not found", 406
         res = handle_test_file(files, course, assignment)
         return make_response(jsonify(res[0]), res[1])
-    else: 
+    else:
         make_response("", 401)
+
 
 @app.route('/getAssignmentTestFeedback', methods=['POST'])
 def get_assignment_feedback():
@@ -213,7 +215,7 @@ def get_assignment_feedback():
     else:
         return make_response("", code)
 
-# TODO: add token checks
+
 @app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
     """
@@ -253,7 +255,7 @@ def get_tests():
     data = request.get_json()
     course = data['course']
     assignment = data['assignment']
-    filename = data['filename']  
+    filename = data['filename']
     result = get_test_file(course, assignment, filename)
 
     res = make_response(send_file(path_or_file=result,
@@ -264,6 +266,7 @@ def get_tests():
                .format(filename)}
     res.headers = headers
     return res
+
 
 @app.route('/getUserInfo', methods=['GET'])
 def get_user_info():
@@ -544,7 +547,8 @@ def edit_name():
     assignment = int(data['Assignment'])
 
     if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
-        res = course_handler.change_assignment_name(new_name, course, assignment)
+        res = course_handler.change_assignment_name(new_name, course,
+                                                    assignment)
 
         if res is None:
             return make_response("", 200)
@@ -561,7 +565,7 @@ def get_users_in_course():
     course = int(request.args.get('Course'))
     if (user_handler.is_admin_on_course(request_user_id, course)):
         res = user_handler.get_users_on_course(course)
-        return make_response(jsonify({"Users":res[0]}), res[1])
+        return make_response(jsonify({"Users": res[0]}), res[1])
     else:
         return make_response("", 401)
 
@@ -647,7 +651,8 @@ def set_feedback():
     group_id: int = int(data['Group'])
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
-        course_handler.set_teacher_feedback(group_id, feedback, grade, course, assignment, submission)
+        course_handler.set_teacher_feedback(group_id, feedback, grade, course,
+                                            assignment, submission)
         return make_response("", 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
@@ -666,6 +671,7 @@ def get_test_file_names():
         return make_response(jsonify(overview), 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
+
 
 @app.route('/changeCourseName', methods=['POST'])
 def change_course_name():
