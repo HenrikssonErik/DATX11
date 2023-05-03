@@ -29,6 +29,7 @@
     "bcryptjs": "^2.4.3",
     "bootstrap": "^5.2.3",
     "csv-parse": "^5.3.8",
+    "fuse.js": "^6.6.2",
     "jquery": "^3.6.4",
     "ngx-bootstrap": "^10.2.0",
     "ngx-toastr": "^16.1.0",
