@@ -26,6 +26,10 @@ export interface TestResult {
 }
 
 export interface AssignmentSubmission {
+  Date: string;
+  Feedback: string | null;
+  GradedBy: string;
+  Score: number;
   grade: number | null;
   groupid: number;
   testpass: boolean;
