@@ -52,7 +52,8 @@ export class SubmissionService {
     submission: number,
     feedback: string,
     grade: boolean,
-    groupId: number
+    groupId: number,
+    score: number
   ): Observable<any> {
     const headers = new HttpHeaders().append('Cookies', document.cookie);
 
@@ -65,6 +66,7 @@ export class SubmissionService {
         Feedback: feedback,
         Grade: grade,
         Group: groupId,
+        Score: score,
       },
       {
         observe: 'response',
