@@ -7,6 +7,7 @@ import { debounceTime } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FeedbackTeacherViewModalComponent } from '../feedback-teacher-view-modal/feedback-teacher-view-modal.component';
 import { FormControl, FormGroup } from '@angular/forms';
+import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
 
 @Component({
   selector: 'app-gradeing',
@@ -24,18 +25,22 @@ export class GradeingComponent {
   allAssignments?: Submission[];
   searchText: string = '';
   commentText: string = '';
+  score: number = 1;
   fileNames?: string[];
   form!: FormGroup;
 
   constructor(
     private submissionService: SubmissionService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private tooltipEnabler: TooltipEnablerService
   ) {}
 
   ngOnInit(): void {
     this.form = new FormGroup({
       gradeAgain: new FormControl(false),
     });
+
+    this.enableTooltips();
 
     this.submissionService
       .getAssignmentOverView(this.course.courseID)
@@ -54,11 +59,12 @@ export class GradeingComponent {
           }
         },
       });
+
+    console.log;
   }
 
-  testMethod(submission: any) {
-    console.log('Checkbox: ', !this.form.get('gradeAgain')?.value);
-    console.log('Grade', submission !== null);
+  private enableTooltips(): void {
+    this.tooltipEnabler.enableTooltip();
   }
 
   filterAssignments(assignmentNr: number) {
@@ -78,6 +84,13 @@ export class GradeingComponent {
     } else {
       // Assignment was not found
     }
+  }
+
+  getMaxScore(assignmentNr: number): number {
+    const assignment = this.course.Assignments.find(
+      (assignment) => assignment.AssignmentNr === assignmentNr
+    );
+    return assignment?.MaxScore ?? 0;
   }
 
   setFileNames(assignmentNr: number) {
@@ -143,6 +156,7 @@ export class GradeingComponent {
     assignmentNr: number,
     grade: boolean
   ) {
+    console.log(this.commentText);
     this.submissionService
       .setFeedback(
         this.course.courseID,
@@ -150,7 +164,8 @@ export class GradeingComponent {
         submission.Submission,
         this.commentText,
         grade,
-        submission.groupid
+        submission.groupid,
+        this.score
       )
       .subscribe({
         next: (data: any) => {
@@ -192,5 +207,9 @@ export class GradeingComponent {
       submissionId,
       fileName
     );
+  }
+
+  getDate(date: string) {
+    return new Date(date).toLocaleDateString('sv-SE');
   }
 }
