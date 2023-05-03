@@ -19,6 +19,8 @@ export interface Assignment {
   Description: string;
   DueDate: Date;
   Name: string;
+  PassScore: number;
+  MaxScore: number;
 }
 
 export interface ProgressItem {
