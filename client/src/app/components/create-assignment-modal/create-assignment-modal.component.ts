@@ -65,6 +65,16 @@ export class CreateAssignmentModalComponent {
     });
   }
 
+  passFailToggle() {
+    if (this.form.get('PassFail')!.value) {
+      this.form.controls['MaxScore']?.setValue(0);
+      this.form.controls['PassScore']?.setValue(0);
+    } else {
+      this.form.controls['MaxScore']?.setValue(1);
+      this.form.controls['PassScore']?.setValue(1);
+    }
+  }
+
   changeMinVal() {
     this.form.controls['MaxScore'].clearValidators();
     this.form.controls['MaxScore'].addValidators([

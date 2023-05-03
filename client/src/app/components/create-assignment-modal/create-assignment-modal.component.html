@@ -49,27 +49,31 @@
     </div>
     <div class="row mt-2">
       <div class="form-group col-md-4">
-        <label for="maxScore">Max Score:</label>
-        <input
-          type="number"
-          class="form-control"
-          id="maxScore"
-          name="maxScore"
-          formControlName="MaxScore"
-          min="1"
-        />
+        <fieldset [disabled]="form.get('PassFail')!.value">
+          <label for="maxScore">Max Score:</label>
+          <input
+            type="number"
+            class="form-control"
+            id="maxScore"
+            name="maxScore"
+            formControlName="MaxScore"
+            min="1"
+          />
+        </fieldset>
       </div>
       <div class="form-group col-md-4">
-        <label for="passScore" translate>Passing_Score</label>
-        <input
-          type="number"
-          class="form-control"
-          id="passScore"
-          name="passScore"
-          min="1"
-          formControlName="PassScore"
-          (change)="changeMinVal()"
-        />
+        <fieldset [disabled]="form.get('PassFail')!.value">
+          <label for="passScore" translate>Passing_Score</label>
+          <input
+            type="number"
+            class="form-control"
+            id="passScore"
+            name="passScore"
+            min="1"
+            formControlName="PassScore"
+            (change)="changeMinVal()"
+          />
+        </fieldset>
       </div>
       <div class="form-group col-md-4">
         <input
@@ -78,6 +82,7 @@
           id="passFail"
           name="passFail"
           formControlName="PassFail"
+          (click)="passFailToggle()"
         />
         <label class="form-check-label" for="passFail">Pass/Fail</label>
       </div>
