@@ -73,7 +73,7 @@
       aria-labelledby="current-tab"
       tabindex="0"
     >
-      <div class="mt-3">
+      <div class="mt-3 courses">
         <app-course
           [data]="course"
           *ngFor="let course of currentCourses"
@@ -99,7 +99,7 @@
       aria-labelledby="completed-tab"
       tabindex="0"
     >
-      <div class="mt-3 courses">
+      <div class="mt-3">
         <app-course
           [data]="course"
           *ngFor="let course of passedCourses"

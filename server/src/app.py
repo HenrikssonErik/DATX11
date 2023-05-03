@@ -665,7 +665,6 @@ def set_feedback():
 def get_file_names():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
-    print(request.args.get('Course'))
     course = int(request.args.get('Course'))
     assignment = int(request.args.get('Assignment'))
 
@@ -675,6 +674,18 @@ def get_file_names():
         return make_response(jsonify({'Filenames': filenames}), 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
+
+
+@app.route('/getCourseProgress', methods=['GET'])
+def get_progress():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+
+    if (user_handler.is_in_course):
+        prog = course_handler.get_progress(user_id)
+        return make_response(jsonify(prog), 200)
+    else:
+        return make_response("", 401)
 
 
 @app.route('/changeCourseName', methods=['POST'])

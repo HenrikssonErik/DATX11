@@ -11,6 +11,7 @@ export interface Course {
   Year: number;
   courseID: number;
   Admin: string;
+  Completed?: number;
 }
 
 export interface Assignment {
@@ -18,4 +19,9 @@ export interface Assignment {
   Description: string;
   DueDate: Date;
   Name: string;
+}
+
+export interface ProgressItem {
+  Course: number;
+  Completed: number;
 }

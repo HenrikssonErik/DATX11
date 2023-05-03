@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Course } from 'src/app/models/courses';
+import { Course, ProgressItem } from 'src/app/models/courses';
 import { CourseService } from 'src/app/services/course-service.service';
+
 @Component({
   selector: 'app-course-picker',
   templateUrl: './course-picker.component.html',
@@ -17,8 +18,22 @@ export class CoursePickerComponent implements OnInit {
     //TODO: FIX so that we dont have to call this twice. Once here and once in courses.component.ts
     this.courseService.getCourses().subscribe((res: Course[]) => {
       this.courses = res;
+      console.log(this.courses);
       this.sortCourses();
+      this.courseService
+        .getCourseProgress()
+        .subscribe((res: ProgressItem[]) => this.handleProgress(res));
     });
+  }
+
+  handleProgress(ProgressList: ProgressItem[]) {
+    for (var i = 0; i < ProgressList.length; i++) {
+      this.courses.find(
+        (course) => course.courseID == ProgressList[i].Course
+      )!.Completed = ProgressList[i].Completed;
+    }
+    console.log('Update progress');
+    console.log(this.courses);
   }
 
   sortCourses() {

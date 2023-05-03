@@ -95,6 +95,32 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
         return [{'status': "No Courses Found"}]
 
 
+def get_progress(user_id: int) -> list:
+    """Retrieves the results of the latest submisison for the user on all courses"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query = """SELECT af.courseId, COUNT(*) AS Completed FROM
+                UserGroupCourseInfo ugci JOIN AssignmentFeedback af ON
+                ugci.groupId = af.groupId AND ugci.courseId = af.courseId
+                WHERE ugci.userId = %s AND af.teacherGrade = TRUE GROUP BY
+                af.courseId;"""
+                cur.execute(query, [user_id])
+                data = cur.fetchall()
+        conn.close()
+        if not (data):
+            return []
+        else:
+            courses = [{'Course': row[0], 'Completed': row[1]} for row in data]
+            return courses
+
+    except Exception as e:
+        print(e)
+        raise Exception("Could not get status") from e
+
+
 def add_group_to_course(course_id: int, user_id: int):
     """Creates a  group to the specified course and adds the user to it,
     group number is set to the following integer that isnt already used

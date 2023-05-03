@@ -85,16 +85,14 @@
 }
 
 .progress-bar-container {
-  display: flex;
   align-items: center;
   flex-direction: row;
   height: 3px;
   border-radius: 5px;
-  margin-bottom: 10px;
+  display: flex;
 }
 
 .progress-bar {
-  flex-grow: 1;
   height: 100%;
   background-color: #000;
   border-radius: 5px;
@@ -103,8 +101,8 @@
 .progress-text {
   margin-top: 5px;
   margin-left: 10px;
-  align-self: flex-start;
-  justify-self: flex-end;
+  align-self: flex-end;
+  justify-self: end;
   font-size: 12px;
 }
 
