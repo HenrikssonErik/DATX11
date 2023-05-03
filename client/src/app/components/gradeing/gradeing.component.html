@@ -116,11 +116,14 @@
                   >Assignment {{ gradeingSubmission.Assignment }} - Group
                   {{ submission.groupid }}</span
                 >
-                <span class="statusText" *ngIf="submission.grade !== null"
-                  >Graded</span
+                <span class="statusText" *ngIf="submission.grade"
+                  >Graded: Passed</span
                 >
                 <span class="statusText" *ngIf="submission.grade === null"
                   >Not Graded</span
+                >
+                <span class="statusText" *ngIf="!submission.grade"
+                  >Graded: Failed</span
                 >
               </div>
             </ng-template>
@@ -207,6 +210,10 @@
               </div>
 
               <div class="row text-muted">
+                <div class="col-auto">
+                  <p class="header">Group Members</p>
+                  <p class="resultText">Malte Carlstedt</p>
+                </div>
                 <div class="col-auto">
                   <p class="header">Test Result</p>
 
@@ -310,7 +317,7 @@
                       class="form-control"
                       placeholder="Leave a comment here"
                       id="comments"
-                      style="height: 165px"
+                      style="height: 180px"
                       [(ngModel)]="commentText"
                     ></textarea>
                   </fieldset>
