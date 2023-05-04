@@ -438,7 +438,7 @@ def get_course_groups(course: int):
                 data = cur.fetchall()
                 group_list = []
                 if not data:
-                    return {}
+                    return []
                 for row in data:
                     group_dict = {
                         "groupNumber": row[0],
