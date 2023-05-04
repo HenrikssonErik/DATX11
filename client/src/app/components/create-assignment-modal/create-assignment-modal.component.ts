@@ -142,7 +142,6 @@ export class CreateAssignmentModalComponent {
             if (response.status == 200) {
               this.toastr.success('Assignment Created', response.body);
               this.postUnittests(fileData, headers);
-              location.reload();
             }
           } catch {
             throw new Error('unexpected_error');
