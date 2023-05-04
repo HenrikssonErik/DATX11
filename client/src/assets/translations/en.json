@@ -102,15 +102,12 @@
   "Upload_Tests": "Upload Test (replaces file with same name)",
   "No_Tests": "No Test Files Uploaded",
   "Passed": "Passed",
-  "Failed": "Failed",
-  "Waiting_For_Review": "Waiting For Review",
-  "Test_Results": "Test Results",
-  "Test_Ran": "Test ran",
-  "Grade": "Grade",
-  "Reviewed_By": "Reviewed By",
-  "Comments": "Comments",
-  "Submitted_Files": "Submitted Files",
-  "Errors": "Errors:",
-  "Failed_Tests": "Failed Tests",
-  "Pep8_Results": "Pep8 Results"
+  "Not_Passed": "Not Passed",
+  "Score": "Score",
+  "Comment": "Comment",
+  "Group_Members": "Group Members",
+  "Leave_a_comment": "Leave_a_comment",
+  "Pass": "Pass",
+  "Fail": "Fail",
+  "No_assignments_found": "No Assignments Found"
 }
