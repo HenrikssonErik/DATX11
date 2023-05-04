@@ -23,7 +23,7 @@ export class AssignmentsComponent implements OnInit {
   selectedTab: number = -2;
   //group!: Group;
   courseGroups: Group[] = [];
-  fileNames: any = {}; //String[] = [];
+  fileNames: String[] = [];
   myGroup?: Group;
   isLoadingMap: Map<number, boolean> = new Map<number, boolean>();
   createGroupLoader: boolean = false;
@@ -53,6 +53,7 @@ export class AssignmentsComponent implements OnInit {
             this.myGroup = res;
             console.log(res);
           });
+          this.getFileNames();
         }
         //this.getFileNames();
       });
@@ -67,13 +68,13 @@ export class AssignmentsComponent implements OnInit {
     return this.course.Role === 'Admin' || this.course.Role === 'Teacher';
   }
 
-  getFileNames(tab: number) {
+  getFileNames() {
     this.fileNames = [];
     if (this.selectedTab >= 0) {
       this.submissionService
         .getFileNames(
           this.course.courseID,
-          this.course.Assignments[tab].AssignmentNr
+          this.course.Assignments[this.selectedTab].AssignmentNr
         )
         .subscribe((res) => {
           this.fileNames = res['Filenames'];
@@ -83,7 +84,7 @@ export class AssignmentsComponent implements OnInit {
 
   onTabSelect(tabNumber: number): void {
     this.selectedTab = tabNumber;
-    this.getFileNames(tabNumber);
+    this.getFileNames();
   }
 
   goBack(): void {
