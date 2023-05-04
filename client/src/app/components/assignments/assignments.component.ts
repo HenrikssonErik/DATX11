@@ -88,7 +88,6 @@ export class AssignmentsComponent implements OnInit {
   }
 
   onTabSelect(tabNumber: number): void {
-    console.log('changing tab');
     this.selectedTab = tabNumber;
     this.getFileNames();
   }
