@@ -286,13 +286,6 @@ def get_assignment_feedback():
         return make_response("", code)
 
 
-<< << << < HEAD
-# TODO: add token checks
-
-== == == =
->>>>>> > 5a6478a3741ceadbb61d3c96acd6801e3f5a0c4f
-
-
 @app.route('/getAssignmentFile', methods=['POST'])
 def get_files():
     """
