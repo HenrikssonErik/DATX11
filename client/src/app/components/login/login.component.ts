@@ -300,6 +300,6 @@ export class LoginComponent implements OnInit {
     this.verificationCidForm.reset();
   }
   openPwdModal(): void {
-    this.verificationCidForm.reset();
+    this.forgotPwdForm.reset();
   }
 }
