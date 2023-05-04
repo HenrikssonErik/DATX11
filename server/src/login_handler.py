@@ -18,7 +18,7 @@ def create_key():
     or login/registration will fail
     """
     global __SECRET_KEY
-    __SECRET_KEY = "g"  # random_string()
+    __SECRET_KEY = random_string()
 
 
 def random_string() -> str:
