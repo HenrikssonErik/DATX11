@@ -8,8 +8,9 @@ from unittest.mock import MagicMock, patch
 import bcrypt
 from psycopg2 import IntegrityError
 
+
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_cid_token, verify_user_in_db, verify_and_get_cid, user_to_resend_verification_email, create_temp_users  # noqa: E402, E501
+from src.login_handler import log_in, verify_and_get_id, create_token, create_key, check_data_input, user_registration, registration_query, create_cid_token, verify_user_in_db, verify_and_get_cid, update_pwd_in_db, user_to_resend_verification_email, create_temp_users  # noqa: E402, E501
 
 
 def setup_mock_cursor(mock_connect) -> MagicMock:
@@ -306,4 +307,55 @@ class TestFileHandler(unittest.TestCase):
         mock_cur.fetchone.return_value = None
         actual_response = user_to_resend_verification_email(cid)
         expected_response = {"status": "unexpected_error"}, 500
+        self.assertEqual(actual_response, expected_response)
+
+    @patch('psycopg2.connect')
+    def test_update_pwd_in_db_user_not_found(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.rowcount = 0
+        random_cid = random_cid_generator()
+        salt = bcrypt.gensalt()
+        passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
+
+        actual_response = update_pwd_in_db(random_cid, passphrase)
+
+        expected_response = ({'status': 'user_not_found'}, 406)
+
+        mock_cur.execute.assert_called_once_with("UPDATE UserData " +
+                                                 "SET passphrase = %s " +
+                                                 "WHERE cid = %s;",
+                                                 (passphrase, random_cid))
+        self.assertEqual(actual_response, expected_response)
+
+    @patch('psycopg2.connect')
+    def test_update_pwd_in_db_success(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.rowcount = 1
+        random_cid = random_cid_generator()
+        salt = bcrypt.gensalt()
+        passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
+        actual_response = update_pwd_in_db(random_cid, passphrase)
+        expected_response = ({'status': 'success'}, 200)
+        mock_cur.execute.assert_called_once_with("UPDATE UserData " +
+                                                 "SET passphrase = %s " +
+                                                 "WHERE cid = %s;",
+                                                 (passphrase, random_cid))
+        self.assertEqual(actual_response, expected_response)
+
+    @patch('psycopg2.connect')
+    def test_update_pwd_in_db_uncaught_error(self, mock_connect):
+        mock_cur = setup_mock_cursor(mock_connect)
+        mock_cur.execute.side_effect = Exception("Exception")
+        random_cid = random_cid_generator()
+        salt = bcrypt.gensalt()
+        passphrase = memoryview(bcrypt.hashpw('pass'.encode('utf8'), salt))
+
+        actual_response = update_pwd_in_db(random_cid, passphrase)
+
+        expected_response = ({'status': 'uncaught_error'}, 500)
+
+        mock_cur.execute.assert_called_once_with("UPDATE UserData " +
+                                                 "SET passphrase = %s " +
+                                                 "WHERE cid = %s;",
+                                                 (passphrase, random_cid))
         self.assertEqual(actual_response, expected_response)
