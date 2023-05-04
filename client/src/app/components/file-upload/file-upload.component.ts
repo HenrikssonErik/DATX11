@@ -5,23 +5,20 @@ import { API_URL } from 'src/environments/environment';
 import { EventEmitter } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-
 @Component({
   selector: 'app-file-upload',
   templateUrl: './file-upload.component.html',
-  styleUrls: ['./file-upload.component.css'],
+  styleUrls: ['./file-upload.component.scss'],
 })
 export class FileUploadComponent {
   files: File[] = [];
   @ViewChild('fileUpload', { static: false })
   fileDropEl!: ElementRef;
 
-
   @Input() courseId!: number;
   @Input() assignmentNumber!: number;
   @Input() groupId!: number;
   isLoading: boolean = false;
-
 
   allowedFileTypes: string[] = [
     'text/x-python',

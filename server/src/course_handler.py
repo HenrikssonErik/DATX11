@@ -170,8 +170,8 @@ def _create_course(course_name: str, course_abbr: str, year: int,
         with conn:
             with conn.cursor() as cur:
                 query_one = """Insert into Courses
-                                (coursename, course, teachingperiod, courseyear)
-                                values (%s,%s,%s,%s) """
+                                (courseName, course, teachingPeriod,
+                                courseYear) values (%s,%s,%s,%s) """
                 cur.execute(query_one, [course_name, course_abbr,
                                         teaching_period, year])
 
@@ -250,8 +250,8 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT assignment, enddate, Description, name, maxscore, passscore FROM " +\
-                    "assignments WHERE courseid = %s"
+                query_data = """SELECT assignment, endDate, description, name, maxscore, passscore
+                FROM Assignments WHERE courseid = %s"""
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
@@ -293,6 +293,26 @@ def change_description(new_desc: str, course_id: int,
         return {'status': "No Courses Found"}
 
 
+def change_assignment_name(new_name: str, course_id: int,
+                           assignment: int) -> dict | None:
+    """ Changes the description for the a assignment"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """UPDATE assignments set name = %s
+                                WHERE courseid = %s and assignment = %s"""
+                cur.execute(query_data, [new_name, course_id, assignment])
+
+        conn.close()
+        return None
+
+    except Exception as e:
+        print(e)
+        raise Exception("could not change name") from e
+
+
 def change_course_name(new_name: str, course: int):
     """ Changes the name for the course"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -320,11 +340,13 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
         with conn:
             with conn.cursor() as cur:
                 query_one = """UPDATE AssignmentFeedback SET
-                teacherFeedback = %s, teacherGrade = %s, score = %s,
-                userid = %s WHERE groupId = %s AND courseId = %s AND
+                teacherFeedback = %s, teacherGrade = %s,
+                feedbackdate = (CURRENT_TIMESTAMP AT TIME ZONE
+                'Europe/Stockholm'), score = %s, AND courseId = %s
+                userid = %s WHERE groupId = %s AND
                 submission = %s AND assignment = %s;"""
-                cur.execute(query_one, [feedback, grade, score, teacher,
-                                        group_id, course,
+                cur.execute(query_one, [feedback, grade, score, course, teacher,
+                                        group_id,
                                         submission, assignment])
         conn.close()
         return
@@ -455,12 +477,12 @@ def get_course_groups(course: int):
                 data = cur.fetchall()
                 group_list = []
                 if not data:
-                    return {}
+                    return []
                 for row in data:
                     group_dict = {
                         "groupNumber": row[0],
                         "groupId": row[1],
-                        "users": row[2]}
+                        "groupMembers": row[2]}
                     group_list.append(group_dict)
         conn.close()
         return group_list

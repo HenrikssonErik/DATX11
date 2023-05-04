@@ -12,8 +12,12 @@
         formControlName="editMode"
         class="form-check-input"
         id="editMode"
+        (change)="editToggle()"
       />
-      <label class="form-check-label text-muted" for="editMode" translate
+      <label
+        class="form-check-label text-muted editBtn"
+        for="editMode"
+        translate
         >Edit_Mode</label
       >
     </div>
@@ -25,15 +29,14 @@
           type="text"
           class="form-control"
           id="floatingCourseName"
-          [disabled]="!form.get('editMode')?.value"
-          [value]="course.CourseName"
+          formControlName="Name"
         />
         <button
           style="float: right"
           *ngIf="form.get('editMode')?.value"
           class="btn btn-primary mt-2"
           (click)="changeCourseName()"
-          [disabled]="form.get('CourseName')?.value != course.CourseName"
+          [disabled]="form.get('Name')?.value == course.CourseName"
         >
           Save
         </button>
@@ -54,7 +57,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <h5>Assignments</h5>
       <button
         class="btn btn-primary w-100"
@@ -63,18 +66,31 @@
         Create Assignment
       </button>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
       <h5>Members</h5>
-      <button class="btn btn-primary w-100" (click)="openHandleUsersModal()">Handle Members</button>
+      <button class="btn btn-primary w-100" (click)="openHandleUsersModal()">
+        Handle Members
+      </button>
+    </div>
+    <div class="col-md-4">
+      <h5>Testfile Template</h5>
+      <a href="assets/test_template.py">
+        <button class="btn btn-primary w-100">
+          <i class="fas fa-download"></i>
+          Downlaod Template
+        </button>
+      </a>
     </div>
   </div>
 </div>
 <div class="row mt-3">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="header">
-        <h5>Assignment</h5>
-      </div>
-    </div>
+  <div
+    class="col-md-6 card-container mb-2"
+    *ngFor="let assignment of this.course.Assignments"
+  >
+    <app-assignment-card
+      [Assignment]="assignment"
+      [courseID]="course.courseID"
+    ></app-assignment-card>
   </div>
 </div>

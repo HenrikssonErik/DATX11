@@ -38,7 +38,7 @@ const response_to_toastr: ResponseToToastr = {
 export class ToastrResponseService {
   constructor() {}
 
-  getToastrRepsonse(status: string): string[] {
+  getToastrResponse(status: string): string[] {
     return response_to_toastr[status];
   }
 }

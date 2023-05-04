@@ -260,18 +260,18 @@ class TestUserHandler(unittest.TestCase):
         self.assertEqual(
             res, ([
                 {
-                    'Id': 1,
-                    'Cid': 'kvalden',
-                    'Name': 'Sebastian Kvalden',
-                    'Email': 'kvalden@chalmers.se',
-                    'Role': 'Student'
+                    'id': 1,
+                    'cid': 'kvalden',
+                    'fullname': 'Sebastian Kvalden',
+                    'email': 'kvalden@chalmers.se',
+                    'role': 'Student'
                 },
                 {
-                    'Id': 2,
-                    'Cid': 'erhen',
-                    'Name': 'Erik Henriksson',
-                    'Email': 'erhen@chalmers.se',
-                    'Role': 'Student'
+                    'id': 2,
+                    'cid': 'erhen',
+                    'fullname': 'Erik Henriksson',
+                    'email': 'erhen@chalmers.se',
+                    'role': 'Student'
                 }
             ], 200)
         )

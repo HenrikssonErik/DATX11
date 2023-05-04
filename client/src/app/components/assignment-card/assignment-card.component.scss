@@ -1,0 +1,54 @@
+.card {
+  border-radius: 12px;
+  background-color: #fff;
+  padding: 20px;
+  width: 100%;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.row {
+  margin-bottom: 5px;
+}
+
+input {
+  margin-bottom: 5px;
+}
+
+.testFiles {
+  font-size: smaller;
+  margin-bottom: 0px;
+  font-weight: 600;
+  text-align: right;
+}
+
+label {
+  font-size: small;
+  margin-bottom: 3px;
+  padding-top: -5px;
+  font-weight: 600;
+}
+
+p {
+  font-size: small;
+  margin-bottom: 3px;
+  padding-top: -5px;
+  font-weight: 600;
+}
+
+.files {
+  font-size: small;
+  margin-bottom: 3px;
+  padding-top: -5px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#description {
+  height: auto;
+}

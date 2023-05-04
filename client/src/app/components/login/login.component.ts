@@ -109,7 +109,7 @@ export class LoginComponent implements OnInit {
         error: (err) => {
           let statusMsg: string = err.error.status;
           const [errorMessage, errorTitle]: string[] =
-            this.toastrResponse.getToastrRepsonse(statusMsg);
+            this.toastrResponse.getToastrResponse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
@@ -171,7 +171,7 @@ export class LoginComponent implements OnInit {
         error: (err) => {
           let statusMsg = err.error.status;
           const [errorMessage, errorTitle]: string[] =
-            this.toastrResponse.getToastrRepsonse(statusMsg);
+            this.toastrResponse.getToastrResponse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
@@ -236,7 +236,7 @@ export class LoginComponent implements OnInit {
         error: (err) => {
           let statusMsg = err.error.status;
           const [errorMessage, errorTitle]: string[] =
-            this.toastrResponse.getToastrRepsonse(statusMsg);
+            this.toastrResponse.getToastrResponse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });

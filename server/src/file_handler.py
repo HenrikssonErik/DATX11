@@ -29,10 +29,9 @@ def handle_files(files: list[FileStorage], course: int, group: int,
     number_of_files = {}
     res_code = 200
 
-    file_amount, res_code = ("OK", res_code)  \
+    file_amount, res_code = ("OK", res_code) \
         if (len(files) == __nr_of_files) \
-        else (f"Received {len(files)}, should be {__nr_of_files} files",
-              406)
+        else (f"Received {len(files)}, should be {__nr_of_files} files", 406)
 
     number_of_files.update({"number_of_files": file_amount})
     response_items = []
@@ -92,6 +91,28 @@ def get_filenames(course: int, assignment: int) -> tuple:
     except Exception as e:
         print(e)
         return ()
+
+
+def get_test_filenames(course: int, assignment: int) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query = """SELECT fileName FROM TestFiles WHERE courseId = %s
+                AND assignment = %s"""
+
+                cur.execute(query, (course, assignment))
+                data = cur.fetchall()
+                names = []
+                for name in data:
+                    names.append(name[0].split("test_", 1)[1])
+
+        conn.close()
+        return names
+
+    except Exception as e:
+        print(e)
+        raise Exception("Could not get test file names") from e
 
 
 def save_to_temp_and_database(
@@ -234,7 +255,6 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
                     VALUES (%s, %s, %s, %s, %s, 0);
                     """
 
-
             cur.execute(
                 query,
                 (
@@ -242,8 +262,7 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
                     course_id,
                     assignment,
                     file_name,
-                    binary,
-                    0
+                    binary
                 )
             )
 
@@ -289,6 +308,23 @@ def get_assignment_test_feedback_from_database(
     conn.close()
 
     return data, 200
+
+
+def get_test_file(course: int, assignment: int, file_name: str):
+    """Retrieves file from database"""
+
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            query_data = """SELECT FileData FROM testFiles WHERE fileName = %s
+            AND courseId = %s AND assignment = %s"""
+            cur.execute(query_data, (('test_' + file_name), course,
+                                     assignment))
+            data = cur.fetchone()
+    conn.close()
+
+    file_binary = io.BytesIO(data[0].tobytes())
+    return file_binary
 
 
 def get_assignment_file_from_database(
@@ -366,7 +402,6 @@ def get_all_assignment_files_from_db(
                 SELECT filename, filedata FROM AssignmentFiles
                     WHERE GroupId        = %s
                     AND   CourseId       = %s
-                    AND   FileType     NOT LIKE 'pdf'
                     AND   \"assignment\"   = %s;
                 """,
                 (group_id, course_id, assignment)
@@ -423,9 +458,10 @@ def save_feedback_to_db(
                         courseid,
                         \"assignment\",
                         testfeedback,
-                        testpass
+                        testpass,
+                        submission
                     )
-                    VALUES(%s, %s, %s, %s, %s)
+                    VALUES(%s, %s, %s, %s, %s, 0)
                 """,
                 (group_id, course_id, assignment, feedback, passed)
             )

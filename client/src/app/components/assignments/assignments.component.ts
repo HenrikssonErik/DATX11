@@ -21,10 +21,10 @@ import { Group } from 'src/app/models/group';
 export class AssignmentsComponent implements OnInit {
   course: Course = {} as Course;
   selectedTab: number = 0;
-  group!: Group;
+  //group!: Group;
   courseGroups: Group[] = [];
 
-  myGroup!: Group;
+  myGroup?: Group;
   isLoadingMap: Map<number, boolean> = new Map<number, boolean>();
   createGroupLoader: boolean = false;
 
@@ -54,18 +54,19 @@ export class AssignmentsComponent implements OnInit {
     }
 
     this.groupService.getMyGroup(id).subscribe((res) => {
+      this.myGroup = res;
+      console.log(res);
+    });
+
+    /*this.groupService.getMyGroup(id).subscribe((res) => {
       //TODO: HANDLE THE EMPTY GROUP BETTER, THIS FIX IS DUMB
       this.group = res;
-    });
+      console.log(this.group);
+    });*/
 
     this.groupService.getGroups(id).subscribe((res) => {
       this.courseGroups = res;
-      console.log(this.courseGroups);
-    });
-
-    this.groupService.getMyGroup(id).subscribe((res) => {
-      this.myGroup = res;
-      console.log(res);
+      //console.log(this.courseGroups);
     });
   }
 
@@ -120,6 +121,7 @@ export class AssignmentsComponent implements OnInit {
 
   removeFromGroup(courseId: number, groupId: number) {
     this.isLoadingMap.set(groupId, true);
+    console.log(this.createGroupLoader);
     this.userService.getUserData().subscribe((res) => {
       this.groupService.removeFromGroup(courseId, groupId, res.id).subscribe({
         next: (res) => {
@@ -155,7 +157,7 @@ export class AssignmentsComponent implements OnInit {
   }
 
   // TODO: Handle in backend instead
-  groupExists(): boolean {
+  /*groupExists(): boolean {
     if (this.group) {
       if ('status' in this.group) {
         return false;
@@ -164,10 +166,11 @@ export class AssignmentsComponent implements OnInit {
       }
     }
     return false;
-  }
+  }*/
+
   // TODO: Bad
   hasGroup(): boolean {
-    if (this.myGroup) {
+    if (this?.myGroup) {
       if ('status' in this.myGroup) {
         return false;
       } else {

@@ -98,10 +98,10 @@ class TestCourseHandler(unittest.TestCase):
     def test_get_assignments(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
         course_id = 1
-        mock_cursor.fetchall.return_value = [(2, '2022-03-18', 'description')]
+        mock_cursor.fetchall.return_value = [(2, '2022-03-18', 'description', 'TestName')]
         res = course_handler.get_assignments(course_id)
         mock_cursor.execute.assert_called_once_with(
-            "SELECT assignment, enddate, Description FROM "
+            "SELECT assignment, enddate, Description, Name FROM "
             "assignments WHERE courseid = %s",
             [course_id]
         )
@@ -109,7 +109,8 @@ class TestCourseHandler(unittest.TestCase):
             res, [{
                 'AssignmentNr': 2,
                 'DueDate': '2022-03-18',
-                'Description': 'description'
+                'Description': 'description',
+                'Name': 'TestName'
             }])
 
     @patch('psycopg2.connect')

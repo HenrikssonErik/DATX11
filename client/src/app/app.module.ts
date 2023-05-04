@@ -36,6 +36,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TeacherSettingsComponent } from './components/teacher-settings/teacher-settings.component';
 import { CreateAssignmentModalComponent } from './components/create-assignment-modal/create-assignment-modal.component';
 import { HandleUsersModalComponent } from './components/handle-users-modal/handle-users-modal.component';
+import { AssignmentCardComponent } from './components/assignment-card/assignment-card.component';
 import { SubmissionsComponent } from './components/submissions/submissions.component';
 import { GradeingComponent } from './components/gradeing/gradeing.component';
 import { FeedbackTeacherViewModalComponent } from './components/feedback-teacher-view-modal/feedback-teacher-view-modal.component';
@@ -67,6 +68,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     TeacherSettingsComponent,
     CreateAssignmentModalComponent,
     HandleUsersModalComponent,
+    AssignmentCardComponent,
     SubmissionsComponent,
     GradeingComponent,
     FeedbackTeacherViewModalComponent,

@@ -103,8 +103,9 @@
           class="btn btn-primary"
           (click)="createGroup(course.courseID)"
         >
-          <span *ngIf="createGroupLoader" class="loader"></span>
-          <span *ngIf="!createGroupLoader" translate>Create_Group</span>
+          <span [ngClass]="createGroupLoader ? 'loader' : ''" translate>
+            {{ createGroupLoader ? "" : "Create_Group" }}
+          </span>
         </button>
       </div>
       <ngb-accordion #groupAccordion="ngbAccordion">
@@ -197,7 +198,7 @@
               (click)="
                 openModal(
                   course.courseID,
-                  group.groupId,
+                  myGroup!.groupId,
                   assignment.AssignmentNr
                 )
               "
@@ -227,14 +228,12 @@
             </p>
           </div>
           <!--TODO: HANDLE THE EMPTY GROUP BETTER-->
-          <div class="col-md-2" *ngIf="groupExists()">
-            <h5 translate>
-              Group <span>{{ group.groupNumber }}</span>
-            </h5>
+          <div class="col-md-2" *ngIf="hasGroup()">
+            <h5>Group {{ myGroup?.groupId }}</h5>
             <ng-container>
               <p
                 style="padding: 0; margin: 0"
-                *ngFor="let member of group.groupMembers"
+                *ngFor="let member of myGroup?.groupMembers"
               >
                 {{ member }}
               </p>

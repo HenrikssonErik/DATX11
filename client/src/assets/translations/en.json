@@ -28,7 +28,7 @@
   "Sign_Up_btn": "Sign Up",
   "Already_have_an_account": "Already have an account?",
   "A_PLATFORM": "A code testing platform for students and teachers",
-  "BY_AUTHORS": "- A bachelor Thesis 2023 by Alex, Alfred, Erik, Malte, Sebastian and Gabster",
+  "BY_AUTHORS": "- A bachelor Thesis 2023 by Alex, Alfred, Erik, Malte, Sebastian and Gabriel",
   "A_code_testing_platform_for_teachers_and_students": "A code testing platform for teachers and students",
   "A_PLATFORM_TEXT": "Hydrant can automate the process of code testing for teachers and students. Our platform provides an easy-to-use interface for teachers to create and upload assignments, including unit tests, for students to complete. Students can then submit their code, which is automatically tested against the uploaded unit tests providing immediate feedback and enabling a more efficient and productive learning experience.",
   "Catching_and_preventing_errors_early": "Catching and preventing errors early",
@@ -97,5 +97,8 @@
   "Leave_Comment": "Leave a Comment",
   "No_Assignments_Found": "No Assignments Found",
   "Passing_Score": "Passing Score",
-  "Grade_Again": "Grade Again"
+  "Grade_Again": "Grade Again",
+  "Test_Files": "Current Test Files:",
+  "Upload_Tests": "Upload Test (replaces file with same name)",
+  "No_Tests": "No Test Files Uploaded"
 }
