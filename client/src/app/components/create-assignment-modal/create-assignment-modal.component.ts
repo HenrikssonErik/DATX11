@@ -177,7 +177,6 @@ export class CreateAssignmentModalComponent {
           try {
             if (response.status == 200) {
               this.toastr.success('Unittests added', response.body);
-              location.reload();
             }
           } catch {
             throw new Error('unexpected_error');
@@ -190,6 +189,9 @@ export class CreateAssignmentModalComponent {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+        },
+        complete: () => {
+          location.reload();
         },
       });
   }
