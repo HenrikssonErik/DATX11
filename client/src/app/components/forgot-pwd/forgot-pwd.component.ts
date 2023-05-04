@@ -5,7 +5,7 @@ import {
   UntypedFormGroup,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ToastrResponseService } from 'src/app/services/toastr-response.service';
 import { API_URL } from 'src/environments/environment';
@@ -31,7 +31,8 @@ export class ForgotPwdComponent implements OnInit {
     private http: HttpClient,
     private activatedRoute: ActivatedRoute,
     private toastr: ToastrService,
-    private toastrResponse: ToastrResponseService
+    private toastrResponse: ToastrResponseService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -130,6 +131,7 @@ export class ForgotPwdComponent implements OnInit {
           this.toastr.success(undefined, 'Password changed!', {
             closeButton: true,
           });
+          this.router.navigate(['/login']);
         },
       });
   }
