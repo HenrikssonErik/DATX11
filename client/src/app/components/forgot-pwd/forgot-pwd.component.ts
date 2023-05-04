@@ -62,6 +62,7 @@ export class ForgotPwdComponent implements OnInit {
         },
         error: (error) => {
           this.imgSrc = 'pwd_error';
+          console.log(error.error);
           this.tokenValid = Promise.resolve(false);
         },
         complete: () => {},
