@@ -240,9 +240,20 @@
             </ng-container>
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-3">
             <h5 translate>Description</h5>
             <p>{{ assignment.Description }}</p>
+          </div>
+          <div class="col-md-2">
+            <h5 translate>RequiredFiles</h5>
+            <ng-container>
+              <p
+                style="padding: 0; margin: 0"
+                *ngFor="let filename of fileNames"
+              >
+                {{ filename }}
+              </p>
+            </ng-container>
           </div>
         </div>
       </div>

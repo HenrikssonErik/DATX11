@@ -23,7 +23,7 @@ export class AssignmentsComponent implements OnInit {
   selectedTab: number = 0;
   //group!: Group;
   courseGroups: Group[] = [];
-
+  fileNames: String[] = [];
   myGroup?: Group;
   isLoadingMap: Map<number, boolean> = new Map<number, boolean>();
   createGroupLoader: boolean = false;
@@ -50,6 +50,7 @@ export class AssignmentsComponent implements OnInit {
           //TODO: Move admins to "gradeing" tab. Ugly but wokrs for now
           this.selectedTab = -3;
         }
+      this.getFileNames()
       });
     }
 
@@ -74,8 +75,16 @@ export class AssignmentsComponent implements OnInit {
     return this.course.Role === 'Admin' || this.course.Role === 'Teacher';
   }
 
+  getFileNames(): String[]{
+    this.courseService.getFileNames(this.course.courseID, this.course.Assignments[this.selectedTab].AssignmentNr).subscribe((res: String[]) => {
+      this.fileNames = res;
+    });
+    return this.fileNames
+  }
+
   onTabSelect(tabNumber: number): void {
     this.selectedTab = tabNumber;
+    this.getFileNames()
   }
 
   goBack(): void {
