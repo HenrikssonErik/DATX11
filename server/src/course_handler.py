@@ -511,7 +511,7 @@ def get_assignment_overview(course: int) -> list[dict]:
 
                 query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
                 teacherGrade, submission, score,  teacherfeedback, userid,
-                feedbackdate FROM AssignmentFeedback WHERE courseId = %s AND
+                feedbackdate, createdDate FROM AssignmentFeedback WHERE courseId = %s AND
                 assignment = %s ORDER BY groupId, submission DESC;"""
                 return_list = []
                 for assignment in assignments:
@@ -529,7 +529,8 @@ def get_assignment_overview(course: int) -> list[dict]:
                                 "Score": row[4],
                                 "Feedback": row[5],
                                 "GradedBy": teacher,
-                                'Date': row[7]}
+                                'Date': row[7],
+                                'CreatedDate': row[8]}
                             overview_list.append(group_dict)
                     return_list.append({"Assignment": assignment[0],
                                         "Submissions": overview_list})
