@@ -41,9 +41,10 @@
       class="progress-bar"
       role="progressbar"
       [ngStyle]="{
-        'width': (data.Completed
-          ? data.Completed / data.Assignments.length *100
-          : 0) + '%'
+        width:
+          (data.Completed
+            ? (data.Completed / data.Assignments.length) * 100
+            : 0) + '%'
       }"
     ></div>
   </div>
