@@ -23,7 +23,7 @@ export class AssignmentsComponent implements OnInit {
   selectedTab: number = -2;
   //group!: Group;
   courseGroups: Group[] = [];
-  fileNames: any = {}; //String[] = [];
+  fileNames: String[] = [];
   myGroup?: Group;
   isLoadingMap: Map<number, boolean> = new Map<number, boolean>();
   createGroupLoader: boolean = false;
@@ -53,11 +53,16 @@ export class AssignmentsComponent implements OnInit {
             this.myGroup = res;
             console.log(res);
           });
-          this.getFileNames();
         }
         //this.getFileNames();
       });
     }
+
+    /*this.groupService.getMyGroup(id).subscribe((res) => {
+      //TODO: HANDLE THE EMPTY GROUP BETTER, THIS FIX IS DUMB
+      this.group = res;
+      console.log(this.group);
+    });*/
 
     this.groupService.getGroups(id).subscribe((res) => {
       this.courseGroups = res;
