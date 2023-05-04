@@ -1,7 +1,7 @@
 <div class="modal-content" [formGroup]="form">
   <div class="modal-header">
     <h4 class="modal-title text-muted" translate>
-      Create Assignment for: {{ course.Course }}
+      Create_Assignment_For: <span>{{ course.Course }}</span>
     </h4>
     <i
       class="fa-solid fa-xmark close"
@@ -19,7 +19,7 @@
             placeholder="Assignment Name"
             formControlName="AssignmentName"
           />
-          <label for="floatingAssignmentName">Assignment Name</label>
+          <label for="floatingAssignmentName" translate>Assignment_Name</label>
         </div>
       </div>
       <div class="col-md-6">
@@ -30,7 +30,7 @@
             id="Date"
             formControlName="Date"
           />
-          <label for="Date">Due Date</label>
+          <label for="Date" translate>Due_Date</label>
         </div>
       </div>
     </div>
@@ -43,14 +43,14 @@
             style="height: 150px"
             formControlName="Description"
           ></textarea>
-          <label for="description">Description</label>
+          <label for="description" translate>Description</label>
         </div>
       </div>
     </div>
     <div class="row mt-2">
       <div class="form-group col-md-4">
         <fieldset [disabled]="form.get('PassFail')!.value">
-          <label for="maxScore">Max Score:</label>
+          <label for="maxScore" translate>Max_Score</label>
           <input
             type="number"
             class="form-control"
@@ -84,11 +84,15 @@
           formControlName="PassFail"
           (click)="passFailToggle()"
         />
-        <label class="form-check-label" for="passFail">Pass/Fail</label>
+        <label class="form-check-label" for="passFail" translate
+          >Pass/Fail</label
+        >
       </div>
       <div class="row mt-2">
         <div class="col-12">
-          <h6 class="text-muted">Number of files needed in submission</h6>
+          <h6 class="text-muted" translate>
+            Number_Of_Files_Needed_In_Submission
+          </h6>
           <div class="input-group mb-3">
             <select
               class="form-select"
@@ -111,7 +115,7 @@
       </div>
       <div class="row mt-2" *ngIf="form.controls['numOfFiles'].value">
         <div class="col-12">
-          <h6 class="text-muted">Submission File Names</h6>
+          <h6 class="text-muted" translate>Submission_File_Names</h6>
           <div formArrayName="fileNames">
             <div *ngFor="let fileControl of fileControls; let i = index">
               <input
@@ -128,8 +132,8 @@
       <div class="row mt-2">
         <div class="col-md-12">
           <div class="mb-3">
-            <label for="formFile" class="form-label"
-              >Upload unit test for this assignment</label
+            <label for="formFile" class="form-label" translate
+              >Upload_Unit_Test_For_This_Assignment</label
             >
             <input
               class="form-control"
@@ -147,8 +151,9 @@
             (click)="createAssignment()"
             class="btn btn-primary w-100"
             [ngClass]="{ disabled: form.invalid }"
+            translate
           >
-            Create Assignment
+            Create_Assignment
           </button>
         </div>
       </div>
