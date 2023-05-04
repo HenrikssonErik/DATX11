@@ -706,7 +706,7 @@ def set_feedback():
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         course_handler.set_teacher_feedback(group_id, feedback, grade, course,
-                                            assignment, submission)
+                                            assignment, submission, user_id, score)
         return make_response("", 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
