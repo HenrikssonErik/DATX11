@@ -10,18 +10,11 @@
           <div class="form-group mb-3">
             <label for="cid" class="text-muted">Chalmers ID (CID)</label>
             <input
-              [ngClass]="{
-                success: passwordForm.get('cid')?.valid,
-                error:
-                  passwordForm.get('cid')?.invalid &&
-                  (passwordForm.get('cid')?.dirty ||
-                    passwordForm.get('cid')?.touched)
-              }"
               type="text"
               formControlName="cid"
               class="form-control disabled"
               id="cid"
-              placeholder="{{ 'CID' | translate }}"
+              placeholder="{{ 'CID' }}"
               required
               readonly
             />
