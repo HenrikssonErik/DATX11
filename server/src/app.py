@@ -140,9 +140,8 @@ def verify_email() -> Response:
         return res
 
 
-@app.route('/new_pwd_reset', methods=['POST'])
+@app.route('/new_pwd', methods=['POST'])
 def update_password() -> Response:
-
     return make_response({}, 200)
 
 
