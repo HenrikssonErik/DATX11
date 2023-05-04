@@ -144,34 +144,26 @@ def verify_email() -> Response:
 def update_password() -> Response:
     data = request.form
     token: str = data['token']
-    cid: str = data['cid']
     password: str = data['password']
     verification_password: str = data['verificationPassword']
 
     try:
         token_verification = verify_and_get_cid(token)
-    except:
+    except Exception as e:
+        print(e)
         return make_response({"status": "error"}, 400)
 
     if not token_verification[1] == 200:
         return make_response(token_verification)
 
-    if not cid == token_verification[0].get('cid'):
-
-        print('cid: ', cid, ' | token cid: ',
-              token_verification[0].get('cid'))
-        return make_response({"status": "not_matching_cid"}, 400)
-
     if not password == verification_password:
-        print('pass: ', password, ' | verPass: ',
-              verification_password)
         return make_response({"status": "not_matching_password"}, 400)
+
+    cid: str = token_verification[0]['cid']
 
     password_status = new_password(cid, password)
 
     return make_response(password_status)
-
-    return make_response({}, 200)
 
 
 def send_forgotpwd_email(to: str, token: str) -> None:
