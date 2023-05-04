@@ -6,6 +6,7 @@
       hydrantDropdown
       data-bs-toggle="dropdown"
       aria-expanded="false"
+      translate
     >
       Assignment <i class="fa-solid fa-chalkboard-user"></i>
     </button>
@@ -24,8 +25,9 @@
             (click)="filterAssignments(assignment); $event.stopPropagation()"
             class="form-check-label text-muted"
             for="assignmentCheckbox"
+            translate
           >
-            Assignment {{ assignment }}
+            Assignment <span> {{ assignment }} </span>
           </label>
         </div>
       </li>
@@ -35,6 +37,7 @@
       type="button"
       data-bs-toggle="dropdown"
       aria-expanded="false"
+      translate
     >
       Graded <i class="fa-solid fa-graduation-cap"></i>
     </button>
@@ -47,7 +50,7 @@
             value=""
             id="checkbox1"
           />
-          <label class="form-check-label text-muted" for="checkbox1">
+          <label class="form-check-label text-muted" for="checkbox1" translate>
             No
           </label>
         </div>
@@ -60,7 +63,7 @@
             value=""
             id="checkbox2"
           />
-          <label class="form-check-label text-muted" for="checkbox2">
+          <label class="form-check-label text-muted" for="checkbox2" translate>
             Yes
           </label>
         </div>
@@ -71,17 +74,18 @@
       type="button"
       data-bs-toggle="dropdown"
       aria-expanded="false"
+      translate
     >
       Date <i class="fa-solid fa-clock"></i>
     </button>
     <ul class="dropdown-menu">
       <li>
-        <a class="dropdown-item text-muted" href="#"
+        <a class="dropdown-item text-muted" href="#" translate
           >Ascending <i class="fa-solid fa-sort-up"></i>
         </a>
       </li>
       <li>
-        <a class="dropdown-item text-muted" href="#"
+        <a class="dropdown-item text-muted" href="#" translate
           >Descending <i class="fa-solid fa-sort-down"></i
         ></a>
       </li>
@@ -112,18 +116,21 @@
           <ngb-panel *ngFor="let submission of gradeingSubmission.Submissions">
             <ng-template ngbPanelTitle>
               <div class="titleAccordion">
-                <span
+                <span translate
                   >Assignment {{ gradeingSubmission.Assignment }} - Group
                   {{ submission.groupid }}</span
                 >
-                <span class="statusText" *ngIf="submission.grade"
-                  >Graded: Passed</span
+                <span class="statusText" *ngIf="submission.grade" translate
+                  >Graded_Passed</span
                 >
-                <span class="statusText" *ngIf="submission.grade === null"
-                  >Not Graded</span
+                <span
+                  class="statusText"
+                  *ngIf="submission.grade === null"
+                  translate
+                  >Not_Graded</span
                 >
-                <span class="statusText" *ngIf="!submission.grade"
-                  >Graded: Failed</span
+                <span class="statusText" *ngIf="!submission.grade" translate
+                  >Graded_Failed</span
                 >
               </div>
             </ng-template>
@@ -159,13 +166,13 @@
                     <i class="fa-regular fa-comment-dots gradedIcon"></i>
                   </div>
                   <div class="col-md-5 p-0">
-                    <span class="headerTitle">
+                    <span class="headerTitle" translate>
                       {{ course.CourseName }} Assignment
                       {{ gradeingSubmission.Assignment }}
                     </span>
                     <br />
-                    <span
-                      >Graded By
+                    <span translate
+                      >Graded_By
                       <span style="text-decoration: underline">{{
                         submission.GradedBy
                       }}</span></span
@@ -173,13 +180,14 @@
 
                     <div class="row mt-2">
                       <div class="col-auto">
-                        <p class="header">Grade</p>
+                        <p class="header" translate>Grade</p>
                         <span
                           [ngStyle]="{
                             color: submission.grade ? '#006c5c' : '#8b0000'
                           }"
                           class="resultText"
                           *ngIf="submission.grade"
+                          translate
                           >Passed</span
                         >
                         <span
@@ -188,18 +196,19 @@
                           }"
                           class="resultText"
                           *ngIf="!submission.grade"
-                          >Not Passed</span
+                          translate
+                          >Not_Passed</span
                         >
                       </div>
                       <div
                         class="col-auto"
                         *ngIf="getMaxScore(gradeingSubmission.Assignment) > 1"
                       >
-                        <p class="header">Score</p>
+                        <p class="header" translate>Score</p>
                         <span class="resultText">{{ submission.Score }}</span>
                       </div>
                       <div class="col flex-grow">
-                        <p class="header">Comment</p>
+                        <p class="header" translate>Comment</p>
                         <span class="resultText">{{
                           submission.Feedback
                         }}</span>
@@ -211,11 +220,11 @@
 
               <div class="row text-muted">
                 <div class="col-auto">
-                  <p class="header">Group Members</p>
+                  <p class="header" translate>Group_Members</p>
                   <p class="resultText">Malte Carlstedt</p>
                 </div>
                 <div class="col-auto">
-                  <p class="header">Test Result</p>
+                  <p class="header" translate>Test_Result</p>
 
                   <p
                     (click)="
@@ -229,22 +238,25 @@
                       color: submission.testpass ? '#006c5c' : '#8b0000'
                     }"
                   >
-                    <ng-container *ngIf="submission.testpass; else failed">
+                    <ng-container
+                      *ngIf="submission.testpass; else failed"
+                      translate
+                    >
                       Passed
                     </ng-container>
-                    <ng-template #failed> Failed </ng-template>
+                    <ng-template #failed translate> Failed </ng-template>
                     <span
                       ><i class="fa-solid fa-up-right-from-square"></i
                     ></span>
                   </p>
                 </div>
                 <div class="col-auto">
-                  <p class="header">Time Submitted</p>
+                  <p class="header" translate>Time_Submitted</p>
                   <p class="resultText">{{ getDate(submission.Date) }}</p>
                 </div>
                 <div class="col-auto">
-                  <p class="header">
-                    Files submitted
+                  <p class="header" translate>
+                    Files_Submitted
                     <span
                       ><i
                         class="fa-regular fa-circle-question"
@@ -276,7 +288,7 @@
                   class="col-md-3"
                   *ngIf="getMaxScore(gradeingSubmission.Assignment) > 1"
                 >
-                  <p class="header">Score</p>
+                  <p class="header" translate>Score</p>
                   <div class="input-group mb-3">
                     <input
                       type="number"
@@ -304,7 +316,7 @@
                 </div>
 
                 <div class="col flex-grow">
-                  <p class="header">Leave a comment</p>
+                  <p class="header" translate>Leave_a_comment</p>
                   <fieldset
                     [disabled]="
                       (!form.get('gradeAgain')?.value &&
@@ -341,6 +353,7 @@
                         true
                       )
                     "
+                    translate
                   >
                     Pass
                   </button>
@@ -360,6 +373,7 @@
                         false
                       )
                     "
+                    translate
                   >
                     Fail
                   </button>
@@ -373,5 +387,5 @@
   </div>
 </div>
 <ng-template #noSubmissions>
-  <p>No assignments found.</p>
+  <p translate>No_assignments_found</p>
 </ng-template>
