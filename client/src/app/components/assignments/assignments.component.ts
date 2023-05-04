@@ -44,7 +44,6 @@ export class AssignmentsComponent implements OnInit {
     if (!isNaN(id)) {
       this.courseService.getCourse(id).subscribe((res: Course) => {
         this.course = res;
-        console.log(this.course);
         this.course.Assignments.sort((a, b) => a.AssignmentNr - b.AssignmentNr);
         if (this.isAdmin) {
           //TODO: Move admins to "gradeing" tab. Ugly but wokrs for now
@@ -56,18 +55,10 @@ export class AssignmentsComponent implements OnInit {
 
     this.groupService.getMyGroup(id).subscribe((res) => {
       this.myGroup = res;
-      //console.log(res);
     });
-
-    /*this.groupService.getMyGroup(id).subscribe((res) => {
-      //TODO: HANDLE THE EMPTY GROUP BETTER, THIS FIX IS DUMB
-      this.group = res;
-      console.log(this.group);
-    });*/
 
     this.groupService.getGroups(id).subscribe((res) => {
       this.courseGroups = res;
-      //console.log(this.courseGroups);
     });
   }
 
@@ -77,31 +68,19 @@ export class AssignmentsComponent implements OnInit {
 
   getFileNames(tab: number) {
     this.fileNames = [];
-    console.log('tab:', this.selectedTab);
     if (this.selectedTab >= 0) {
-      console.log(
-        'in if, with assig:',
-        this.course.Assignments[this.selectedTab].AssignmentNr,
-        'tab:',
-        this.selectedTab
-      );
       this.submissionService
         .getFileNames(
           this.course.courseID,
           this.course.Assignments[tab].AssignmentNr
         )
         .subscribe((res) => {
-          console.log('list?:', res);
           this.fileNames = res['Filenames'];
-          //console.log(this.fileNames);
         });
-
-      console.log('finaly list', this.fileNames);
     }
   }
 
   onTabSelect(tabNumber: number): void {
-    console.log('changing tab');
     this.selectedTab = tabNumber;
     this.getFileNames(tabNumber);
   }
@@ -149,7 +128,6 @@ export class AssignmentsComponent implements OnInit {
 
   removeFromGroup(courseId: number, groupId: number) {
     this.isLoadingMap.set(groupId, true);
-    console.log(this.createGroupLoader);
     this.userService.getUserData().subscribe((res) => {
       this.groupService.removeFromGroup(courseId, groupId, res.id).subscribe({
         next: (res) => {
