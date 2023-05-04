@@ -8,7 +8,7 @@ import { API_URL } from 'src/environments/environment';
 import { ToastrResponseService } from 'src/app/services/toastr-response.service';
 
 @Component({
-  selector: 'app-assignemnt-card',
+  selector: 'app-assignment-card',
   templateUrl: './assignment-card.component.html',
   styleUrls: ['./assignment-card.component.scss'],
 })
