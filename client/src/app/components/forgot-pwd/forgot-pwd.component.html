@@ -19,16 +19,12 @@
               }"
               type="text"
               formControlName="cid"
-              class="form-control focus-border"
+              class="form-control disabled"
               id="cid"
-              placeholder="{{ 'Enter_Cid' | translate }}"
-              (focus)="onInputFocus('cid', passwordForm)"
+              placeholder="{{ 'CID' | translate }}"
               required
               readonly
             />
-            <!--  <div class="error-message" *ngIf="signUpForm.get('cid')?.invalid && (signUpForm.get('cid')?.dirty || signUpForm.get('cid')?.touched)">
-                Please enter a CID
-              </div> -->
           </div>
           <div class="form-group mb-3">
             <label for="password" class="text-muted" translate

@@ -16,11 +16,15 @@ import { API_URL } from 'src/environments/environment';
   styleUrls: ['./forgot-pwd.component.scss'],
 })
 export class ForgotPwdComponent implements OnInit {
-  passwordForm: UntypedFormGroup = new UntypedFormGroup({});
+  passwordForm: UntypedFormGroup = this.fb.group({
+    cid: this.fb.control({ value: 'CID', disabled: true }),
+    password: ['', Validators.required],
+    verifyPassword: ['', Validators.required],
+  });
   imgSrc: string = 'pwd_success';
   token!: Params;
 
-  tokenValid!: Promise<Boolean>;
+  tokenValid: Promise<Boolean> = Promise.resolve(true);
 
   constructor(
     private fb: UntypedFormBuilder,
