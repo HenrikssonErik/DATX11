@@ -50,7 +50,7 @@ def check_data_input(cid: str, email: str, pwd: str,
         return "wrong_format", 400
     if not user_exists:
         return "cid_does_not_exist", 400
-    if not allowed_password:
+    if not allowed_password(pwd):
         return "pass_not_ok", 400
     return "OK", 200
 
