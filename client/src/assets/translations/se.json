@@ -99,7 +99,7 @@
   "Passing_Score": "Poäng För Godkänt",
   "Grade_Again": "Betygsätt Igen",
   "Test_Files": "Nuvarande Testfiler:",
-  "Upload_Tests": "Ladda Upp Test (ersätter fil med samma namn)",
+  "Upload_Tests": "Ladda Upp Test (ersätt fil med samma namn)",
   "No_Tests": "Inga Uppladdade Testfiler",
   "Grading": "Bedömningar",
   "Ascending": "Stigande",
@@ -129,5 +129,10 @@
   "Pass/Fail": "Godkänt/Underkänt",
   "Submission_File_Names": "Filnamn För Inlämningen",
   "Upload_Unit_Test_For_This_Assignment": "Ladda Upp Testfiler",
-  "Create_Assignment": "Skapa Uppgift"
+  "Create_Assignment": "Skapa Uppgift",
+  "Course": "Kurs",
+  "Handle_Members": "Hantera Medlemmar",
+  "Members": "Medlemmar",
+  "Testfile_Template": "Mall för Testfil",
+  "Download_Template": "Ladda Ner Mall"
 }

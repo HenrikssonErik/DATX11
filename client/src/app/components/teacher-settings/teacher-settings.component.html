@@ -1,9 +1,10 @@
 <h3 class="text-muted mt-3" translate>Settings</h3>
 <div class="card" [formGroup]="form">
   <div class="header">
-    <h5>
-      <span
-        ><span>Course: </span>{{ course.CourseName }} - {{ course.Course }}
+    <h5 translate>
+      Course<span
+        >: {{ course.CourseName }} -
+        {{ course.Course }}
       </span>
     </h5>
     <div class="form-group form-check">
@@ -40,7 +41,7 @@
         >
           Save
         </button>
-        <label for="floatingCourseName">Course Name</label>
+        <label for="floatingCourseName" translate>Course_Name</label>
       </div>
     </div>
     <div class="col-md-6">
@@ -52,32 +53,37 @@
           disabled
           [value]="course.Course"
         />
-        <label for="floatingCourseCode">Course Code</label>
+        <label for="floatingCourseCode" translate>Course_Code</label>
       </div>
     </div>
   </div>
   <div class="row">
     <div class="col-md-4">
-      <h5>Assignments</h5>
+      <h5 translate>Assignments</h5>
       <button
         class="btn btn-primary w-100"
         (click)="openCreateAssignmentModal()"
+        translate
       >
-        Create Assignment
+        Create_Assignment
       </button>
     </div>
     <div class="col-md-4">
-      <h5>Members</h5>
-      <button class="btn btn-primary w-100" (click)="openHandleUsersModal()">
-        Handle Members
+      <h5 translate>Members</h5>
+      <button
+        class="btn btn-primary w-100"
+        (click)="openHandleUsersModal()"
+        translate
+      >
+        Handle_Members
       </button>
     </div>
     <div class="col-md-4">
-      <h5>Testfile Template</h5>
+      <h5 translate>Testfile_Template</h5>
       <a href="assets/test_template.py">
         <button class="btn btn-primary w-100">
           <i class="fas fa-download"></i>
-          Downlaod Template
+          <span translate>Download_Template</span>
         </button>
       </a>
     </div>
