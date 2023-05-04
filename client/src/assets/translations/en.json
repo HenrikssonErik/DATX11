@@ -109,5 +109,18 @@
   "Leave_a_comment": "Leave_a_comment",
   "Pass": "Pass",
   "Fail": "Fail",
-  "No_assignments_found": "No Assignments Found"
+  "No_assignments_found": "No Assignments Found",
+  "Handle_Users_In": "Handle Users In",
+  "Add_CSV": "Add CSV",
+  "Submit": "Submit",
+  "Name": "Name",
+  "Role": "Role",
+  "Create_Assignment_For": "Create Assignment For:",
+  "Assignment_Name": "Assignment Name",
+  "Max_Score": "Max Score:",
+  "Pass/Fail": "Pass/Fail",
+  "Number_Of_Files_Needed_In_Submission": "Number of files needed in submission",
+  "Submission_File_Names": "Submission File Names",
+  "Upload_Unit_Test_For_This_Assignment": "Upload unit test for this assignment",
+  "Create_Assignment": "Create Assignment"
 }
