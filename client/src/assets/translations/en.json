@@ -122,5 +122,10 @@
   "Number_Of_Files_Needed_In_Submission": "Number of files needed in submission",
   "Submission_File_Names": "Submission File Names",
   "Upload_Unit_Test_For_This_Assignment": "Upload unit test for this assignment",
-  "Create_Assignment": "Create Assignment"
+  "Create_Assignment": "Create Assignment",
+  "Course": "Course",
+  "Handle_Members": "Handle_Members",
+  "Members": "Members",
+  "Testfile_Template": "Testfile Template",
+  "Download_Template": "Download Template"
 }
