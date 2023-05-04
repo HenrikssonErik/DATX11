@@ -98,10 +98,8 @@ def get_test_filenames(course: int, assignment: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query = """SELECT filename FROM testfiles
-                        WHERE courseId   = %s
-                        AND assignment = %s
-                        """
+                query = """SELECT fileName FROM TestFiles WHERE courseId = %s
+                AND assignment = %s"""
 
                 cur.execute(query, (course, assignment))
                 data = cur.fetchall()
@@ -318,9 +316,8 @@ def get_test_file(course: int, assignment: int, file_name: str):
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
-            query_data = """SELECT FileData FROM testFiles
-                        WHERE fileName   = %s AND courseId = %s
-                        AND assignment = %s"""
+            query_data = """SELECT FileData FROM testFiles WHERE fileName = %s
+            AND courseId = %s AND assignment = %s"""
             cur.execute(query_data, (('test_' + file_name), course,
                                      assignment))
             data = cur.fetchone()

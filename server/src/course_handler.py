@@ -143,8 +143,8 @@ def _create_course(course_name: str, course_abbr: str, year: int,
         with conn:
             with conn.cursor() as cur:
                 query_one = """Insert into Courses
-                                (coursename, course, teachingperiod,
-                                courseyear) values (%s,%s,%s,%s) """
+                                (courseName, course, teachingPeriod,
+                                courseYear) values (%s,%s,%s,%s) """
                 cur.execute(query_one, [course_name, course_abbr,
                                         teaching_period, year])
 
@@ -221,8 +221,8 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT assignment, enddate, Description, Name
-                FROM assignments WHERE courseid = %s"""
+                query_data = """SELECT assignment, endDate, description, name
+                FROM Assignments WHERE courseid = %s"""
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()

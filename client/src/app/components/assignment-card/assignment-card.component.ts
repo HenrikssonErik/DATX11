@@ -9,10 +9,10 @@ import { ToastrResponseService } from 'src/app/services/toastr-response.service'
 
 @Component({
   selector: 'app-assignemnt-card',
-  templateUrl: './assignemnt-card.component.html',
-  styleUrls: ['./assignemnt-card.component.scss'],
+  templateUrl: './assignment-card.component.html',
+  styleUrls: ['./assignment-card.component.scss'],
 })
-export class AssignemntCardComponent {
+export class AssignmentCardComponent {
   Files: File[] = [];
   fileDropEl!: ElementRef;
   allowedFileTypes = ['text/x-python'];
@@ -115,6 +115,10 @@ export class AssignemntCardComponent {
   }
 
   onSubmit() {
+    console.log(this.form.get('editMode')?.value);
+    this.editToggle();
+    this.form.controls['editMode'].setValue(false);
+
     if (this.Files.length > 0) {
       this.changeTests();
     }
