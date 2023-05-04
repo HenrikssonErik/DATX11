@@ -128,16 +128,13 @@ def update_pwd_in_db(cid: str, pwd: bytes):
                     cid
                 ))
 
-                if cur.rowcount == 0:  # Does this work?
-                    print("In if-statement in update_pwd_query")
+                if cur.rowcount == 0:
                     status = 'user_not_found'
                     res_code = 406
                 else:
-                    print("In else in update_pwd_query")
                     status = 'success'
                     res_code = 200
             except Exception:
-                print("In exception in update_pwd_query")
                 status = 'uncaught_error'
                 res_code = 500
     conn.close()
