@@ -1,9 +1,127 @@
---The order of tables must change to able create entire database from this file
--- without entering each tavle/view one by one
+--Will clear the whole database, be careful!!
+/*
+\c hydrant	
+\set QUIT true
+SET client_min_messages TO WARNING;
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO postgres;
+\set QUIET false
+*/
+------------------------------------------------------------------------------
+CREATE TABLE UserData (
+	userId SERIAL NOT NULL,
+	cid TEXT UNIQUE NOT NULL,
+	email TEXT UNIQUE NOT NULL,
+	passphrase BYTEA,
+	verified BOOLEAN NOT NULL DEFAULT FALSE,
+	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher', 'Admin')),
+	fullName TEXT NOT NULL,
+	PRIMARY KEY (userId),
+	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
+	);
 
----------------------
----------------------
--- CourseInstance, group and lab assignment and submission should be primary key here
+
+------------------------------------------------------------------------------
+--USE courseId as foreign key in assignment files and lab tests,what should be used as primarykey?
+CREATE TABLE Courses (
+	courseId SERIAL PRIMARY KEY,
+	courseName TEXT NOT NULL,
+	course Char(6) NOT NULL,
+	teachingPeriod INTEGER NOT NULL,
+	courseYear INTEGER NOT NULL,
+	CHECK (teachingPeriod BETWEEN 1 AND 5),
+	UNIQUE ( course, teachingPeriod, courseYear)
+);
+
+
+------------------------------------------------------------------------------
+CREATE TABLE Assignments(
+	courseId SERIAL NOT NULL,
+	assignment INTEGER NOT NULL CHECK (assignment > 0),
+	endDate DATE NOT NULL,
+	description TEXT NOT NULL DEFAULT '',
+	name TEXT NOT NULL DEFAULT '',
+	maxScore INT DEFAULT 1,
+	passScore INT DEFAULT 1,
+	PRIMARY KEY (courseId, assignment),
+	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (courseId) 
+			REFERENCES Courses(courseId) 
+			ON DELETE CASCADE 
+			ON UPDATE CASCADE
+);
+
+CREATE OR REPLACE FUNCTION set_assignment_number_assignments()
+RETURNS TRIGGER AS $$
+DECLARE
+    max_assignment INTEGER;
+BEGIN
+    IF NEW.assignment = 0 THEN
+        SELECT COALESCE(MAX(assignment), 0) + 1 INTO max_assignment
+        FROM Assignments
+        WHERE courseId = NEW.courseId;
+        IF max_assignment > 0 THEN
+            NEW.assignment := max_assignment;
+        ELSE
+            SELECT COALESCE(MAX(assignment), 0) + 1 INTO NEW.assignment
+            FROM Assignments
+            WHERE courseId = NEW.courseId;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER increment_assignment_assignments
+BEFORE INSERT ON Assignments
+FOR EACH ROW
+EXECUTE FUNCTION set_assignment_number_assignments();
+
+
+------------------------------------------------------------------------------
+CREATE TABLE Groups (
+	groupId SERIAL PRIMARY KEY,
+	groupNumber INTEGER NOT NULL,
+	course INTEGER NOT NULL,
+	UNIQUE (groupNumber, course),
+	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (course) 
+	REFERENCES Courses(courseid) 
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+);
+
+
+------------------------------------------------------------------------------
+--for unittests
+CREATE TABLE TestFiles (
+	courseId SERIAL NOT NULL,
+	assignment INTEGER NOT NULL, 
+	filename TEXT NOT NULL,
+	fileData BYTEA NOT NULL,
+	PRIMARY KEY(courseId, assignment, fileName),
+	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
+		REFERENCES Assignments(courseId, assignment) 
+		ON UPDATE CASCADE 
+		ON DELETE CASCADE
+);
+
+
+------------------------------------------------------------------------------
+CREATE TABLE FileNames (
+	nameId SERIAL NOT NULL,
+	courseId SERIAL NOT NULL,
+	assignment INTEGER NOT NULL, 
+	filename TEXT NOT NULL,
+	UNIQUE (courseId, assignment, filename),
+	PRIMARY KEY(nameId),
+	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
+		REFERENCES Assignments(courseId, assignment) 
+		ON UPDATE CASCADE 
+		ON DELETE CASCADE
+);
+
+
+------------------------------------------
 CREATE TABLE AssignmentFeedback (
     groupId INTEGER NOT NULL,
     courseId SERIAL NOT NULL,  
@@ -13,7 +131,10 @@ CREATE TABLE AssignmentFeedback (
     teacherFeedback TEXT,
     testPass BOOLEAN NOT NULL DEFAULT FALSE,
     teacherGrade BOOLEAN,
-	feedbackDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'), 
+	feedbackDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'),
+	createdDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'),
+	score INT DEFAULT 0,
+	userId INT,
     PRIMARY KEY (groupId, courseId, assignment, submission),
     CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId)
         REFERENCES groups(groupId)
@@ -22,7 +143,11 @@ CREATE TABLE AssignmentFeedback (
     CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
         REFERENCES assignments(courseid, assignment)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+	CONSTRAINT constraint_userId_fkey FOREIGN KEY (userId)
+		REFERENCES userdata(userId)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE	
 );
 
 CREATE OR REPLACE FUNCTION set_submission_number_assignmentfeedback()
@@ -55,15 +180,15 @@ BEFORE INSERT ON AssignmentFeedback
 FOR EACH ROW
 EXECUTE FUNCTION set_submission_number_assignmentfeedback();
 
+
 ------------------------------------------------------------------------------
-CREATE Table AssignmentFiles (
+CREATE TABLE AssignmentFiles (
 		groupId INTEGER NOT NULL, 
 		courseId SERIAL NOT NULL,
 		assignment INTEGER NOT NULL,
 		submission SERIAL NOT NULL,
 		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
-		fileType TEXT,
 		submissionDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'), 
 		PRIMARY KEY(groupId, courseId, assignment, fileName, submission),
 		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
@@ -109,109 +234,6 @@ BEFORE INSERT ON AssignmentFiles
 FOR EACH ROW
 EXECUTE FUNCTION set_submission_number_assignmentfiles();
 
-------------------------------------------------------------------------------
---USE courseId as foring key in assignment files and lab tests,what should be used as primarykey?
-CREATE Table Courses (
-	courseId SERIAL PRIMARY KEY,
-	courseName TEXT NOT NULL,
-	course Char(6) NOT NULL,
-	teachingPeriod INTEGER NOT NULL,
-	courseYear INTEGER NOT NULL,
-	CHECK (teachingPeriod BETWEEN 1 AND 5),
-	UNIQUE ( course, teachingPeriod, courseYear)
-);
-
-------------------------------------------------------------------------------
-CREATE Table Assignments(
-	courseId SERIAL NOT NULL,
-	assignment INTEGER NOT NULL CHECK (assignment > 0),
-	endDate DATE NOT NULL,
-	description TEXT NOT NULL DEFAULT '',
-	name TEXT NOT NULL DEFAULT '',
-	PRIMARY KEY (courseId, assignment),
-	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (courseId) 
-			REFERENCES Courses(courseId) 
-			ON DELETE CASCADE 
-			ON UPDATE CASCADE
-);
-
-CREATE OR REPLACE FUNCTION set_assignment_number_assignments()
-RETURNS TRIGGER AS $$
-DECLARE
-    max_assignment INTEGER;
-BEGIN
-    IF NEW.assignment = 0 THEN
-        SELECT COALESCE(MAX(assignment), 0) + 1 INTO max_assignment
-        FROM Assignments
-        WHERE courseId = NEW.courseId;
-        IF max_assignment > 0 THEN
-            NEW.assignment := max_assignment;
-        ELSE
-            SELECT COALESCE(MAX(assignment), 0) + 1 INTO NEW.assignment
-            FROM Assignments
-            WHERE courseId = NEW.courseId;
-        END IF;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER increment_assignment_assignments
-BEFORE INSERT ON Assignments
-FOR EACH ROW
-EXECUTE FUNCTION set_assignment_number_assignments();
-
-------------------------------------------------------------------------------
---for unittests
-CREATE Table TestFiles (
-	courseId SERIAL NOT NULL,
-	assignment INTEGER NOT NULL, 
-	filename TEXT NOT NULL,
-	fileData BYTEA NOT NULL,
-	PRIMARY KEY(courseId, assignment, fileName),
-	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
-		REFERENCES Assignments(courseId, assignment) 
-		ON UPDATE CASCADE 
-		ON DELETE CASCADE
-);
-------------------------------------------------------------------------------
-CREATE Table FileNames (
-	nameId SERIAL NOT NULL,
-	courseId SERIAL NOT NULL,
-	assignment INTEGER NOT NULL, 
-	filename TEXT NOT NULL,
-	UNIQUE (courseId, assignment, filename),
-	PRIMARY KEY(nameId),
-	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
-		REFERENCES Assignments(courseId, assignment) 
-		ON UPDATE CASCADE 
-		ON DELETE CASCADE
-);
-
-------------------------------------------------------------------------------
-CREATE TABLE UserData (
-	userId SERIAL NOT NULL,
-	cid TEXT UNIQUE NOT NULL,
-	email TEXT UNIQUE NOT NULL,
-	passphrase BYTEA,
-	verified BOOLEAN NOT NULL DEFAULT FALSE,
-	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher', 'Admin')),
-	fullName TEXT NOT NULL,
-	PRIMARY KEY (userId),
-	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
-	);
-
-------------------------------------------------------------------------------
-CREATE TABLE Groups (
-	groupId SERIAL PRIMARY KEY,
-	groupNumber INTEGER NOT NULL,
-	course INTEGER NOT NULL,
-	UNIQUE (groupNumber, course),
-	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (course) 
-	REFERENCES Courses(courseid) 
-	ON DELETE CASCADE 
-	ON UPDATE CASCADE,
-);
 
 ------------------------------------------------------------------------------
 CREATE TABLE UserInGroup (
@@ -228,6 +250,7 @@ CREATE TABLE UserInGroup (
 		ON UPDATE CASCADE
 );
 
+
 ------------------------------------------------------------------------------
 CREATE TABLE UserInCourse (
 	userId INTEGER,
@@ -243,6 +266,7 @@ CREATE TABLE UserInCourse (
 		ON DELETE CASCADE 
 		ON UPDATE CASCADE
 );
+
 
 ------------------------------------------------------------------------------
 --View for user and course data can be called for course inf from specific user:

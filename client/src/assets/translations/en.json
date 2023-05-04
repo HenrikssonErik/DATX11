@@ -81,5 +81,8 @@
   "Hydrant_Change_Password": "Change Your Password",
   "Change_pwd": "Change Password",
   "New_pwd": "new password",
-  "Ver_pwd": "verify password"
+  "Ver_pwd": "verify password",
+  "Test_Files": "Current Test Files:",
+  "Upload_Tests": "Upload Test (replaces file with same name)",
+  "No_Tests": "No Test Files Uploaded"
 }

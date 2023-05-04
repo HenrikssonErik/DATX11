@@ -93,6 +93,28 @@ def get_filenames(course: int, assignment: int) -> tuple:
         return ()
 
 
+def get_test_filenames(course: int, assignment: int) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query = """SELECT fileName FROM TestFiles WHERE courseId = %s
+                AND assignment = %s"""
+
+                cur.execute(query, (course, assignment))
+                data = cur.fetchall()
+                names = []
+                for name in data:
+                    names.append(name[0].split("test_", 1)[1])
+
+        conn.close()
+        return names
+
+    except Exception as e:
+        print(e)
+        raise Exception("Could not get test file names") from e
+
+
 def save_to_temp_and_database(
         files: list[FileStorage],
         response_items: dict,
@@ -233,7 +255,6 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
                     VALUES (%s, %s, %s, %s, %s, 0);
                     """
 
-
             cur.execute(
                 query,
                 (
@@ -287,6 +308,23 @@ def get_assignment_test_feedback_from_database(
     conn.close()
 
     return data, 200
+
+
+def get_test_file(course: int, assignment: int, file_name: str):
+    """Retrieves file from database"""
+
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            query_data = """SELECT FileData FROM testFiles WHERE fileName = %s
+            AND courseId = %s AND assignment = %s"""
+            cur.execute(query_data, (('test_' + file_name), course,
+                                     assignment))
+            data = cur.fetchone()
+    conn.close()
+
+    file_binary = io.BytesIO(data[0].tobytes())
+    return file_binary
 
 
 def get_assignment_files_from_database(

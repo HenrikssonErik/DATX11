@@ -81,5 +81,8 @@
   "Hydrant_Change_Password": "Ändra Ditt Lösenord",
   "Change_pwd": "Ändra Lösenord",
   "New_pwd": "nytt lösenord",
-  "Ver_pwd": "verifiera lösenord"
+  "Ver_pwd": "verifiera lösenord",
+  "Test_Files": "Nuvarande Testfiler:",
+  "Upload_Tests": "Ladda Upp Test (ersätter fil med samma namn)",
+  "No_Tests": "Inga Uppladdade Testfiler"
 }
