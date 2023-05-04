@@ -73,5 +73,8 @@
   "Click_here_verification": "Klicka här",
   "Upload_File": "Ladda upp fil",
   "Groups_Tab": "Grupper",
-  "Edit_Mode": "Redigerings läge"
+  "Edit_Mode": "Redigerings läge",
+  "Test_Files": "Nuvarande Testfiler:",
+  "Upload_Tests": "Ladda Upp Test (ersätter fil med samma namn)",
+  "No_Tests": "Inga Uppladdade Testfiler"
 }

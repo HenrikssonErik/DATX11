@@ -143,8 +143,8 @@ def _create_course(course_name: str, course_abbr: str, year: int,
         with conn:
             with conn.cursor() as cur:
                 query_one = """Insert into Courses
-                                (coursename, course, teachingperiod, courseyear)
-                                values (%s,%s,%s,%s) """
+                                (courseName, course, teachingPeriod,
+                                courseYear) values (%s,%s,%s,%s) """
                 cur.execute(query_one, [course_name, course_abbr,
                                         teaching_period, year])
 
@@ -221,8 +221,8 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT assignment, enddate, Description, Name FROM " +\
-                    "assignments WHERE courseid = %s"
+                query_data = """SELECT assignment, endDate, description, name
+                FROM Assignments WHERE courseid = %s"""
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
@@ -260,9 +260,10 @@ def change_description(new_desc: str, course_id: int,
     except Exception as e:
         print(e)
         return {'status': "No Courses Found"}
-    
+
+
 def change_assignment_name(new_name: str, course_id: int,
-                       assignment: int) -> dict | None:
+                           assignment: int) -> dict | None:
     """ Changes the description for the a assignment"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -307,9 +308,9 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
         with conn:
             with conn.cursor() as cur:
                 query_one = """UPDATE AssignmentFeedback SET
-                teacherFeedback = %s, teacherGrade = %s, 
-                feedbackdate = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm')
-                WHERE groupId = %s AND courseId = %s 
+                teacherFeedback = %s, teacherGrade = %s,
+                feedbackdate = (CURRENT_TIMESTAMP AT TIME ZONE
+                'Europe/Stockholm') WHERE groupId = %s AND courseId = %s
                 AND submission = %s AND assignment = %s;"""
                 cur.execute(query_one, [feedback, grade, group_id, course,
                                         submission, assignment])
@@ -437,7 +438,7 @@ def get_course_groups(course: int):
                 data = cur.fetchall()
                 group_list = []
                 if not data:
-                    return {}
+                    return []
                 for row in data:
                     group_dict = {
                         "groupNumber": row[0],
@@ -451,7 +452,7 @@ def get_course_groups(course: int):
         print(e)
         raise Exception("Error when getting course groups") from e
 
-# TODO:check so the query has the intended effect
+
 def get_assignment_overview(course: int, assignment: int) -> list[dict]:
     """Returns a list with test status and grade for all the latest
     submissions for a assignment"""

@@ -33,6 +33,22 @@ label {
   font-weight: 600;
 }
 
+p {
+  font-size: small;
+  margin-bottom: 3px;
+  padding-top: -5px;
+  font-weight: 600;
+}
+
+.files {
+  font-size: small;
+  margin-bottom: 3px;
+  padding-top: -5px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 #description {
   height: auto;
 }

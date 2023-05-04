@@ -1,7 +1,7 @@
 <div class="card" [formGroup]="form">
   <div class="header">
     <h5>
-      <span>Assignment </span> <span>{{ Assignment.AssignmentNr }}</span>
+      <span translate>Assignment {{ Assignment.AssignmentNr }}</span>
     </h5>
     <div class="form-group form-check">
       <input
@@ -25,7 +25,7 @@
           id="floatingAssignmentName"
           formControlName="AssignmentName"
         />
-        <label for="floatingAssignmentName">Assignment Name</label>
+        <label for="floatingAssignmentName" translate>Assignment_Name</label>
       </div>
     </div>
     <div class="row">
@@ -37,12 +37,16 @@
             id="Date"
             formControlName="Date"
           />
-          <label for="Date">Due Date</label>
+          <label for="Date" translate>Due_Date</label>
         </div>
       </div>
       <div class="col-md-7">
-        <label for="formFile" class="form-label" style="font-size: small"
-          >Replace tests (replaces file with same name)</label
+        <label
+          for="formFile"
+          class="form-label"
+          style="font-size: small"
+          translate
+          >Upload_Tests (replaces file with same name)</label
         >
         <input
           class="form-control"
@@ -56,6 +60,13 @@
       <!-- add (change)="fileBrowseHandler($event)"  to input-->
     </div>
     <div class="row">
+      <p translate>Test_Files</p>
+      <div class="col" *ngFor="let file of filenames">
+        <p class="files" (click)="downloadTest(file)">{{ file }} &#x2193;</p>
+      </div>
+      <div *ngIf="filenames.length == 0"><p translate>No_Tests</p></div>
+    </div>
+    <div class="row">
       <div class="col-12">
         <div class="form-floating">
           <textarea
@@ -63,7 +74,7 @@
             id="description"
             formControlName="Description"
           ></textarea>
-          <label for="description">Description</label>
+          <label for="description" translate>Description</label>
         </div>
       </div>
     </div>
@@ -72,6 +83,7 @@
       *ngIf="form.get('editMode')?.value"
       class="btn btn-primary mt-2"
       (click)="onSubmit()"
+      translate
     >
       Save
     </button>

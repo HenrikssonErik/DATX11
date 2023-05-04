@@ -8,15 +8,16 @@ import { API_URL } from 'src/environments/environment';
 import { ToastrResponseService } from 'src/app/services/toastr-response.service';
 
 @Component({
-  selector: 'app-assignemnt-card',
-  templateUrl: './assignemnt-card.component.html',
-  styleUrls: ['./assignemnt-card.component.scss'],
+  selector: 'app-assignment-card',
+  templateUrl: './assignment-card.component.html',
+  styleUrls: ['./assignment-card.component.scss'],
 })
-export class AssignemntCardComponent {
+export class AssignmentCardComponent {
   Files: File[] = [];
   fileDropEl!: ElementRef;
   allowedFileTypes = ['text/x-python'];
   formatedDate!: string;
+  filenames: string[] = [];
 
   headers = new HttpHeaders()
     .append('Cookies', document.cookie)
@@ -45,6 +46,17 @@ export class AssignemntCardComponent {
 
     this.form.get('Date')?.setValue(this.formatedDate);
     this.form.get('Description')?.setValue(this.Assignment.Description);
+    this.courseService
+      .getTestFileNames(this.courseID, this.Assignment.AssignmentNr)
+      .subscribe({
+        next: (response: string[]) => {
+          console.log(response);
+          this.filenames = response;
+        },
+        error: (error: any) => {
+          this.toastr.error('', error.error);
+        },
+      });
   }
 
   formatDate(dateObj: Date): string {
@@ -103,6 +115,10 @@ export class AssignemntCardComponent {
   }
 
   onSubmit() {
+    console.log(this.form.get('editMode')?.value);
+    this.editToggle();
+    this.form.controls['editMode'].setValue(false);
+
     if (this.Files.length > 0) {
       this.changeTests();
     }
@@ -243,6 +259,51 @@ export class AssignemntCardComponent {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+        },
+      });
+  }
+
+  downloadTest(filename: string): void {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    this.http
+      .post(
+        `${API_URL}/DownloadTestFile`,
+
+        // replace fixed values with dynamic user input, when that is implemented
+        {
+          course: this.courseID,
+          assignment: this.Assignment.AssignmentNr,
+          filename: filename,
+        },
+        {
+          observe: 'response',
+          responseType: 'blob',
+          headers,
+        }
+      )
+      .subscribe({
+        next: (response) => {
+          const contentDispositionHeader = response.headers.getAll(
+            'Content-Disposition'
+          )![0];
+          const filename = contentDispositionHeader
+            .split(';')[1]
+            .split('=')[1]
+            .replace(/"/g, '')
+            .trim();
+          var file = new File([response.body!], 'test');
+
+          const url = URL.createObjectURL(file);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          link.click();
+        },
+        error: (err) => {
+          this.toastr.error('Could Not Download');
         },
       });
   }
