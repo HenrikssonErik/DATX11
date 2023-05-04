@@ -100,5 +100,22 @@
   "Grade_Again": "Grade Again",
   "Test_Files": "Current Test Files:",
   "Upload_Tests": "Upload Test (replaces file with same name)",
-  "No_Tests": "No Test Files Uploaded"
+  "No_Tests": "No Test Files Uploaded",
+  "Grading": "Grading",
+  "Ascending": "Ascending",
+  "Descending": "Descending",
+  "Graded_Passed": "Graded: Passed",
+  "Not_Graded": "Not Graded",
+  "Graded_Failed": "Graded_Failed",
+  "Graded_By": "Graded By",
+  "Grade": "Grade",
+  "Passed": "Passed",
+  "Not_Passed": "Not Passed",
+  "Score": "Score",
+  "Comment": "Comment",
+  "Group_Members": "Group Members",
+  "Leave_a_comment": "Leave_a_comment",
+  "Pass": "Pass",
+  "Fail": "Fail",
+  "No_assignments_found": "No Assignments Found"
 }
