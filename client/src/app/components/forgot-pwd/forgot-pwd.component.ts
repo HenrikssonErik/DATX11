@@ -102,7 +102,6 @@ export class ForgotPwdComponent implements OnInit {
         'Make sure the passwords are the same.',
         'Nonidentical passwords!'
       );
-      console.log('pass: ', pass.value, ' | verPass: ', verificationPass.value);
       return;
     }
 
