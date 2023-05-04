@@ -75,5 +75,11 @@
   "Groups_Tab": "Grupper",
   "Edit_Mode": "Redigerings läge",
   "Forgot_pwd_title": "Glömt lösenord",
-  "Forgot_pwd_btn": "Skicka återställningsmail"
+  "Forgot_pwd_btn": "Skicka återställningsmail",
+  "New_password": "Skriv nytt lösenord",
+  "Password_verify": "Verifiera det nya lösenordet",
+  "Hydrant_Change_Password": "Ändra Ditt Lösenord",
+  "Change_pwd": "Ändra Lösenord",
+  "New_pwd": "nytt lösenord",
+  "Ver_pwd": "verifiera lösenord"
 }
