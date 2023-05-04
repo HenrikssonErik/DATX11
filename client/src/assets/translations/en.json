@@ -137,5 +137,11 @@
   "Testfile_Template": "Testfile Template",
   "Download_Template": "Download Template",
   "Forgot_pwd_title": "Forgot Password",
-  "Forgot_pwd_btn": "Send reset password email"
+  "Forgot_pwd_btn": "Send reset password email",
+  "New_password": "Enter new password",
+  "Password_verify": "Verify new password",
+  "Hydrant_Change_Password": "Change Your Password",
+  "Change_pwd": "Change Password",
+  "New_pwd": "new password",
+  "Ver_pwd": "verify password"
 }

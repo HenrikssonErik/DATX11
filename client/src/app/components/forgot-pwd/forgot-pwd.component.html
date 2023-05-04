@@ -2,10 +2,10 @@
 <div class="container text-muted">
   <div class="row" style="margin-top: 50px">
     <div class="col-md-6 col-12 d-flex justify-content-center">
-      <div *ngIf="tokenValid | async; else tokenInvalid" style="max-width: 80%">
+      <div *ngIf="tokenValid | async; else tokenInvalid" style="min-width: 60%">
         <form (ngSubmit)="onNewPassword()" [formGroup]="passwordForm">
           <h3 class="text-center text-muted mb-4" translate>
-            Hydrant Change Password
+            Hydrant_Change_Password
           </h3>
           <div class="form-group mb-3">
             <label for="cid" class="text-muted">Chalmers ID (CID)</label>
@@ -20,13 +20,15 @@
             />
           </div>
           <div class="form-group mb-3">
-            <label for="password" class="text-muted" translate>Password</label>
+            <label for="password" class="text-muted" translate
+              >New_password</label
+            >
             <div class="input-group">
               <input
                 type="password"
                 formControlName="password"
                 class="form-control"
-                placeholder="{{ 'Password' | translate }}"
+                placeholder="{{ 'New_pwd' | translate }}"
                 id="password"
                 (focus)="onInputFocus('password', passwordForm)"
               />
@@ -50,7 +52,7 @@
                 formControlName="verifyPassword"
                 class="form-control focus-border"
                 id="verPass"
-                placeholder="{{ 'Password_verify' | translate }}"
+                placeholder="{{ 'Ver_pwd' | translate }}"
                 (focus)="onInputFocus('verifyPassword', passwordForm)"
                 required
               />
