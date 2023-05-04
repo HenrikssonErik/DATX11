@@ -1,5 +1,7 @@
 
 
+import jwt
+from flask_mail import Mail, Message
 from typing import Literal
 from flask import Flask, Response, jsonify, make_response, render_template, \
     request, send_file
@@ -10,11 +12,10 @@ from .file_handler import handle_files, \
     get_assignment_test_feedback_from_database
 from . import user_handler
 from . import course_handler
-from .login_handler import new_password, user_registration, log_in, create_key, \
-    user_to_resend_verification_email, user_to_send_reset_pwd_email, verify_and_get_cid, \
-    verify_and_get_id, create_temp_users
-from flask_mail import Mail, Message
-import jwt
+from .login_handler import new_password, user_registration, log_in, \
+    create_key, user_to_resend_verification_email, \
+    user_to_send_reset_pwd_email, verify_and_get_cid, verify_and_get_id, \
+    create_temp_users
 # from .podman.podman_runner import init_images
 
 # init basic image
