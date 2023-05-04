@@ -20,7 +20,7 @@ import { Group } from 'src/app/models/group';
 })
 export class AssignmentsComponent implements OnInit {
   course: Course = {} as Course;
-  selectedTab: number = 0;
+  selectedTab: number = -2;
   //group!: Group;
   courseGroups: Group[] = [];
 
