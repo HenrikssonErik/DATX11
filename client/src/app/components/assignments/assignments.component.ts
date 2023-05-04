@@ -20,10 +20,10 @@ import { Group } from 'src/app/models/group';
 })
 export class AssignmentsComponent implements OnInit {
   course: Course = {} as Course;
-  selectedTab: number = 0;
+  selectedTab: number = -2;
   //group!: Group;
   courseGroups: Group[] = [];
-  fileNames: String[] = [];
+  fileNames: any = {}; //String[] = [];
   myGroup?: Group;
   isLoadingMap: Map<number, boolean> = new Map<number, boolean>();
   createGroupLoader: boolean = false;
@@ -50,13 +50,13 @@ export class AssignmentsComponent implements OnInit {
           //TODO: Move admins to "gradeing" tab. Ugly but wokrs for now
           this.selectedTab = -3;
         }
-      this.getFileNames()
+        //this.getFileNames();
       });
     }
 
     this.groupService.getMyGroup(id).subscribe((res) => {
       this.myGroup = res;
-      console.log(res);
+      //console.log(res);
     });
 
     /*this.groupService.getMyGroup(id).subscribe((res) => {
@@ -75,16 +75,35 @@ export class AssignmentsComponent implements OnInit {
     return this.course.Role === 'Admin' || this.course.Role === 'Teacher';
   }
 
-  getFileNames(): String[]{
-    this.courseService.getFileNames(this.course.courseID, this.course.Assignments[this.selectedTab].AssignmentNr).subscribe((res: String[]) => {
-      this.fileNames = res;
-    });
-    return this.fileNames
+  getFileNames(tab: number) {
+    this.fileNames = [];
+    console.log('tab:', this.selectedTab);
+    if (this.selectedTab >= 0) {
+      console.log(
+        'in if, with assig:',
+        this.course.Assignments[this.selectedTab].AssignmentNr,
+        'tab:',
+        this.selectedTab
+      );
+      this.submissionService
+        .getFileNames(
+          this.course.courseID,
+          this.course.Assignments[tab].AssignmentNr
+        )
+        .subscribe((res) => {
+          console.log('list?:', res);
+          this.fileNames = res['Filenames'];
+          //console.log(this.fileNames);
+        });
+
+      console.log('finaly list', this.fileNames);
+    }
   }
 
   onTabSelect(tabNumber: number): void {
+    console.log('changing tab');
     this.selectedTab = tabNumber;
-    this.getFileNames()
+    this.getFileNames(tabNumber);
   }
 
   goBack(): void {
