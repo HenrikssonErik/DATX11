@@ -2,7 +2,7 @@
 <div class="modal-content">
   <div class="modal-header">
     <h4 class="modal-title text-muted" translate>
-      Handle Users in {{ course.Course }}
+      Handle_Users_In <span>{{ course.Course }}</span>
     </h4>
     <i
       class="fa-solid fa-xmark close"
@@ -11,9 +11,9 @@
   </div>
   <div class="modal-body">
     <div class="row form mb-3">
-      <div class="col-md-5">
+      <div class="col-md-6">
         <label for="file-upload" class="custom-file-upload">
-          <i class="fa fa-cloud-upload"> Add CSV</i>
+          <i class="fa fa-cloud-upload" translate> Add_CSV</i>
         </label>
         <input
           type="file"
@@ -24,6 +24,7 @@
           class="btn btn-primary w-20"
           [disabled]="csvData.length === 0"
           (click)="submitCSV()"
+          translate
         >
           Submit
         </button>
@@ -43,6 +44,7 @@
           class="btn btn-primary w-20"
           [disabled]="newCid === ''"
           (click)="submitCid()"
+          translate
         >
           Submit
         </button>
@@ -64,13 +66,13 @@
         <li class="list-group-item">
           <div class="row">
             <div class="col-md-5">
-              <p style="font-weight: bold">Name</p>
+              <p style="font-weight: bold" translate>Name</p>
             </div>
             <div class="col-md-3">
-              <p style="font-weight: bold">Cid</p>
+              <p style="font-weight: bold">CID</p>
             </div>
             <div class="col-md-3">
-              <p style="font-weight: bold">Role</p>
+              <p style="font-weight: bold" translate>Role</p>
             </div>
           </div>
         </li>
@@ -99,6 +101,7 @@
                 <option
                   value="Teacher"
                   [selected]="user.role === 'Teacher' ? true : false"
+                  translate
                 >
                   Teacher
                 </option>

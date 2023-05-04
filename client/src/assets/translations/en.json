@@ -117,5 +117,10 @@
   "Leave_a_comment": "Leave_a_comment",
   "Pass": "Pass",
   "Fail": "Fail",
-  "No_assignments_found": "No Assignments Found"
+  "No_assignments_found": "No Assignments Found",
+  "Handle_Users_In": "Handle Users In",
+  "Add_CSV": "Add CSV",
+  "Submit": "Submit",
+  "Name": "Name",
+  "Role": "Role"
 }

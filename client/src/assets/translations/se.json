@@ -116,5 +116,10 @@
   "Leave_a_comment": "Skriv En Kommentar",
   "Pass": "Godkänn",
   "Fail": "Underkänn",
-  "No_assignments_found": "Inga Inlämningar Hittades"
+  "No_assignments_found": "Inga Inlämningar Hittades",
+  "Handle_Users_In": "Hantera Användare I",
+  "Add_CSV": "Ladda Upp CSV",
+  "Submit": "Lägg Till",
+  "Name": "Namn",
+  "Role": "Roll"
 }
