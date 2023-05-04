@@ -265,58 +265,22 @@ def get_tests():
     """
     token = extract_token(request)
     user_id: int = verify_and_get_id(token)
-    
-    data = request.get_json()
-    course = data['course']
-    assignment = data['assignment']
-    filename = data['filename']
-    result = get_test_file(course, assignment, filename)
 
-    data = request.args
-    group_id = int(data['groupId'])
+    data = request.get_json()
     course = int(data['course'])
     assignment = int(data['assignment'])
     filename = data['filename']
-    submission = int(data['submission'])
     headers = {"Access-Control-Expose-Headers": "Content-Disposition",
                'Content-Disposition': 'attachment; filename={}'
                .format(filename)}
 
     if (user_handler.check_admin_or_course_teacher(user_id, course) or user_handler.get_group(user_id, course)['groupId'] == group_id):
 
-        result = get_assignment_file_from_database(
-                group_id, course, assignment, filename, submission)
+        result = get_test_file(course, assignment, filename)
 
         res = make_response(send_file(path_or_file=result,
-                                      download_name=filename,
-                                      as_attachment=True))
+                                      download_name=filename, as_attachment=True))
 
-        res.headers = headers
-        return res
-    else:
-        return make_response({'status': 'No_Access'}, 401)
-
-
-@app.route('/DownloadTestFile', methods=['POST'])
-def get_tests():
-    """
-    Takes in information from the frontend about a specific course assignment
-      test file to then return its file content.
-    Input data structure:
-    Returns a file to be downloaded
-    """
-    data = request.get_json()
-    course = data['course']
-    assignment = data['assignment']
-    filename = data['filename']
-    result = get_test_file(course, assignment, filename)
-
-    res = make_response(send_file(path_or_file=result,
-                                  download_name=filename, as_attachment=True))
-
-    headers = {"Access-Control-Expose-Headers": "Content-Disposition",
-               'Content-Disposition': 'attachment; filename={}'
-               .format(filename)}
     res.headers = headers
     return res
 
