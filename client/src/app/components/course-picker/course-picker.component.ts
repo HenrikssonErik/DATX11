@@ -45,7 +45,7 @@ export class CoursePickerComponent implements OnInit {
         (assignment) => new Date(assignment.DueDate) < now
       );
 
-      if (allAssignmentsPassed) {
+      if (allAssignmentsPassed && course.Year <= now.getFullYear()) {
         this.passedCourses.push(course);
       } else {
         this.currentCourses.push(course);
