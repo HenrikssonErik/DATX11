@@ -93,26 +93,24 @@ export class ForgotPwdComponent implements OnInit {
       return;
     }
 
-    if (pass != verificationPass) {
+    if (pass.value != verificationPass.value) {
       this.toastr.error(
         'Make sure the passwords are the same.',
         'Nonidentical passwords!'
       );
+      console.log('pass: ', pass.value, ' | verPass: ', verificationPass.value);
       return;
     }
 
     passForm.append('cid', cid.value);
+    passForm.append('token', this.token['token']);
     passForm.append('password', pass.value);
     passForm.append('verificationPassword', verificationPass.value);
 
     this.http
-      .post<HttpResponse<any>>(
-        `${API_URL}/new_pwd`,
-        { formData: passForm, token: this.token },
-        {
-          observe: 'response',
-        }
-      )
+      .post<HttpResponse<any>>(`${API_URL}/new_pwd`, passForm, {
+        observe: 'response',
+      })
       .subscribe({
         next: (response: any) => {
           console.log(response);

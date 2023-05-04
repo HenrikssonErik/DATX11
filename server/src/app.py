@@ -10,7 +10,7 @@ from .file_handler import handle_files, \
     get_test_file, get_filenames
 from . import user_handler
 from . import course_handler
-from .login_handler import user_registration, log_in, create_key, \
+from .login_handler import new_password, user_registration, log_in, create_key, \
     user_to_resend_verification_email, user_to_send_reset_pwd_email, verify_and_get_cid, \
     verify_and_get_id, create_temp_users
 from flask_mail import Mail, Message
@@ -142,6 +142,35 @@ def verify_email() -> Response:
 
 @app.route('/new_pwd', methods=['POST'])
 def update_password() -> Response:
+    data = request.form
+    token: str = data['token']
+    cid: str = data['cid']
+    password: str = data['password']
+    verification_password: str = data['verificationPassword']
+
+    try:
+        token_verification = verify_and_get_cid(token)
+    except:
+        return make_response({"status": "error"}, 400)
+
+    if not token_verification[1] == 200:
+        return make_response(token_verification)
+
+    if not cid == token_verification[0].get('cid'):
+
+        print('cid: ', cid, ' | token cid: ',
+              token_verification[0].get('cid'))
+        return make_response({"status": "not_matching_cid"}, 400)
+
+    if not password == verification_password:
+        print('pass: ', password, ' | verPass: ',
+              verification_password)
+        return make_response({"status": "not_matching_password"}, 400)
+
+    password_status = new_password(cid, password)
+
+    return make_response(password_status)
+
     return make_response({}, 200)
 
 

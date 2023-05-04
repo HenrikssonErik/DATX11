@@ -18,7 +18,7 @@ def create_key():
     or login/registration will fail
     """
     global __SECRET_KEY
-    __SECRET_KEY = random_string()
+    __SECRET_KEY = "g"  # random_string()
 
 
 def random_string() -> str:
@@ -99,12 +99,7 @@ def create_temp_users(cids: list[str]) -> list[str]:
     return newly_registered
 
 
-def new_password(token, password):
-
-    try:
-        cid: str = verify_and_get_cid(token)[0]['cid']
-    except Exception as e:
-        raise Exception("Invalid token") from e
+def new_password(cid, password):
 
     if not allowed_password(password):
         return {"status": "pass_not_ok"}, 400
@@ -365,15 +360,15 @@ def verify_and_get_cid(token: str) -> \
         else:
             return verification_response
 
-    except jwt.ExpiredSignatureError:
+    except jwt.ExpiredSignatureError as e:
         # If the token has expired, raise an exception
 
-        raise jwt.ExpiredSignatureError('Expired token')
+        raise jwt.ExpiredSignatureError('Expired token') from e
 
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
         # If the token is invalid, raise an exception
 
-        raise jwt.InvalidTokenError('Invalid token')
+        raise jwt.InvalidTokenError('Invalid token') from e
 
 
 def verify_user_in_db(cid: str) -> \
