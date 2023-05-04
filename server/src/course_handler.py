@@ -47,8 +47,8 @@ def get_courses_info(user_id: int) -> list[dict[str, str | int]]:
         for info in data:
             ordered_data.append({"Role": info[1], "courseID": info[2],
                                 "CourseName": info[3],
-                                 "Course": info[4], "Year": info[5],
-                                 "StudyPeriod": info[6],
+                                 "Course": info[4], "Year": info[6],
+                                 "StudyPeriod": info[5],
                                  'Assignments': get_assignments(info[2])})
         return ordered_data
 
