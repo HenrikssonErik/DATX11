@@ -117,8 +117,12 @@
       <ng-container
         *ngIf="gradeingSubmission.Submissions.length > 0; else noSubmissions"
       >
-        <ngb-accordion #submissionAccordion="ngbAccordion">
-          <ngb-panel *ngFor="let submission of gradeingSubmission.Submissions">
+        <ngb-accordion
+          #submissionAccordion="ngbAccordion"
+          *ngFor="let submission of gradeingSubmission.Submissions"
+          (panelChange)="getGroupMembers(submission.groupid)"
+        >
+          <ngb-panel>
             <ng-template ngbPanelTitle>
               <div class="titleAccordion">
                 <span translate
@@ -226,10 +230,14 @@
                 </div>
               </div>
 
-              <div class="row text-muted">
+              <div class="row">
                 <div class="col-auto">
                   <p class="header" translate>Group_Members</p>
-                  <p class="resultText">Malte Carlstedt</p>
+                  <div *ngFor="let member of groupMembers[submission.groupid]">
+                    <p class="resultText">
+                      {{ member }}
+                    </p>
+                  </div>
                 </div>
                 <div class="col-auto">
                   <p class="header" translate>Test_Result</p>
@@ -324,25 +332,26 @@
                     />
                   </div>
                 </div>
-
-                <div class="col flex-grow">
-                  <p class="header" translate>Leave_a_comment</p>
-                  <fieldset
-                    [disabled]="
-                      (!form.get('gradeAgain')?.value &&
-                        submission.grade !== null) ||
-                      (submission.grade === null &&
-                        form.get('gradeAgain')?.value)
-                    "
-                  >
-                    <textarea
-                      class="form-control"
-                      placeholder="Leave a comment here"
-                      id="comments"
-                      style="height: 180px"
-                      [(ngModel)]="commentText"
-                    ></textarea>
-                  </fieldset>
+                <div class="row">
+                  <div class="col flex-grow">
+                    <p class="header" translate>Leave_a_comment</p>
+                    <fieldset
+                      [disabled]="
+                        (!form.get('gradeAgain')?.value &&
+                          submission.grade !== null) ||
+                        (submission.grade === null &&
+                          form.get('gradeAgain')?.value)
+                      "
+                    >
+                      <textarea
+                        class="form-control"
+                        placeholder="Leave a comment here"
+                        id="comments"
+                        style="height: 180px"
+                        [(ngModel)]="commentText"
+                      ></textarea>
+                    </fieldset>
+                  </div>
                 </div>
               </div>
               <div class="row mt-2 justify-content-end">

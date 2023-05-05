@@ -74,13 +74,13 @@ export class GroupService {
     );
   }
 
-  getGroupMembers(groupId: number, courseId: number) {
+  getGroup(groupId: number, courseId: number) {
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
 
     return this.http.get<any>(
-      `${API_URL}/groupMembers?Course=${courseId}&GroupId=${groupId}`,
+      `${API_URL}/getGroup?Course=${courseId}&GroupId=${groupId}`,
       {
         headers,
       }
