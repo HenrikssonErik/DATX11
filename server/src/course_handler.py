@@ -509,8 +509,7 @@ def get_course_group(course: int, group_id: int):
                     return {}
                 group_dict = {
                     "groupNumber": data[0],
-                    "groupId": data[1],
-                    "users": data[2]}
+                    "users": data[1]}
         conn.close()
         return group_dict
 

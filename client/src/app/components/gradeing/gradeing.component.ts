@@ -10,6 +10,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { TooltipEnablerService } from 'src/app/services/tooltip-enabler.service';
 import { ToastrService } from 'ngx-toastr';
 import { GroupService } from 'src/app/services/group.service';
+import { CourseService } from 'src/app/services/course-service.service';
 
 @Component({
   selector: 'app-gradeing',
@@ -32,6 +33,7 @@ export class GradeingComponent {
   form!: FormGroup;
   sortGraded: boolean = false;
   dateFilter: string = '';
+  groupMembers: any = {};
 
   constructor(
     private submissionService: SubmissionService,
@@ -268,11 +270,12 @@ export class GradeingComponent {
       });
   }
 
-  getGroupMembers(group: number): string[] {
-    this.groupService.getGroupMembers(group, this.course.courseID).subscribe({
+  getGroupMembers(group: number) {
+    this.groupService.getGroup(group, this.course.courseID).subscribe({
       next: (data: any) => {
+        console.log('grroup');
         console.log(data);
-        return data;
+        this.groupMembers[group] = data['users'];
       },
       error: (err) => {
         console.log(err);
