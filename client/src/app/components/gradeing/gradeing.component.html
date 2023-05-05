@@ -18,11 +18,11 @@
             type="checkbox"
             value="assignment"
             id="{{ 'assignmentCheckbox-' + assignment }}"
-            (click)="filterAssignments(assignment)"
+            (click)="filter()"
             [checked]="selectedAssignment === assignment"
           />
           <label
-            (click)="filterAssignments(assignment); $event.stopPropagation()"
+            (click)="filter(); $event.stopPropagation()"
             class="form-check-label text-muted"
             for="assignmentCheckbox"
             translate
@@ -50,7 +50,11 @@
             value=""
             id="checkbox1"
           />
-          <label class="form-check-label text-muted" for="checkbox1" translate>
+          <label
+            class="form-check-label text-muted"
+            for="checkbox1"
+            (click)="(sortGraded == false); filter()"
+          >
             No
           </label>
         </div>
@@ -63,7 +67,11 @@
             value=""
             id="checkbox2"
           />
-          <label class="form-check-label text-muted" for="checkbox2" translate>
+          <label
+            class="form-check-label text-muted"
+            for="checkbox2"
+            (click)="(sortGraded == true); filter()"
+          >
             Yes
           </label>
         </div>
@@ -80,12 +88,18 @@
     </button>
     <ul class="dropdown-menu">
       <li>
-        <a class="dropdown-item text-muted" href="#" translate
+        <a
+          class="dropdown-item text-muted"
+          href="#"
+          (click)="(dateFilter == 'ASC'); filter()"
           >Ascending <i class="fa-solid fa-sort-up"></i>
         </a>
       </li>
       <li>
-        <a class="dropdown-item text-muted" href="#" translate
+        <a
+          class="dropdown-item text-muted"
+          href="#"
+          (click)="(dateFilter == 'DESC'); filter()"
           >Descending <i class="fa-solid fa-sort-down"></i
         ></a>
       </li>

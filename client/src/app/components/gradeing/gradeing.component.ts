@@ -30,6 +30,8 @@ export class GradeingComponent {
   score: number = 1;
   fileNames?: string[];
   form!: FormGroup;
+  sortGraded: boolean = false;
+  dateFilter: string = '';
 
   constructor(
     private submissionService: SubmissionService,
@@ -46,13 +48,16 @@ export class GradeingComponent {
 
     this.enableTooltips();
 
+    this.setSelectedAssignment();
+
+    //TODO: Break out into a function
     this.submissionService
       .getAssignmentOverView(this.course.courseID)
       .subscribe({
         next: (data: Submission[]) => {
           this.allAssignments = data;
           this.assignmentNumbers = this.getAssignmentNumbers(data);
-          this.setAssignmentToGrade(data[0]);
+          //this.setAssignmentToGrade(data[0]);
         },
         error: (error) => {
           console.error('Failed to get data:', error);
@@ -63,6 +68,12 @@ export class GradeingComponent {
           }
         },
       });
+  }
+
+  setSelectedAssignment() {
+    if (this.course.Assignments.length > 0) {
+      this.selectedAssignment = this.course.Assignments[0].AssignmentNr;
+    }
   }
 
   private enableTooltips(): void {
@@ -85,6 +96,51 @@ export class GradeingComponent {
       console.log(this.gradeingSubmission);
     } else {
       // Assignment was not found
+    }
+  }
+
+  filterAssignment(submissions: Submission[]): Submission[] {
+    if (this.selectedAssignment) {
+      return submissions.filter((submission) => {
+        return submission.Assignment === this.selectedAssignment;
+      });
+    }
+    return submissions;
+  }
+
+  filterGraded(submissions: Submission[]): Submission[] {
+    const tempList: Submission[] = submissions.filter(
+      (submission: Submission): boolean => {
+        return submission.Submissions.some(
+          (submission: AssignmentSubmission): boolean => {
+            return submission.grade === this.sortGraded;
+          }
+        );
+      }
+    );
+    return tempList;
+  }
+
+  filterDate(submissions: Submission[]): Submission[] {
+    const tempList: Submission[] = submissions.sort((a, b) => {
+      const dateA = new Date(a.Submissions[0].Date);
+      const dateB = new Date(b.Submissions[0].Date);
+
+      if (this.dateFilter === 'ASC') {
+        return dateA.getTime() - dateB.getTime();
+      } else {
+        return dateB.getTime() - dateA.getTime();
+      }
+    });
+    return tempList;
+  }
+
+  filter() {
+    if (this.allAssignments) {
+      let tempList: Submission[] = this.allAssignments?.slice();
+      tempList = this.filterAssignment(tempList);
+      tempList = this.filterGraded(tempList);
+      tempList = this.filterDate(tempList);
     }
   }
 
