@@ -543,6 +543,7 @@ def get_assignment_overview(course: int) -> list[dict]:
                     if data:
                         for row in data:
                             teacher = "" if (x := row[6]) is None else user_handler.get_fullname(row[6])
+                            group = get_group_number(course, row[0])
                             group_dict = {
                                 "groupid": row[0],
                                 "testpass": row[1],
@@ -552,7 +553,8 @@ def get_assignment_overview(course: int) -> list[dict]:
                                 "Feedback": row[5],
                                 "GradedBy": teacher,
                                 'Date': row[7],
-                                'CreatedDate': row[8]}
+                                'CreatedDate': row[8],
+                                'GroupNUmber': group}
                             overview_list.append(group_dict)
                     return_list.append({"Assignment": assignment[0],
                                         "Submissions": overview_list})
@@ -562,6 +564,28 @@ def get_assignment_overview(course: int) -> list[dict]:
     except Exception as e:
         print(e)
         raise Exception("Error when getting assignment overview") from e
+
+
+def get_group_number(course_id: int, group_id) -> int:
+    """Returns  group number associated with the group_id
+        in the specified course"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT groupnumber FROM Groups WHERE courseid = %s and groupid = %s"""
+                cur.execute(query_data, (course_id, group_id))
+                data = cur.fetchone()
+        conn.close()
+
+        if not data:
+            raise Exception("No group such group")
+
+        return data[0]
+    except Exception as e:
+        print(e)
+        raise Exception("Could not find any such  group") from e
 
 
 def passed_deadline(course: int, assignment: int) -> bool:
