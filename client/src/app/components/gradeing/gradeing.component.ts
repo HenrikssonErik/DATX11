@@ -70,12 +70,16 @@ export class GradeingComponent {
       });
   }
 
-  setSelectedAssignmentIndex(assignmentNr: number) {
+  setSelectedAssignmentIndex(assignmentNr: number): void {
     this.selectedAssignment = assignmentNr;
   }
 
-  setGradedBoolean(graded: boolean) {
+  setGradedBoolean(graded: boolean): void {
     this.sortGraded = graded;
+  }
+
+  setDateSort(sort: string): void {
+    this.dateFilter = sort;
   }
 
   setSelectedAssignment() {
@@ -118,7 +122,6 @@ export class GradeingComponent {
   }
 
   filterGraded(submissions: Submission[]): Submission[] {
-    console.log(this.sortGraded);
     const tempList: Submission[] = submissions.filter(
       (submission: Submission): boolean => {
         return submission.Submissions.some(
@@ -137,9 +140,9 @@ export class GradeingComponent {
 
   filterDate(submissions: Submission[]): Submission[] {
     const tempList: Submission[] = submissions.sort((a, b) => {
+      console.log('TEST');
       const dateA = new Date(a.Submissions[0].Date);
       const dateB = new Date(b.Submissions[0].Date);
-
       if (this.dateFilter === 'ASC') {
         return dateA.getTime() - dateB.getTime();
       } else {
@@ -152,11 +155,11 @@ export class GradeingComponent {
   filter() {
     if (this.allAssignments) {
       let tempList: Submission[] = this.allAssignments?.slice();
-      console.log('All:', tempList);
+      //console.log('All:', tempList);
       tempList = this.filterAssignment(tempList);
-      console.log('after filterassignment:', tempList);
+      //console.log('after filterassignment:', tempList);
       tempList = this.filterGraded(tempList);
-      console.log('After filted graded:', tempList);
+      //console.log('After filted graded:', tempList);
       tempList = this.filterDate(tempList);
       console.log('After filted date:', tempList);
       this.gradeingSubmission = tempList[0];

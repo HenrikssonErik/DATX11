@@ -83,16 +83,14 @@
       <li>
         <a
           class="dropdown-item text-muted"
-          href="#"
-          (click)="(dateFilter == 'ASC'); filter()"
+          (click)="setDateSort('ASC'); filter()"
           >Ascending <i class="fa-solid fa-sort-up"></i>
         </a>
       </li>
       <li>
         <a
           class="dropdown-item text-muted"
-          href="#"
-          (click)="(dateFilter == 'DESC'); filter()"
+          (click)="setDateSort('DESC'); filter()"
           >Descending <i class="fa-solid fa-sort-down"></i
         ></a>
       </li>
