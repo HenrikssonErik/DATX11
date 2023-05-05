@@ -45,6 +45,7 @@
   padding: 0.5rem 1rem;
   margin-right: 10px;
   font-weight: 500;
+  cursor: pointer;
   transition: box-shadow 0.3s ease, color 0.3s ease, border 0.3s ease;
 }
 
@@ -156,4 +157,8 @@
 .resultText {
   font-size: 1.1rem;
   font-weight: 500;
+}
+
+.dateSort {
+  cursor: pointer;
 }
