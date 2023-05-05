@@ -30,7 +30,7 @@ export interface AssignmentSubmission {
   Feedback: string | null;
   GradedBy: string;
   Score: number;
-  grade: number | null;
+  grade: boolean | null;
   groupid: number;
   testpass: boolean;
   Submission: number;
