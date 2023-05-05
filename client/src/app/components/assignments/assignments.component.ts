@@ -96,6 +96,7 @@ export class AssignmentsComponent implements OnInit {
     modalRef.componentInstance.groupNr = groupId;
     modalRef.componentInstance.groupId = groupId;
     modalRef.componentInstance.assignmentNumber = assignmentNumber;
+    modalRef.componentInstance.fileList = this.fileNames;
   }
 
   formatDate(date: Date): string {
