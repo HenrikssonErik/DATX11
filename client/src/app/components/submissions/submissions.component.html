@@ -73,6 +73,16 @@
             </div>
           </div>
         </div>
+        <div clss="row">
+          <h6 class="text-muted">Submitted Files</h6>
+          <p
+            (click)="downloadFile(name, submission.Submission)"
+            class="files"
+            *ngFor="let name of fileList"
+          >
+            {{ name }} &#x2193;
+          </p>
+        </div>
 
         <div
           class="row"
