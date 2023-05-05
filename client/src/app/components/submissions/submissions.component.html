@@ -13,14 +13,30 @@
             class="statusText passed"
             *ngIf="submission.Grade === true"
             translate
+          <span translate
+            >Submission <span>{{ submission.Submission }}</span></span
+          >
+          <span
+            class="statusText passed"
+            *ngIf="submission.Grade === true"
+            translate
             >Passed</span
           >
           <span
             class="statusText failed"
             *ngIf="submission.Grade === false"
             translate
+          <span
+            class="statusText failed"
+            *ngIf="submission.Grade === false"
+            translate
             >Failed</span
           >
+          <span
+            class="statusText warning"
+            *ngIf="submission.Grade === null"
+            translate
+            >Waiting_For_Review</span
           <span
             class="statusText warning"
             *ngIf="submission.Grade === null"
@@ -33,10 +49,12 @@
         <div class="row text-muted">
           <div class="col-md-2">
             <h6 translate>Test_Results</h6>
+            <h6 translate>Test_Results</h6>
             <p>
               <span
                 *ngIf="submission.testfeedback.unittest_feedback.was_successful"
                 class="passed"
+                translate
                 translate
                 >Passed</span
               >
@@ -46,11 +64,13 @@
                 "
                 class="failed"
                 translate
+                translate
                 >Failed</span
               >
             </p>
           </div>
           <div class="col-md-2">
+            <h6 translate>Test_Ran</h6>
             <h6 translate>Test_Ran</h6>
             <p>
               {{ submission.testfeedback.unittest_feedback.tests_run }}
@@ -77,7 +97,7 @@
               >Waiting_For_Review</span
             >
           </div>
-          <div class="col-md-2" *ngIf="true">
+          <div class="col-md-2">
             <h6 translate>Reviewed_By</h6>
             <p class="statusText">{{ submission.GradedBy }}</p>
           </div>
@@ -111,7 +131,7 @@
           </div>
         </div>
         <div clss="row">
-          <h6 class="text-muted">Submitted Files</h6>
+          <h6 class="text-muted" translate>Submitted_Files</h6>
           <p
             (click)="downloadFile(name, submission.Submission)"
             class="files"
