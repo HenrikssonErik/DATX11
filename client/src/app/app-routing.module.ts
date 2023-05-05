@@ -10,6 +10,7 @@ import { AuthguardGuard } from './authguard.guard';
 import { AssignmentsComponent } from './components/assignments/assignments.component';
 import { CoursePickerComponent } from './components/course-picker/course-picker.component';
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
+import { ForgotPwdComponent } from './components/forgot-pwd/forgot-pwd.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent },
@@ -36,6 +37,7 @@ const routes: Routes = [
   },
   { path: 'upload', component: FileUploadComponent },
   { path: 'verifyEmail/:token', component: VerifyEmailComponent },
+  { path: 'forgotPwd/:token', component: ForgotPwdComponent },
   { path: '404', component: PageNotFoundComponent },
   { path: '**', redirectTo: '/404' },
 ];

@@ -246,7 +246,15 @@
               Login
             </button>
             <p style="float: right" class="mt-2 mb-0 text-muted ml-auto">
-              <a style="color: inherit" href="#" translate>Forgot_Password?</a>
+              <a
+                style="color: inherit"
+                href="#"
+                (click)="openPwdModal()"
+                data-bs-toggle="modal"
+                data-bs-target="#pwdModal"
+                translate
+                >Forgot_Password?</a
+              >
             </p>
             <div style="clear: both"></div>
             <!--  <div class="error-message text-center mt-4" *ngIf="submitFailed">
@@ -291,6 +299,72 @@
 
 <div
   class="modal fade"
+  id="pwdModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog verificationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel" translate>
+          Forgot_pwd_title
+        </h5>
+        <button
+          type="button"
+          id="closePwdModal"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form (ngSubmit)="onSubmitForgotPwd()" [formGroup]="forgotPwdForm">
+        <div class="modal-body">
+          <label for="pwd" class="text-muted" translate
+            >Chalmers ID (CID)</label
+          >
+          <input
+            [ngClass]="{
+              success: forgotPwdForm.get('cid')?.valid,
+              error:
+                forgotPwdForm.get('cid')?.invalid &&
+                (forgotPwdForm.get('cid')?.dirty ||
+                  forgotPwdForm.get('cid')?.touched)
+            }"
+            type="text"
+            formControlName="cid"
+            class="form-control focus-border"
+            id="verCid"
+            placeholder="{{ 'Enter_Cid' | translate }}"
+            (focus)="onInputFocus('cid', forgotPwdForm)"
+            required
+          />
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            translate
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            [disabled]="forgotPwdForm.invalid"
+            class="btn btn-primary btn-success-bg"
+            translate
+          >
+            Forgot_pwd_btn
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
   id="exampleModal"
   tabindex="-1"
   aria-labelledby="exampleModalLabel"
@@ -304,6 +378,7 @@
         </h5>
         <button
           type="button"
+          id="closeVerModal"
           class="btn-close"
           data-bs-dismiss="modal"
           aria-label="Close"

@@ -50,11 +50,17 @@ def check_data_input(cid: str, email: str, pwd: str,
         return "wrong_format", 400
     if not user_exists:
         return "cid_does_not_exist", 400
+    if not allowed_password(pwd):
+        return "pass_not_ok", 400
+    return "OK", 200
+
+
+def allowed_password(pwd: str) -> bool:
     allowed_characters = set(string.ascii_letters + string.digits +
                              string.punctuation)
     if not set(pwd) <= allowed_characters:
-        return "pass_not_ok", 400
-    return "OK", 200
+        return False
+    return True
 
 
 def create_temp_users(cids: list[str]) -> list[str]:
@@ -93,6 +99,48 @@ def create_temp_users(cids: list[str]) -> list[str]:
     return newly_registered
 
 
+def new_password(cid, password):
+
+    if not allowed_password(password):
+        return {"status": "pass_not_ok"}, 400
+    else:
+        salt: bytes = bcrypt.gensalt()
+        hashed_pass: bytes = bcrypt.hashpw(password.encode('utf-8'), salt)
+
+        update_status = update_pwd_in_db(cid, hashed_pass)
+
+        return update_status
+
+
+def update_pwd_in_db(cid: str, pwd: bytes):
+    conn = psycopg2.connect(get_conn_string())
+
+    with conn:
+        with conn.cursor() as cur:
+            try:
+
+                query = "UPDATE UserData " +\
+                        "SET passphrase = %s " +\
+                        "WHERE cid = %s;"
+
+                cur.execute(query, (
+                    pwd,
+                    cid
+                ))
+
+                if cur.rowcount == 0:
+                    status = 'user_not_found'
+                    res_code = 406
+                else:
+                    status = 'success'
+                    res_code = 200
+            except Exception:
+                status = 'uncaught_error'
+                res_code = 500
+    conn.close()
+    return {'status': status}, res_code
+
+
 def user_registration(data: Request.form) -> \
         tuple[dict[str, str], Literal[200, 400, 401, 406, 500]]:
     """
@@ -126,7 +174,7 @@ def user_registration(data: Request.form) -> \
         ] = registration_query(
             cid, email, hashed_pass, role, name
         )
-        res_object = ({'token': create_verification_token(cid)}, 200) if (
+        res_object = ({'token': create_cid_token(cid)}, 200) if (
             res_query[1] == 200) else (res_query)
 
         return res_object
@@ -183,7 +231,7 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
     return {'status': status}, res_code
 
 
-def user_to_resend_verification(cid: str) -> tuple:
+def user_to_resend_verification_email(cid: str) -> tuple:
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
@@ -201,11 +249,35 @@ def user_to_resend_verification(cid: str) -> tuple:
 
                 if not verified:
                     response_object = {"email": mail}
-                    token = create_verification_token(cid)
+                    token = create_cid_token(cid)
                     response_object.update({'token': token})
                     return response_object, 200
                 else:
                     return {"status": "already_verified"}, 406
+            except Exception:
+                return {"status": "unexpected_error"}, 500
+
+
+def user_to_send_reset_pwd_email(cid: str) -> tuple:
+    conn = psycopg2.connect(dsn=get_conn_string())
+    with conn:
+        with conn.cursor() as cur:
+            try:
+                query_data = """SELECT email
+                            FROM UserData
+                            WHERE userdata.cid = %s
+                                AND userdata.passphrase IS NOT NULL"""
+                cur.execute(query_data, (cid,))
+                data = cur.fetchone()
+                if not data:
+                    return {'status': 'no_user'}, 406
+                mail = data[0]
+
+                response_object = {"email": mail}
+                token = create_cid_token(cid)
+                response_object.update({'token': token})
+                return response_object, 200
+
             except Exception:
                 return {"status": "unexpected_error"}, 500
 
@@ -248,7 +320,7 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
         return {'status': "wrong_credentials"}, 401
 
 
-def create_verification_token(cid: str) -> str:
+def create_cid_token(cid: str) -> str:
     """
     Creates a token to verify a User that is valid for 24 hours.
     This token is sent in the verification email to the user registering.
@@ -262,7 +334,7 @@ def create_verification_token(cid: str) -> str:
     return token
 
 
-def verify_user_from_email_verification(token: str) -> \
+def verify_and_get_cid(token: str) -> \
         tuple[dict[str, str], Literal[200, 406, 500]]:
     """
     Verifies if a token is issued by this system and if it is still valid.
@@ -285,15 +357,15 @@ def verify_user_from_email_verification(token: str) -> \
         else:
             return verification_response
 
-    except jwt.ExpiredSignatureError:
+    except jwt.ExpiredSignatureError as e:
         # If the token has expired, raise an exception
 
-        raise jwt.ExpiredSignatureError('Expired token')
+        raise jwt.ExpiredSignatureError('Expired token') from e
 
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
         # If the token is invalid, raise an exception
 
-        raise jwt.InvalidTokenError('Invalid token')
+        raise jwt.InvalidTokenError('Invalid token') from e
 
 
 def verify_user_in_db(cid: str) -> \
