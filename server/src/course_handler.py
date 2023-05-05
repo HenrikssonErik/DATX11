@@ -533,7 +533,7 @@ def get_assignment_overview(course: int) -> list[dict]:
 
                 query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
                 teacherGrade, submission, score,  teacherfeedback, userid,
-                feedbackdate, createdDate FROM AssignmentFeedback WHERE courseId = %s AND
+                feedbackdate, createdDate FROM AssignmentFeedback WHERE courseid = %s AND
                 assignment = %s ORDER BY groupId, submission DESC;"""
                 return_list = []
                 for assignment in assignments:
@@ -570,22 +570,22 @@ def get_group_number(course_id: int, group_id) -> int:
     """Returns  group number associated with the group_id
         in the specified course"""
     conn = psycopg2.connect(dsn=get_conn_string())
-
+    print('course and group',course_id, group_id)
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupnumber FROM Groups WHERE courseid = %s and groupid = %s"""
+                query_data = """SELECT groupnumber FROM Groups WHERE course = %s and groupid = %s"""
                 cur.execute(query_data, (course_id, group_id))
                 data = cur.fetchone()
         conn.close()
 
         if not data:
-            raise Exception("No group such group")
+            raise Exception("No group found")
 
         return data[0]
     except Exception as e:
         print(e)
-        raise Exception("Could not find any such  group") from e
+        raise Exception("Could not find any group") from e
 
 
 def passed_deadline(course: int, assignment: int) -> bool:
