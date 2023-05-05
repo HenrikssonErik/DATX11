@@ -28,26 +28,28 @@
         Settings
       </button>
     </li>
-    <li
-      class="nav-item"
-      role="presentation"
-      *ngFor="let assignment of course.Assignments; let i = index"
-    >
-      <button
-        class="nav-link"
-        [class.active]="selectedTab === i"
-        [id]="'tab-' + assignment.AssignmentNr"
-        [attr.data-bs-toggle]="'tab'"
-        [attr.data-bs-target]="'#tab-pane-' + assignment.AssignmentNr"
-        type="button"
-        role="tab"
-        [attr.aria-controls]="'tab-pane-' + assignment.AssignmentNr"
-        [attr.aria-selected]="selectedTab === i"
-        (click)="onTabSelect(i)"
+    <ng-container *ngIf="!isAdmin">
+      <li
+        class="nav-item"
+        role="presentation"
+        *ngFor="let assignment of course.Assignments; let i = index"
       >
-        <span translate>Assignment </span>{{ assignment.AssignmentNr }}
-      </button>
-    </li>
+        <button
+          class="nav-link"
+          [class.active]="selectedTab === i"
+          [id]="'tab-' + assignment.AssignmentNr"
+          [attr.data-bs-toggle]="'tab'"
+          [attr.data-bs-target]="'#tab-pane-' + assignment.AssignmentNr"
+          type="button"
+          role="tab"
+          [attr.aria-controls]="'tab-pane-' + assignment.AssignmentNr"
+          [attr.aria-selected]="selectedTab === i"
+          (click)="onTabSelect(i)"
+        >
+          <span translate>Assignment </span>{{ assignment.AssignmentNr }}
+        </button>
+      </li>
+    </ng-container>
     <li class="nav-item" role="presentation">
       <button
         class="nav-link"
@@ -175,87 +177,89 @@
       <!--CONTENT FOR Gradeing-->
       <app-gradeing [course]="course"></app-gradeing>
     </div>
-    <div
-      class="tab-pane fade"
-      [id]="'tab-pane-' + assignment.AssignmentNr"
-      *ngFor="let assignment of course.Assignments; let i = index"
-      role="tabpanel"
-      [attr.aria-labelledby]="'tab-' + assignment.AssignmentNr"
-      [class.show]="selectedTab === i"
-      [class.active]="selectedTab === i"
-    >
-      <!--CONTENT FOR ASSIGNMENTS-->
-      <div class="card mt-3">
-        <div class="header">
-          <h5 translate>
-            <span translate>Assignment</span> {{ assignment.AssignmentNr }} -
-            {{ assignment.Name }}
-          </h5>
-          <!-- <h5><i class="fa-solid fa-ellipsis-vertical"></i></h5> -->
-          <div>
-            <button
-              [disabled]="datePassed(assignment.DueDate)"
-              class="btn btn-primary submitBtn"
-              (click)="
-                openModal(
-                  course.courseID,
-                  myGroup!.groupId,
-                  assignment.AssignmentNr
-                )
-              "
-            >
-              <span *ngIf="!datePassed(assignment.DueDate)" translate
-                >Submit_Assignment</span
-              ><span *ngIf="datePassed(assignment.DueDate)" translate
-                >Deadline_Passed</span
+    <ng-container *ngIf="!isAdmin">
+      <div
+        class="tab-pane fade"
+        [id]="'tab-pane-' + assignment.AssignmentNr"
+        *ngFor="let assignment of course.Assignments; let i = index"
+        role="tabpanel"
+        [attr.aria-labelledby]="'tab-' + assignment.AssignmentNr"
+        [class.show]="selectedTab === i"
+        [class.active]="selectedTab === i"
+      >
+        <!--CONTENT FOR ASSIGNMENTS-->
+        <div class="card mt-3">
+          <div class="header">
+            <h5 translate>
+              <span translate>Assignment</span> {{ assignment.AssignmentNr }} -
+              {{ assignment.Name }}
+            </h5>
+            <!-- <h5><i class="fa-solid fa-ellipsis-vertical"></i></h5> -->
+            <div>
+              <button
+                [disabled]="datePassed(assignment.DueDate)"
+                class="btn btn-primary submitBtn"
+                (click)="
+                  openModal(
+                    course.courseID,
+                    myGroup!.groupId,
+                    assignment.AssignmentNr
+                  )
+                "
               >
-            </button>
+                <span *ngIf="!datePassed(assignment.DueDate)" translate
+                  >Submit_Assignment</span
+                ><span *ngIf="datePassed(assignment.DueDate)" translate
+                  >Deadline_Passed</span
+                >
+              </button>
+            </div>
           </div>
-        </div>
-        <h6>{{ course.CourseName }} - {{ course.Course }}</h6>
-        <div class="row mt-2">
-          <div class="col-2">
-            <h5 translate>Teacher</h5>
-            <p>{{ course.Admin }}</p>
-          </div>
-          <div class="col-2">
-            <h5 translate>Due_Date</h5>
-            <p>
-              <span class="due-date-icon"
-                ><i class="fa-regular fa-calendar-days"></i></span
-              ><span class="due-date">{{
-                formatDate(assignment.DueDate)
-              }}</span>
-            </p>
-          </div>
-          <!--TODO: HANDLE THE EMPTY GROUP BETTER-->
-          <div class="col-md-2" *ngIf="hasGroup()">
-            <h5><span translate>Group</span> {{ myGroup?.groupId }}</h5>
-            <ng-container>
-              <p
-                style="padding: 0; margin: 0"
-                *ngFor="let member of myGroup?.groupMembers"
-              >
-                {{ member }}
+          <h6>{{ course.CourseName }} - {{ course.Course }}</h6>
+          <div class="row mt-2">
+            <div class="col-2">
+              <h5 translate>Teacher</h5>
+              <p>{{ course.Admin }}</p>
+            </div>
+            <div class="col-2">
+              <h5 translate>Due_Date</h5>
+              <p>
+                <span class="due-date-icon"
+                  ><i class="fa-regular fa-calendar-days"></i></span
+                ><span class="due-date">{{
+                  formatDate(assignment.DueDate)
+                }}</span>
               </p>
-            </ng-container>
+            </div>
+            <!--TODO: HANDLE THE EMPTY GROUP BETTER-->
+            <div class="col-md-2" *ngIf="hasGroup()">
+              <h5><span translate>Group</span> {{ myGroup?.groupId }}</h5>
+              <ng-container>
+                <p
+                  style="padding: 0; margin: 0"
+                  *ngFor="let member of myGroup?.groupMembers"
+                >
+                  {{ member }}
+                </p>
+              </ng-container>
+            </div>
+            <div class="col-md-6">
+              <h5 translate>Description</h5>
+              <p>{{ assignment.Description }}</p>
+            </div>
           </div>
-          <div class="col-md-6">
-            <h5 translate>Description</h5>
-            <p>{{ assignment.Description }}</p>
+        </div>
+        <div class="row mt-3">
+          <div class="col-12">
+            <app-submissions
+              [assignmentNr]="assignment.AssignmentNr"
+              [courseId]="course.courseID"
+              [fileList]="fileNames"
+              [groupId]="myGroup?.groupId"
+            ></app-submissions>
           </div>
         </div>
       </div>
-      <div class="row mt-3">
-        <div class="col-12">
-          <app-submissions
-            [assignmentNr]="assignment.AssignmentNr"
-            [courseId]="course.courseID"
-            [fileList]="fileNames"
-            [groupId]="myGroup?.groupId"
-          ></app-submissions>
-        </div>
-      </div>
-    </div>
+    </ng-container>
   </div>
 </div>

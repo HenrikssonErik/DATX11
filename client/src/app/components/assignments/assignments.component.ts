@@ -48,14 +48,15 @@ export class AssignmentsComponent implements OnInit {
         if (this.isAdmin) {
           //TODO: Move admins to "gradeing" tab. Ugly but wokrs for now
           this.selectedTab = -3;
+        } else {
+          this.groupService.getMyGroup(id).subscribe((res) => {
+            this.myGroup = res;
+            console.log(res);
+          });
         }
         //this.getFileNames();
       });
     }
-
-    this.groupService.getMyGroup(id).subscribe((res) => {
-      this.myGroup = res;
-    });
 
     this.groupService.getGroups(id).subscribe((res) => {
       this.courseGroups = res;
