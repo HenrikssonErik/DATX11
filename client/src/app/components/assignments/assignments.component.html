@@ -213,11 +213,11 @@
         </div>
         <h6>{{ course.CourseName }} - {{ course.Course }}</h6>
         <div class="row mt-2">
-          <div class="col-auto">
+          <div class="col-2">
             <h5 translate>Teacher</h5>
             <p>{{ course.Admin }}</p>
           </div>
-          <div class="col-auto">
+          <div class="col-2">
             <h5 translate>Due_Date</h5>
             <p>
               <span class="due-date-icon"
@@ -228,7 +228,7 @@
             </p>
           </div>
           <!--TODO: HANDLE THE EMPTY GROUP BETTER-->
-          <div class="col-auto" *ngIf="hasGroup()">
+          <div class="col-2" *ngIf="hasGroup()">
             <h5>Group {{ myGroup?.groupId }}</h5>
             <ng-container>
               <p
@@ -239,7 +239,7 @@
               </p>
             </ng-container>
           </div>
-          <div class="col flex-grow">
+          <div class="col-md-6">
             <h5 translate>Description</h5>
             <p>{{ assignment.Description }}</p>
           </div>
