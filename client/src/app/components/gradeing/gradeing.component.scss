@@ -162,3 +162,19 @@
 .dateSort {
   cursor: pointer;
 }
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #26734d;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+}
