@@ -18,11 +18,15 @@
             type="checkbox"
             value="assignment"
             id="{{ 'assignmentCheckbox-' + assignment }}"
-            (click)="filter()"
+            (click)="setSelectedAssignmentIndex(assignment); filter()"
             [checked]="selectedAssignment === assignment"
           />
           <label
-            (click)="filter(); $event.stopPropagation()"
+            (click)="
+              setSelectedAssignmentIndex(assignment);
+              filter();
+              $event.stopPropagation()
+            "
             class="form-check-label text-muted"
             for="assignmentCheckbox"
             translate
