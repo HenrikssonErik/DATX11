@@ -44,7 +44,7 @@ export class AssignmentsComponent implements OnInit {
     if (!isNaN(id)) {
       this.courseService.getCourse(id).subscribe((res: Course) => {
         this.course = res;
-        console.log(this.course);
+        //console.log(this.course);
         this.course.Assignments.sort((a, b) => a.AssignmentNr - b.AssignmentNr);
         if (this.isAdmin) {
           //TODO: Move admins to "gradeing" tab. Ugly but wokrs for now
@@ -53,10 +53,12 @@ export class AssignmentsComponent implements OnInit {
       });
     }
 
-    this.groupService.getMyGroup(id).subscribe((res) => {
-      this.myGroup = res;
-      console.log(res);
-    });
+    if (this.isAdmin) {
+      this.groupService.getMyGroup(id).subscribe((res) => {
+        this.myGroup = res;
+        console.log(res);
+      });
+    }
 
     /*this.groupService.getMyGroup(id).subscribe((res) => {
       //TODO: HANDLE THE EMPTY GROUP BETTER, THIS FIX IS DUMB
