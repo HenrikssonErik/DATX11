@@ -3,7 +3,7 @@ import { Course } from 'src/app/models/courses';
 import { SubmissionService } from 'src/app/services/submission.service';
 import { AssignmentSubmission, Submission } from 'src/app/models/submission';
 import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FeedbackTeacherViewModalComponent } from '../feedback-teacher-view-modal/feedback-teacher-view-modal.component';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -19,6 +19,7 @@ import { CourseService } from 'src/app/services/course-service.service';
 })
 export class GradeingComponent {
   searchTerm$: Subject<string> = new Subject<string>();
+  unsubscribe$: Subject<void> = new Subject();
   @Input() course!: Course;
   //TODO: Rename
   gradeingSubmission?: Submission;
@@ -34,6 +35,7 @@ export class GradeingComponent {
   sortGraded: boolean = false;
   dateFilter: string = '';
   groupMembers: any = {};
+  isLoading: boolean = false;
 
   constructor(
     private submissionService: SubmissionService,
@@ -48,7 +50,24 @@ export class GradeingComponent {
     this.setSelectedAssignment();
     this.initForm();
     this.enableTooltips();
-    this.filter();
+  }
+
+  ngAfterViewInit(): void {
+    this.isLoading = true;
+    this.waitForData().then((): void => {
+      this.filter();
+    });
+  }
+
+  waitForData(): Promise<void> {
+    return new Promise((resolve) => {
+      const checkData = setInterval(() => {
+        if (this.allAssignments && this.selectedAssignment) {
+          clearInterval(checkData);
+          resolve();
+        }
+      }, 100);
+    });
   }
 
   getSubmissions() {
@@ -120,8 +139,8 @@ export class GradeingComponent {
 
   filterDate(submissions: AssignmentSubmission[]): AssignmentSubmission[] {
     const tempList: AssignmentSubmission[] = submissions.sort((a, b) => {
-      const dateA = new Date(a.Date);
-      const dateB = new Date(b.Date);
+      const dateA = new Date(a.dateSubmitted);
+      const dateB = new Date(b.dateSubmitted);
       if (this.dateFilter === 'ASC') {
         if (dateA.getTime() < dateB.getTime()) {
           return -1;
@@ -143,23 +162,35 @@ export class GradeingComponent {
     return tempList;
   }
 
-  filter() {
-    console.log('test');
+  filterSearch() {
+    this.searchTerm$
+      .pipe(takeUntil(this.unsubscribe$), debounceTime(200))
+      .subscribe((searchTerm: string) => {
+        console.log(searchTerm);
+        if (this.gradeingSubmission) {
+          console.log(this.gradeingSubmission);
+          this.gradeingSubmission = this.gradeingSubmission[0].filter(
+            (submission) =>
+              submission.GroupNumber.toString().includes(searchTerm)
+          );
+        }
+      });
+  }
+
+  filter(): void {
     if (this.allAssignments && this.selectedAssignment) {
-      console.log('filtering');
       let tempList: Submission[] = this.allAssignments?.slice();
       tempList = this.filterAssignment(tempList);
       let tempListSubmissions: AssignmentSubmission[] =
         tempList[0].Submissions.slice();
-
       tempListSubmissions = this.filterGraded(tempListSubmissions);
-
       tempListSubmissions = this.filterDate(tempListSubmissions);
+      this.isLoading = false;
       this.gradeingSubmission = {
         ...tempList[0],
         Submissions: tempListSubmissions,
       };
-
+      this.filterSearch();
       this.setFileNames(this.selectedAssignment);
     }
   }
@@ -185,28 +216,6 @@ export class GradeingComponent {
 
   getAssignmentNumbers(data: Submission[]): number[] {
     return data.map((sub: Submission): number => sub.Assignment);
-  }
-
-  initSearch() {
-    this.searchTerm$.pipe(debounceTime(200)).subscribe((searchTerm: string) => {
-      if (!searchTerm && this.allAssignments) {
-        if (this.selectedAssignmentIndex) {
-          this.gradeingSubmission =
-            this.allAssignments[this.selectedAssignmentIndex];
-          return;
-        } else {
-          this.gradeingSubmission = this.allAssignments[0];
-          return;
-        }
-      }
-      this.gradeingSubmission = this.allAssignments?.find((assignment) => {
-        return assignment.Submissions.some((submission) => {
-          return submission.groupid.toString().includes(searchTerm);
-        });
-      });
-      //TODO: handle if it was not found. Right now it will just be undefined :(
-      console.log(this.gradeingSubmission);
-    });
   }
 
   onSearchTextChanged() {
@@ -305,5 +314,10 @@ export class GradeingComponent {
 
   getDate(date: string) {
     return new Date(date).toLocaleDateString('sv-SE');
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }
