@@ -23,6 +23,7 @@ export interface TestResult {
     };
   };
   testpass: boolean;
+  GradedBy: string;
 }
 
 export interface AssignmentSubmission {

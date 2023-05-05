@@ -77,33 +77,38 @@
               >Waiting_For_Review</span
             >
           </div>
-          <div class="col-md-2" *ngIf="false">
+          <div class="col-md-2" *ngIf="true">
             <h6 translate>Reviewed_By</h6>
-            <p class="statusText">Malte Carlstedt</p>
+            <p class="statusText">{{ submission.GradedBy }}</p>
           </div>
-          <div class="col-md-6" *ngIf="submission.teacherfeedback != null">
-            <h6 translate>Comments</h6>
-            <div class="form-floating mb-3">
-              <textarea
-                class="form-control"
-                placeholder="Leave a comment here"
-                id="comments"
-                style="height: 100px"
-                disabled
-                [value]="submission.teacherfeedback"
-              ></textarea>
+          <div class="row">
+            <div class="col-auto">
+              <h6 class="text-muted" translate>Submitted_Files</h6>
+              <p
+                (click)="downloadFile(name, submission.Submission)"
+                class="files"
+                *ngFor="let name of fileList"
+              >
+                {{ name }} &#x2193;
+              </p>
+            </div>
+            <div
+              class="col flex-grow"
+              *ngIf="submission.teacherfeedback != null"
+            >
+              <h6 translate>Comments</h6>
+              <div class="form-floating mb-3">
+                <textarea
+                  class="form-control"
+                  placeholder="Leave a comment here"
+                  id="comments"
+                  style="height: 100px"
+                  disabled
+                  [value]="submission.teacherfeedback"
+                ></textarea>
+              </div>
             </div>
           </div>
-        </div>
-        <div clss="row">
-          <h6 class="text-muted" translate>Submitted_Files</h6>
-          <p
-            (click)="downloadFile(name, submission.Submission)"
-            class="files"
-            *ngFor="let name of fileList"
-          >
-            {{ name }} &#x2193;
-          </p>
         </div>
 
         <div

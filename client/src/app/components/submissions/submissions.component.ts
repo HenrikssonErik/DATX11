@@ -27,6 +27,8 @@ export class SubmissionsComponent {
       .getSubmission(this.courseId, this.assignmentNr)
       .subscribe({
         next: (res: TestResult[]) => {
+          console.log('res');
+          console.log(res);
           this.submissions = res;
           this.submissions.sort((a, b) => b.Submission - a.Submission);
         },
