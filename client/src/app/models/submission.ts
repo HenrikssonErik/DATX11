@@ -27,7 +27,8 @@ export interface TestResult {
 }
 
 export interface AssignmentSubmission {
-  Date: string;
+  dateSubmitted: string;
+  lastEdited: string;
   Feedback: string | null;
   GradedBy: string;
   Score: number;
@@ -35,6 +36,7 @@ export interface AssignmentSubmission {
   groupid: number;
   testpass: boolean;
   Submission: number;
+  GroupNumber: number;
 }
 
 export interface Submission {
