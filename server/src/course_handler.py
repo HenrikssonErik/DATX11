@@ -554,9 +554,9 @@ def get_assignment_overview(course: int) -> list[dict]:
                                 "Score": row[4],
                                 "Feedback": row[5],
                                 "GradedBy": teacher,
-                                'Date': row[7],
-                                'CreatedDate': row[8],
-                                'GroupNUmber': group}
+                                'lastEdited': row[7],
+                                'dateSubmitted': row[8],
+                                'GroupNumber': group}
                             overview_list.append(group_dict)
                     return_list.append({"Assignment": assignment[0],
                                         "Submissions": overview_list})
