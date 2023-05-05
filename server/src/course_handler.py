@@ -96,7 +96,8 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
 
 
 def get_progress(user_id: int) -> list:
-    """Retrieves the results of the latest submisison for the user on all courses"""
+    """Retrieves the results of the latest submisison for the user on
+    all courses"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -189,7 +190,8 @@ def _create_course(course_name: str, course_abbr: str, year: int,
 
 
 def create_assignment(course_id: int, description: str, assignment_name: int,
-                      end_date: str, file_names: list, max_score: int, pass_score: int) -> dict:
+                      end_date: str, file_names: list, max_score: int,
+                      pass_score: int) -> dict:
     """Creates an assignment for a course, assignment number will not be
     incremented automatically, thus must be provided by the creator"""
     res: dict = {}
@@ -250,8 +252,8 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT assignment, endDate, description, name, maxscore, passscore
-                FROM Assignments WHERE courseid = %s"""
+                query_data = """SELECT assignment, endDate, description, name,
+                maxscore, passscore FROM Assignments WHERE courseid = %s"""
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
@@ -345,9 +347,9 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
                 'Europe/Stockholm'), score = %s, courseId = %s,
                 userid = %s WHERE groupId = %s AND
                 submission = %s AND assignment = %s;"""
-                cur.execute(query_one, [feedback, grade, score, course, teacher,
-                                        group_id,
-                                        submission, assignment])
+                cur.execute(query_one, [feedback, grade, score, course,
+                                        teacher, group_id, submission,
+                                        assignment])
         conn.close()
         return
     except Exception as e:
@@ -426,9 +428,9 @@ def get_assignment_feedback(course: int, assignment: int,
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT submission, testpass,
-                testfeedback, teacherfeedback, teachergrade, userid, feedbackdate FROM
-                                assignmentfeedback WHERE courseid = %s AND
-                                groupid = %s AND assignment = %s"""
+                testfeedback, teacherfeedback, teachergrade, userid,
+                feedbackdate FROM assignmentfeedback WHERE courseid = %s AND
+                groupid = %s AND assignment = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
                 print("from db")
@@ -533,8 +535,9 @@ def get_assignment_overview(course: int) -> list[dict]:
 
                 query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
                 teacherGrade, submission, score,  teacherfeedback, userid,
-                feedbackdate, createdDate FROM AssignmentFeedback WHERE courseid = %s AND
-                assignment = %s ORDER BY groupId, submission DESC;"""
+                feedbackdate, createdDate FROM AssignmentFeedback WHERE
+                courseid = %s AND assignment = %s ORDER BY groupId,
+                submission DESC;"""
                 return_list = []
                 for assignment in assignments:
                     overview_list = []
@@ -542,7 +545,7 @@ def get_assignment_overview(course: int) -> list[dict]:
                     data = cur.fetchall()
                     if data:
                         for row in data:
-                            teacher = "" if (x := row[6]) is None else user_handler.get_fullname(row[6])
+                            teacher = "" if (x := row[6]) is None else user_handler.get_fullname(x)
                             group = get_group_number(course, row[0])
                             group_dict = {
                                 "groupid": row[0],
@@ -570,11 +573,12 @@ def get_group_number(course_id: int, group_id) -> int:
     """Returns  group number associated with the group_id
         in the specified course"""
     conn = psycopg2.connect(dsn=get_conn_string())
-    print('course and group',course_id, group_id)
+    print('course and group', course_id, group_id)
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupnumber FROM Groups WHERE course = %s and groupid = %s"""
+                query_data = """SELECT groupnumber FROM Groups WHERE
+                course = %s and groupid = %s"""
                 cur.execute(query_data, (course_id, group_id))
                 data = cur.fetchone()
         conn.close()

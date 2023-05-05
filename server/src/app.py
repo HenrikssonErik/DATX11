@@ -6,8 +6,7 @@ from flask import Flask, Response, jsonify, make_response, render_template, \
 from flask_cors import CORS
 from .constants import DOMAIN
 from .file_handler import handle_files, \
-    handle_test_file, get_assignment_file_from_database, \
-    get_assignment_test_feedback_from_database, get_test_filenames,\
+    handle_test_file, get_assignment_file_from_database, get_test_filenames,\
     get_test_file, get_filenames
 from . import user_handler
 from . import course_handler
@@ -194,8 +193,8 @@ def post_tests():
             return "Files not found", 406
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
-            res = handle_test_file(files, course, assignment)
-            return make_response(jsonify(res[0]), res[1])
+        res = handle_test_file(files, course, assignment)
+        return make_response(jsonify(res[0]), res[1])
     else:
         return make_response({'status': 'Not_a_course_teacher'}, 401)
 
@@ -217,6 +216,7 @@ def get_assignment_feedback():
     else:
         return make_response("", code)
 """
+
 
 @app.route('/getAssignmentFile', methods=['GET'])
 def get_file():
@@ -240,10 +240,11 @@ def get_file():
                'Content-Disposition': 'attachment; filename={}'
                .format(filename)}
 
-    if (user_handler.check_admin_or_course_teacher(user_id, course) or user_handler.get_group(user_id, course)['groupId'] == group_id):
+    if (user_handler.check_admin_or_course_teacher(user_id, course) or
+       user_handler.get_group(user_id, course)['groupId'] == group_id):
 
         result = get_assignment_file_from_database(
-                group_id, course, assignment, filename, submission)
+            group_id, course, assignment, filename, submission)
 
         res = make_response(send_file(path_or_file=result,
                                       download_name=filename,
@@ -274,12 +275,13 @@ def get_tests():
                'Content-Disposition': 'attachment; filename={}'
                .format(filename)}
 
-    if (user_handler.check_admin_or_course_teacher(user_id, course) or user_handler.get_group(user_id, course)['groupId'] == group_id):
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
 
         result = get_test_file(course, assignment, filename)
 
         res = make_response(send_file(path_or_file=result,
-                                      download_name=filename, as_attachment=True))
+                                      download_name=filename,
+                                      as_attachment=True))
 
     res.headers = headers
     return res
@@ -616,7 +618,7 @@ def get_feedback():
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
     assignment = int(request.args.get('Assignment'))
-    
+
     if (user_id):
         group = user_handler.get_group(user_id, course)['groupId']
         feedback = course_handler.get_assignment_feedback(course, assignment,
@@ -706,7 +708,8 @@ def set_feedback():
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         course_handler.set_teacher_feedback(group_id, feedback, grade, course,
-                                            assignment, submission, user_id, score)
+                                            assignment, submission, user_id,
+                                            score)
         return make_response("", 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
