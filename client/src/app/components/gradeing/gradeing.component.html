@@ -136,7 +136,10 @@
                   translate
                   >Not_Graded</span
                 >
-                <span class="statusText" *ngIf="!submission.grade" translate
+                <span
+                  class="statusText"
+                  *ngIf="submission.grade == false"
+                  translate
                   >Graded_Failed</span
                 >
               </div>
