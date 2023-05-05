@@ -70,6 +70,10 @@ export class GradeingComponent {
       });
   }
 
+  setSelectedAssignmentIndex(assignmentNr: number) {
+    this.selectedAssignment = assignmentNr;
+  }
+
   setSelectedAssignment() {
     if (this.course.Assignments.length > 0) {
       this.selectedAssignment = this.course.Assignments[0].AssignmentNr;
@@ -101,6 +105,7 @@ export class GradeingComponent {
 
   filterAssignment(submissions: Submission[]): Submission[] {
     if (this.selectedAssignment) {
+      this.setFileNames(this.selectedAssignment);
       return submissions.filter((submission) => {
         return submission.Assignment === this.selectedAssignment;
       });
@@ -113,7 +118,7 @@ export class GradeingComponent {
       (submission: Submission): boolean => {
         return submission.Submissions.some(
           (submission: AssignmentSubmission): boolean => {
-            return submission.grade === this.sortGraded;
+            return submission.grade != this.sortGraded;
           }
         );
       }
@@ -138,9 +143,15 @@ export class GradeingComponent {
   filter() {
     if (this.allAssignments) {
       let tempList: Submission[] = this.allAssignments?.slice();
+      console.log('All:', tempList);
       tempList = this.filterAssignment(tempList);
+      console.log('after filterassignment:', tempList);
       tempList = this.filterGraded(tempList);
+      console.log('After filted graded:', tempList);
       tempList = this.filterDate(tempList);
+      console.log('After filted date:', tempList);
+      this.gradeingSubmission = tempList[0];
+      console.log('Gradeingsubmission', this.gradeingSubmission);
     }
   }
 
