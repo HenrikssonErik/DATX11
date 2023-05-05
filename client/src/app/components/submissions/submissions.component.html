@@ -6,26 +6,38 @@
     <ngb-panel *ngFor="let submission of submissions">
       <ng-template ngbPanelTitle>
         <div class="titleAccordion">
-          <span>Submission {{ submission.Submission }}</span>
-          <span class="statusText passed" *ngIf="submission.Grade === true"
+          <span translate
+            >Submission <span>{{ submission.Submission }}</span></span
+          >
+          <span
+            class="statusText passed"
+            *ngIf="submission.Grade === true"
+            translate
             >Passed</span
           >
-          <span class="statusText failed" *ngIf="submission.Grade === false"
+          <span
+            class="statusText failed"
+            *ngIf="submission.Grade === false"
+            translate
             >Failed</span
           >
-          <span class="statusText warning" *ngIf="submission.Grade === null"
-            >Waiting for review</span
+          <span
+            class="statusText warning"
+            *ngIf="submission.Grade === null"
+            translate
+            >Waiting_For_Review</span
           >
         </div>
       </ng-template>
       <ng-template ngbPanelContent>
         <div class="row text-muted">
           <div class="col-md-2">
-            <h6>Test results</h6>
+            <h6 translate>Test_Results</h6>
             <p>
               <span
                 *ngIf="submission.testfeedback.unittest_feedback.was_successful"
                 class="passed"
+                translate
                 >Passed</span
               >
               <span
@@ -33,34 +45,44 @@
                   !submission.testfeedback.unittest_feedback.was_successful
                 "
                 class="failed"
+                translate
                 >Failed</span
               >
             </p>
           </div>
           <div class="col-md-2">
-            <h6>Test ran</h6>
+            <h6 translate>Test_Ran</h6>
             <p>
               {{ submission.testfeedback.unittest_feedback.tests_run }}
             </p>
           </div>
           <div class="col-md-2">
-            <h6>Grade</h6>
-            <span class="statusText passed" *ngIf="submission.Grade === true"
+            <h6 translate>Grade</h6>
+            <span
+              class="statusText passed"
+              *ngIf="submission.Grade === true"
+              translate
               >Passed</span
             >
-            <span class="statusText failed" *ngIf="submission.Grade === false"
+            <span
+              class="statusText failed"
+              *ngIf="submission.Grade === false"
+              translate
               >Failed</span
             >
-            <span class="statusText warning" *ngIf="submission.Grade === null"
-              >Waiting for review</span
+            <span
+              class="statusText warning"
+              *ngIf="submission.Grade === null"
+              translate
+              >Waiting_For_Review</span
             >
           </div>
           <div class="col-md-2" *ngIf="false">
-            <h6>Reviewed By</h6>
+            <h6 translate>Reviewed_By</h6>
             <p class="statusText">Malte Carlstedt</p>
           </div>
           <div class="col-md-6" *ngIf="submission.teacherfeedback != null">
-            <h6>Comments</h6>
+            <h6 translate>Comments</h6>
             <div class="form-floating mb-3">
               <textarea
                 class="form-control"
@@ -74,7 +96,7 @@
           </div>
         </div>
         <div clss="row">
-          <h6 class="text-muted">Submitted Files</h6>
+          <h6 class="text-muted" translate>Submitted_Files</h6>
           <p
             (click)="downloadFile(name, submission.Submission)"
             class="files"
@@ -89,7 +111,7 @@
           *ngIf="submission.testfeedback.unittest_feedback.errors.length > 0"
         >
           <div class="col-12">
-            <h6 class="text-muted">Errors:</h6>
+            <h6 class="text-muted" translate>Errors</h6>
             <div
               *ngFor="
                 let errors of submission.testfeedback.unittest_feedback.errors
@@ -106,7 +128,7 @@
           *ngIf="submission.testfeedback.unittest_feedback.failures.length > 0"
         >
           <div class="col-12">
-            <h6 class="text-muted">Failed Tests</h6>
+            <h6 class="text-muted" translate>Failed_Tests</h6>
             <div
               *ngFor="
                 let failures of submission.testfeedback.unittest_feedback
@@ -135,7 +157,7 @@
           class="row"
           *ngIf="submission.testfeedback.general_tests_feedback[0].PEP8_results"
         >
-          <h6 class="text-muted mt-2 mb-2">Pep8 Results</h6>
+          <h6 class="text-muted mt-2 mb-2" translate>Pep8_Results</h6>
           <div class="col-12">
             <div
               *ngFor="

@@ -100,5 +100,17 @@
   "Grade_Again": "Betygsätt Igen",
   "Test_Files": "Nuvarande Testfiler:",
   "Upload_Tests": "Ladda Upp Test (ersätter fil med samma namn)",
-  "No_Tests": "Inga Uppladdade Testfiler"
+  "No_Tests": "Inga Uppladdade Testfiler",
+  "Passed": "Godkänd",
+  "Failed": "Underkänd",
+  "Waiting_For_Review": "Väntar På Granskning",
+  "Test_Results": "Testresultat",
+  "Test_Ran": "Tester Körda",
+  "Grade": "Bedömd",
+  "Reviewed_By": "Bedömd Av",
+  "Comments": "Kommentarer",
+  "Submitted_Files": "Inlämnade Filer",
+  "Errors": "Errors",
+  "Failed_Tests": "Misslyckade Tester",
+  "Pep8_Results": "Pep8 Resultat"
 }
