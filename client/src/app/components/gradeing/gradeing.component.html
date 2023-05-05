@@ -22,11 +22,6 @@
             [checked]="selectedAssignment === assignment"
           />
           <label
-            (click)="
-              setSelectedAssignmentIndex(assignment);
-              filter();
-              $event.stopPropagation()
-            "
             class="form-check-label text-muted"
             for="assignmentCheckbox"
             translate
@@ -51,14 +46,11 @@
           <input
             class="form-check-input"
             type="checkbox"
-            value=""
             id="checkbox1"
+            [checked]="sortGraded == false"
+            (click)="setGradedBoolean(false); filter()"
           />
-          <label
-            class="form-check-label text-muted"
-            for="checkbox1"
-            (click)="(sortGraded == false); filter()"
-          >
+          <label class="form-check-label text-muted" for="checkbox1">
             No
           </label>
         </div>
@@ -68,14 +60,11 @@
           <input
             class="form-check-input"
             type="checkbox"
-            value=""
             id="checkbox2"
+            [checked]="sortGraded == true"
+            (click)="setGradedBoolean(true); filter()"
           />
-          <label
-            class="form-check-label text-muted"
-            for="checkbox2"
-            (click)="(sortGraded == true); filter()"
-          >
+          <label class="form-check-label text-muted" for="checkbox2">
             Yes
           </label>
         </div>
@@ -313,6 +302,8 @@
                       class="form-control"
                       placeholder="Score"
                       aria-label="Score"
+                      [max]="getMaxScore(gradeingSubmission.Assignment)"
+                      [min]="0"
                       [(ngModel)]="score"
                       [disabled]="
                         (!form.get('gradeAgain')?.value &&

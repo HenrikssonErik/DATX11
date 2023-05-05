@@ -74,6 +74,10 @@ export class GradeingComponent {
     this.selectedAssignment = assignmentNr;
   }
 
+  setGradedBoolean(graded: boolean) {
+    this.sortGraded = graded;
+  }
+
   setSelectedAssignment() {
     if (this.course.Assignments.length > 0) {
       this.selectedAssignment = this.course.Assignments[0].AssignmentNr;
@@ -114,11 +118,16 @@ export class GradeingComponent {
   }
 
   filterGraded(submissions: Submission[]): Submission[] {
+    console.log(this.sortGraded);
     const tempList: Submission[] = submissions.filter(
       (submission: Submission): boolean => {
         return submission.Submissions.some(
           (submission: AssignmentSubmission): boolean => {
-            return submission.grade != this.sortGraded;
+            if (this.sortGraded) {
+              return submission.grade === true || submission.grade === false;
+            } else {
+              return submission.grade === null;
+            }
           }
         );
       }
