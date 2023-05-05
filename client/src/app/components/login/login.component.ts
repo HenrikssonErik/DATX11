@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit {
   cid: string = '';
   passwordVisible: boolean = false;
   verificationCidForm: UntypedFormGroup = new UntypedFormGroup({});
+  forgotPwdForm: UntypedFormGroup = new UntypedFormGroup({});
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -51,6 +52,9 @@ export class LoginComponent implements OnInit {
 
   private initCid(): void {
     this.verificationCidForm = this.fb.group({
+      cid: ['', [Validators.required]],
+    });
+    this.forgotPwdForm = this.fb.group({
       cid: ['', [Validators.required]],
     });
   }
@@ -240,6 +244,9 @@ export class LoginComponent implements OnInit {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+          if (statusMsg === 'already_verified') {
+            document.getElementById('closeVerModal')!.click();
+          }
         },
         complete: () => {
           this.toastr.success(
@@ -249,11 +256,55 @@ export class LoginComponent implements OnInit {
               closeButton: true,
             }
           );
+          document.getElementById('closeVerModal')!.click();
+        },
+      });
+  }
+
+  onSubmitForgotPwd(): void {
+    if (this.forgotPwdForm.invalid) {
+      return;
+    }
+
+    const cidForm = new FormData();
+    const cid = this.forgotPwdForm.get('cid');
+    if (cid) {
+      cidForm.append('cid', cid.value);
+    } else {
+      return;
+    }
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/reset_pwd_email`, cidForm, {
+        observe: 'response',
+      })
+      .subscribe({
+        next: (response: any) => {},
+        error: (err) => {
+          let statusMsg = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrResponse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+        complete: () => {
+          this.toastr.success(
+            'Click the link in the email to reset your password!',
+            'Password reset mail has been sent!',
+            {
+              closeButton: true,
+            }
+          );
+          document.getElementById('closePwdModal')!.click();
         },
       });
   }
 
   openVerificationModal(): void {
     this.verificationCidForm.reset();
+  }
+  openPwdModal(): void {
+    this.forgotPwdForm.reset();
   }
 }

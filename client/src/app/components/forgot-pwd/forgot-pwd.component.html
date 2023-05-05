@@ -1,0 +1,91 @@
+<app-spinner></app-spinner>
+<div class="container text-muted">
+  <div class="row" style="margin-top: 50px">
+    <div class="col-md-6 col-12">
+      <div *ngIf="tokenValid | async; else tokenInvalid">
+        <div class="d-flex justify-content-center">
+          <form
+            (ngSubmit)="onNewPassword()"
+            [formGroup]="passwordForm"
+            style="min-width: 80%"
+          >
+            <h3 class="text-center text-muted mb-4" translate>
+              Hydrant_Change_Password
+            </h3>
+            <div class="form-group mb-3">
+              <label for="cid" class="text-muted">Chalmers ID (CID)</label>
+              <input
+                type="text"
+                formControlName="cid"
+                class="form-control disabled"
+                id="cid"
+                placeholder="{{ 'CID' }}"
+                required
+                readonly
+              />
+            </div>
+            <div class="form-group mb-3">
+              <label for="password" class="text-muted" translate
+                >New_password</label
+              >
+              <div class="input-group">
+                <input
+                  type="password"
+                  formControlName="password"
+                  class="form-control"
+                  placeholder="{{ 'New_pwd' | translate }}"
+                  id="password"
+                  (focus)="onInputFocus('password', passwordForm)"
+                />
+              </div>
+            </div>
+            <div class="form-group mb-1">
+              <label for="signUpPasswordVer" class="text-muted" translate
+                >Password_verify</label
+              >
+              <div class="input-group passwordInput">
+                <input
+                  [ngClass]="{
+                    success: passwordForm.get('verifyPassword')?.valid,
+                    error:
+                      passwordForm.get('verifyPassword')?.invalid &&
+                      (passwordForm.get('verifyPassword')?.dirty ||
+                        passwordForm.get('verifyPassword')?.touched)
+                  }"
+                  type="password"
+                  maxlength="33"
+                  formControlName="verifyPassword"
+                  class="form-control focus-border"
+                  id="verPass"
+                  placeholder="{{ 'Ver_pwd' | translate }}"
+                  (focus)="onInputFocus('verifyPassword', passwordForm)"
+                  required
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary btn-block mt-3 w-100"
+              [disabled]="passwordForm.invalid"
+              translate
+            >
+              Change_pwd
+            </button>
+          </form>
+        </div>
+      </div>
+      <ng-template #tokenInvalid>
+        <div class="row"><h1>Error!</h1></div>
+        <br />
+        <div class="row">
+          <h4>
+            Could not validate your token. Try resetting your password again!
+          </h4>
+        </div></ng-template
+      >
+    </div>
+    <div class="col-md-6 col-12 d-flex justify-content-center mt-auto">
+      <img src="assets\{{ imgSrc }}.svg" height="250" width="auto" />
+    </div>
+  </div>
+</div>

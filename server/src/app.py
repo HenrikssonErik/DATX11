@@ -1,5 +1,7 @@
 
 
+import jwt
+from flask_mail import Mail, Message
 from typing import Literal
 from flask import Flask, Response, jsonify, make_response, render_template, \
     request, send_file
@@ -11,11 +13,10 @@ from .file_handler import handle_files, \
     get_test_file
 from . import user_handler
 from . import course_handler
-from .login_handler import user_registration, log_in, create_key, \
-    user_to_resend_verification, verify_user_from_email_verification, \
-    verify_and_get_id, create_temp_users
-from flask_mail import Mail, Message
-import jwt
+from .login_handler import new_password, user_registration, log_in, \
+    create_key, user_to_resend_verification_email, \
+    user_to_send_reset_pwd_email, verify_and_get_cid, verify_and_get_id, \
+    create_temp_users
 # from .podman.podman_runner import init_images
 
 # init basic image
@@ -83,11 +84,27 @@ def resend_verification_email() -> Response:
     data = request.form
     cid = data['cid']
 
-    user_lookup = user_to_resend_verification(cid)
+    user_lookup = user_to_resend_verification_email(cid)
     if (user_lookup[1] == 200):
         email = user_lookup[0]['email']
         token = user_lookup[0]['token']
         send_verification_email(email, token)
+        return make_response({'status': "success"}, 200)
+    else:
+        return make_response(user_lookup)
+
+
+@app.route('/reset_pwd_email', methods=['POST'])
+def reset_pwd() -> Response:
+    data = request.form
+    cid = data['cid']
+
+    user_lookup = user_to_send_reset_pwd_email(cid)
+
+    if (user_lookup[1] == 200):
+        email = user_lookup[0]['email']
+        token = user_lookup[0]['token']
+        send_forgotpwd_email(email, token)
         return make_response({'status': "success"}, 200)
     else:
         return make_response(user_lookup)
@@ -114,7 +131,7 @@ def verify_email() -> Response:
     try:
         verify: tuple[dict[str, str],
                       Literal[200, 406, 500]] = \
-            verify_user_from_email_verification(token)
+            verify_and_get_cid(token)
         response = make_response(verify)
         return response
     except jwt.ExpiredSignatureError:
@@ -123,6 +140,59 @@ def verify_email() -> Response:
     except jwt.InvalidTokenError:
         res = make_response({'status': 'invalid_verification_token'}, 400)
         return res
+
+
+@app.route('/new_pwd', methods=['POST'])
+def update_password() -> Response:
+    data = request.form
+    token: str = data['token']
+    password: str = data['password']
+    verification_password: str = data['verificationPassword']
+
+    try:
+        token_verification = verify_and_get_cid(token)
+    except Exception as e:
+        print(e)
+        return make_response({"status": "error"}, 400)
+
+    if not token_verification[1] == 200:
+        return make_response(token_verification)
+
+    if not password == verification_password:
+        return make_response({"status": "not_matching_password"}, 400)
+
+    cid: str = token_verification[0]['cid']
+
+    password_status = new_password(cid, password)
+
+    return make_response(password_status)
+
+
+def send_forgotpwd_email(to: str, token: str) -> None:
+    """
+    Sends a forgot password email to a user.
+    This email is in an HTML format, with a working link sending
+    the user directly to the correct endpoint in the frontend
+    (To be updated whenever the website is launched to not link to localhost)
+
+
+    Args:
+        to (str): The recipient's email address, which has been verified
+        in login_handler's check_data_input to be a valid email.
+        token_dict (dict): The jwt-generated token from login_handler's
+        create_verification_token-function.
+    """
+
+    msg = Message('Forgot password?',
+                  sender='temphydrant@gmail.com', recipients=[to])
+
+    endpoint: str = "/forgotPwd/" + token
+
+    url: str = DOMAIN + endpoint
+
+    msg.html = render_template("forgotPwdTemplate.html", link=url, raw_url=url)
+
+    mail.send(msg)
 
 
 def send_verification_email(to: str, token: str) -> None:
@@ -547,8 +617,8 @@ def edit_name():
     assignment = int(data['Assignment'])
 
     if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
-        res = course_handler.change_assignment_name(new_name, course,
-                                                    assignment)
+        res = course_handler.change_assignment_name(
+            new_name, course, assignment)
 
         if res is None:
             return make_response("", 200)
@@ -651,8 +721,8 @@ def set_feedback():
     group_id: int = int(data['Group'])
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
-        course_handler.set_teacher_feedback(group_id, feedback, grade, course,
-                                            assignment, submission)
+        course_handler.set_teacher_feedback(
+            group_id, feedback, grade, course, assignment, submission)
         return make_response("", 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
