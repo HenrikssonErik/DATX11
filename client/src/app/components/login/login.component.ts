@@ -244,6 +244,9 @@ export class LoginComponent implements OnInit {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+          if (statusMsg === 'already_verified') {
+            document.getElementById('closeVerModal')!.click();
+          }
         },
         complete: () => {
           this.toastr.success(
@@ -253,6 +256,7 @@ export class LoginComponent implements OnInit {
               closeButton: true,
             }
           );
+          document.getElementById('closeVerModal')!.click();
         },
       });
   }
@@ -292,6 +296,7 @@ export class LoginComponent implements OnInit {
               closeButton: true,
             }
           );
+          document.getElementById('closePwdModal')!.click();
         },
       });
   }
