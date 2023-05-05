@@ -44,32 +44,36 @@ export class GradeingComponent {
   ) {}
 
   ngOnInit(): void {
-    this.form = new FormGroup({
-      gradeAgain: new FormControl(false),
-    });
-
-    this.enableTooltips();
-
+    this.getSubmissions();
     this.setSelectedAssignment();
+    this.initForm();
+    this.enableTooltips();
+    this.filter();
+  }
 
-    //TODO: Break out into a function
+  getSubmissions() {
     this.submissionService
       .getAssignmentOverView(this.course.courseID)
       .subscribe({
         next: (data: Submission[]) => {
           this.allAssignments = data;
           this.assignmentNumbers = this.getAssignmentNumbers(data);
-          //this.setAssignmentToGrade(data[0]);
         },
         error: (error) => {
           console.error('Failed to get data:', error);
         },
         complete: () => {
           if (this.allAssignments) {
-            this.initSearch();
+            //this.initSearch();
           }
         },
       });
+  }
+
+  initForm(): void {
+    this.form = new FormGroup({
+      gradeAgain: new FormControl(false),
+    });
   }
 
   setSelectedAssignmentIndex(assignmentNr: number): void {
@@ -94,28 +98,8 @@ export class GradeingComponent {
     this.tooltipEnabler.enableTooltip();
   }
 
-  filterAssignments(assignmentNr: number) {
-    this.selectedAssignment = assignmentNr;
-    this.getSelectedAssignmentIndex();
-    if (this.allAssignments) {
-      this.gradeingSubmission = this.allAssignments.find(
-        (assignment: Submission): boolean =>
-          assignment.Assignment === assignmentNr
-      )!;
-      this.setFileNames(assignmentNr);
-    }
-    //TODO: handle if it was not found
-    if (this.gradeingSubmission) {
-      // Assignment was found
-      console.log(this.gradeingSubmission);
-    } else {
-      // Assignment was not found
-    }
-  }
-
   filterAssignment(submissions: Submission[]): Submission[] {
     if (this.selectedAssignment) {
-      this.setFileNames(this.selectedAssignment);
       return submissions.filter((submission) => {
         return submission.Assignment === this.selectedAssignment;
       });
@@ -123,49 +107,60 @@ export class GradeingComponent {
     return submissions;
   }
 
-  filterGraded(submissions: Submission[]): Submission[] {
-    const tempList: Submission[] = submissions.filter(
-      (submission: Submission): boolean => {
-        return submission.Submissions.some(
-          (submission: AssignmentSubmission): boolean => {
-            if (this.sortGraded) {
-              return submission.grade === true || submission.grade === false;
-            } else {
-              return submission.grade === null;
-            }
-          }
-        );
-      }
-    );
-    return tempList;
+  filterGraded(submissions: AssignmentSubmission[]): AssignmentSubmission[] {
+    console.log(submissions);
+    if (this.sortGraded) {
+      return submissions.filter((submission) => {
+        return submission.grade !== null;
+      });
+    } else {
+      return submissions.filter((submission) => submission.grade === null);
+    }
   }
 
-  filterDate(submissions: Submission[]): Submission[] {
-    const tempList: Submission[] = submissions.sort((a, b) => {
-      console.log('TEST');
-      const dateA = new Date(a.Submissions[0].Date);
-      const dateB = new Date(b.Submissions[0].Date);
+  filterDate(submissions: AssignmentSubmission[]): AssignmentSubmission[] {
+    const tempList: AssignmentSubmission[] = submissions.sort((a, b) => {
+      const dateA = new Date(a.Date);
+      const dateB = new Date(b.Date);
       if (this.dateFilter === 'ASC') {
-        return dateA.getTime() - dateB.getTime();
+        if (dateA.getTime() < dateB.getTime()) {
+          return -1;
+        } else if (dateA.getTime() > dateB.getTime()) {
+          return 1;
+        } else {
+          return 0;
+        }
       } else {
-        return dateB.getTime() - dateA.getTime();
+        if (dateA.getTime() < dateB.getTime()) {
+          return 1;
+        } else if (dateA.getTime() > dateB.getTime()) {
+          return -1;
+        } else {
+          return 0;
+        }
       }
     });
     return tempList;
   }
 
   filter() {
-    if (this.allAssignments) {
+    console.log('test');
+    if (this.allAssignments && this.selectedAssignment) {
+      console.log('filtering');
       let tempList: Submission[] = this.allAssignments?.slice();
-      //console.log('All:', tempList);
       tempList = this.filterAssignment(tempList);
-      //console.log('after filterassignment:', tempList);
-      tempList = this.filterGraded(tempList);
-      //console.log('After filted graded:', tempList);
-      tempList = this.filterDate(tempList);
-      console.log('After filted date:', tempList);
-      this.gradeingSubmission = tempList[0];
-      console.log('Gradeingsubmission', this.gradeingSubmission);
+      let tempListSubmissions: AssignmentSubmission[] =
+        tempList[0].Submissions.slice();
+
+      tempListSubmissions = this.filterGraded(tempListSubmissions);
+
+      tempListSubmissions = this.filterDate(tempListSubmissions);
+      this.gradeingSubmission = {
+        ...tempList[0],
+        Submissions: tempListSubmissions,
+      };
+
+      this.setFileNames(this.selectedAssignment);
     }
   }
 
@@ -173,7 +168,7 @@ export class GradeingComponent {
     const assignment = this.course.Assignments.find(
       (assignment) => assignment.AssignmentNr === assignmentNr
     );
-    return assignment?.MaxScore ?? 0;
+    return assignment?.MaxScore ?? 1;
   }
 
   setFileNames(assignmentNr: number) {
@@ -186,12 +181,6 @@ export class GradeingComponent {
     modalRef.componentInstance.group = group;
     modalRef.componentInstance.assignmentNr = assignmentNr;
     modalRef.componentInstance.courseId = this.course.courseID;
-  }
-
-  setAssignmentToGrade(assignment: Submission) {
-    //TODO: Make sure that the init with 1 is ok. It probably is not.
-    this.filterAssignments(1);
-    this.gradeingSubmission = assignment;
   }
 
   getAssignmentNumbers(data: Submission[]): number[] {
