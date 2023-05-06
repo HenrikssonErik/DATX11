@@ -67,7 +67,8 @@ class TestCourseHandler(unittest.TestCase):
         ) as mock_assignments:
             mock_assignments.return_value = []
             mock_cursor = setup_mock_cursor(mock_connect)
-            mock_cursor.fetchone.side_effect = [[1, 'Admin', 1, 'Whole course name', 'datx12', 2023, 3], ['name here']]
+            mock_cursor.fetchone.side_effect = [
+                [1, 'Admin', 1, 'Whole course name', 'datx12', 2023, 3], ['name here']]
             user_id = 1
             course_id = 1
             result = course_handler.get_course_info(user_id, course_id)
@@ -98,11 +99,12 @@ class TestCourseHandler(unittest.TestCase):
     def test_get_assignments(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
         course_id = 1
-        mock_cursor.fetchall.return_value = [(2, '2022-03-18', 'description', 'TestName')]
+        mock_cursor.fetchall.return_value = [
+            (2, '2022-03-18', 'description', 'TestName')]
         res = course_handler.get_assignments(course_id)
         mock_cursor.execute.assert_called_once_with(
-            "SELECT assignment, enddate, Description, Name FROM "
-            "assignments WHERE courseid = %s",
+            "SELECT assignment, endDate, description, name,"
+            "maxscore, passscore FROM Assignments WHERE courseid = %s",
             [course_id]
         )
         self.assertEqual(
