@@ -252,8 +252,8 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT assignment, endDate, description, name,
-                maxscore, passscore FROM Assignments WHERE courseid = %s"""
+                query_data = "SELECT assignment, endDate, description, name,"\
+                    "maxscore, passscore FROM Assignments WHERE courseid = %s"
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
@@ -454,7 +454,8 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
 
         grade = None if (x := submission[4]) is None else x
 
-        teacher = "" if (x := submission[5]) is None else user_handler.get_fullname(submission[5])
+        teacher = "" if (x := submission[5]) is None else user_handler.get_fullname(
+            submission[5])
 
         assignments.append({'Submission': submission[0],
                             'testpass': submission[1],
@@ -544,7 +545,8 @@ def get_assignment_overview(course: int) -> list[dict]:
                     data = cur.fetchall()
                     if data:
                         for row in data:
-                            teacher = "" if (x := row[6]) is None else user_handler.get_fullname(x)
+                            teacher = "" if (
+                                x := row[6]) is None else user_handler.get_fullname(x)
                             group = get_group_number(course, row[0])
                             group_dict = {
                                 "groupid": row[0],

@@ -146,7 +146,7 @@ class TestUserHandler(unittest.TestCase):
                       [group_id])
         ])
 
-    @patch('src.user_handler.get_courses_info')
+    @patch('src.course_handler.get_courses_info')
     def test_is_admin_on_course(self, mock_user_courses):
         user_id = 1
         course_id = 1
@@ -160,7 +160,7 @@ class TestUserHandler(unittest.TestCase):
         mock_user_courses.assert_called_once_with(user_id)
         self.assertTrue(res)
 
-    @patch('src.user_handler.get_courses_info')
+    @patch('src.course_handler.get_courses_info')
     def test_is_not_admin_on_course(self, mock_user_courses):
         user_id = 1
         course_id = 1
@@ -174,7 +174,7 @@ class TestUserHandler(unittest.TestCase):
         mock_user_courses.assert_called_once_with(user_id)
         self.assertFalse(res)
 
-    @patch('src.user_handler.get_courses_info')
+    @patch('src.course_handler.get_courses_info')
     def test_is_teacher_on_course(self, mock_user_courses):
         user_id = 1
         course_id = 1
@@ -188,7 +188,7 @@ class TestUserHandler(unittest.TestCase):
         mock_user_courses.assert_called_once_with(user_id)
         self.assertTrue(res)
 
-    @patch('src.user_handler.get_courses_info')
+    @patch('src.course_handler.get_courses_info')
     def test_is_not_teacher_on_course(self, mock_user_courses):
         user_id = 1
         course_id = 1

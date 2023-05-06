@@ -1,5 +1,5 @@
 from .connector import get_conn_string
-from .course_handler import get_courses_info
+from . import course_handler
 import psycopg2
 from enum import Enum
 
@@ -131,7 +131,7 @@ def _get_group_members(group_id: int) -> list:
 def add_user_to_group(user_id: int, group_id: int) -> None:
     """Adds a user to the specified group, also checks that th euser is
     part of the course to which the group is associated"""
-    user_courses = get_courses_info(user_id)
+    user_courses = course_handler.get_courses_info(user_id)
     conn = psycopg2.connect(dsn=get_conn_string())
 
     course_id = _get_course_id_from_group(group_id)
@@ -267,7 +267,7 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
 def is_teacher_on_course(user_id: int, course_id: int) -> bool:
     """Checks if a user has the teacher role on the course
     Returns True/False"""
-    courses = get_courses_info(user_id)
+    courses = course_handler.get_courses_info(user_id)
     for course in courses:
         if course['courseID'] == course_id \
            and course['Role'] == Role.Teacher.name:
@@ -279,7 +279,7 @@ def is_teacher_on_course(user_id: int, course_id: int) -> bool:
 def is_in_course(user_id: int, course_id: int) -> bool:
     """Checks if a user is a member of the course
     Returns True/False"""
-    courses = get_courses_info(user_id)
+    courses = course_handler.get_courses_info(user_id)
     for course in courses:
         if (course['courseID'] == course_id):
             return True
@@ -289,7 +289,7 @@ def is_in_course(user_id: int, course_id: int) -> bool:
 def is_admin_on_course(user_id: int, course_id: int) -> bool:
     """Checks if a user has the Admin role on the course
     Returns True/False"""
-    courses = get_courses_info(user_id)
+    courses = course_handler.get_courses_info(user_id)
     for course in courses:
         if course['courseID'] == course_id \
            and course['Role'] == Role.Admin.name:
