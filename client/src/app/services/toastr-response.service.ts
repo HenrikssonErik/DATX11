@@ -30,6 +30,8 @@ const response_to_toastr: ResponseToToastr = {
   ],
   no_user: ['Register to create your user.', 'There is no user with that CID!'],
   already_verified: ['Want to login instead?', 'You are already verified!'],
+  tests_updated: ['Updated', 'Unit Tests'],
+  tests_uploaded: ['Uploaded', 'Unit Tests'],
 };
 
 @Injectable({

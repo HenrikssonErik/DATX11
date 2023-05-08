@@ -245,7 +245,9 @@ export class AssignmentCardComponent {
         next: (response: any) => {
           try {
             if (response.status == 200) {
-              this.toastr.success('Unittests Updated', response.body);
+              const [message, title]: string[] =
+                this.toastrResponse.getToastrResponse('tests_updated');
+              this.toastr.success(message, title);
               //location.reload();
             }
           } catch {

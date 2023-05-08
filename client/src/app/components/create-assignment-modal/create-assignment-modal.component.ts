@@ -175,7 +175,9 @@ export class CreateAssignmentModalComponent {
         next: (response: any) => {
           try {
             if (response.status == 200) {
-              this.toastr.success('Unittests added', response.body);
+              const [message, title]: string[] =
+                this.toastrResponse.getToastrResponse('tests_uploaded');
+              this.toastr.success(message, title);
             }
           } catch {
             throw new Error('unexpected_error');
