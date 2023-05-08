@@ -640,8 +640,8 @@ def edit_name():
     assignment = int(data['Assignment'])
 
     if (user_handler.check_admin_or_course_teacher(request_user_id, course)):
-        res = course_handler.change_assignment_name(new_name, course,
-                                                    assignment)
+        res = course_handler.change_assignment_name(
+            new_name, course, assignment)
 
         if res is None:
             return make_response("", 200)

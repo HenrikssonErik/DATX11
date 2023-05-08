@@ -54,7 +54,12 @@ export class AssignmentsComponent implements OnInit {
             console.log(res);
           });
         }
-        //this.getFileNames();
+        if (!this.isAdmin) {
+          this.groupService.getMyGroup(id).subscribe((res) => {
+            this.myGroup = res;
+            console.log(res);
+          });
+        }
       });
     }
 
