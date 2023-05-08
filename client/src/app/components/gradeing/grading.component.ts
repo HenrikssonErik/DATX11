@@ -14,10 +14,10 @@ import { CourseService } from 'src/app/services/course-service.service';
 
 @Component({
   selector: 'app-gradeing',
-  templateUrl: './gradeing.component.html',
-  styleUrls: ['./gradeing.component.scss'],
+  templateUrl: './grading.component.html',
+  styleUrls: ['./grading.component.scss'],
 })
-export class GradeingComponent {
+export class GradingComponent {
   searchTerm$: Subject<string> = new Subject<string>();
   unsubscribe$: Subject<void> = new Subject();
   @Input() course!: Course;
