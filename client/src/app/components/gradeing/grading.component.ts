@@ -34,6 +34,7 @@ export class GradingComponent {
   form!: FormGroup;
   sortGraded: boolean = false;
   dateFilter: string = '';
+  //TODO: Add type @Kvalle99
   groupMembers: any = {};
   isLoading: boolean = false;
 
