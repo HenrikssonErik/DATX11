@@ -506,7 +506,7 @@ def get_course_group(course: int, group_id: int):
                 groupid = %s GROUP BY groupid, groupnumber"""
                 cur.execute(query_data, [course, group_id])
                 data = cur.fetchone()
-                if not data:
+                if data is None:
                     return {}
                 group_dict = {
                     "groupNumber": data[0],
@@ -584,7 +584,7 @@ def get_group_number(course_id: int, group_id) -> int:
                 data = cur.fetchone()
         conn.close()
 
-        if not data:
+        if data is None:
             raise Exception("No group found")
 
         return data[0]

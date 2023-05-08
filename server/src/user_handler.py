@@ -64,7 +64,7 @@ def get_fullname(user_id: int) -> str:
                 cur.execute(query_data, [user_id])
                 data = cur.fetchone()
         conn.close()
-        if not data:
+        if data is None:
             raise Exception("No such user")
         return data[0]
 
