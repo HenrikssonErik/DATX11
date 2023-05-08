@@ -10,6 +10,8 @@ import { TestResult } from 'src/app/models/submission';
 export class SubmissionsComponent {
   @Input() assignmentNr!: number;
   @Input() courseId!: number;
+  @Input() fileList!: string[];
+  @Input() groupId?: number;
   submissions!: TestResult[];
   generalTest!: any[];
   isLoading: boolean = false;
@@ -25,6 +27,8 @@ export class SubmissionsComponent {
       .getSubmission(this.courseId, this.assignmentNr)
       .subscribe({
         next: (res: TestResult[]) => {
+          console.log('res');
+          console.log(res);
           this.submissions = res;
           this.submissions.sort((a, b) => b.Submission - a.Submission);
         },
@@ -87,5 +91,15 @@ export class SubmissionsComponent {
   parseErrors(str: string): string {
     const error: string = str.substring(str.lastIndexOf(',') + 1);
     return error;
+  }
+
+  downloadFile(fileName: string, submission: number) {
+    this.submissionService.downloadSubmissionFile(
+      this.courseId,
+      this.groupId!,
+      this.assignmentNr,
+      submission,
+      fileName
+    );
   }
 }

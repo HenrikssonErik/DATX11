@@ -10,6 +10,7 @@ export class FileUploadModalComponent {
   @Input() courseId!: number;
   @Input() assignmentNumber!: number;
   @Input() groupId!: number;
+  @Input() fileList!: string[];
 
   constructor(public activeModal: NgbActiveModal) {}
 }

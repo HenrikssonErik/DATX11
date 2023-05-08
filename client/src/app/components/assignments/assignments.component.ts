@@ -23,7 +23,7 @@ export class AssignmentsComponent implements OnInit {
   selectedTab: number = -2;
   //group!: Group;
   courseGroups: Group[] = [];
-
+  fileNames: string[] = [];
   myGroup?: Group;
   isLoadingMap: Map<number, boolean> = new Map<number, boolean>();
   createGroupLoader: boolean = false;
@@ -44,11 +44,15 @@ export class AssignmentsComponent implements OnInit {
     if (!isNaN(id)) {
       this.courseService.getCourse(id).subscribe((res: Course) => {
         this.course = res;
-        //console.log(this.course);
         this.course.Assignments.sort((a, b) => a.AssignmentNr - b.AssignmentNr);
         if (this.isAdmin) {
           //TODO: Move admins to "gradeing" tab. Ugly but wokrs for now
           this.selectedTab = -3;
+        } else {
+          this.groupService.getMyGroup(id).subscribe((res) => {
+            this.myGroup = res;
+            console.log(res);
+          });
         }
         if (!this.isAdmin) {
           this.groupService.getMyGroup(id).subscribe((res) => {
@@ -67,7 +71,6 @@ export class AssignmentsComponent implements OnInit {
 
     this.groupService.getGroups(id).subscribe((res) => {
       this.courseGroups = res;
-      //console.log(this.courseGroups);
     });
   }
 
@@ -75,8 +78,23 @@ export class AssignmentsComponent implements OnInit {
     return this.course.Role === 'Admin' || this.course.Role === 'Teacher';
   }
 
+  getFileNames() {
+    this.fileNames = [];
+    if (this.selectedTab >= 0) {
+      this.submissionService
+        .getFileNames(
+          this.course.courseID,
+          this.course.Assignments[this.selectedTab].AssignmentNr
+        )
+        .subscribe((res) => {
+          this.fileNames = res['Filenames'];
+        });
+    }
+  }
+
   onTabSelect(tabNumber: number): void {
     this.selectedTab = tabNumber;
+    this.getFileNames();
   }
 
   goBack(): void {
@@ -90,6 +108,7 @@ export class AssignmentsComponent implements OnInit {
     modalRef.componentInstance.groupNr = groupId;
     modalRef.componentInstance.groupId = groupId;
     modalRef.componentInstance.assignmentNumber = assignmentNumber;
+    modalRef.componentInstance.fileList = this.fileNames;
   }
 
   formatDate(date: Date): string {
@@ -122,7 +141,6 @@ export class AssignmentsComponent implements OnInit {
 
   removeFromGroup(courseId: number, groupId: number) {
     this.isLoadingMap.set(groupId, true);
-    console.log(this.createGroupLoader);
     this.userService.getUserData().subscribe((res) => {
       this.groupService.removeFromGroup(courseId, groupId, res.id).subscribe({
         next: (res) => {

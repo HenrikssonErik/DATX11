@@ -42,7 +42,6 @@ import { GradingComponent } from './components/gradeing/grading.component';
 import { FeedbackTeacherViewModalComponent } from './components/feedback-teacher-view-modal/feedback-teacher-view-modal.component';
 import { ForgotPwdComponent } from './components/forgot-pwd/forgot-pwd.component';
 
-
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
 }

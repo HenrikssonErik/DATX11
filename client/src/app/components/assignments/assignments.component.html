@@ -22,7 +22,7 @@
         role="tab"
         [attr.aria-controls]="'tab-pane-settings'"
         [attr.aria-selected]="selectedTab === -1"
-        (click)="selectedTab = -1"
+        (click)="onTabSelect(-1)"
         translate
       >
         Settings
@@ -44,7 +44,7 @@
           role="tab"
           [attr.aria-controls]="'tab-pane-' + assignment.AssignmentNr"
           [attr.aria-selected]="selectedTab === i"
-          (click)="selectedTab = i"
+          (click)="onTabSelect(i)"
         >
           <span translate>Assignment </span>{{ assignment.AssignmentNr }}
         </button>
@@ -61,7 +61,7 @@
         role="tab"
         [attr.aria-controls]="'tab-pane-groups'"
         [attr.aria-selected]="selectedTab === -2"
-        (click)="selectedTab = -2"
+        (click)="onTabSelect(-2)"
         translate
       >
         Groups_Tab
@@ -78,7 +78,7 @@
         role="tab"
         [attr.aria-controls]="'tab-pane-gradeing'"
         [attr.aria-selected]="selectedTab === -3"
-        (click)="selectedTab = -3"
+        (click)="onTabSelect(-3)"
         translate
       >
         Grading
@@ -243,7 +243,6 @@
                 </p>
               </ng-container>
             </div>
-
             <div class="col-md-6">
               <h5 translate>Description</h5>
               <p>{{ assignment.Description }}</p>
@@ -255,6 +254,8 @@
             <app-submissions
               [assignmentNr]="assignment.AssignmentNr"
               [courseId]="course.courseID"
+              [fileList]="fileNames"
+              [groupId]="myGroup?.groupId"
             ></app-submissions>
           </div>
         </div>

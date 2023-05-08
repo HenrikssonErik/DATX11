@@ -257,6 +257,7 @@ def post_tests():
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
 
+
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
 
         if not files:
@@ -265,8 +266,8 @@ def post_tests():
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         res = handle_test_file(files, course, assignment)
         return make_response(jsonify(res[0]), res[1])
-    else:
-        return make_response({'status': 'Not_a_course_teacher'}, 401)
+    else: 
+        return make_response("", 401)
 
 
 """
@@ -780,7 +781,6 @@ def set_feedback():
         course_handler.set_teacher_feedback(group_id, feedback, grade, course,
                                             assignment, submission, user_id,
                                             score)
-
         return make_response("", 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
