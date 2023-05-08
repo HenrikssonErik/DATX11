@@ -255,7 +255,7 @@ export class GradingComponent {
         },
         error: (err) => {
           console.log(err);
-          this.toastr.error('Something went wrong!', 'Error!');
+          this.toastr.error('Could not set grade', 'Error!');
         },
         complete: () => {
           this.toastr.success(
