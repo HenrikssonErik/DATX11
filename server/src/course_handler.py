@@ -1,6 +1,7 @@
 from .connector import get_conn_string
 import psycopg2
 import datetime
+from . import user_handler
 
 
 def create_course(course_name: str, course_abbr: str, year: int,
@@ -46,8 +47,8 @@ def get_courses_info(user_id: int) -> list[dict[str, str | int]]:
         for info in data:
             ordered_data.append({"Role": info[1], "courseID": info[2],
                                 "CourseName": info[3],
-                                 "Course": info[4], "Year": info[5],
-                                 "StudyPeriod": info[6],
+                                 "Course": info[4], "Year": info[6],
+                                 "StudyPeriod": info[5],
                                  'Assignments': get_assignments(info[2])})
         return ordered_data
 
@@ -92,6 +93,33 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
     except Exception as e:
         print(e)
         return [{'status': "No Courses Found"}]
+
+
+def get_progress(user_id: int) -> list:
+    """Retrieves the results of the latest submisison for the user on
+    all courses"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query = """SELECT af.courseId, COUNT(*) AS Completed FROM
+                UserGroupCourseInfo ugci JOIN AssignmentFeedback af ON
+                ugci.groupId = af.groupId AND ugci.courseId = af.courseId
+                WHERE ugci.userId = %s AND af.teacherGrade = TRUE GROUP BY
+                af.courseId;"""
+                cur.execute(query, [user_id])
+                data = cur.fetchall()
+        conn.close()
+        if not (data):
+            return []
+        else:
+            courses = [{'Course': row[0], 'Completed': row[1]} for row in data]
+            return courses
+
+    except Exception as e:
+        print(e)
+        raise Exception("Could not get status") from e
 
 
 def add_group_to_course(course_id: int, user_id: int):
@@ -162,7 +190,8 @@ def _create_course(course_name: str, course_abbr: str, year: int,
 
 
 def create_assignment(course_id: int, description: str, assignment_name: int,
-                      end_date: str, file_names: list) -> dict:
+                      end_date: str, file_names: list, max_score: int,
+                      pass_score: int) -> dict:
     """Creates an assignment for a course, assignment number will not be
     incremented automatically, thus must be provided by the creator"""
     res: dict = {}
@@ -193,15 +222,17 @@ def create_assignment(course_id: int, description: str, assignment_name: int,
                     # need to increment by 1
                     assignment_nr = data[0] + 1
                 query_two = """INSERT INTO Assignments (courseid, assignment,
-                enddate, description, name) VALUES
-                    (%s, 0, %s, %s, %s);"""
+                enddate, description, name, maxscore, passscore) VALUES
+                    (%s, 0, %s, %s, %s, %s, %s);"""
                 cur.execute(
                     query_two,
                     [
                         course_id,
                         end_date,
                         description,
-                        assignment_name
+                        assignment_name,
+                        max_score,
+                        pass_score
                     ]
                 )
         conn.close()
@@ -221,8 +252,8 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT assignment, endDate, description, name
-                FROM Assignments WHERE courseid = %s"""
+                query_data = "SELECT assignment, endDate, description, name,"\
+                    "maxscore, passscore FROM Assignments WHERE courseid = %s"
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
@@ -231,7 +262,9 @@ def get_assignments(course_id: int) -> tuple:
                     assignments.append({'AssignmentNr': assignment_row[0],
                                         'DueDate': assignment_row[1],
                                         'Description': assignment_row[2],
-                                        'Name': assignment_row[3]})
+                                        'Name': assignment_row[3],
+                                        'MaxScore': assignment_row[4],
+                                        'PassScore': assignment_row[5]})
         conn.close()
         if not data:
             return []
@@ -300,7 +333,8 @@ def change_course_name(new_name: str, course: int):
 
 
 def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
-                         course: int, assignment: int, submission: int):
+                         course: int, assignment: int, submission: int,
+                         teacher: int, score: int):
     """Submission is set to 0 since a primary cannot be null.
     It will increment by default anyway."""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -310,10 +344,12 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
                 query_one = """UPDATE AssignmentFeedback SET
                 teacherFeedback = %s, teacherGrade = %s,
                 feedbackdate = (CURRENT_TIMESTAMP AT TIME ZONE
-                'Europe/Stockholm') WHERE groupId = %s AND courseId = %s
-                AND submission = %s AND assignment = %s;"""
-                cur.execute(query_one, [feedback, grade, group_id, course,
-                                        submission, assignment])
+                'Europe/Stockholm'), score = %s, courseId = %s,
+                userid = %s WHERE groupId = %s AND
+                submission = %s AND assignment = %s;"""
+                cur.execute(query_one, [feedback, grade, score, course,
+                                        teacher, group_id, submission,
+                                        assignment])
         conn.close()
         return
     except Exception as e:
@@ -392,9 +428,9 @@ def get_assignment_feedback(course: int, assignment: int,
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT submission, testpass,
-                testfeedback, teacherfeedback, teachergrade FROM
-                                assignmentfeedback WHERE courseid = %s AND
-                                groupid = %s AND assignment = %s"""
+                testfeedback, teacherfeedback, teachergrade, userid,
+                feedbackdate FROM assignmentfeedback WHERE courseid = %s AND
+                groupid = %s AND assignment = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
                 print("from db")
@@ -417,11 +453,17 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
         teacherfeedback = "" if (x := submission[3]) is None else x
 
         grade = None if (x := submission[4]) is None else x
+
+        teacher = "" if (x := submission[5]) is None else user_handler.get_fullname(
+            submission[5])
+
         assignments.append({'Submission': submission[0],
                             'testpass': submission[1],
                             'testfeedback': testfeedback,
                             'teacherfeedback': teacherfeedback,
-                            'Grade': grade})
+                            'Grade': grade,
+                            'GradedBy': teacher,
+                            'Date': submission[6]})
     return assignments
 
 
@@ -453,7 +495,31 @@ def get_course_groups(course: int):
         raise Exception("Error when getting course groups") from e
 
 
-def get_assignment_overview(course: int, assignment: int) -> list[dict]:
+def get_course_group(course: int, group_id: int):
+    conn = psycopg2.connect(dsn=get_conn_string())
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT groupnumber,
+                array_agg(fullname) FROM GroupDetails WHERE course = %s and
+                groupid = %s GROUP BY groupid, groupnumber"""
+                cur.execute(query_data, [course, group_id])
+                data = cur.fetchone()
+                if data is None:
+                    return {}
+                group_dict = {
+                    "groupNumber": data[0],
+                    "users": data[1]}
+        conn.close()
+        return group_dict
+
+    except Exception as e:
+        print(e)
+        raise Exception("Error when getting course groups") from e
+
+
+def get_assignment_overview(course: int) -> list[dict]:
     """Returns a list with test status and grade for all the latest
     submissions for a assignment"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -461,29 +527,70 @@ def get_assignment_overview(course: int, assignment: int) -> list[dict]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
-                teacherGrade FROM AssignmentFeedback WHERE courseId = %s
-                AND assignment = %s ORDER BY groupId,
-                submission DESC;"""
+                query_one = """ select assignment from assignments where
+                courseid = %s"""
+                cur.execute(query_one, [course])
 
-                cur.execute(query_data, [course, assignment])
-                data = cur.fetchall()
-                if not data:
-                    return []
-                
-                overview_list = []
-                for row in data:
-                    group_dict = {
-                        "groupid": row[0],
-                        "testpass": row[1],
-                        "grade": row[2]}
-                    overview_list.append(group_dict)
+                assignments = cur.fetchall()
+
+                query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
+                teacherGrade, submission, score,  teacherfeedback, userid,
+                feedbackdate, createdDate FROM AssignmentFeedback WHERE
+                courseid = %s AND assignment = %s ORDER BY groupId,
+                submission DESC;"""
+                return_list = []
+                for assignment in assignments:
+                    overview_list = []
+                    cur.execute(query_data, [course, assignment[0]])
+                    data = cur.fetchall()
+                    if data:
+                        for row in data:
+                            teacher = "" if (
+                                x := row[6]) is None else user_handler.get_fullname(x)
+                            group = get_group_number(course, row[0])
+                            group_dict = {
+                                "groupid": row[0],
+                                "testpass": row[1],
+                                "grade": row[2],
+                                'Submission': row[3],
+                                "Score": row[4],
+                                "Feedback": row[5],
+                                "GradedBy": teacher,
+                                'lastEdited': row[7],
+                                'dateSubmitted': row[8],
+                                'GroupNumber': group}
+                            overview_list.append(group_dict)
+                    return_list.append({"Assignment": assignment[0],
+                                        "Submissions": overview_list})
         conn.close()
-        return overview_list
+        return return_list
 
     except Exception as e:
         print(e)
         raise Exception("Error when getting assignment overview") from e
+
+
+def get_group_number(course_id: int, group_id) -> int:
+    """Returns  group number associated with the group_id
+        in the specified course"""
+    conn = psycopg2.connect(dsn=get_conn_string())
+    print('course and group', course_id, group_id)
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                query_data = """SELECT groupnumber FROM Groups WHERE
+                course = %s and groupid = %s"""
+                cur.execute(query_data, (course_id, group_id))
+                data = cur.fetchone()
+        conn.close()
+
+        if data is None:
+            raise Exception("No group found")
+
+        return data[0]
+    except Exception as e:
+        print(e)
+        raise Exception("Could not find any group") from e
 
 
 def passed_deadline(course: int, assignment: int) -> bool:

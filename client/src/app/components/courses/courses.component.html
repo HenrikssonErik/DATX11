@@ -40,7 +40,7 @@
         </div>
       </div>
       <div class="row comingUp">
-        <div class="col-12 bottomBorder">
+        <div class="col-12">
           <h5 class="mt-3" translate="">Coming_Up</h5>
           <div *ngIf="deadlines.length == 0">
             <p class="noDeadLines mt-5" translate>No_deadlines</p>
@@ -55,14 +55,14 @@
         </div>
       </div>
 
-      <div class="row recentEvents">
+      <!--       <div class="row recentEvents">
         <div class="col-12">
           <h5 class="mt-3" translate>Recent_Events</h5>
           <div *ngIf="events.length == 0">
             <p class="nothingNew mt-5" translate>Nothing_new</p>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="col-md-10 col-12">
       <router-outlet></router-outlet>

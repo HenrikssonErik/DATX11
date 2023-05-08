@@ -1,0 +1,106 @@
+<div *ngIf="isLoading" class="loader-container">
+  <div class="loader"></div>
+</div>
+<div *ngIf="submission">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="text-muted">
+        Test result for group {{ group }} assignment {{ assignmentNr }}
+      </h5>
+      <i
+        class="fa-solid fa-xmark close"
+        (click)="activeModal.dismiss('Cross click')"
+      ></i>
+    </div>
+    <div class="modal-body">
+      <p
+        [ngStyle]="{
+          'font-size': '1.5em',
+          color: submission[0].testpass ? '#006c5c' : '#8b0000'
+        }"
+      >
+        <ng-container *ngIf="submission[0].testpass; else failed">
+          Passed
+        </ng-container>
+        <ng-template #failed> Failed </ng-template>
+      </p>
+      <div
+        class="row"
+        *ngIf="submission[0].testfeedback.unittest_feedback.errors.length > 0"
+      >
+        <div class="col-12">
+          <h6 class="text-muted">Errors:</h6>
+          <div
+            *ngFor="
+              let errors of submission[0].testfeedback.unittest_feedback.errors
+            "
+          >
+            <div class="card errors">
+              <p class="text-muted">{{ parseErrors(errors[1]) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+        *ngIf="submission[0].testfeedback.unittest_feedback.failures.length > 0"
+      >
+        <div class="col-12">
+          <h6 class="text-muted">Failed Tests</h6>
+          <div
+            *ngFor="
+              let failures of submission[0].testfeedback.unittest_feedback
+                .failures
+            "
+          >
+            <div
+              class="card unitTest"
+              *ngFor="
+                let unitTestFailures of parseUnitTest(failures[0], failures[1])
+              "
+            >
+              <div class="text-muted">
+                <p>Test: {{ unitTestFailures.test }}</p>
+                <p>{{ unitTestFailures.error }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+        *ngIf="
+          submission[0].testfeedback.general_tests_feedback[0].PEP8_results
+        "
+      >
+        <h6 class="text-muted mt-2 mb-2">Pep8 Results</h6>
+        <div class="col-12">
+          <div
+            *ngFor="
+              let generalTestResult of submission[0].testfeedback
+                .general_tests_feedback
+            "
+          >
+            <div
+              *ngFor="
+                let parsedError of parseGeneralTest(
+                  generalTestResult.PEP8_results
+                )
+              "
+              class="card generalTest"
+            >
+              <p class="text-muted">
+                File: {{ generalTestResult.tested_file.file }}, error on line:
+                <span>{{ parsedError.lineNum }}</span
+                ><span>, column: {{ parsedError.colNum }}</span>
+              </p>
+              <p class="text-muted">
+                {{ parsedError.message }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

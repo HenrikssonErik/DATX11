@@ -327,7 +327,7 @@ def get_test_file(course: int, assignment: int, file_name: str):
     return file_binary
 
 
-def get_assignment_files_from_database(
+def get_assignment_file_from_database(
         group_id: int,
         course: int,
         assignment: int,

@@ -1,40 +1,42 @@
 import { Component, Input } from '@angular/core';
-import { SubmissionService } from 'src/app/services/submission.service';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { TestResult } from 'src/app/models/submission';
+import { SubmissionService } from 'src/app/services/submission.service';
 
 @Component({
-  selector: 'app-submissions',
-  templateUrl: './submissions.component.html',
-  styleUrls: ['./submissions.component.scss'],
+  selector: 'app-feedback-teacher-view-modal',
+  templateUrl: './feedback-teacher-view-modal.component.html',
+  styleUrls: ['./feedback-teacher-view-modal.component.scss'],
 })
-export class SubmissionsComponent {
+export class FeedbackTeacherViewModalComponent {
   @Input() assignmentNr!: number;
   @Input() courseId!: number;
-  submissions!: TestResult[];
-  generalTest!: any[];
+  @Input() group!: number;
+  submission!: TestResult[];
   isLoading: boolean = false;
-  constructor(private submissionService: SubmissionService) {}
+
+  constructor(
+    private submissionService: SubmissionService,
+    public activeModal: NgbActiveModal
+  ) {}
 
   ngOnInit(): void {
-    this.getSubmissions();
-  }
-
-  getSubmissions() {
     this.isLoading = true;
     this.submissionService
-      .getSubmission(this.courseId, this.assignmentNr)
+      .getTestingFeedback(this.courseId, this.assignmentNr, this.group)
       .subscribe({
-        next: (res: TestResult[]) => {
-          this.submissions = res;
-          this.submissions.sort((a, b) => b.Submission - a.Submission);
+        next: (data: any) => {
+          //console.log(data);
+          this.submission = data;
+          console.log('submissions:', this.submission);
         },
-        error: (err) => {
-          console.log(err);
+        error: (error) => {
           this.isLoading = false;
+          console.error('Failed to get data:', error);
         },
         complete: () => {
           this.isLoading = false;
-          console.log(this.submissions);
+          console.log('complete');
         },
       });
   }

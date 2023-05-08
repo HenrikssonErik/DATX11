@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, mergeMap, Observable, switchMap } from 'rxjs';
 import { API_URL } from 'src/environments/environment';
-import { Courses } from '../models/courses';
+import { Courses, ProgressItem } from '../models/courses';
 import { Course } from '../models/courses';
 
 @Injectable({
@@ -25,6 +25,15 @@ export class CourseService {
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
     return this.http.get<Course>(`${API_URL}/getCourse?Course=${id}`, {
+      headers,
+    });
+  }
+
+  getCourseProgress(): Observable<ProgressItem[]> {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+    return this.http.get<ProgressItem[]>(`${API_URL}/getCourseProgress`, {
       headers,
     });
   }

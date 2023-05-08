@@ -35,6 +35,16 @@ export class CreateAssignmentModalComponent {
       AssignmentName: ['', Validators.required],
       Date: ['', Validators.required],
       Description: ['', Validators.required],
+      MaxScore: [
+        0,
+        [
+          Validators.required,
+          Validators.min(1),
+          Validators.min(this.form?.controls['PassScore'].value),
+        ],
+      ],
+      PassScore: [0, [Validators.required, Validators.min(1)]],
+      PassFail: [false],
       numOfFiles: [0, [Validators.required, Validators.min(1)]],
       fileNames: this.formBuilder.array(
         [],
@@ -53,6 +63,26 @@ export class CreateAssignmentModalComponent {
         fileArray.push(control);
       }
     });
+  }
+
+  passFailToggle() {
+    if (this.form.get('PassFail')!.value) {
+      this.form.controls['MaxScore']?.setValue(0);
+      this.form.controls['PassScore']?.setValue(0);
+    } else {
+      this.form.controls['MaxScore']?.setValue(1);
+      this.form.controls['PassScore']?.setValue(1);
+    }
+  }
+
+  changeMinVal() {
+    this.form.controls['MaxScore'].clearValidators();
+    this.form.controls['MaxScore'].addValidators([
+      Validators.required,
+      Validators.min(this.form?.controls['PassScore'].value),
+    ]);
+    this.form.controls['MaxScore'].updateValueAndValidity();
+    console.log(this.form.controls['MaxScore'].valid);
   }
 
   fileBrowseHandler(files: Event): void {
@@ -93,7 +123,7 @@ export class CreateAssignmentModalComponent {
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
-
+    console.log('create');
     const formData = { ...this.form };
     delete formData.value.numOfFiles;
     const fileData = new FormData();
@@ -112,7 +142,6 @@ export class CreateAssignmentModalComponent {
             if (response.status == 200) {
               this.toastr.success('Assignment Created', response.body);
               this.postUnittests(fileData, headers);
-              location.reload();
             }
           } catch {
             throw new Error('unexpected_error');
@@ -147,7 +176,6 @@ export class CreateAssignmentModalComponent {
           try {
             if (response.status == 200) {
               this.toastr.success('Unittests added', response.body);
-              location.reload();
             }
           } catch {
             throw new Error('unexpected_error');
@@ -160,6 +188,9 @@ export class CreateAssignmentModalComponent {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+        },
+        complete: () => {
+          location.reload();
         },
       });
   }

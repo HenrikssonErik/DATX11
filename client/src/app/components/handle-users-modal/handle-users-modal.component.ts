@@ -8,6 +8,7 @@ import { User } from 'src/app/models/user';
 import { ToastrResponseService } from 'src/app/services/toastr-response.service';
 import { UserService } from 'src/app/services/user-service.service';
 import { API_URL } from 'src/environments/environment';
+import Fuse from 'fuse.js';
 
 @Component({
   selector: 'app-handle-users-modal',
@@ -17,8 +18,10 @@ import { API_URL } from 'src/environments/environment';
 export class HandleUsersModalComponent {
   @Input() users!: User[];
   @Input() course!: Course;
+  usersList: User[] = [];
   csvData: string[] = [];
   newCid: string = '';
+  searchString: string = '';
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -34,6 +37,7 @@ export class HandleUsersModalComponent {
       (res: User[]) => {
         console.log(res);
         this.users = res;
+        this.usersList = this.users;
       },
       (error) => {
         console.error(error);
@@ -189,5 +193,23 @@ export class HandleUsersModalComponent {
           });
         },
       });
+  }
+
+  search() {
+    const options = {
+      keys: ['cid', 'email', 'fullname'],
+      threshold: 0.3, // Adjust this value to control the "fuzziness" of the search
+      ignoreLocation: true,
+      includeScore: true,
+    };
+    console.log(this.searchString);
+
+    if (this.searchString == '') {
+      this.usersList = this.users;
+    } else {
+      const fuse = new Fuse(this.users, options);
+      const result = fuse.search(this.searchString);
+      this.usersList = result.map((r) => r.item);
+    }
   }
 }

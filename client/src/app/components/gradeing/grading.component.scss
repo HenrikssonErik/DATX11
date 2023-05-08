@@ -1,0 +1,180 @@
+.form-check-input:checked {
+  background-color: #216b42 !important;
+  border-color: #216b42;
+}
+
+.form-check-input:focus {
+  border-color: #28a745;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgb(40 167 69 / 25%);
+}
+
+.form-control:focus {
+  border-color: rgba(38, 115, 77, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
+}
+
+.form-outline input[type="search"]::-webkit-search-cancel-button {
+  filter: invert(50%);
+  cursor: pointer;
+}
+
+.testResult {
+  margin-left: 5px;
+}
+
+.statusText {
+  margin-right: 15px;
+}
+
+.testResult:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.submissionFiles {
+  text-decoration: underline;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.hydrantDropdown {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin-right: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, color 0.3s ease, border 0.3s ease;
+}
+
+.hydrantDropdown:hover {
+  box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.1);
+}
+
+.hydrantDropdown:focus {
+  outline: none;
+}
+
+.hydrantDropdown:focus,
+.hydrantDropdown:active {
+  border: 1px solid #216b42;
+  color: #216b42 !important;
+}
+
+.accordion-button:focus {
+  color: green;
+}
+
+::ng-deep ngb-accordion {
+  .accordion-button {
+    color: #6c757d;
+  }
+  .accordion-button:focus {
+    border-color: rgba(38, 115, 77, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
+  }
+  .accordion-button:not(.collapsed) {
+    border-color: rgba(38, 115, 77, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
+    background-color: #26734d;
+    color: #f5f5f5;
+  }
+
+  .accordion-button:not(.collapsed)::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23f5f5f5'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  }
+}
+
+.header {
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.titleAccordion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.btn-danger {
+  background-color: #8b0000 !important;
+  border-color: #8b0000 !important;
+}
+
+.btn-danger:hover {
+  background-color: #7a0000 !important;
+  border-color: #7a0000 !important;
+}
+
+.dropdown-menu.show {
+  padding: 12px;
+}
+
+.form-check-input {
+  cursor: pointer;
+}
+
+.form-check-input:checked {
+  background-color: #216b42 !important;
+  border-color: #216b42;
+}
+
+.form-check-input:focus {
+  border-color: #28a745;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgb(40 167 69 / 25%);
+}
+
+.form-control:focus {
+  border-color: rgba(38, 115, 77, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
+}
+
+.card {
+  border-radius: 12px;
+  background-color: #f4f8fb;
+  padding: 20px;
+  width: 100%;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.gradedIcon {
+  font-size: 35px;
+}
+
+.headerTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.gradedIconCol {
+  padding: 0 10px 0 10px;
+}
+
+.resultText {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.dateSort {
+  cursor: pointer;
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #26734d;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+}

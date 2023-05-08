@@ -1,0 +1,415 @@
+<div class="row mt-3 d-flex flex-row flex-wrap nowrap">
+  <div class="dropdown">
+    <button
+      class="hydrantDropdown text-muted"
+      type="button"
+      hydrantDropdown
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+      translate
+    >
+      Assignment <i class="fa-solid fa-chalkboard-user"></i>
+    </button>
+    <ul class="dropdown-menu">
+      <li *ngFor="let assignment of assignmentNumbers">
+        <div class="form-check">
+          <input
+            class="form-check-input text-muted"
+            type="checkbox"
+            value="assignment"
+            id="{{ 'assignmentCheckbox-' + assignment }}"
+            (click)="setSelectedAssignmentIndex(assignment); filter()"
+            [checked]="selectedAssignment === assignment"
+          />
+          <label
+            class="form-check-label text-muted"
+            for="assignmentCheckbox"
+            translate
+          >
+            Assignment <span> {{ assignment }} </span>
+          </label>
+        </div>
+      </li>
+    </ul>
+    <button
+      class="hydrantDropdown text-muted"
+      type="button"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+      translate
+    >
+      Graded <i class="fa-solid fa-graduation-cap"></i>
+    </button>
+    <ul class="dropdown-menu">
+      <li>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="checkbox1"
+            [checked]="sortGraded == false"
+            (click)="setGradedBoolean(false); filter()"
+          />
+          <label class="form-check-label text-muted" for="checkbox1">
+            No
+          </label>
+        </div>
+      </li>
+      <li>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="checkbox2"
+            [checked]="sortGraded == true"
+            (click)="setGradedBoolean(true); filter()"
+          />
+          <label class="form-check-label text-muted" for="checkbox2">
+            Yes
+          </label>
+        </div>
+      </li>
+    </ul>
+    <button
+      class="hydrantDropdown text-muted"
+      type="button"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+      translate
+    >
+      Date <i class="fa-solid fa-clock"></i>
+    </button>
+    <ul class="dropdown-menu">
+      <li>
+        <a
+          class="dropdown-item text-muted dateSort"
+          (click)="setDateSort('ASC'); filter()"
+          >Ascending <i class="fa-solid fa-arrow-down-short-wide"></i>
+        </a>
+      </li>
+      <li>
+        <a
+          class="dropdown-item dateSort text-muted"
+          (click)="setDateSort('DESC'); filter()"
+          >Descending <i class="fa-solid fa-arrow-down-wide-short"></i
+        ></a>
+      </li>
+    </ul>
+  </div>
+  <div class="dropdown"></div>
+</div>
+<div class="row">
+  <div class="form-outline mt-2">
+    <input
+      type="search"
+      id="form1"
+      class="form-control"
+      placeholder="Search..."
+      aria-label="Search"
+      [(ngModel)]="searchText"
+      (input)="onSearchTextChanged()"
+    />
+  </div>
+</div>
+<div class="row mt-3">
+  <div class="col-12 text-muted">
+    <div *ngIf="isLoading" class="loader-container">
+      <div class="loader"></div>
+    </div>
+    <div *ngIf="gradeingSubmission">
+      <ng-container
+        *ngIf="gradeingSubmission.Submissions.length > 0; else noSubmissions"
+      >
+        <ngb-accordion
+          #submissionAccordion="ngbAccordion"
+          *ngFor="let submission of gradeingSubmission.Submissions"
+          (panelChange)="getGroupMembers(submission.groupid)"
+        >
+          <ngb-panel>
+            <ng-template ngbPanelTitle>
+              <div class="titleAccordion">
+                <span translate
+                  >Assignment {{ gradeingSubmission.Assignment }} - Group
+                  {{ submission.GroupNumber }}</span
+                >
+                <span class="statusText" *ngIf="submission.grade" translate
+                  >Graded_Passed</span
+                >
+                <span
+                  class="statusText"
+                  *ngIf="submission.grade === null"
+                  translate
+                  >Not_Graded</span
+                >
+                <span
+                  class="statusText"
+                  *ngIf="submission.grade == false"
+                  translate
+                  >Graded_Failed</span
+                >
+              </div>
+            </ng-template>
+            <ng-template ngbPanelContent>
+              <div class="row" *ngIf="submission.grade !== null">
+                <div
+                  class="col-12 d-flex justify-content-end"
+                  [formGroup]="form"
+                >
+                  <div class="form-group form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      formControlName="gradeAgain"
+                      id="gradeAgain"
+                    />
+                    <label
+                      class="form-check-label text-muted"
+                      for="gradeAgain"
+                      translate
+                    >
+                      Grade_Again
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="card mt-2 mb-3 text-muted"
+                *ngIf="submission.grade !== null"
+              >
+                <div class="row">
+                  <div class="col-auto gradedIconCol">
+                    <i class="fa-regular fa-comment-dots gradedIcon"></i>
+                  </div>
+                  <div class="col-md-5 p-0">
+                    <span class="headerTitle" translate>
+                      {{ course.CourseName }} Assignment
+                      {{ gradeingSubmission.Assignment }}
+                    </span>
+                    <br />
+                    <span translate
+                      >Graded_By
+                      <span style="text-decoration: underline">{{
+                        submission.GradedBy
+                      }}</span></span
+                    >
+
+                    <div class="row mt-2">
+                      <div class="col-auto">
+                        <p class="header" translate>Grade</p>
+                        <span
+                          [ngStyle]="{
+                            color: submission.grade ? '#006c5c' : '#8b0000'
+                          }"
+                          class="resultText"
+                          *ngIf="submission.grade"
+                          translate
+                          >Passed</span
+                        >
+                        <span
+                          [ngStyle]="{
+                            color: submission.grade ? '#006c5c' : '#8b0000'
+                          }"
+                          class="resultText"
+                          *ngIf="!submission.grade"
+                          translate
+                          >Not_Passed</span
+                        >
+                      </div>
+                      <div
+                        class="col-auto"
+                        *ngIf="getMaxScore(gradeingSubmission.Assignment) > 1"
+                      >
+                        <p class="header" translate>Score</p>
+                        <span class="resultText">{{ submission.Score }}</span>
+                      </div>
+                      <div class="col flex-grow">
+                        <p class="header" translate>Comment</p>
+                        <span class="resultText">{{
+                          submission.Feedback
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row text-muted">
+                <div class="col-auto">
+                  <p class="header" translate>Group_Members</p>
+                  <div *ngFor="let member of groupMembers[submission.groupid]">
+                    <p class="resultText">
+                      {{ member }}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <p class="header" translate>Test_Result</p>
+
+                  <p
+                    (click)="
+                      openFeedBackModal(
+                        submission.groupid,
+                        gradeingSubmission.Assignment
+                      )
+                    "
+                    class="testResult resultText"
+                    [ngStyle]="{
+                      color: submission.testpass ? '#006c5c' : '#8b0000'
+                    }"
+                  >
+                    <ng-container
+                      *ngIf="submission.testpass; else failed"
+                      translate
+                    >
+                      Passed
+                    </ng-container>
+                    <ng-template #failed translate> Failed </ng-template>
+                    <span
+                      ><i class="fa-solid fa-up-right-from-square"></i
+                    ></span>
+                  </p>
+                </div>
+                <div class="col-auto">
+                  <p class="header" translate>Time_Submitted</p>
+                  <p class="resultText">
+                    {{ getDate(submission.dateSubmitted) }}
+                  </p>
+                </div>
+                <div class="col-auto">
+                  <p class="header" translate>
+                    Files_Submitted
+                    <span
+                      ><i
+                        class="fa-regular fa-circle-question"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="
+                        Click to download the student submitted file"
+                      ></i
+                    ></span>
+                  </p>
+                  <ng-container *ngIf="fileNames">
+                    <p
+                      *ngFor="let file of fileNames"
+                      class="submissionFiles resultText"
+                      (click)="
+                        downloadSubmissionFile(
+                          submission.groupid,
+                          gradeingSubmission.Assignment,
+                          submission.Submission,
+                          file
+                        )
+                      "
+                    >
+                      {{ file }}
+                    </p>
+                  </ng-container>
+                </div>
+                <div
+                  class="col-md-3"
+                  *ngIf="getMaxScore(gradeingSubmission.Assignment) > 1"
+                >
+                  <p class="header" translate>Score</p>
+                  <div class="input-group mb-3">
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="Score"
+                      aria-label="Score"
+                      [max]="getMaxScore(gradeingSubmission.Assignment)"
+                      [min]="0"
+                      [(ngModel)]="score"
+                      [disabled]="
+                        (!form.get('gradeAgain')?.value &&
+                          submission.grade !== null) ||
+                        (submission.grade === null &&
+                          form.get('gradeAgain')?.value)
+                      "
+                    />
+                    <span class="input-group-text">/</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="Total"
+                      aria-label="Total"
+                      disabled
+                      [value]="getMaxScore(gradeingSubmission.Assignment)"
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col flex-grow">
+                    <p class="header" translate>Leave_a_comment</p>
+                    <fieldset
+                      [disabled]="
+                        (!form.get('gradeAgain')?.value &&
+                          submission.grade !== null) ||
+                        (submission.grade === null &&
+                          form.get('gradeAgain')?.value)
+                      "
+                    >
+                      <textarea
+                        class="form-control"
+                        placeholder="{{ 'Leave_a_comment' | translate }}"
+                        id="comments"
+                        style="height: 180px"
+                        [(ngModel)]="commentText"
+                      ></textarea>
+                    </fieldset>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-2 justify-content-end">
+                <div class="col-md-3">
+                  <button
+                    [disabled]="
+                      (!form.get('gradeAgain')?.value &&
+                        submission.grade !== null) ||
+                      (submission.grade === null &&
+                        form.get('gradeAgain')?.value)
+                    "
+                    style="float: right"
+                    class="btn btn-primary"
+                    (click)="
+                      setSubmissionGrade(
+                        submission,
+                        gradeingSubmission.Assignment,
+                        true
+                      )
+                    "
+                    translate
+                  >
+                    Pass
+                  </button>
+                  <button
+                    [disabled]="
+                      (!form.get('gradeAgain')?.value &&
+                        submission.grade !== null) ||
+                      (submission.grade === null &&
+                        form.get('gradeAgain')?.value)
+                    "
+                    style="float: right; margin-right: 5px"
+                    class="btn btn-danger"
+                    (click)="
+                      setSubmissionGrade(
+                        submission,
+                        gradeingSubmission.Assignment,
+                        false
+                      )
+                    "
+                    translate
+                  >
+                    Fail
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+          </ngb-panel>
+        </ngb-accordion>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<ng-template #noSubmissions>
+  <p class="mt-3" translate>No_assignments_found</p>
+</ng-template>

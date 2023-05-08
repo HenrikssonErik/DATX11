@@ -8,9 +8,8 @@ from flask import Flask, Response, jsonify, make_response, render_template, \
 from flask_cors import CORS
 from .constants import DOMAIN
 from .file_handler import handle_files, \
-    handle_test_file, get_assignment_files_from_database, \
-    get_assignment_test_feedback_from_database, get_test_filenames,\
-    get_test_file
+    handle_test_file, get_assignment_file_from_database, get_test_filenames,\
+    get_test_file, get_filenames
 from . import user_handler
 from . import course_handler
 from .login_handler import new_password, user_registration, log_in, \
@@ -253,8 +252,7 @@ def post_files():
 @app.route('/unitTest', methods=['POST'])
 def post_tests():
     token = extract_token(request)
-    user_id = verify_and_get_id(token)
-
+    user_id: int = verify_and_get_id(token)
     files = request.files.getlist('files')
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
@@ -263,12 +261,15 @@ def post_tests():
 
         if not files:
             return "Files not found", 406
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
         res = handle_test_file(files, course, assignment)
         return make_response(jsonify(res[0]), res[1])
     else:
-        make_response("", 401)
+        return make_response({'status': 'Not_a_course_teacher'}, 401)
 
 
+"""
 @app.route('/getAssignmentTestFeedback', methods=['POST'])
 def get_assignment_feedback():
     data = request.get_json()
@@ -284,10 +285,11 @@ def get_assignment_feedback():
         return make_response(result, 200)
     else:
         return make_response("", code)
+"""
 
 
-@app.route('/getAssignmentFile', methods=['POST'])
-def get_files():
+@app.route('/getAssignmentFile', methods=['GET'])
+def get_file():
     """
     Takes in information from the frontend about a specific course assignment
       file to then return its file content.
@@ -295,23 +297,33 @@ def get_files():
     { groupId: number, course: number, assignment: number, filename: string }
     Returns a file to be downloaded
     """
-    data = request.get_json()
-    group_id = data['groupId']
-    course = data['course']
-    assignment = data['assignment']
-    filename = data['filename']  # should also be imported from frontend
-    submission = data['submission']
-    result = get_assignment_files_from_database(
-        group_id, course, assignment, filename, submission)
+    token = extract_token(request)
+    user_id: int = verify_and_get_id(token)
 
-    res = make_response(send_file(path_or_file=result,
-                                  download_name=filename, as_attachment=True))
-
+    data = request.args
+    group_id = int(data['groupId'])
+    course = int(data['course'])
+    assignment = int(data['assignment'])
+    filename = data['filename']
+    submission = int(data['submission'])
     headers = {"Access-Control-Expose-Headers": "Content-Disposition",
                'Content-Disposition': 'attachment; filename={}'
                .format(filename)}
-    res.headers = headers
-    return res
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course) or
+       user_handler.get_group(user_id, course)['groupId'] == group_id):
+
+        result = get_assignment_file_from_database(
+            group_id, course, assignment, filename, submission)
+
+        res = make_response(send_file(path_or_file=result,
+                                      download_name=filename,
+                                      as_attachment=True))
+
+        res.headers = headers
+        return res
+    else:
+        return make_response({'status': 'No_Access'}, 401)
 
 
 @app.route('/DownloadTestFile', methods=['POST'])
@@ -322,18 +334,25 @@ def get_tests():
     Input data structure:
     Returns a file to be downloaded
     """
+    token = extract_token(request)
+    user_id: int = verify_and_get_id(token)
+
     data = request.get_json()
-    course = data['course']
-    assignment = data['assignment']
+    course = int(data['course'])
+    assignment = int(data['assignment'])
     filename = data['filename']
-    result = get_test_file(course, assignment, filename)
-
-    res = make_response(send_file(path_or_file=result,
-                                  download_name=filename, as_attachment=True))
-
     headers = {"Access-Control-Expose-Headers": "Content-Disposition",
                'Content-Disposition': 'attachment; filename={}'
                .format(filename)}
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
+
+        result = get_test_file(course, assignment, filename)
+
+        res = make_response(send_file(path_or_file=result,
+                                      download_name=filename,
+                                      as_attachment=True))
+
     res.headers = headers
     return res
 
@@ -551,12 +570,15 @@ def create_assignment():
     end_date = data['Date']
     file_names = data.get('fileNames', [])
     assignment_name = data.get('AssignmentName')
+    max_score = data.get('MaxScore')
+    pass_score = data.get('PassScore')
 
     if (user_handler.check_admin_or_course_teacher(request_user_id,
                                                    course_id)):
         res = course_handler.create_assignment(course_id, description,
                                                assignment_name, end_date,
-                                               file_names)
+                                               file_names, max_score,
+                                               pass_score)
         if not (len(res) == 0):
             return make_response(jsonify(res), 400)
         else:
@@ -664,8 +686,8 @@ def change_assignment_date():
 def get_feedback():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
-    course = request.args.get('Course')
-    assignment = request.args.get('Assignment')
+    course = int(request.args.get('Course'))
+    assignment = int(request.args.get('Assignment'))
 
     if (user_id):
         group = user_handler.get_group(user_id, course)['groupId']
@@ -675,6 +697,23 @@ def get_feedback():
 
     else:
         return make_response({"status": 'not_logged_in'}, 401)
+
+
+@app.route('/getTestingFeedback', methods=['GET'])
+def get_testing_feedback():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = int(request.args.get('Course'))
+    assignment = int(request.args.get('Assignment'))
+    group_id = int(request.args.get('Group'))
+
+    if (user_handler.check_admin_or_course_teacher(user_id, course)):
+        feedback = course_handler.get_assignment_feedback(course, assignment,
+                                                          group_id)
+        return make_response(jsonify(feedback), 200)
+
+    else:
+        return make_response({"status": 'not_teacher_in_course'}, 401)
 
 
 @app.route('/getGroups', methods=['GET'])
@@ -693,16 +732,32 @@ def get_course_groups():
         return make_response("not_logged_in", 401)
 
 
+@app.route('/getGroup', methods=['GET'])
+def get_course_group():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = int(request.args.get('Course'))
+    group_id = int(request.args.get('GroupId'))
+
+    if (user_id):
+        if (user_handler.is_in_course(user_id, course)):
+            group = course_handler.get_course_group(course, group_id)
+            return make_response(jsonify(group), 200)
+        else:
+            return make_response("not_in_course", 401)
+    else:
+        return make_response("not_logged_in", 401)
+
+
 @app.route('/assignmentsOverview', methods=['GET'])
 def get_overview():
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
-    assignment = int(request.args.get('Assignment'))
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         # create overview
-        overview = course_handler.get_assignment_overview(course, assignment)
+        overview = course_handler.get_assignment_overview(course)
         return make_response(jsonify(overview), 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
@@ -719,10 +774,13 @@ def set_feedback():
     feedback: str = str(data['Feedback'])
     grade: bool = bool(data['Grade'])
     group_id: int = int(data['Group'])
+    score: int = int(data['Score'])
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
-        course_handler.set_teacher_feedback(
-            group_id, feedback, grade, course, assignment, submission)
+        course_handler.set_teacher_feedback(group_id, feedback, grade, course,
+                                            assignment, submission, user_id,
+                                            score)
+
         return make_response("", 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
@@ -741,6 +799,33 @@ def get_test_file_names():
         return make_response(jsonify(overview), 200)
     else:
         return make_response(jsonify({"status": "no_permission"}), 401)
+
+
+@app.route('/getFilenames', methods=['GET'])
+def get_file_names():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+    course = int(request.args.get('Course'))
+    assignment = int(request.args.get('Assignment'))
+
+    if (user_handler.is_in_course(user_id, course)):
+        # create overview
+        filenames = get_filenames(course, assignment)
+        return make_response(jsonify({'Filenames': filenames}), 200)
+    else:
+        return make_response(jsonify({"status": "no_permission"}), 401)
+
+
+@app.route('/getCourseProgress', methods=['GET'])
+def get_progress():
+    token = extract_token(request)
+    user_id = verify_and_get_id(token)
+
+    if (user_handler.is_in_course):
+        prog = course_handler.get_progress(user_id)
+        return make_response(jsonify(prog), 200)
+    else:
+        return make_response("", 401)
 
 
 @app.route('/changeCourseName', methods=['POST'])

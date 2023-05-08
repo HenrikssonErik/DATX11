@@ -1,4 +1,4 @@
-export interface Submission {
+export interface TestResult {
   Grade: null | boolean;
   Submission: number;
   teacherfeedback: null | string;
@@ -14,6 +14,7 @@ export interface Submission {
     unittest_feedback: {
       errors: [string, string][];
       expected_failures: never[];
+      successes: never[];
       failures: never[];
       skipped: never[];
       tests_run: number;
@@ -22,4 +23,22 @@ export interface Submission {
     };
   };
   testpass: boolean;
+}
+
+export interface AssignmentSubmission {
+  dateSubmitted: string;
+  lastEdited: string;
+  Feedback: string | null;
+  GradedBy: string;
+  Score: number;
+  grade: boolean | null;
+  groupid: number;
+  testpass: boolean;
+  Submission: number;
+  GroupNumber: number;
+}
+
+export interface Submission {
+  Assignment: number;
+  Submissions: AssignmentSubmission[];
 }

@@ -12,10 +12,12 @@
         role="tab"
         aria-controls="current-tab-pane"
         aria-selected="true"
+        translate
       >
-        Current Courses
+        Current_Courses
       </button>
     </li>
+    <!--
     <li class="nav-item" role="presentation">
       <button
         class="nav-link me-4"
@@ -26,10 +28,11 @@
         role="tab"
         aria-controls="upcoming-tab-pane"
         aria-selected="false"
+        translate
       >
         Upcoming
       </button>
-    </li>
+    </li> --->
     <li class="nav-item" role="presentation">
       <button
         class="nav-link me-4"
@@ -40,6 +43,7 @@
         role="tab"
         aria-controls="completed-tab-pane"
         aria-selected="false"
+        translate
       >
         Completed
       </button>
@@ -69,10 +73,14 @@
       aria-labelledby="current-tab"
       tabindex="0"
     >
-      <div class="mt-3">
-        <app-course [data]="course" *ngFor="let course of courses"></app-course>
+      <div class="mt-3 courses">
+        <app-course
+          [data]="course"
+          *ngFor="let course of currentCourses"
+        ></app-course>
       </div>
     </div>
+    <!--
     <div
       class="tab-pane fade"
       id="upcoming-tab-pane"
@@ -83,7 +91,7 @@
       <p>
         Here we should see courses with a startdate later than today's date.
       </p>
-    </div>
+    </div> --->
     <div
       class="tab-pane fade"
       id="completed-tab-pane"
@@ -91,9 +99,12 @@
       aria-labelledby="completed-tab"
       tabindex="0"
     >
-      <p>
-        Here we should see courses that has a end date less than todays date
-      </p>
+      <div class="mt-3">
+        <app-course
+          [data]="course"
+          *ngFor="let course of passedCourses"
+        ></app-course>
+      </div>
     </div>
     <div
       class="tab-pane fade"

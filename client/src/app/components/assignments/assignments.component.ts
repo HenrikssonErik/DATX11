@@ -20,7 +20,7 @@ import { Group } from 'src/app/models/group';
 })
 export class AssignmentsComponent implements OnInit {
   course: Course = {} as Course;
-  selectedTab: number = 0;
+  selectedTab: number = -2;
   //group!: Group;
   courseGroups: Group[] = [];
 
@@ -44,15 +44,20 @@ export class AssignmentsComponent implements OnInit {
     if (!isNaN(id)) {
       this.courseService.getCourse(id).subscribe((res: Course) => {
         this.course = res;
-        console.log(this.course);
+        //console.log(this.course);
         this.course.Assignments.sort((a, b) => a.AssignmentNr - b.AssignmentNr);
+        if (this.isAdmin) {
+          //TODO: Move admins to "gradeing" tab. Ugly but wokrs for now
+          this.selectedTab = -3;
+        }
+        if (!this.isAdmin) {
+          this.groupService.getMyGroup(id).subscribe((res) => {
+            this.myGroup = res;
+            console.log(res);
+          });
+        }
       });
     }
-
-    this.groupService.getMyGroup(id).subscribe((res) => {
-      this.myGroup = res;
-      console.log(res);
-    });
 
     /*this.groupService.getMyGroup(id).subscribe((res) => {
       //TODO: HANDLE THE EMPTY GROUP BETTER, THIS FIX IS DUMB
@@ -82,6 +87,7 @@ export class AssignmentsComponent implements OnInit {
     const modalRef = this.modalService.open(FileUploadModalComponent);
     modalRef.componentInstance.name = 'fileUpload';
     modalRef.componentInstance.courseId = courseId;
+    modalRef.componentInstance.groupNr = groupId;
     modalRef.componentInstance.groupId = groupId;
     modalRef.componentInstance.assignmentNumber = assignmentNumber;
   }

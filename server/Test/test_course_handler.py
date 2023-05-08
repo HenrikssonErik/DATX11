@@ -28,8 +28,8 @@ class TestCourseHandler(unittest.TestCase):
             mock_assignments.return_value = []
             mock_cursor = setup_mock_cursor(mock_connect)
             mock_cursor.fetchall.return_value = [
-                (1, 'Admin', 1, 'Whole course name', 'datx12', 2023, 3),
-                (1, 'Student', 2, 'Whole course name', 'datx11', 2023, 2)
+                (1, 'Admin', 1, 'Whole course name', 'datx12', 3, 2023),
+                (1, 'Student', 2, 'Whole course name', 'datx11', 2, 2023)
             ]
 
             user_id = 1
@@ -67,7 +67,8 @@ class TestCourseHandler(unittest.TestCase):
         ) as mock_assignments:
             mock_assignments.return_value = []
             mock_cursor = setup_mock_cursor(mock_connect)
-            mock_cursor.fetchone.side_effect = [[1, 'Admin', 1, 'Whole course name', 'datx12', 2023, 3], ['name here']]
+            mock_cursor.fetchone.side_effect = [
+                [1, 'Admin', 1, 'Whole course name', 'datx12', 2023, 3], ['name here']]
             user_id = 1
             course_id = 1
             result = course_handler.get_course_info(user_id, course_id)
@@ -98,11 +99,12 @@ class TestCourseHandler(unittest.TestCase):
     def test_get_assignments(self, mock_connect):
         mock_cursor = setup_mock_cursor(mock_connect)
         course_id = 1
-        mock_cursor.fetchall.return_value = [(2, '2022-03-18', 'description', 'TestName')]
+        mock_cursor.fetchall.return_value = [
+            (2, '2022-03-18', 'description', 'TestName',1,1)]
         res = course_handler.get_assignments(course_id)
         mock_cursor.execute.assert_called_once_with(
-            "SELECT assignment, enddate, Description, Name FROM "
-            "assignments WHERE courseid = %s",
+            "SELECT assignment, endDate, description, name,"
+            "maxscore, passscore FROM Assignments WHERE courseid = %s",
             [course_id]
         )
         self.assertEqual(
@@ -110,7 +112,9 @@ class TestCourseHandler(unittest.TestCase):
                 'AssignmentNr': 2,
                 'DueDate': '2022-03-18',
                 'Description': 'description',
-                'Name': 'TestName'
+                'Name': 'TestName',
+                'MaxScore': 1,
+                'PassScore': 1
             }])
 
     @patch('psycopg2.connect')
@@ -130,11 +134,14 @@ class TestCourseHandler(unittest.TestCase):
         assignment_nr = 2
         end_date = '2024-01-11'
         file_names = ['file1.txt', 'file2.py']
+        max_score = 5
+        pass_score = 3
         mock_cursor.fetchone.return_value = [None]
 
         with patch.object(course_handler, 'add_filenames') as mock_files:
             course_handler.create_assignment(
-                course_id, desc, assignment_nr, end_date, file_names
+                course_id, desc, assignment_nr, end_date, file_names,
+                max_score, pass_score
             )
             assert 2 == mock_cursor.execute.call_count
         mock_files.assert_called_once_with(

@@ -12,6 +12,11 @@
   color: #6c757d;
 }
 
+.courses {
+  position: relative;
+  z-index: 999;
+}
+
 .nav-tabs .nav-link.active {
   color: whitesmoke;
   background-color: #26734d;
@@ -21,6 +26,7 @@
   position: absolute;
   bottom: 60px;
   right: 50px;
+  z-index: 0;
 }
 
 .card {
