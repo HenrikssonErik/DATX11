@@ -18,6 +18,7 @@ export class AssignmentCardComponent {
   allowedFileTypes = ['text/x-python'];
   formatedDate!: string;
   filenames: string[] = [];
+  loadingAssignment: boolean = true;
 
   headers = new HttpHeaders()
     .append('Cookies', document.cookie)
@@ -46,12 +47,17 @@ export class AssignmentCardComponent {
 
     this.form.get('Date')?.setValue(this.formatedDate);
     this.form.get('Description')?.setValue(this.Assignment.Description);
+    this.updateFilenames();
+  }
+
+  updateFilenames() {
     this.courseService
       .getTestFileNames(this.courseID, this.Assignment.AssignmentNr)
       .subscribe({
         next: (response: string[]) => {
           console.log(response);
           this.filenames = response;
+          this.loadingAssignment = false;
         },
         error: (error: any) => {
           this.toastr.error('', error.error);
@@ -131,6 +137,7 @@ export class AssignmentCardComponent {
     if (this.form.get('Date')?.value != this.formatedDate) {
       this.changeDate();
     }
+    this.updateFilenames();
   }
 
   changeDesc() {

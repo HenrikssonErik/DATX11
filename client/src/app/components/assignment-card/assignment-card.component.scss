@@ -40,6 +40,16 @@ p {
   font-weight: 600;
 }
 
+.loader {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #26734d;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  animation: spin 2s linear infinite;
+  margin-right: 15px;
+}
+
 .files {
   font-size: small;
   margin-bottom: 3px;

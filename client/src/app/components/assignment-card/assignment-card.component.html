@@ -59,10 +59,13 @@
     </div>
     <div class="row">
       <p translate>Test_Files</p>
-      <div class="col" *ngFor="let file of filenames">
-        <p class="files" (click)="downloadTest(file)">{{ file }} &#x2193;</p>
+      <span *ngIf="loadingAssignment" class="loader"></span>
+      <div *ngIf="!loadingAssignment">
+        <div class="col" *ngFor="let file of filenames">
+          <p class="files" (click)="downloadTest(file)">{{ file }} &#x2193;</p>
+        </div>
+        <div *ngIf="filenames.length == 0"><p translate>No_Tests</p></div>
       </div>
-      <div *ngIf="filenames.length == 0"><p translate>No_Tests</p></div>
     </div>
     <div class="row">
       <div class="col-12">

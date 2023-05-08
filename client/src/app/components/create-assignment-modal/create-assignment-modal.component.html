@@ -150,10 +150,17 @@
           <button
             (click)="createAssignment()"
             class="btn btn-primary w-100"
-            [ngClass]="{ disabled: form.invalid }"
+            [ngClass]="[
+              'btn',
+              'btn-primary',
+              'w-100',
+              form.invalid ? 'disabled' : ''
+            ]"
             translate
           >
-            Create_Assignment
+            <span [ngClass]="loader ? 'loader' : ''" translate>
+              {{ loader ? "" : "Create_Assignment" }}</span
+            >
           </button>
         </div>
       </div>

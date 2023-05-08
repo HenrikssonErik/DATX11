@@ -20,6 +20,7 @@ export class CreateAssignmentModalComponent {
   Files: File[] = [];
   fileDropEl!: ElementRef;
   allowedFileTypes = ['text/x-python', 'application/pdf', 'text/plain'];
+  loader: boolean = false;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -120,6 +121,7 @@ export class CreateAssignmentModalComponent {
   }
 
   createAssignment(): void {
+    this.loader = true;
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
@@ -154,6 +156,7 @@ export class CreateAssignmentModalComponent {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+          this.loader = false;
         },
       });
   }
@@ -161,6 +164,11 @@ export class CreateAssignmentModalComponent {
   postUnittests(fileData: FormData, headers: HttpHeaders) {
     //add course and assignment to formdata,
     //could mb work as assignemtn nr: this.course.Assignments.length+1
+    if (fileData.getAll('files').length == 0) {
+      this.loader = false;
+      //location.reload();
+      this.activeModal.close();
+    }
     fileData.append('Course', this.course.courseID.toString());
     fileData.append(
       'Assignment',
@@ -190,9 +198,12 @@ export class CreateAssignmentModalComponent {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+          this.loader = false;
         },
         complete: () => {
-          location.reload();
+          console.log('in comp');
+          this.loader = false;
+          this.activeModal.close();
         },
       });
   }
