@@ -259,7 +259,7 @@ export class GradingComponent {
         },
         complete: () => {
           this.toastr.success(
-            'The assignment was succesfully graded!',
+            'The assignment was successfully graded!',
             'Success!',
             {
               closeButton: true,
