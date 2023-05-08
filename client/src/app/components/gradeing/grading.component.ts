@@ -207,10 +207,15 @@ export class GradingComponent {
     this.getFileNames(assignmentNr);
   }
 
-  openFeedBackModal(group: number, assignmentNr: number) {
+  openFeedBackModal(
+    groupId: number,
+    assignmentNr: number,
+    groupNumber: number
+  ) {
     const modalRef = this.modalService.open(FeedbackTeacherViewModalComponent);
     modalRef.componentInstance.name = 'feedbackTeacherViewModalComponent';
-    modalRef.componentInstance.group = group;
+    modalRef.componentInstance.groupId = groupId;
+    modalRef.componentInstance.groupNumber = groupNumber;
     modalRef.componentInstance.assignmentNr = assignmentNr;
     modalRef.componentInstance.courseId = this.course.courseID;
   }

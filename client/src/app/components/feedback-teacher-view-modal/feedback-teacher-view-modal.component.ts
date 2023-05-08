@@ -11,7 +11,8 @@ import { SubmissionService } from 'src/app/services/submission.service';
 export class FeedbackTeacherViewModalComponent {
   @Input() assignmentNr!: number;
   @Input() courseId!: number;
-  @Input() group!: number;
+  @Input() groupId!: number;
+  @Input() groupNumber!: number;
   submission!: TestResult[];
   isLoading: boolean = false;
 
@@ -23,7 +24,7 @@ export class FeedbackTeacherViewModalComponent {
   ngOnInit(): void {
     this.isLoading = true;
     this.submissionService
-      .getTestingFeedback(this.courseId, this.assignmentNr, this.group)
+      .getTestingFeedback(this.courseId, this.assignmentNr, this.groupId)
       .subscribe({
         next: (data: any) => {
           //console.log(data);
