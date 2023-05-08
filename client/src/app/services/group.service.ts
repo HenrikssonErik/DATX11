@@ -74,7 +74,7 @@ export class GroupService {
     );
   }
 
-  getGroup(groupId: number, courseId: number) {
+  getGroup(groupId: number, courseId: number): Observable<any> {
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
