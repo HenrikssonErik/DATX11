@@ -23,7 +23,7 @@ export class AssignmentsComponent implements OnInit {
   selectedTab: number = -2;
   //group!: Group;
   courseGroups: Group[] = [];
-  fileNames: String[] = [];
+  fileNames: any = {}; //String[] = [];
   myGroup?: Group;
   isLoadingMap: Map<number, boolean> = new Map<number, boolean>();
   createGroupLoader: boolean = false;
@@ -83,6 +83,7 @@ export class AssignmentsComponent implements OnInit {
   }
 
   onTabSelect(tabNumber: number): void {
+    console.log('changing tab');
     this.selectedTab = tabNumber;
     this.getFileNames();
   }
