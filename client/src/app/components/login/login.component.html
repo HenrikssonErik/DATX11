@@ -320,7 +320,7 @@
       </div>
       <form (ngSubmit)="onSubmitForgotPwd()" [formGroup]="forgotPwdForm">
         <div class="modal-body">
-          <label for="pwd" class="text-muted" translate
+          <label for="pwdCid" class="text-muted" translate
             >Chalmers ID (CID)</label
           >
           <input
@@ -334,7 +334,7 @@
             type="text"
             formControlName="cid"
             class="form-control focus-border"
-            id="verCid"
+            id="pwdCid"
             placeholder="{{ 'Enter_Cid' | translate }}"
             (focus)="onInputFocus('cid', forgotPwdForm)"
             required
