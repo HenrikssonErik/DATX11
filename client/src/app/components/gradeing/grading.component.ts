@@ -35,7 +35,6 @@ export class GradingComponent {
   sortGraded: boolean = false;
   dateFilter: string = '';
   //TODO: Add type @Kvalle99
-  //TODO: DETTA BORDE INTE VA INITIERAT TOMT OBJEKT HELLO??
   groupMembers: any = {};
   isLoading: boolean = false;
 
@@ -277,6 +276,8 @@ export class GradingComponent {
   }
 
   getGroupMembers(group: number) {
+    //TODO: Fattar fortfarande inte vafan som händer här. Varför returnas alltid en tom array?
+    //Borde inte returna nåt imo? HTMLen bryr väl sig ändå bara om this.groupMembers?
     this.groupService.getGroup(group, this.course.courseID).subscribe({
       next: (data: any) => {
         console.log(data);
