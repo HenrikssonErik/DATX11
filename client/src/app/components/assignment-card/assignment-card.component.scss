@@ -40,6 +40,10 @@ p {
   font-weight: 600;
 }
 
+.fileTitle {
+  font-size: medium;
+}
+
 .loader {
   border: 2px solid #f3f3f3;
   border-top: 2px solid #26734d;
@@ -49,6 +53,13 @@ p {
   animation: spin 2s linear infinite;
   margin-right: 15px;
   margin-left: 5%;
+}
+
+.subFiles {
+  font-size: small;
+  margin-bottom: 3px;
+  padding-top: -5px;
+  font-weight: 600;
 }
 
 .files {

@@ -58,13 +58,23 @@
       <!-- add (change)="fileBrowseHandler($event)"  to input-->
     </div>
     <div class="row">
-      <p translate>Test_Files</p>
-      <span *ngIf="loadingAssignment" class="loader"></span>
-      <div *ngIf="!loadingAssignment">
+      <p class="fileTitle" translate>Test_Files</p>
+      <span *ngIf="loadingSpinner" class="loader"></span>
+      <div *ngIf="!loadingSpinner">
         <div class="col" *ngFor="let file of filenames">
           <p class="files" (click)="downloadTest(file)">{{ file }} &#x2193;</p>
         </div>
         <div *ngIf="filenames.length == 0"><p translate>No_Tests</p></div>
+      </div>
+    </div>
+    <div class="row">
+      <p class="fileTitle" translate>Submission_Files</p>
+      <span *ngIf="loadingSubmissionSpinner" class="loader"></span>
+      <div *ngIf="!loadingSubmissionSpinner">
+        <div class="col" *ngFor="let file of submissionFiles">
+          <p class="subFiles">{{ file }}</p>
+        </div>
+        <div *ngIf="submissionFiles.length == 0"><p translate>No_Files</p></div>
       </div>
     </div>
     <div class="row">

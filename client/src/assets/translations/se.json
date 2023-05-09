@@ -114,7 +114,6 @@
   "Waiting_For_Review": "Väntar På Granskning",
   "Test_Results": "Testresultat",
   "Test_Ran": "Tester Körda",
-  "Grade": "Bedömning",
   "Reviewed_By": "Bedömd Av",
   "Comments": "Kommentarer",
   "Submitted_Files": "Inlämnade Filer",
@@ -155,12 +154,6 @@
   "Testfile_Template": "Mall för Testfil",
   "Download_Template": "Ladda Ner Mall",
   "Graded_Failed": "Graded: Underkänd",
-  "Forgot_pwd_title": "Glömt lösenord",
-  "Forgot_pwd_btn": "Skicka återställningsmail",
-  "New_password": "Skriv nytt lösenord",
-  "Password_verify": "Verifiera det nya lösenordet",
-  "Hydrant_Change_Password": "Ändra Ditt Lösenord",
-  "Change_pwd": "Ändra Lösenord",
-  "New_pwd": "nytt lösenord",
-  "Ver_pwd": "verifiera lösenord"
+  "No_Files": "Inga Filer Hittades",
+  "Submission_Files": "Inlämningsfiler:"
 }
