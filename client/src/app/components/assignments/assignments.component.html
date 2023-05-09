@@ -197,7 +197,7 @@
             <!-- <h5><i class="fa-solid fa-ellipsis-vertical"></i></h5> -->
             <div>
               <button
-                [disabled]="datePassed(assignment.DueDate)"
+                [disabled]="datePassed(assignment.DueDate) || !hasGroup()"
                 class="btn btn-primary submitBtn"
                 (click)="
                   openModal(
