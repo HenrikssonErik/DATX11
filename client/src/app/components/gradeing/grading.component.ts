@@ -78,6 +78,7 @@ export class GradingComponent {
         next: (data: Submission[]) => {
           this.allAssignments = data;
           this.assignmentNumbers = this.getAssignmentNumbers(data);
+          this.isLoading = false;
         },
         error: (error) => {
           console.error('Failed to get data:', error);
