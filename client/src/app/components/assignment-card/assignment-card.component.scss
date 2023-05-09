@@ -55,6 +55,15 @@ p {
   margin-left: 5%;
 }
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .subFiles {
   font-size: small;
   margin-bottom: 3px;
