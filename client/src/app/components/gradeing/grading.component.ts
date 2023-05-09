@@ -35,6 +35,7 @@ export class GradingComponent {
   sortGraded: boolean = false;
   dateFilter: string = '';
   //TODO: Add type @Kvalle99
+  //TODO: DETTA BORDE INTE VA INITIERAT TOMT OBJEKT HELLO??
   groupMembers: any = {};
   isLoading: boolean = false;
 
