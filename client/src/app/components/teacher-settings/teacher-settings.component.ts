@@ -44,7 +44,12 @@ export class TeacherSettingsComponent {
       this.course = res;
       this.form.get('Name')?.setValue(this.course.CourseName);
       this.form.get('Course')?.setValue(this.course.Course);
+      this.sortAssignments();
     });
+  }
+
+  sortAssignments() {
+    this.course.Assignments.sort((a, b) => a.AssignmentNr - b.AssignmentNr);
   }
   editToggle(): void {
     this.form.get('Name')?.setValue(this.course.CourseName);
