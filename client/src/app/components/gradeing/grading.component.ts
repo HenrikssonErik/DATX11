@@ -279,7 +279,6 @@ export class GradingComponent {
   getGroupMembers(group: number) {
     this.groupService.getGroup(group, this.course.courseID).subscribe({
       next: (data: any) => {
-        console.log('grroup');
         console.log(data);
         this.groupMembers[group] = data['users'];
       },
