@@ -113,7 +113,9 @@
             [disabled]="!myForm.valid"
             translate
           >
-            Create_Course
+            <span [ngClass]="isLoading ? 'loader' : ''" translate>
+              {{ isLoading ? "" : "Create_Course" }}
+            </span>
           </button>
         </div>
       </form>

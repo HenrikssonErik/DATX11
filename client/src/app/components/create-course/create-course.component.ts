@@ -13,6 +13,8 @@ import { CourseService } from 'src/app/services/course-service.service';
   styleUrls: ['./create-course.component.scss'],
 })
 export class CreateCourseComponent {
+  isLoading: boolean = false;
+
   formData = {
     Course: null,
     Abbreviation: null,
@@ -38,7 +40,7 @@ export class CreateCourseComponent {
 
   onSubmit(): void {
     // Handle form submission
-
+    this.isLoading = true;
     const headers = new HttpHeaders()
       .append('Cookies', document.cookie)
       .set('Cache-Control', 'public, max-age=3600');
@@ -66,6 +68,10 @@ export class CreateCourseComponent {
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
         },
       });
   }
