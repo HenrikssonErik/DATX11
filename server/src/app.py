@@ -66,7 +66,7 @@ def sign_up() -> Response:
         from login_handler's user_registration-function,
         either successful or invalidated.
     """
-    response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
+    response: tuple[dict[str, str], Literal[200, 400, 401, 406, 500]] =\
         user_registration(request.form)
     if (response[1] == 200):
         send_verification_email(
@@ -257,7 +257,6 @@ def post_tests():
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
 
-
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
 
         if not files:
@@ -266,7 +265,7 @@ def post_tests():
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         res = handle_test_file(files, course, assignment)
         return make_response(jsonify(res[0]), res[1])
-    else: 
+    else:
         return make_response("", 401)
 
 
@@ -354,8 +353,9 @@ def get_tests():
                                       download_name=filename,
                                       as_attachment=True))
 
-    res.headers = headers
-    return res
+        res.headers = headers
+        return res
+    return make_response({'status': 'No_Access'}, 401)
 
 
 @app.route('/getUserInfo', methods=['GET'])
@@ -584,6 +584,9 @@ def create_assignment():
             return make_response(jsonify(res), 400)
         else:
             return make_response("", 200)
+        
+    return make_response({'status': 'No_Access'}, 401)
+    
 
 
 @app.route('/changeUserRole', methods=['POST'])

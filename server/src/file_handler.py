@@ -14,8 +14,7 @@ __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 
 
 def handle_files(files: list[FileStorage], course: int, group: int,
-                 assignment: int) -> tuple[list[dict[str, str]],
-                                           dict[str, str], int]:
+                 assignment: int) -> tuple:
     """Sanitizes files, checks for number of files,
     allowed file names and file types
     Returns: json object with feedback on submitted files
