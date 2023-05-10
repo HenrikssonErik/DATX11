@@ -73,11 +73,14 @@
       aria-labelledby="current-tab"
       tabindex="0"
     >
-      <div class="mt-3 courses">
+      <div class="mt-3">
         <app-course
           [data]="course"
           *ngFor="let course of currentCourses"
         ></app-course>
+        <div class="teachingIllu">
+          <img src="assets\teaching.svg" height="220" width="auto" />
+        </div>
       </div>
     </div>
     <!--
@@ -104,6 +107,9 @@
           [data]="course"
           *ngFor="let course of passedCourses"
         ></app-course>
+        <div class="teachingIllu">
+          <img src="assets\teaching.svg" height="220" width="auto" />
+        </div>
       </div>
     </div>
     <div
@@ -115,9 +121,6 @@
     >
       <app-create-course></app-create-course>
     </div>
-  </div>
-  <div class="teachingIllu">
-    <img src="assets\teaching.svg" height="220" width="auto" />
   </div>
   <router-outlet></router-outlet>
 </div>
