@@ -108,12 +108,10 @@ CREATE TABLE TestFiles (
 
 ------------------------------------------------------------------------------
 CREATE TABLE FileNames (
-	nameId SERIAL NOT NULL,
 	courseId SERIAL NOT NULL,
 	assignment INTEGER NOT NULL, 
 	filename TEXT NOT NULL,
-	UNIQUE (courseId, assignment, filename),
-	PRIMARY KEY(nameId),
+	PRIMARY KEY (courseId, assignment, filename),
 	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
 		REFERENCES Assignments(courseId, assignment) 
 		ON UPDATE CASCADE 
