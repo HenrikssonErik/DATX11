@@ -141,8 +141,10 @@ export class GradingComponent {
       return submissions.filter((submission) => {
         return submission.grade !== null;
       });
-    } else {
+    } else if (this.sortNotGraded) {
       return submissions.filter((submission) => submission.grade === null);
+    } else {
+      return submissions;
     }
   }
 
@@ -192,7 +194,9 @@ export class GradingComponent {
       tempList = this.filterAssignment(tempList);
       let tempListSubmissions: AssignmentSubmission[] =
         tempList[0].Submissions.slice();
-      tempListSubmissions = this.filterGraded(tempListSubmissions);
+      if (this.sortGraded || this.sortNotGraded) {
+        tempListSubmissions = this.filterGraded(tempListSubmissions);
+      }
       tempListSubmissions = this.filterDate(tempListSubmissions);
       this.isLoading = false;
       this.gradeingSubmission = {
