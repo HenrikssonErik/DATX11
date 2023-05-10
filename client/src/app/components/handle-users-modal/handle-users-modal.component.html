@@ -24,7 +24,9 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <div *ngIf="isLoading"></div>
+        <div *ngIf="isLoading" class="loader-container mt-3">
+          <div class="loader"></div>
+        </div>
         <table class="table table-hover">
           <thead>
             <tr class="text-muted">
