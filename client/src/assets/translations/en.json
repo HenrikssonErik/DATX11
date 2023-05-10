@@ -161,5 +161,6 @@
   "Submitted_Files": "Submitted Files",
   "Errors": "Errors:",
   "Failed_Tests": "Failed Tests",
-  "Pep8_Results": "Pep8 Results"
+  "Pep8_Results": "Pep8 Results",
+  "create_course_subtext": "Quicky create a course here by filling in the form. To further tweak you course. Head to settings in the course settings panel."
 }

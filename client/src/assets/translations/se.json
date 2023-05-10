@@ -162,5 +162,6 @@
   "Hydrant_Change_Password": "Ändra Ditt Lösenord",
   "Change_pwd": "Ändra Lösenord",
   "New_pwd": "nytt lösenord",
-  "Ver_pwd": "verifiera lösenord"
+  "Ver_pwd": "verifiera lösenord",
+  "create_course_subtext": "Skapa snabbt en kurs här genom att fylla i formuläret. För att ytterligare finjustera din kurs. Gå till inställningar i panelen för kursinställningar."
 }

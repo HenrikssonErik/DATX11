@@ -2,15 +2,6 @@
   opacity: 0.8;
 }
 
-span {
-  background: #eee;
-  padding: 0 10px;
-  color: #26734d;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 14px;
-}
-
 .error-message {
   color: #8b0000;
   margin-top: 5px;
@@ -44,6 +35,11 @@ label {
 }
 
 .subText {
+  text-align: justify;
+  max-width: 400px;
+}
+
+.subText span {
   color: #b0bec5;
 }
 
