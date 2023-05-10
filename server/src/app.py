@@ -552,7 +552,7 @@ def create_group():
     course_id = data['Course']
 
     if (user_id):
-        if (user_handler.is_in_course(user_id, course_id)):
+        if (user_handler.is_in_course(user_id, course_id) and not user_handler.check_admin_or_course_teacher(user_id, course_id)):
             course_handler.add_group_to_course(course_id, user_id)
             return make_response("", 200)
         else:
