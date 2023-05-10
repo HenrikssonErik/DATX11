@@ -13,12 +13,6 @@
             class="statusText passed"
             *ngIf="submission.Grade === true"
             translate
-            >Submission <span>{{ submission.Submission }}</span></span
-          >
-          <span
-            class="statusText passed"
-            *ngIf="submission.Grade === true"
-            translate
             >Passed</span
           >
           <span
@@ -26,12 +20,6 @@
             *ngIf="submission.Grade === false"
             translate
             >Failed</span
-          >
-          <span
-            class="statusText warning"
-            *ngIf="submission.Grade === null"
-            translate
-            >Waiting_For_Review</span
           >
           <span
             class="statusText warning"
