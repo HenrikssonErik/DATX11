@@ -10,12 +10,161 @@
   </div>
   <div class="modal-body">
     <div class="row">
+      <div class="col-md-12 text-muted">
+        <h5 translate>Add_members</h5>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-1">
+                <i
+                  class="fa-solid fa-arrow-up-from-bracket upload text-muted"
+                ></i>
+              </div>
+              <div class="col-md-8 text-muted" *ngIf="csvData.length === 0">
+                <span translate>UPLOAD_MEMBERS</span>
+                <br />
+                <small class="subtitle" translate>USE_ONE_COLUMN</small>
+              </div>
+              <div [ngClass]="csvData.length === 0 ? 'col-md-3' : 'col-md-11'">
+                <div *ngIf="csvData.length === 0">
+                  <label for="file-upload" class="custom-file-upload" translate
+                    >Add_CSV<span> ></span></label
+                  >
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept=".csv"
+                    (change)="handleFileInput($event)"
+                  />
+                </div>
+                <div *ngIf="csvData.length > 0">
+                  <div class="row align-items-center">
+                    <div class="col-auto csvHeader">
+                      <div style="display: flex; align-items: center">
+                        <img
+                          src="assets/csv.png"
+                          height="60px"
+                          style="margin-right: 10px"
+                        />
+                        <div>
+                          <p class="m-0 csvFileNameHeader text-muted">
+                            {{ fileName }}
+                          </p>
+                          <p class="m-0">
+                            <small class="subtitle"
+                              >{{ numberOfRows }} rows</small
+                            >
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <i
+                        class="fa-solid fa-xmark removeCsv"
+                        (click)="removeCsv()"
+                      ></i>
+                    </div>
+                    <div class="col flex-grow">
+                      <div
+                        *ngIf="isAddingFromCsv"
+                        style="float: right"
+                        class="loader-container"
+                      >
+                        <div class="loader"></div>
+                      </div>
+                      <button
+                        *ngIf="!isAddingFromCsv"
+                        type="button"
+                        class="btn btn-outline-primary"
+                        style="float: right"
+                        [disabled]="csvData.length === 0"
+                        (click)="submitCSV()"
+                        translate
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </div>
+
+                  <!--   <div class="row">
+                    <div class="col-md-12">
+                      <button class="btn btn-primary">Hej</button>
+                    </div>
+                  </div> -->
+                </div>
+              </div>
+              <!--               <div class="col-md-6">
+                <label for="file-upload" class="custom-file-upload">
+                  <i class="fa fa-cloud-upload" translate> Add_CSV</i>
+                </label>
+                <input
+                  type="file"
+                  id="file-upload"
+                  (change)="handleFileInput($event)"
+                />
+                <button
+                  class="btn btn-primary w-20"
+                  [disabled]="csvData.length === 0"
+                  (click)="submitCSV()"
+                  translate
+                >
+                  Submit
+                </button>
+              </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="container-divider">
+          <span class="divider-mark" translate>ONE_AT_A_TIME</span>
+        </h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="input-group mb-3">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="CID"
+            id="newCID"
+            aria-label="CID"
+            aria-describedby="button-addon2"
+            [(ngModel)]="newCid"
+          />
+          <button
+            class="btn btn-primary"
+            type="button"
+            id="button-addon2"
+            [disabled]="newCid === ''"
+            (click)="submitCid()"
+            translate
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 text-muted">
+        <h5 translate>Search_Users</h5>
+        <small class="subtitle" translate>SEARCH_BY</small>
+      </div>
+    </div>
+    <div class="row mt-2">
       <div class="col-md-12">
         <input
           [(ngModel)]="searchString"
           type="text"
           class="form-control"
-          placeholder="Search..."
+          placeholder="{{ 'Search...' | translate }}"
           aria-label="Search"
           aria-describedby="basic-addon2"
           (input)="search()"
@@ -27,7 +176,10 @@
         <div *ngIf="isLoading" class="loader-container mt-3">
           <div class="loader"></div>
         </div>
-        <table class="table table-hover">
+        <table
+          class="table table-hover"
+          *ngIf="usersList.length > 0; else noMembers"
+        >
           <thead>
             <tr class="text-muted">
               <th translate>Name</th>
@@ -68,7 +220,14 @@
                 </select>
               </td>
               <td>
+                <div
+                  *ngIf="isRemoveUserLoading.get(user.id!)"
+                  class="loader-container"
+                >
+                  <div class="loaderMini"></div>
+                </div>
                 <i
+                  *ngIf="!isRemoveUserLoading.get(user.id!)"
                   class="fa-solid fa-xmark delete"
                   (click)="removeUser(user)"
                 ></i>
@@ -76,129 +235,12 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!--KVALLES-->
-
-<div class="modal-content">
-  <div class="modal-header">
-    <h4 class="modal-title text-muted" translate>
-      Handle_Users_In <span>{{ course.Course }}</span>
-    </h4>
-    <i
-      class="fa-solid fa-xmark close"
-      (click)="activeModal.dismiss('Cross click')"
-    ></i>
-  </div>
-  <div class="modal-body">
-    <div class="row form mb-3">
-      <div class="col-md-6">
-        <label for="file-upload" class="custom-file-upload">
-          <i class="fa fa-cloud-upload" translate> Add_CSV</i>
-        </label>
-        <input
-          type="file"
-          id="file-upload"
-          (change)="handleFileInput($event)"
-        />
-        <button
-          class="btn btn-primary w-20"
-          [disabled]="csvData.length === 0"
-          (click)="submitCSV()"
-          translate
-        >
-          Submit
-        </button>
-      </div>
-
-      <div class="col-md-3">
-        <input
-          class="form-control"
-          type="text"
-          id="newCID"
-          placeholder="CID"
-          [(ngModel)]="newCid"
-        />
-      </div>
-      <div class="col-md-3">
-        <button
-          class="btn btn-primary w-20"
-          [disabled]="newCid === ''"
-          (click)="submitCid()"
-          translate
-        >
-          Submit
-        </button>
-      </div>
-    </div>
-    <div class="row">
-      <input
-        [(ngModel)]="searchString"
-        type="text"
-        class="form-control"
-        placeholder="Search"
-        aria-label="Search"
-        aria-describedby="basic-addon2"
-        (input)="search()"
-      />
-    </div>
-    <div>
-      <ul class="list-group-flush">
-        <li class="list-group-item">
-          <div class="row">
-            <div class="col-md-5">
-              <p style="font-weight: bold" translate>Name</p>
-            </div>
-            <div class="col-md-3">
-              <p style="font-weight: bold">CID</p>
-            </div>
-            <div class="col-md-3">
-              <p style="font-weight: bold" translate>Role</p>
-            </div>
+        <ng-template #noMembers>
+          <div class="d-flex justify-content-center">
+            <p class="text-muted mt-2">No_users_found</p>
           </div>
-        </li>
-        <li class="list-group-item" *ngFor="let user of usersList">
-          <div class="row">
-            <div class="col-md-5">
-              <p>{{ user.fullname }}</p>
-            </div>
-            <div class="col-md-3">
-              <p>{{ user.cid }}</p>
-            </div>
-            <div class="col-md-3">
-              <select [(ngModel)]="user.role" (change)="updateRole(user)">
-                <option
-                  value="Admin"
-                  [selected]="user.role === 'Admin' ? true : false"
-                >
-                  Admin
-                </option>
-                <option
-                  value="Student"
-                  [selected]="user.role === 'Student' ? true : false"
-                >
-                  Student
-                </option>
-                <option
-                  value="Teacher"
-                  [selected]="user.role === 'Teacher' ? true : false"
-                  translate
-                >
-                  Teacher
-                </option>
-              </select>
-            </div>
-
-            <div class="col-md-1">
-              <button class="remove" (click)="removeUser(user)">X</button>
-            </div>
-          </div>
-        </li>
-      </ul>
+        </ng-template>
+      </div>
     </div>
-    <div class="row"></div>
   </div>
 </div>
