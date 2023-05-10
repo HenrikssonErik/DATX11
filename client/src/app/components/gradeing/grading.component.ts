@@ -33,6 +33,7 @@ export class GradingComponent {
   fileNames?: string[];
   form!: FormGroup;
   sortGraded: boolean = false;
+  sortNotGraded: boolean = false;
   dateFilter: string = '';
   //TODO: Add type @Kvalle99
   groupMembers: any = {};
@@ -101,8 +102,14 @@ export class GradingComponent {
     this.selectedAssignment = assignmentNr;
   }
 
-  setGradedBoolean(graded: boolean): void {
-    this.sortGraded = graded;
+  setGradedBoolean(): void {
+    this.sortGraded = !this.sortGraded;
+    this.sortGraded === true ? (this.sortNotGraded = false) : '';
+  }
+
+  setNotGradedBoolean(): void {
+    this.sortNotGraded = !this.sortNotGraded;
+    this.sortNotGraded === true ? (this.sortGraded = false) : '';
   }
 
   setDateSort(sort: string): void {
@@ -134,8 +141,10 @@ export class GradingComponent {
       return submissions.filter((submission) => {
         return submission.grade !== null;
       });
-    } else {
+    } else if (this.sortNotGraded) {
       return submissions.filter((submission) => submission.grade === null);
+    } else {
+      return submissions;
     }
   }
 
@@ -185,7 +194,9 @@ export class GradingComponent {
       tempList = this.filterAssignment(tempList);
       let tempListSubmissions: AssignmentSubmission[] =
         tempList[0].Submissions.slice();
-      tempListSubmissions = this.filterGraded(tempListSubmissions);
+      if (this.sortGraded || this.sortNotGraded) {
+        tempListSubmissions = this.filterGraded(tempListSubmissions);
+      }
       tempListSubmissions = this.filterDate(tempListSubmissions);
       this.isLoading = false;
       this.gradeingSubmission = {
