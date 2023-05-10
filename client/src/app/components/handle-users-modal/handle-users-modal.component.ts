@@ -22,6 +22,7 @@ export class HandleUsersModalComponent {
   csvData: string[] = [];
   newCid: string = '';
   searchString: string = '';
+  isLoading: boolean = false;
 
   constructor(
     public activeModal: NgbActiveModal,
