@@ -34,11 +34,12 @@ export class HandleUsersModalComponent {
   ) {}
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.user_service.getUsersInCourse(this.course.courseID).subscribe(
       (res: User[]) => {
-        console.log(res);
         this.users = res;
         this.usersList = this.users;
+        this.isLoading = false;
       },
       (error) => {
         console.error(error);
@@ -49,7 +50,6 @@ export class HandleUsersModalComponent {
   updateUsers() {
     this.user_service.getUsersInCourse(this.course.courseID).subscribe(
       (res: User[]) => {
-        console.log(res);
         this.users = res;
       },
       (error) => {
