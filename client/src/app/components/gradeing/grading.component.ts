@@ -33,6 +33,7 @@ export class GradingComponent {
   fileNames?: string[];
   form!: FormGroup;
   sortGraded: boolean = false;
+  sortNotGraded: boolean = false;
   dateFilter: string = '';
   //TODO: Add type @Kvalle99
   groupMembers: any = {};
@@ -101,8 +102,14 @@ export class GradingComponent {
     this.selectedAssignment = assignmentNr;
   }
 
-  setGradedBoolean(graded: boolean): void {
-    this.sortGraded = graded;
+  setGradedBoolean(): void {
+    this.sortGraded = !this.sortGraded;
+    this.sortGraded === true ? (this.sortNotGraded = false) : '';
+  }
+
+  setNotGradedBoolean(): void {
+    this.sortNotGraded = !this.sortNotGraded;
+    this.sortNotGraded === true ? (this.sortGraded = false) : '';
   }
 
   setDateSort(sort: string): void {

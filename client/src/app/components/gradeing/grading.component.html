@@ -47,8 +47,8 @@
             class="form-check-input"
             type="checkbox"
             id="checkbox1"
-            [checked]="sortGraded == false"
-            (click)="setGradedBoolean(false); filter()"
+            [checked]="sortNotGraded == true"
+            (click)="setNotGradedBoolean(); filter()"
           />
           <label class="form-check-label text-muted" for="checkbox1">
             No
@@ -62,7 +62,7 @@
             type="checkbox"
             id="checkbox2"
             [checked]="sortGraded == true"
-            (click)="setGradedBoolean(true); filter()"
+            (click)="setGradedBoolean(); filter()"
           />
           <label class="form-check-label text-muted" for="checkbox2">
             Yes
