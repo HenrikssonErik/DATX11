@@ -41,11 +41,30 @@
               <td>{{ user.fullname }}</td>
               <td>{{ user.cid }}</td>
               <td>
-                <select class="form-select">
-                  <option selected>Test</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                <select
+                  class="form-select"
+                  [(ngModel)]="user.role"
+                  (change)="updateRole(user)"
+                >
+                  <option
+                    value="Admin"
+                    [selected]="user.role === 'Admin' ? true : false"
+                  >
+                    Admin
+                  </option>
+                  <option
+                    value="Student"
+                    [selected]="user.role === 'Student' ? true : false"
+                  >
+                    Student
+                  </option>
+                  <option
+                    value="Teacher"
+                    [selected]="user.role === 'Teacher' ? true : false"
+                    translate
+                  >
+                    Teacher
+                  </option>
                 </select>
               </td>
               <td>
