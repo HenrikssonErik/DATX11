@@ -20,9 +20,14 @@ export class HandleUsersModalComponent {
   @Input() course!: Course;
   usersList: User[] = [];
   csvData: string[] = [];
+  cidToAdd: string[] = [];
   newCid: string = '';
   searchString: string = '';
   isLoading: boolean = false;
+  isRemoveUserLoading: Map<number, boolean> = new Map<number, boolean>();
+  isAddingFromCsv: boolean = false;
+  fileName: string = '';
+  numberOfRows: number = 0;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -43,6 +48,7 @@ export class HandleUsersModalComponent {
       },
       (error) => {
         console.error(error);
+        this.isLoading = false;
       }
     );
   }
@@ -60,11 +66,13 @@ export class HandleUsersModalComponent {
 
   handleFileInput(event: Event) {
     const files = (event.target as HTMLInputElement).files;
+    this.fileName = files!.item(0)!.name;
     const reader = new FileReader();
     const file = files!.item(0);
     reader.onload = () => {
       const text = reader.result as string;
-      this.csvData = text.split('\r\n');
+      this.csvData = text.split('\r\n').map((str: string) => str.toLowerCase());
+      this.numberOfRows = this.csvData.length;
     };
     reader.readAsText(file!);
   }
@@ -79,6 +87,8 @@ export class HandleUsersModalComponent {
       Cids: this.csvData,
     };
 
+    this.isAddingFromCsv = true;
+
     this.http
       .post<HttpResponse<any>>(`${API_URL}/batchAddToCourse`, formData, {
         observe: 'response',
@@ -88,16 +98,19 @@ export class HandleUsersModalComponent {
         next: (response: any) => {
           try {
             if (response.status == 200) {
-              this.toastr.success('Users added', response.body);
+              this.toastr.success('Users added ', response.body);
               this.csvData = [];
               this.newCid = '';
-              this.updateUsers();
+              setTimeout(() => {
+                this.updateUsers();
+              }, 200);
             }
           } catch {
             throw new Error('unexpected_error');
           }
         },
         error: (err) => {
+          this.isAddingFromCsv = false;
           let statusMsg: string = err.error.status;
           const [errorMessage, errorTitle]: string[] =
             this.toastrResponse.getToastrResponse(statusMsg);
@@ -105,12 +118,62 @@ export class HandleUsersModalComponent {
             closeButton: true,
           });
         },
+        complete: () => {
+          this.isAddingFromCsv = false;
+        },
       });
   }
 
   submitCid(): void {
-    this.csvData = [this.newCid];
-    this.submitCSV();
+    this.cidToAdd = [this.newCid];
+    this.submitCID();
+  }
+
+  submitCID(): void {
+    const headers = new HttpHeaders()
+      .append('Cookies', document.cookie)
+      .set('Cache-Control', 'public, max-age=3600');
+
+    const formData = {
+      Course: this.course.courseID,
+      Cids: this.cidToAdd,
+    };
+
+    this.isAddingFromCsv = true;
+
+    this.http
+      .post<HttpResponse<any>>(`${API_URL}/batchAddToCourse`, formData, {
+        observe: 'response',
+        headers: headers,
+      })
+      .subscribe({
+        next: (response: any) => {
+          try {
+            if (response.status == 200) {
+              this.toastr.success('User added ', response.body);
+              this.csvData = [];
+              this.newCid = '';
+              setTimeout(() => {
+                this.updateUsers();
+              }, 200);
+            }
+          } catch {
+            throw new Error('unexpected_error');
+          }
+        },
+        error: (err) => {
+          this.isAddingFromCsv = false;
+          let statusMsg: string = err.error.status;
+          const [errorMessage, errorTitle]: string[] =
+            this.toastrResponse.getToastrResponse(statusMsg);
+          this.toastr.error(errorMessage, errorTitle, {
+            closeButton: true,
+          });
+        },
+        complete: () => {
+          this.isAddingFromCsv = false;
+        },
+      });
   }
 
   updateRole(user: User): void {
@@ -165,6 +228,8 @@ export class HandleUsersModalComponent {
       User: user.id,
     };
 
+    this.isRemoveUserLoading.set(user.id!, true);
+
     this.http
       .post<HttpResponse<any>>(`${API_URL}/removeFromCourse`, formData, {
         observe: 'response',
@@ -175,7 +240,7 @@ export class HandleUsersModalComponent {
           try {
             if (response.status == 200) {
               this.toastr.success(
-                'Removed' + user.fullname + ' Cid:' + user.cid,
+                'Removed ' + user.fullname + ' Cid: ' + user.cid,
                 response.body
               );
               const index: number = this.users.indexOf(user);
@@ -186,12 +251,16 @@ export class HandleUsersModalComponent {
           }
         },
         error: (err) => {
+          this.isRemoveUserLoading.set(user.id!, false);
           let statusMsg: string = err.error.status;
           const [errorMessage, errorTitle]: string[] =
             this.toastrResponse.getToastrResponse(statusMsg);
           this.toastr.error(errorMessage, errorTitle, {
             closeButton: true,
           });
+        },
+        complete: () => {
+          this.isRemoveUserLoading.set(user.id!, false);
         },
       });
   }
@@ -212,5 +281,9 @@ export class HandleUsersModalComponent {
       const result = fuse.search(this.searchString);
       this.usersList = result.map((r) => r.item);
     }
+  }
+
+  removeCsv(): void {
+    this.csvData = [];
   }
 }
