@@ -39,8 +39,8 @@ CREATE TABLE Courses (
 CREATE TABLE Assignments(
 	courseId SERIAL NOT NULL,
 	assignmentId INTEGER NOT NULL CHECK (assignmentId > 0),
-	assignmentEndDate DATE NOT NULL,
-	assignmentDescription TEXT NOT NULL DEFAULT '',
+	endDate DATE NOT NULL,
+	description TEXT NOT NULL DEFAULT '',
 	assignmentName TEXT NOT NULL DEFAULT '',
 	maxScore INT DEFAULT 1,
 	passScore INT DEFAULT 1,
