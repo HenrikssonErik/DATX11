@@ -30,7 +30,7 @@ def get_user_ids_from_cids(cids: list[str]) -> tuple[list[int], list[str]]:
     return (user_ids, not_user_cids)
 
 
-def get_user(user_id: int) -> dict:
+def get_user(user_id: int) -> dict[str, str | int]:
     """Returns a dict with information on the user to the userId"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -103,7 +103,7 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
         raise Exception("No group found") from e
 
 
-def _get_group_members(group_id: int) -> list:
+def _get_group_members(group_id: int) -> list[str]:
     """ Internal method to retrieve all members of a group"""
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
@@ -346,12 +346,12 @@ def change_role_on_course(new_role: str, user_id: int,
         except Exception as e:
             print(e)
             raise Exception("Could not change the role") from e
-        return None
+        return
     else:
         return {'status': "Not an allowed role"}
 
 
-def get_users_on_course(course: int) -> tuple:
+def get_users_on_course(course: int) -> tuple[list[dict[str, str | int]], int]:
     """Returns a list of all users associated with a course and their
     course role"""
     conn = psycopg2.connect(dsn=get_conn_string())

@@ -222,7 +222,7 @@ def send_verification_email(to: str, token: str) -> None:
 
 # Upload assignment files to get tested
 @app.route('/files', methods=['POST'])
-def post_files():
+def post_files() -> Response | tuple[str, int]:
     token = extract_token(request)
     user_id: int = verify_and_get_id(token)
     files = request.files.getlist('files')
@@ -250,13 +250,12 @@ def post_files():
 
 
 @app.route('/unitTest', methods=['POST'])
-def post_tests():
+def post_tests() -> Response | tuple[str, int]:
     token = extract_token(request)
     user_id: int = verify_and_get_id(token)
     files = request.files.getlist('files')
     course = int(request.form['Course'])
     assignment = int(request.form['Assignment'])
-
 
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
 
@@ -266,31 +265,29 @@ def post_tests():
     if (user_handler.check_admin_or_course_teacher(user_id, course)):
         res = handle_test_file(files, course, assignment)
         return make_response(jsonify(res[0]), res[1])
-    else: 
+    else:
         return make_response("", 401)
 
 
-"""
-@app.route('/getAssignmentTestFeedback', methods=['POST'])
-def get_assignment_feedback():
-    data = request.get_json()
-    group_id = data['groupId']
-    course = data['course']
-    assignment = data['assignment']
-    (result, code) = get_assignment_test_feedback_from_database(
-        course,
-        assignment,
-        group_id
-    )
-    if code == 200:
-        return make_response(result, 200)
-    else:
-        return make_response("", code)
-"""
+# @app.route('/getAssignmentTestFeedback', methods=['POST'])
+# def get_assignment_feedback():
+#     data = request.get_json()
+#     group_id = data['groupId']
+#     course = data['course']
+#     assignment = data['assignment']
+#     (result, code) = get_assignment_test_feedback_from_database(
+#         course,
+#         assignment,
+#         group_id
+#     )
+#     if code == 200:
+#         return make_response(result, 200)
+#     else:
+#         return make_response("", code)
 
 
 @app.route('/getAssignmentFile', methods=['GET'])
-def get_file():
+def get_file() -> Response:
     """
     Takes in information from the frontend about a specific course assignment
       file to then return its file content.
@@ -328,7 +325,7 @@ def get_file():
 
 
 @app.route('/DownloadTestFile', methods=['POST'])
-def get_tests():
+def get_tests() -> Response:
     """
     Takes in information from the frontend about a specific course assignment
       test file to then return its file content.
@@ -354,12 +351,13 @@ def get_tests():
                                       download_name=filename,
                                       as_attachment=True))
 
-    res.headers = headers
-    return res
+        res.headers = headers
+        return res
+    return make_response("", 400)
 
 
 @app.route('/getUserInfo', methods=['GET'])
-def get_user_info():
+def get_user_info() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
 
@@ -371,7 +369,7 @@ def get_user_info():
 
 
 @app.route('/getCourses', methods=['GET'])
-def get_courses():
+def get_courses() -> Response:
     """Returns an array of all Courses a user is associated with together with
        the following information: Role, CourseID, Course (abbriviation),
        Year, StudyPeriod
@@ -390,7 +388,7 @@ def get_courses():
 
 
 @app.route('/getCourse', methods=['GET'])
-def get_course():
+def get_course() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course_id = request.args.get('Course')
@@ -403,7 +401,7 @@ def get_course():
 
 
 @app.route('/getMyGroup', methods=['GET'])
-def get_my_group():
+def get_my_group() -> Response:
     """Takes a Token as cookie, and a course_id.
     Returns the group_id, group_number and cid of members"""
     token = extract_token(request)
@@ -418,7 +416,7 @@ def get_my_group():
 
 
 @app.route('/addToGroup', methods=['POST'])
-def add_to_group():
+def add_to_group() -> Response:
     token = extract_token(request)
     request_user = verify_and_get_id(token)
     data = request.get_json()
@@ -434,7 +432,7 @@ def add_to_group():
 
 
 @app.route('/removeFromGroup', methods=['POST'])
-def remove_from_group():
+def remove_from_group() -> Response:
     token = extract_token(request)
     request_user = verify_and_get_id(token)
     data = request.get_json()
@@ -450,7 +448,7 @@ def remove_from_group():
 
 
 @app.route('/batchAddToCourse', methods=['POST'])
-def batch_add_to_course():
+def batch_add_to_course() -> Response:
     """
     Gets a list of cids that needs to be added to a course and
     in the case of the user not existing, the user should be created
@@ -486,7 +484,7 @@ def batch_add_to_course():
 # Should probably be redone to take a list of users, redo how singup works
 # as well with cid/email being added to the list first
 @app.route('/addToCourse', methods=['POST'])
-def add_to_course():
+def add_to_course() -> Response:
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -504,7 +502,7 @@ def add_to_course():
 
 
 @app.route('/removeFromCourse', methods=['POST'])
-def remove_from_course():
+def remove_from_course() -> Response:
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -519,7 +517,7 @@ def remove_from_course():
 
 
 @app.route('/createCourse', methods=['POST'])
-def create_course():
+def create_course() -> Response:
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -544,7 +542,7 @@ def create_course():
 
 
 @app.route('/createGroup', methods=['POST'])
-def create_group():
+def create_group() -> Response:
     """Creates a group for the specified course and adds the user to it"""
     token = extract_token(request)
     user_id = verify_and_get_id(token)
@@ -562,7 +560,7 @@ def create_group():
 
 
 @app.route('/createAssignment', methods=['POST'])
-def create_assignment():
+def create_assignment() -> Response:
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -584,10 +582,11 @@ def create_assignment():
             return make_response(jsonify(res), 400)
         else:
             return make_response("", 200)
+    return make_response("", 400)
 
 
 @app.route('/changeUserRole', methods=['POST'])
-def change_user_role():
+def change_user_role() -> Response:
     """Course admins can call this method to change a users role in a course.
         E.g from Student to TA (Teacher)
         Returns: Status Code 200, 401"""
@@ -611,7 +610,7 @@ def change_user_role():
 
 
 @app.route('/editDescription', methods=['POST'])
-def edit_desc():
+def edit_desc() -> Response:
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.form
@@ -631,7 +630,7 @@ def edit_desc():
 
 
 @app.route('/editAssignmentName', methods=['POST'])
-def edit_name():
+def edit_name() -> Response:
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.form
@@ -652,7 +651,7 @@ def edit_name():
 
 
 @app.route('/getUsersInCourse', methods=['GET'])
-def get_users_in_course():
+def get_users_in_course() -> Response:
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
@@ -664,7 +663,7 @@ def get_users_in_course():
 
 
 @app.route('/changeAssignmentDate', methods=['POST'])
-def change_assignment_date():
+def change_assignment_date() -> Response:
     token = extract_token(request)
     request_user_id = verify_and_get_id(token)
     data = request.form
@@ -684,7 +683,7 @@ def change_assignment_date():
 
 
 @app.route('/getFeedback', methods=['GET'])
-def get_feedback():
+def get_feedback() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
@@ -701,7 +700,7 @@ def get_feedback():
 
 
 @app.route('/getTestingFeedback', methods=['GET'])
-def get_testing_feedback():
+def get_testing_feedback() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
@@ -718,7 +717,7 @@ def get_testing_feedback():
 
 
 @app.route('/getGroups', methods=['GET'])
-def get_course_groups():
+def get_course_groups() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
@@ -734,7 +733,7 @@ def get_course_groups():
 
 
 @app.route('/getGroup', methods=['GET'])
-def get_course_group():
+def get_course_group() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
@@ -751,7 +750,7 @@ def get_course_group():
 
 
 @app.route('/assignmentsOverview', methods=['GET'])
-def get_overview():
+def get_overview() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
@@ -765,7 +764,7 @@ def get_overview():
 
 
 @app.route('/setFeedback', methods=['POST'])
-def set_feedback():
+def set_feedback() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     data = request.get_json()
@@ -787,7 +786,7 @@ def set_feedback():
 
 
 @app.route('/getTestFileNames', methods=['GET'])
-def get_test_file_names():
+def get_test_file_names() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
@@ -802,7 +801,7 @@ def get_test_file_names():
 
 
 @app.route('/getFilenames', methods=['GET'])
-def get_file_names():
+def get_file_names() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     course = int(request.args.get('Course'))
@@ -817,7 +816,7 @@ def get_file_names():
 
 
 @app.route('/getCourseProgress', methods=['GET'])
-def get_progress():
+def get_progress() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
 
@@ -829,7 +828,7 @@ def get_progress():
 
 
 @app.route('/changeCourseName', methods=['POST'])
-def change_course_name():
+def change_course_name() -> Response:
     token = extract_token(request)
     user_id = verify_and_get_id(token)
     data = request.get_json()

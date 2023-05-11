@@ -57,7 +57,7 @@ def get_courses_info(user_id: int) -> list[dict[str, str | int]]:
         return [{'status': "No Courses Found"}]
 
 
-def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
+def get_course_info(user_id: int, course_id: int) -> dict[str, str | int]:
     """Returns a dict with information on the specified course associated to
     the user_id, course_id"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -92,10 +92,10 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
 
     except Exception as e:
         print(e)
-        return [{'status': "No Courses Found"}]
+        return {'status': "No Courses Found"}
 
 
-def get_progress(user_id: int) -> list:
+def get_progress(user_id: int) -> list[dict]:
     """Retrieves the results of the latest submisison for the user on
     all courses"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -163,7 +163,7 @@ def add_group_to_course(course_id: int, user_id: int):
 
 
 def _create_course(course_name: str, course_abbr: str, year: int,
-                   teaching_period: int) -> int | tuple:
+                   teaching_period: int) -> int | tuple[dict[str, str], int]:
     """Internal method to create a course, used by create_course method after
     verification of data. Returns the new course ID"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -245,7 +245,7 @@ def create_assignment(course_id: int, description: str, assignment_name: int,
         raise Exception("Could not create assignment") from e
 
 
-def get_assignments(course_id: int) -> tuple:
+def get_assignments(course_id: int) -> list[dict] | dict[str, str]:
     """Returns a list of all assignments connected to a course, with their
     description and end date"""
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -259,7 +259,7 @@ def get_assignments(course_id: int) -> tuple:
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
-                assignments: list[dict[str: str | int]] = []
+                assignments: list[dict[str, str | int]] = []
                 for assignment_row in data:
                     assignments.append({'AssignmentNr': assignment_row[0],
                                         'DueDate': assignment_row[1],
@@ -298,7 +298,7 @@ def change_description(new_desc: str, course_id: int,
 
 
 def change_assignment_name(new_name: str, course_id: int,
-                           assignment: int) -> dict | None:
+                           assignment: int):
     """ Changes the description for the a assignment"""
     conn = psycopg2.connect(dsn=get_conn_string())
 
@@ -310,7 +310,7 @@ def change_assignment_name(new_name: str, course_id: int,
                 cur.execute(query_data, [new_name, course_id, assignment])
 
         conn.close()
-        return None
+        return
 
     except Exception as e:
         print(e)
@@ -361,7 +361,7 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
 
 # Not tested
 def change_end_date(course: int, assignment: int,
-                    new_date: str) -> dict | None:
+                    new_date: str) -> dict[str, str] | None:
     """Changes the end-date of the specified assignment
     Returns a dict if error occurs, otherwise None"""
     if (check_date_format(new_date)):
@@ -423,7 +423,7 @@ def check_date_format(date_string) -> bool:
 
 
 def get_assignment_feedback(course: int, assignment: int,
-                            group: int) -> list | dict:
+                            group: int) -> list[dict[str, str | int | None]]:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -435,8 +435,7 @@ def get_assignment_feedback(course: int, assignment: int,
                 globalGroupId = %s AND assignmentId = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
-                print("from db")
-                print(len(data))
+
         conn.close()
         if not data:
             return []
@@ -447,8 +446,10 @@ def get_assignment_feedback(course: int, assignment: int,
         raise Exception("Could not retrieve feedback") from e
 
 
-def _format_assignment_feedback(db_output: list[tuple]) -> list:
-    assignments: list[dict[str, str | int]] = []
+def _format_assignment_feedback(
+        db_output: list[tuple]
+) -> list[dict[str, str | int | None]]:
+    assignments: list[dict[str, str | int | None]] = []
     for submission in db_output:
         testfeedback = "" if (x := submission[2]) is None else x
 
@@ -456,8 +457,10 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
 
         grade = None if (x := submission[4]) is None else x
 
-        teacher = "" if (x := submission[5]) is None else user_handler.get_fullname(
-            submission[5])
+        if (x := submission[5]) is None:
+            teacher = ""
+        else:
+            teacher = user_handler.get_fullname(x)
 
         assignments.append({'Submission': submission[0],
                             'testpass': submission[1],
@@ -469,7 +472,7 @@ def _format_assignment_feedback(db_output: list[tuple]) -> list:
     return assignments
 
 
-def get_course_groups(course: int):
+def get_course_groups(course: int) -> list[dict[str, str | int]]:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -497,7 +500,7 @@ def get_course_groups(course: int):
         raise Exception("Error when getting course groups") from e
 
 
-def get_course_group(course: int, group_id: int):
+def get_course_group(course: int, group_id: int) -> dict[str, str | int]:
     conn = psycopg2.connect(dsn=get_conn_string())
 
     try:
@@ -604,12 +607,11 @@ def passed_deadline(course: int, assignment: int) -> bool:
                 query_one = """SELECT endDate FROM Assignments
                     WHERE courseId = %s AND assignmentId = %s;"""
                 cur.execute(query_one, [course, assignment])
-                date: datetime = cur.fetchone()[0]
+                date = cur.fetchone()[0]
         conn.close()
-        if date < datetime.date.today():
-            return True
-        else:
-            return False
+
+        return date < datetime.date.today()
+
     except Exception as e:
         print(e)
         raise Exception("Could not get the deadline from database") from e

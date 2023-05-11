@@ -27,5 +27,5 @@ def check_against_ldap(cid: str) -> tuple[str, str] | None:
         return Role.Teacher.name, name
     else:
         # Default to student, could only have the else statement
-        # but this will make future changes 'easier' 
+        # but this will make future changes 'easier'
         return Role.Student.name, name
