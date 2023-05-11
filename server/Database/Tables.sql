@@ -1,6 +1,6 @@
 --Will clear the whole database, be careful!!
 /*
-\c hydrant	
+\c SPECIFYDATABASE --hydrant	
 \set QUIT true
 SET client_min_messages TO WARNING;
 DROP SCHEMA public CASCADE;
@@ -11,14 +11,14 @@ GRANT ALL ON SCHEMA public TO postgres;
 ------------------------------------------------------------------------------
 CREATE TABLE UserData (
 	userId SERIAL NOT NULL,
-	cid TEXT UNIQUE NOT NULL,
-	email TEXT UNIQUE NOT NULL,
+	ChalmersId TEXT UNIQUE NOT NULL,
+	userEmail TEXT UNIQUE NOT NULL,
 	passphrase BYTEA,
-	verified BOOLEAN NOT NULL DEFAULT FALSE,
+	verifiedAccount BOOLEAN NOT NULL DEFAULT FALSE,
 	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher', 'Admin')),
 	fullName TEXT NOT NULL,
 	PRIMARY KEY (userId),
-	CHECK (email ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
+	CHECK (userEmail ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
 	);
 
 
@@ -27,24 +27,24 @@ CREATE TABLE UserData (
 CREATE TABLE Courses (
 	courseId SERIAL PRIMARY KEY,
 	courseName TEXT NOT NULL,
-	course Char(6) NOT NULL,
+	courseCode Char(6) NOT NULL,
 	teachingPeriod INTEGER NOT NULL,
 	courseYear INTEGER NOT NULL,
 	CHECK (teachingPeriod BETWEEN 1 AND 5),
-	UNIQUE ( course, teachingPeriod, courseYear)
+	UNIQUE ( courseCode, teachingPeriod, courseYear)
 );
 
 
 ------------------------------------------------------------------------------
 CREATE TABLE Assignments(
 	courseId SERIAL NOT NULL,
-	assignment INTEGER NOT NULL CHECK (assignment > 0),
-	endDate DATE NOT NULL,
-	description TEXT NOT NULL DEFAULT '',
-	name TEXT NOT NULL DEFAULT '',
+	assignmentId INTEGER NOT NULL CHECK (assignmentId > 0),
+	assignmentEndDate DATE NOT NULL,
+	assignmentDescription TEXT NOT NULL DEFAULT '',
+	assignmentName TEXT NOT NULL DEFAULT '',
 	maxScore INT DEFAULT 1,
 	passScore INT DEFAULT 1,
-	PRIMARY KEY (courseId, assignment),
+	PRIMARY KEY (courseId, assignmentId),
 	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (courseId) 
 			REFERENCES Courses(courseId) 
 			ON DELETE CASCADE 
@@ -54,16 +54,16 @@ CREATE TABLE Assignments(
 CREATE OR REPLACE FUNCTION set_assignment_number_assignments()
 RETURNS TRIGGER AS $$
 DECLARE
-    max_assignment INTEGER;
+    max_assignmentId INTEGER;
 BEGIN
-    IF NEW.assignment = 0 THEN
-        SELECT COALESCE(MAX(assignment), 0) + 1 INTO max_assignment
+    IF NEW.assignmentId = 0 THEN
+        SELECT COALESCE(MAX(assignmentId), 0) + 1 INTO max_assignmentId
         FROM Assignments
         WHERE courseId = NEW.courseId;
-        IF max_assignment > 0 THEN
-            NEW.assignment := max_assignment;
+        IF max_assignmentId > 0 THEN
+            NEW.assignmentId := max_assignmentId;
         ELSE
-            SELECT COALESCE(MAX(assignment), 0) + 1 INTO NEW.assignment
+            SELECT COALESCE(MAX(assignmentId), 0) + 1 INTO NEW.assignmentId
             FROM Assignments
             WHERE courseId = NEW.courseId;
         END IF;
@@ -80,12 +80,12 @@ EXECUTE FUNCTION set_assignment_number_assignments();
 
 ------------------------------------------------------------------------------
 CREATE TABLE Groups (
-	groupId SERIAL PRIMARY KEY,
-	groupNumber INTEGER NOT NULL,
-	course INTEGER NOT NULL,
-	UNIQUE (groupNumber, course),
-	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (course) 
-	REFERENCES Courses(courseid) 
+	globalGroupId SERIAL PRIMARY KEY,
+	groupNumberInCourse INTEGER NOT NULL,
+	courseId INTEGER NOT NULL,
+	UNIQUE (groupNumberInCourse, courseId),
+	CONSTRAINT constraint_courseid_fkey FOREIGN KEY (courseId) 
+	REFERENCES Courses(courseId) 
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
 );
@@ -93,27 +93,27 @@ CREATE TABLE Groups (
 
 ------------------------------------------------------------------------------
 --for unittests
-CREATE TABLE TestFiles (
+CREATE TABLE PythonTestFiles (
 	courseId SERIAL NOT NULL,
-	assignment INTEGER NOT NULL, 
-	filename TEXT NOT NULL,
+	assignmentId INTEGER NOT NULL, 
+	testFileName TEXT NOT NULL,
 	fileData BYTEA NOT NULL,
-	PRIMARY KEY(courseId, assignment, fileName),
-	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
-		REFERENCES Assignments(courseId, assignment) 
+	PRIMARY KEY(courseId, assignmentId, testFileName),
+	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignmentId) 
+		REFERENCES Assignments(courseId, assignmentId) 
 		ON UPDATE CASCADE 
 		ON DELETE CASCADE
 );
 
 
 ------------------------------------------------------------------------------
-CREATE TABLE FileNames (
+CREATE TABLE RequiredFileNames (
 	courseId SERIAL NOT NULL,
-	assignment INTEGER NOT NULL, 
-	filename TEXT NOT NULL,
-	PRIMARY KEY (courseId, assignment, filename),
-	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment) 
-		REFERENCES Assignments(courseId, assignment) 
+	assignmentId INTEGER NOT NULL, 
+	assignmentFileName TEXT NOT NULL,
+	PRIMARY KEY (courseId, assignmentId, assignmentFileName),
+	CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignmentId) 
+		REFERENCES Assignments(courseId, assignmentId) 
 		ON UPDATE CASCADE 
 		ON DELETE CASCADE
 );
@@ -121,29 +121,29 @@ CREATE TABLE FileNames (
 
 ------------------------------------------
 CREATE TABLE AssignmentFeedback (
-    groupId INTEGER NOT NULL,
+    globalGroupId INTEGER NOT NULL,
     courseId SERIAL NOT NULL,  
-    assignment INTEGER NOT NULL,
-    submission SERIAL NOT NULL,
-    testFeedback JSON,
+    assignmentId INTEGER NOT NULL,
+    submissionNumber SERIAL NOT NULL,
+    automaticFeedback JSON,
     teacherFeedback TEXT,
-    testPass BOOLEAN NOT NULL DEFAULT FALSE,
+    testPassed BOOLEAN NOT NULL DEFAULT FALSE,
     teacherGrade BOOLEAN,
 	feedbackDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'),
 	createdDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'),
-	score INT DEFAULT 0,
+	assignmentScore INT DEFAULT 0,
 	userId INT,
-    PRIMARY KEY (groupId, courseId, assignment, submission),
-    CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId)
-        REFERENCES groups(groupId)
+    PRIMARY KEY (globalGroupId, courseId, assignmentId, submissionNumber),
+    CONSTRAINT constraint_groupid_fkey FOREIGN KEY (globalGroupId)
+        REFERENCES Groups(globalGroupId)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignment)
-        REFERENCES assignments(courseid, assignment)
+    CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignmentId)
+        REFERENCES Assignments(courseId, assignmentId)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 	CONSTRAINT constraint_userId_fkey FOREIGN KEY (userId)
-		REFERENCES userdata(userId)
+		REFERENCES UserData(userId)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE	
 );
@@ -151,22 +151,22 @@ CREATE TABLE AssignmentFeedback (
 CREATE OR REPLACE FUNCTION set_submission_number_assignmentfeedback()
 RETURNS TRIGGER AS $$
 DECLARE
-    max_submission INTEGER;
+    max_submissionNumber INTEGER;
 BEGIN
-    IF NEW.submission = 0 THEN
-        SELECT COUNT(submission) + 1 INTO max_submission
+    IF NEW.submissionNumber = 0 THEN
+        SELECT COUNT(submissionNumber) + 1 INTO max_submissionNumber
         FROM AssignmentFeedback
-        WHERE groupId = NEW.groupId
+        WHERE globalGroupId = NEW.globalGroupId
             AND courseId = NEW.courseId
-            AND assignment = NEW.assignment;
-        IF max_submission > 0 THEN
-            NEW.submission := max_submission;
+            AND assignmentId = NEW.assignmentId;
+        IF submissionNumber > 0 THEN
+            NEW.submissionNumber := max_submissionNumber;
         ELSE
-            SELECT COUNT(submission) + 1 INTO NEW.submission
+            SELECT COUNT(submissionNumber) + 1 INTO NEW.submissionNumber
             FROM AssignmentFeedback
-            WHERE groupId = NEW.groupId
+            WHERE globalGroupId = NEW.globalGroupId
                 AND courseId = NEW.courseId
-                AND assignment = NEW.assignment;
+                AND assignmentId = NEW.assignmentId;
         END IF;
     END IF;
     RETURN NEW;
@@ -181,21 +181,21 @@ EXECUTE FUNCTION set_submission_number_assignmentfeedback();
 
 ------------------------------------------------------------------------------
 CREATE TABLE AssignmentFiles (
-		groupId INTEGER NOT NULL, 
+		globalGroupId INTEGER NOT NULL, 
 		courseId SERIAL NOT NULL,
-		assignment INTEGER NOT NULL,
-		submission SERIAL NOT NULL,
-		fileName TEXT NOT NULL, --Could add foregin key to FileName-table
+		assignmentId INTEGER NOT NULL,
+		submissionNumber SERIAL NOT NULL,
+		assignmentFileName TEXT NOT NULL, --Could add foregin key to FileName-table
 		fileData BYTEA NOT NULL, 
 		submissionDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'), 
-		PRIMARY KEY(groupId, courseId, assignment, fileName, submission),
-		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
-			REFERENCES Groups (groupId) 
+		PRIMARY KEY(globalGroupId, courseId, assignmentId, assignmentFileName, submissionNumber),
+		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (globalGroupId) 
+			REFERENCES Groups (globalGroupId) 
 			ON DELETE CASCADE 
 			ON UPDATE CASCADE,
 		CONSTRAINT constraint_filename_assignment_course_fkey 
-			FOREIGN KEY (filename, courseid, assignment) 
-			REFERENCES filenames(filename, courseid, assignment) 
+			FOREIGN KEY (assignmentFileName, courseId, assignmentId) 
+			REFERENCES RequiredFileNames(assignmentFileName, courseId, assignmentId) 
 			ON DELETE CASCADE 
 			ON UPDATE CASCADE
 	);
@@ -203,24 +203,24 @@ CREATE TABLE AssignmentFiles (
 CREATE OR REPLACE FUNCTION set_submission_number_assignmentfiles()
 RETURNS TRIGGER AS $$
 DECLARE
-    max_submission INTEGER;
+    max_submissionNumber INTEGER;
 BEGIN
-    IF NEW.submission = 0 THEN
-        SELECT COUNT(submission) + 1 INTO max_submission
+    IF NEW.submissionNumber = 0 THEN
+        SELECT COUNT(submissionNumber) + 1 INTO max_submissionNumber
         FROM AssignmentFiles
         WHERE groupId = NEW.groupId
             AND courseId = NEW.courseId
-            AND assignment = NEW.assignment
-            AND fileName = NEW.fileName;
-        IF max_submission > 0 THEN
-            NEW.submission := max_submission;
+            AND assignmentId = NEW.assignmentId
+            AND assignmentFileName = NEW.assignmentFileName;
+        IF max_submissionNumber > 0 THEN
+            NEW.submissionNumber := max_submissionNumber;
         ELSE
-            SELECT COUNT(submission) + 1 INTO NEW.submission
+            SELECT COUNT(submissionNumber) + 1 INTO NEW.submissionNumber
             FROM AssignmentFiles
             WHERE groupId = NEW.groupId
                 AND courseId = NEW.courseId
-                AND assignment = NEW.assignment
-                AND fileName = NEW.fileName;
+                AND assignmentId = NEW.assignmentId
+                AND assignmentFileName = NEW.assignmentFileName;
         END IF;
     END IF;
     RETURN NEW;
@@ -236,14 +236,14 @@ EXECUTE FUNCTION set_submission_number_assignmentfiles();
 ------------------------------------------------------------------------------
 CREATE TABLE UserInGroup (
 	userId INTEGER,
-	groupId INTEGER,
-	PRIMARY KEY (userId, groupId),
-	CONSTRAINT constraint_groupid_fkey FOREIGN KEY (groupId) 
-		REFERENCES Groups(groupId) 
+	globalGroupId INTEGER,
+	PRIMARY KEY (userId, globalGroupId),
+	CONSTRAINT constraint_groupid_fkey FOREIGN KEY (globalGroupId) 
+		REFERENCES Groups(globalGroupId) 
 		ON DELETE CASCADE 
 		ON UPDATE CASCADE,
 	CONSTRAINT constraint_userid_fkey FOREIGN KEY (userId) 
-		REFERENCES Userdata(userId) 
+		REFERENCES UserData(userId) 
 		ON DELETE CASCADE 
 		ON UPDATE CASCADE
 );
@@ -271,30 +271,31 @@ CREATE TABLE UserInCourse (
 --To Call do: select * from user_course_info where userId = 'id int';
 
 CREATE OR REPLACE VIEW UserCourseInfo AS
-SELECT uic.userId, uic.userRole, c.courseId, c.courseName, c.course, c.teachingPeriod, c.courseYear
-FROM UserInCourse uic
-JOIN Courses c ON uic.courseId = c.courseId;
+SELECT userCourse.userId, userCourse.userRole, course.courseId, course.courseName, course.courseCode, course.teachingPeriod, course.courseYear
+FROM UserInCourse userCourse
+JOIN Courses course ON userCourse.courseId = course.courseId;
 
 ------------------------------------------------------------------------------
 --This view shows user and its courses with corresponding groups. Useful to get group info if user and course id is known
 
 CREATE OR REPLACE VIEW UserGroupCourseInfo AS
-SELECT uig.userId, uig.groupId, g.groupNumber, g.course AS courseId, c.course, c.courseYear, c.teachingPeriod
-FROM UserInGroup uig
-JOIN Groups g ON uig.groupId = g.groupId
-JOIN Courses c ON g.course = c.courseId;
+SELECT userGroup.userId, userGroup.globalGroupId, grp.groupNumberInCourse, grp.courseId 
+	AS courseId, course.courseCode, course.courseYear, course.teachingPeriod
+FROM UserInGroup userGroup
+JOIN Groups grp ON userGroup.globalGroupId = grp.globalGroupId
+JOIN Courses course ON grp.courseId = course.courseId;
 
 ------------------------------------------------------------------------------
 --This view shows all user and group information, eg. used to get all groupmember cids from your group 
 CREATE OR REPLACE VIEW UserGroupInfo AS
-SELECT UserData.userId, UserData.cid, UserInGroup.groupId, Groups.groupNumber
+SELECT UserData.userId, UserData.chalmersId, UserInGroup.globalGroupId, Groups.groupNumberInCourse
 FROM UserData
 JOIN UserInGroup ON UserData.userId = UserInGroup.userId
-JOIN Groups ON UserInGroup.groupId = Groups.groupId;
+JOIN Groups ON UserInGroup.globalGroupId = Groups.globalGroupId;
 
 ------------------------------------------------------------------------------
 CREATE VIEW GroupDetails AS
-SELECT g.groupid, g.groupnumber, g.course, u.fullname
-FROM Groups g
-LEFT JOIN UserInGroup uig ON g.groupid = uig.groupid
-LEFT JOIN UserData u ON uig.userid = u.userid;
+SELECT grp.globalGroupId, grp.groupNumberInCourse, grp.courseId, users.fullName
+FROM Groups grp
+LEFT JOIN UserInGroup userGroup ON grp.globalGroupId = userGroup.globalGroupId
+LEFT JOIN UserData users ON userGroup.userId = users.userId;
