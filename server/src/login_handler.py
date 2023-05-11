@@ -58,9 +58,7 @@ def check_data_input(cid: str, email: str, pwd: str,
 def allowed_password(pwd: str) -> bool:
     allowed_characters = set(string.ascii_letters + string.digits +
                              string.punctuation)
-    if not set(pwd) <= allowed_characters:
-        return False
-    return True
+    return set(pwd) <= allowed_characters
 
 
 def create_temp_users(cids: list[str]) -> list[str]:
@@ -99,7 +97,7 @@ def create_temp_users(cids: list[str]) -> list[str]:
     return newly_registered
 
 
-def new_password(cid, password):
+def new_password(cid, password) -> tuple[dict[str, str], int]:
 
     if not allowed_password(password):
         return {"status": "pass_not_ok"}, 400
@@ -112,7 +110,7 @@ def new_password(cid, password):
         return update_status
 
 
-def update_pwd_in_db(cid: str, pwd: bytes):
+def update_pwd_in_db(cid: str, pwd: bytes) -> tuple[dict[str, str], int]:
     conn = psycopg2.connect(get_conn_string())
 
     with conn:
@@ -141,7 +139,7 @@ def update_pwd_in_db(cid: str, pwd: bytes):
     return {'status': status}, res_code
 
 
-def user_registration(data: Request.form) -> \
+def user_registration(data: Request) -> \
         tuple[dict[str, str], Literal[200, 400, 401, 406, 500]]:
     """
     Registrates the user to the database, then logs in to the user.
@@ -231,7 +229,7 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
     return {'status': status}, res_code
 
 
-def user_to_resend_verification_email(cid: str) -> tuple:
+def user_to_resend_verification_email(cid: str) -> tuple[dict[str, str], int]:
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
@@ -258,7 +256,7 @@ def user_to_resend_verification_email(cid: str) -> tuple:
                 return {"status": "unexpected_error"}, 500
 
 
-def user_to_send_reset_pwd_email(cid: str) -> tuple:
+def user_to_send_reset_pwd_email(cid: str) -> tuple[dict[str, str], int]:
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
