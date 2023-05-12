@@ -137,7 +137,7 @@
   "Fail": "Underkänn",
   "No_assignments_found": "Inga Inlämningar Hittades",
   "Handle_Users_In": "Hantera Användare I",
-  "Add_CSV": "Ladda Upp CSV",
+  "Add_CSV": "Importera CSV",
   "Submit": "Lägg Till",
   "Name": "Namn",
   "Role": "Roll",
@@ -163,5 +163,13 @@
   "Change_pwd": "Ändra Lösenord",
   "New_pwd": "nytt lösenord",
   "Ver_pwd": "verifiera lösenord",
-  "create_course_subtext": "Skapa snabbt en kurs här genom att fylla i formuläret. För att ytterligare finjustera din kurs. Gå till inställningar i panelen för kursinställningar."
+  "create_course_subtext": "Skapa snabbt en kurs här genom att fylla i formuläret. För att ytterligare finjustera din kurs. Gå till inställningar i panelen för kursinställningar.",
+  "Search_Users": "Sök Användare",
+  "SEARCH_BY": "Du kan söka på cid, e-post eller namn",
+  "ONE_AT_A_TIME": "Eller lägg till en i taget",
+  "UPLOAD_MEMBERS": "Ladda upp medlemmar från en CSV-fil",
+  "USE_ONE_COLUMN": "Använd en kolumn med cid för varje medlem. Använd inte en header.",
+  "Add_members": "Lägg till användare",
+  "No_users_found": "Inga användare hittade",
+  "Search...": "Sök..."
 }
