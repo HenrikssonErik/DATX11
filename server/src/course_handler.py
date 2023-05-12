@@ -171,13 +171,13 @@ def _create_course(course_name: str, course_abbr: str, year: int,
         with conn:
             with conn.cursor() as cur:
                 query_one = """Insert into Courses
-                                (courseName, course, teachingPeriod,
+                                (courseName, coursecode, teachingPeriod,
                                 courseYear) values (%s,%s,%s,%s) """
                 cur.execute(query_one, [course_name, course_abbr,
                                         teaching_period, year])
 
                 query_two = """select courseid from Courses
-                                where  (course = %s AND
+                                where  (coursecode = %s AND
                                 teachingperiod = %s AND courseyear = %s)"""
                 cur.execute(query_two, [course_abbr, teaching_period, year])
                 data = cur.fetchone()
@@ -210,7 +210,7 @@ def create_assignment(course_id: int, description: str, assignment_name: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """SELECT MAX(assignment) as max_assignment FROM
+                query_one = """SELECT MAX(assignmentid) as max_assignment FROM
                 Assignments WHERE courseid = %s;"""
                 cur.execute(query_one, [course_id])
                 data = cur.fetchone()
@@ -221,8 +221,8 @@ def create_assignment(course_id: int, description: str, assignment_name: int,
                     # since the "select max" call is done before insert we
                     # need to increment by 1
                     assignment_nr = data[0] + 1
-                query_two = """INSERT INTO Assignments (courseid, assignment,
-                enddate, description, name, maxscore, passscore) VALUES
+                query_two = """INSERT INTO Assignments (courseId, assignmentId,
+                endDate, description, assignmentName, maxScore, passScore) VALUES
                     (%s, 0, %s, %s, %s, %s, %s);"""
                 cur.execute(
                     query_two,
@@ -252,8 +252,9 @@ def get_assignments(course_id: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT assignment, endDate, description, name,"\
-                    "maxscore, passscore FROM Assignments WHERE courseid = %s"
+                query_data = "SELECT Assignment, endDate, description, "\
+                    "assignmentName, maxScore, passScore FROM Assignments"\
+                    " WHERE courseId = %s"
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
@@ -283,8 +284,8 @@ def change_description(new_desc: str, course_id: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """UPDATE assignments set description = %s
-                                WHERE courseid = %s and assignment = %s"""
+                query_data = """UPDATE Assignments SET description = %s
+                                WHERE courseId = %s AND assignmentId = %s"""
                 cur.execute(query_data, [new_desc, course_id, assignment])
 
         conn.close()
@@ -303,8 +304,8 @@ def change_assignment_name(new_name: str, course_id: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """UPDATE assignments set name = %s
-                                WHERE courseid = %s and assignment = %s"""
+                query_data = """UPDATE Assignments set assignmentName = %s
+                                WHERE courseId = %s and assignmentId = %s"""
                 cur.execute(query_data, [new_name, course_id, assignment])
 
         conn.close()
@@ -368,8 +369,8 @@ def change_end_date(course: int, assignment: int,
         try:
             with conn:
                 with conn.cursor() as cur:
-                    query_one = """UPDATE assignments SET enddate = %s
-                    WHERE courseid = %s AND assignment = %s;"""
+                    query_one = """UPDATE Assignments SET endDate = %s
+                    WHERE courseId = %s AND assignmentId = %s;"""
                     cur.execute(query_one, [new_date, course, assignment])
             conn.close()
             return
@@ -527,8 +528,8 @@ def get_assignment_overview(course: int) -> list[dict]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """ select assignment from assignments where
-                courseid = %s"""
+                query_one = """ SELECT assignmentId FROM Assignments WHERE
+                courseId = %s"""
                 cur.execute(query_one, [course])
 
                 assignments = cur.fetchall()
@@ -599,8 +600,8 @@ def passed_deadline(course: int, assignment: int) -> bool:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """select enddate from assignments
-                    WHERE courseid = %s AND assignment = %s;"""
+                query_one = """SELECT endDate FROM Assignments
+                    WHERE courseId = %s AND assignmentId = %s;"""
                 cur.execute(query_one, [course, assignment])
                 date: datetime = cur.fetchone()[0]
         conn.close()

@@ -103,8 +103,8 @@ class TestCourseHandler(unittest.TestCase):
             (2, '2022-03-18', 'description', 'TestName',1,1)]
         res = course_handler.get_assignments(course_id)
         mock_cursor.execute.assert_called_once_with(
-            "SELECT assignment, endDate, description, name,"
-            "maxscore, passscore FROM Assignments WHERE courseid = %s",
+            "SELECT assignment, endDate, description, assignmentName,"
+            "maxScore, passScore FROM Assignments WHERE courseId = %s",
             [course_id]
         )
         self.assertEqual(
