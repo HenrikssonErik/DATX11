@@ -29,7 +29,7 @@
         *ngIf="submission[0].testfeedback.unittest_feedback.errors.length > 0"
       >
         <div class="col-12">
-          <h6 class="text-muted">Errors:</h6>
+          <h6 class="text-muted" translate>Errors</h6>
           <div
             *ngFor="
               let errors of submission[0].testfeedback.unittest_feedback.errors
@@ -46,7 +46,7 @@
         *ngIf="submission[0].testfeedback.unittest_feedback.failures.length > 0"
       >
         <div class="col-12">
-          <h6 class="text-muted">Failed Tests</h6>
+          <h6 class="text-muted" translate>Failed_Tests</h6>
           <div
             *ngFor="
               let failures of submission[0].testfeedback.unittest_feedback
@@ -74,7 +74,7 @@
         "
       >
         <div class="col-12">
-          <h6 class="text-muted">Successful Tests:</h6>
+          <h6 class="text-muted" translate>Successful_Tests</h6>
           <div
             *ngFor="
               let successes of submission[0].testfeedback.unittest_feedback
