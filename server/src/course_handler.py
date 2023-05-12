@@ -133,7 +133,7 @@ def add_group_to_course(course_id: int, user_id: int):
         with conn:
             with conn.cursor() as cur:
                 query = """SELECT EXISTS(SELECT 1 FROM
-                        usergroupcourseinfo WHERE courseid=%s AND userid=%s) as
+                        UserGroupCourseInfo WHERE courseId=%s AND userId=%s) AS
                         exists_row;"""
                 cur.execute(query, [course_id, user_id])
                 in_group = cur.fetchone()[0]

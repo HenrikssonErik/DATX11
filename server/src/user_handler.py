@@ -81,9 +81,9 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT groupid, groupnumber FROM " +\
-                    "userGroupCourseInfo " +\
-                    "WHERE userid = %s and courseid = %s"
+                query_data = "SELECT globalGroupId, groupNumberInCourse FROM " +\
+                    "UserGroupCourseInfo " +\
+                    "WHERE userId = %s and courseId = %s"
                 cur.execute(query_data, (user_id, course_id))
                 data = cur.fetchone()
         conn.close()
@@ -143,7 +143,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
                 with conn:
                     with conn.cursor() as cur:
                         query_one = """SELECT EXISTS(SELECT 1 FROM
-                        usergroupcourseinfo WHERE courseid=%s AND userid=%s) as
+                        UserGroupCourseInfo WHERE courseId=%s AND userId=%s) AS
                         exists_row;"""
                         cur.execute(query_one, [course_id, user_id])
                         in_group = cur.fetchone()[0]

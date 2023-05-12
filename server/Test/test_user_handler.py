@@ -103,9 +103,9 @@ class TestUserHandler(unittest.TestCase):
             result = user_handler.get_group(user_id, course_id)
 
             mock_cursor.execute.assert_called_once_with(
-                "SELECT groupid, groupnumber FROM "
-                "userGroupCourseInfo "
-                "WHERE userid = %s and courseid = %s",
+                "SELECT globalGroupId, groupNumberInCourse FROM "
+                "UserGroupCourseInfo "
+                "WHERE userId = %s and courseId = %s",
                 (user_id, course_id)
             )
             self.assertEqual(
