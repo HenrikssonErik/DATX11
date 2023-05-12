@@ -91,4 +91,12 @@ export class FeedbackTeacherViewModalComponent {
     const error: string = str.substring(str.lastIndexOf(',') + 1);
     return error;
   }
+
+  parseSuccesses(str: any): string {
+    const dotIndex = str.indexOf('.');
+    if (dotIndex !== -1) {
+      return str.substring(dotIndex + 1);
+    }
+    return 'Successfull test not found';
+  }
 }

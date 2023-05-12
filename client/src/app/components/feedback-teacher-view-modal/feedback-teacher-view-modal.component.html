@@ -70,6 +70,26 @@
       <div
         class="row"
         *ngIf="
+          submission[0].testfeedback.unittest_feedback.successes.length > 0
+        "
+      >
+        <div class="col-12">
+          <h6 class="text-muted">Successful Tests:</h6>
+          <div
+            *ngFor="
+              let successes of submission[0].testfeedback.unittest_feedback
+                .successes
+            "
+          >
+            <div class="card passed">
+              <p class="text-muted">{{ parseSuccesses(successes) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="row"
+        *ngIf="
           submission[0].testfeedback.general_tests_feedback[0].PEP8_results
         "
       >
