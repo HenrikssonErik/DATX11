@@ -475,9 +475,9 @@ def get_course_groups(course: int):
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupnumber, groupid,
-                array_agg(fullname) FROM GroupDetails WHERE course = %s GROUP
-                BY groupid, groupnumber"""
+                query_data = """SELECT groupNumberInCourse, globalGroupId,
+                array_agg(fullName) FROM GroupDetails WHERE courseCode = %s GROUP
+                BY globalGroupId, groupNumberInCourse"""
                 cur.execute(query_data, [course])
                 data = cur.fetchall()
                 group_list = []
@@ -503,9 +503,9 @@ def get_course_group(course: int, group_id: int):
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupnumber,
-                array_agg(fullname) FROM GroupDetails WHERE course = %s and
-                groupid = %s GROUP BY groupid, groupnumber"""
+                query_data = """SELECT groupNumberInCourse,
+                array_agg(fullName) FROM GroupDetails WHERE courseCode = %s AND
+                globalGroupId = %s GROUP BY globalGroupId, groupNumberInCourse"""
                 cur.execute(query_data, [course, group_id])
                 data = cur.fetchone()
                 if data is None:
