@@ -223,12 +223,12 @@ def remove_existing_assignment(file_name: str, group_id: int, course_id: int,
 
     with conn:
         with conn.cursor() as cur:
-            query = """DELETE FROM AssignmentFiles
-                 WHERE assignmentFiles.fileName   = %s
-                 AND   assignmentFiles.groupId    = %s
-                 AND   assignmentFiles.courseId   = %s
-                 AND   AssignmentFiles.assignment = %s
-                 AND   AssignmentFiles.submission = %s;
+            query = """DELETE FROM SubmittedAssignment
+                 WHERE SubmittedAssignment.assignmentFileName   = %s
+                 AND   SubmittedAssignment.groupId    = %s
+                 AND   SubmittedAssignment.courseId   = %s
+                 AND   SubmittedAssignment.assignmentId = %s
+                 AND   SubmittedAssignment.submissionNumber = %s;
                  """
 
             cur.execute(query, (file_name, group_id, course_id,
@@ -250,9 +250,9 @@ def save_assignment_to_db(file_name: str, file_data: bytes, group_id: int,
 
     with conn:
         with conn.cursor() as cur:
-            query = """INSERT INTO AssignmentFiles
-                    (groupId, courseId, assignment, fileName,
-                     fileData, submission)
+            query = """INSERT INTO SubmittedAssignment
+                    (globalGroupId, courseId, assignmentId, assignmentFileName,
+                     fileData, submissionNumber)
                     VALUES (%s, %s, %s, %s, %s, 0);
                     """
 
@@ -341,12 +341,12 @@ def get_assignment_file_from_database(
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
-            query_data = """SELECT FileData FROM AssignmentFiles
-                        WHERE AssignmentFiles.fileName   = %s
-                        AND   AssignmentFiles.groupId    = %s
-                        AND   AssignmentFiles.courseId   = %s
-                        AND   AssignmentFiles.assignment = %s
-                        AND   AssignmentFiles.submission = %s
+            query_data = """SELECT FileData FROM SubmittedAssignment
+                        WHERE SubmittedAssignment.assignmentFileName   = %s
+                        AND   SubmittedAssignment.globalGroupId    = %s
+                        AND   SubmittedAssignment.courseId   = %s
+                        AND   SubmittedAssignment.assignmentId = %s
+                        AND   SubmittedAssignment.submissionNumber = %s
                         """
 
             cur.execute(query_data, (file_name, group_id, course,
@@ -401,10 +401,10 @@ def get_all_assignment_files_from_db(
         with conn.cursor() as cur:
             cur.execute(
                 """
-                SELECT filename, filedata FROM AssignmentFiles
-                    WHERE GroupId        = %s
-                    AND   CourseId       = %s
-                    AND   \"assignment\"   = %s;
+                SELECT assignmentFileName, fileData FROM SubmittedAssignment
+                    WHERE globalGroupId        = %s
+                    AND   courseId       = %s
+                    AND   \"assignmentId\"   = %s;
                 """,
                 (group_id, course_id, assignment)
             )
