@@ -189,8 +189,8 @@ def add_users_to_course(user_ids: list[int], course_id: int):
         try:
             with conn:
                 with conn.cursor() as cur:
-                    query_data = "insert into userincourse values " + \
-                        "(%s,%s,%s) on conflict do nothing;"
+                    query_data = "INSERT INTO UserInCourse VALUES " + \
+                        "(%s,%s,%s) ON CONFLICT DO NOTHING;"
 
                     for id in user_ids:
                         cur.execute(query_data, [id, course_id, 'Student'])
@@ -215,7 +215,7 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "INSERT into userincourse values " +\
+                query_data = "INSERT INTO UserInCourse VALUES " +\
                     "(%s, %s, %s)"
                 cur.execute(query_data, [user_id, course_id, user_role.name])
         conn.close()
@@ -231,7 +231,7 @@ def remove_user_from_course(user_id: int, course_id) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """Delete from userincourse where userid = %s AND
+                query_data = """DELETE FROM UserInCourse WHERE userid = %s AND
                 courseid = %s"""
                 cur.execute(query_data, [user_id, course_id])
         conn.close()
@@ -339,8 +339,8 @@ def change_role_on_course(new_role: str, user_id: int,
         try:
             with conn:
                 with conn.cursor() as cur:
-                    query_data = """UPDATE userincourse SET userrole = %s
-                    WHERE userid = %s AND courseid = %s;"""
+                    query_data = """UPDATE UserInCourse SET userRole = %s
+                    WHERE userId = %s AND courseId = %s;"""
                     cur.execute(query_data, [new_role, user_id, course_id])
             conn.close()
         except Exception as e:
@@ -359,12 +359,12 @@ def get_users_on_course(course: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT userdata.userid, userdata.chalmersId,
-                userdata.fullname, userdata.userEmail, userincourse.userrole
-                FROM public.userdata
-                JOIN public.userincourse ON
-                userdata.userid = userincourse.userid
-                WHERE userincourse.courseid = %s;"""
+                query_data = """SELECT UserData.userId, UserData.chalmersId,
+                UserData.fullName, UserData.userEmail, UserInCourse.userRole
+                FROM public.UserData
+                JOIN public.UserInCourse ON
+                UserData.userId = UserInCourse.userid
+                WHERE UserInCourse.courseId = %s;"""
                 cur.execute(query_data, [course])
                 data = cur.fetchall()
         conn.close()

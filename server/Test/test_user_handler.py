@@ -39,8 +39,8 @@ class TestUserHandler(unittest.TestCase):
         user_handler.add_users_to_course(user_ids, course_id)
 
         mock_cursor.execute.assert_called_with(
-            "insert into userincourse values "
-            "(%s,%s,%s) on conflict do nothing;",
+            "INSERT INTO UserInCourse VALUES "
+            "(%s,%s,%s) ON CONFLICT DO NOTHING;",
             [user_ids[1], course_id, "Student"]
         )
         self.assertEqual(2, len(mock_cursor.mock_calls))
@@ -125,7 +125,7 @@ class TestUserHandler(unittest.TestCase):
             user_id, course_id, user_handler.Role.Student)
 
         mock_cursor.execute.assert_called_once_with(
-            "INSERT into userincourse values "
+            "INSERT INTO UserInCourse VALUES "
             "(%s, %s, %s)",
             [user_id, course_id, user_handler.Role.Student.name]
         )
