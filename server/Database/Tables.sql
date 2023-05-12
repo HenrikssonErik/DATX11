@@ -180,12 +180,12 @@ EXECUTE FUNCTION set_submission_number_assignmentfeedback();
 
 
 ------------------------------------------------------------------------------
-CREATE TABLE SubmittedFiles (
+CREATE TABLE SubmittedAssignment (
 		globalGroupId INTEGER NOT NULL, 
 		courseId SERIAL NOT NULL,
 		assignmentId INTEGER NOT NULL,
 		submissionNumber SERIAL NOT NULL,
-		assignmentFileName TEXT NOT NULL, --Could add foregin key to FileName-table
+		assignmentFileName TEXT NOT NULL, 
 		fileData BYTEA NOT NULL, 
 		submissionDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'), 
 		PRIMARY KEY(globalGroupId, courseId, assignmentId, assignmentFileName, submissionNumber),
