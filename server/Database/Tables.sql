@@ -15,7 +15,7 @@ CREATE TABLE UserData (
 	userEmail TEXT UNIQUE NOT NULL,
 	passphrase BYTEA,
 	verifiedAccount BOOLEAN NOT NULL DEFAULT FALSE,
-	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher', 'Admin')),
+	globalRole TEXT NOT NULL DEFAULT 'Student' CHECK (globalRole IN ('Student', 'Teacher')),
 	fullName TEXT NOT NULL,
 	PRIMARY KEY (userId),
 	CHECK (userEmail ~* '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$')
