@@ -36,7 +36,7 @@ class TestCourseHandler(unittest.TestCase):
             result = course_handler.get_courses_info(user_id)
             mock_cursor.execute.assert_called_once_with(
                 """SELECT * FROM UserCourseInfo
-                            WHERE userid = %s""", (user_id,))
+                            WHERE userId = %s""", (user_id,))
             self.assertEqual(
                 result, [
                     {

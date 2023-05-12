@@ -37,7 +37,7 @@ def get_courses_info(user_id: int) -> list[dict[str, str | int]]:
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT * FROM UserCourseInfo
-                            WHERE userid = %s"""
+                            WHERE userId = %s"""
                 cur.execute(query_data, (user_id,))
                 data = cur.fetchall()
         conn.close()
@@ -66,7 +66,7 @@ def get_course_info(user_id: int, course_id: int) -> dict[str: str | int]:
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT * FROM UserCourseInfo
-                            WHERE userid = %s AND courseid=%s"""
+                            WHERE userId = %s AND courseId=%s"""
                 cur.execute(query_data, [user_id, course_id])
                 data = cur.fetchone()
                 query_two = """SELECT ud.fullName FROM UserData ud JOIN
