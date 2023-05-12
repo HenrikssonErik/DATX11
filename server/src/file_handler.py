@@ -298,9 +298,9 @@ def get_assignment_test_feedback_from_database(
     with conn:
         with conn.cursor() as cur:
             query_data = """
-            select submission, testfeedback, testpass
-            from assignmentfeedback where
-            groupid = %s and courseid = %s and \"assignment\" = %s
+            SELECT submissionNumber, automaticFeedback, testPassed
+            FROM SubmissionFeedback WHERE
+            groupId = %s AND courseId = %s AND \"assignmentId\" = %s
             """
 
             cur.execute(query_data, (group_id, course,

@@ -103,11 +103,12 @@ def get_progress(user_id: int) -> list:
     try:
         with conn:
             with conn.cursor() as cur:
-                query = """SELECT af.courseId, COUNT(*) AS Completed FROM
-                UserGroupCourseInfo ugci JOIN AssignmentFeedback af ON
-                ugci.groupId = af.groupId AND ugci.courseId = af.courseId
-                WHERE ugci.userId = %s AND af.teacherGrade = TRUE GROUP BY
-                af.courseId;"""
+                query = """SELECT sf.courseId, COUNT(*) AS Completed FROM
+                UserGroupCourseInfo ugci JOIN SubmissionFeedback sf ON
+                ugci.globalGroupId = sf.globalGroupId AND 
+                ugci.courseId = sf.courseId
+                WHERE ugci.userId = %s AND sf.teacherGrade = TRUE GROUP BY
+                sf.courseId;"""
                 cur.execute(query, [user_id])
                 data = cur.fetchall()
         conn.close()
@@ -428,10 +429,10 @@ def get_assignment_feedback(course: int, assignment: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT submission, testpass,
-                testfeedback, teacherfeedback, teachergrade, userid,
-                feedbackdate FROM assignmentfeedback WHERE courseid = %s AND
-                groupid = %s AND assignment = %s"""
+                query_data = """SELECT submissionNumber, testPassed,
+                automaticFeedback, teacherFeedback, teacherGrade, userId,
+                feedbackDate FROM SubmissionFeedback WHERE courseId = %s AND
+                globalGroupId = %s AND assignmentId = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
                 print("from db")
