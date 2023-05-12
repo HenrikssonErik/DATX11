@@ -98,8 +98,9 @@ def get_test_filenames(course: int, assignment: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query = """SELECT fileName FROM TestFiles WHERE courseId = %s
-                AND assignment = %s"""
+                query = """SELECT testFileName FROM PythonTestFiles 
+                WHERE courseId = %s
+                AND assignmentId = %s"""
 
                 cur.execute(query, (course, assignment))
                 data = cur.fetchall()
@@ -205,8 +206,8 @@ def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
 
     with conn:
         with conn.cursor() as cur:
-            query = """INSERT INTO TestFiles
-                    (courseId, assignment, filename, filedata)
+            query = """INSERT INTO PythonTestFiles
+                    (courseId, assignmentId, testFilename, fileData)
                     VALUES (%s, %s, %s,%s);
                     """
 
@@ -279,10 +280,10 @@ def remove_existing_test_file(
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
-            query_data = """DELETE FROM TestFiles
-                 WHERE testfiles.filename   = %s
-                 AND   testfiles.courseid   = %s
-                 AND   testfiles.assignment = %s;
+            query_data = """DELETE FROM PythonTestFiles
+                 WHERE PythonTestFiles.testFileName   = %s
+                 AND   PythonTestFiles.courseId   = %s
+                 AND   PythonTestFiles.AssignmentId = %s;
                  """
             cur.execute(query_data, (file_name, course_id, assignment))
     conn.close()
@@ -316,8 +317,9 @@ def get_test_file(course: int, assignment: int, file_name: str):
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
-            query_data = """SELECT FileData FROM testFiles WHERE fileName = %s
-            AND courseId = %s AND assignment = %s"""
+            query_data = """SELECT FileData FROM PythonTestFiles 
+            WHERE testFileName = %s
+            AND courseId = %s AND assignmentId = %s"""
             cur.execute(query_data, (('test_' + file_name), course,
                                      assignment))
             data = cur.fetchone()
@@ -371,9 +373,9 @@ def get_unit_test_files_from_db(
         with conn.cursor() as cur:
             cur.execute(
                 """
-                SELECT filename, filedata FROM testfiles
-                    WHERE testfiles.courseid     = %s
-                    AND testfiles.\"assignment\" = %s;
+                SELECT testFileName, fileData FROM PythonTestFiles
+                    WHERE PythonTestFiles.courseId     = %s
+                    AND PythonTestFiles.\"assignmentId\" = %s;
                 """,
                 (courseid, assignment)
             )
