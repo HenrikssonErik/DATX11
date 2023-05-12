@@ -120,7 +120,7 @@ CREATE TABLE RequiredFileNames (
 
 
 ------------------------------------------
-CREATE TABLE AssignmentFeedback (
+CREATE TABLE SubmissionFeedback (
     globalGroupId INTEGER NOT NULL,
     courseId SERIAL NOT NULL,  
     assignmentId INTEGER NOT NULL,
@@ -180,7 +180,7 @@ EXECUTE FUNCTION set_submission_number_assignmentfeedback();
 
 
 ------------------------------------------------------------------------------
-CREATE TABLE AssignmentFiles (
+CREATE TABLE SubmittedFiles (
 		globalGroupId INTEGER NOT NULL, 
 		courseId SERIAL NOT NULL,
 		assignmentId INTEGER NOT NULL,
