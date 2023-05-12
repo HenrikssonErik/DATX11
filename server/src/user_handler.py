@@ -148,7 +148,7 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
                         cur.execute(query_one, [course_id, user_id])
                         in_group = cur.fetchone()[0]
                         if not (in_group):
-                            query_two = """INSERT into useringroup VALUES
+                            query_two = """INSERT INTO UserInGroup VALUES
                                            (%s, %s)"""
                             cur.execute(query_two, [user_id, group_id])
                         else:
@@ -248,8 +248,8 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """DELETE from useringroup
-                                WHERE userid = %s AND groupid = %s """
+                query_data = """DELETE FROM UserInGroup
+                                WHERE userId = %s AND globalGroupId = %s """
                 cur.execute(query_data, [user_id, group_id])
                 query_two = """SELECT (fullname IS NULL)
                 AS is_empty FROM GroupDetails WHERE groupid = %s;"""

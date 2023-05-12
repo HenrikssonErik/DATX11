@@ -138,11 +138,11 @@ class TestUserHandler(unittest.TestCase):
         mock_cursor.return_value = False
         user_handler.remove_user_from_group(user_id, group_id)
         mock_cursor.execute.assert_has_calls([
-            mock.call("""DELETE from useringroup
-                                WHERE userid = %s AND groupid = %s """,
+            mock.call("""DELETE from UserInGroup
+                                WHERE userId = %s AND groupId = %s """,
                       [user_id, group_id]),
-            mock.call("""SELECT (fullname IS NULL)
-                AS is_empty FROM GroupDetails WHERE groupid = %s;""",
+            mock.call("""SELECT (fullName IS NULL)
+                AS is_empty FROM GroupDetails WHERE globalGroupId = %s;""",
                       [group_id])
         ])
 

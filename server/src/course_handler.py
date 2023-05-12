@@ -148,9 +148,9 @@ def add_group_to_course(course_id: int, user_id: int):
                     query_two = """INSERT INTO Groups
                         (courseId, groupNumberInCourse) VALUES (%s,%s) """
                     cur.execute(query_two, [course_id, current_group + 1])
-                    query_three = """INSERT INTO UserInGroup (userId, groupId)
-                    SELECT %s, gd.groupid FROM GroupDetails gd WHERE
-                    gd.groupnumber = %s AND gd.course = %s;"""
+                    query_three = """INSERT INTO UserInGroup (userId, globalGroupId)
+                    SELECT %s, gd.globalGroupId FROM GroupDetails gd WHERE
+                    gd.groupNumberInCourse = %s AND gd.courseId = %s;"""
                     cur.execute(query_three, [user_id, current_group+1,
                                               course_id])
                 else:
