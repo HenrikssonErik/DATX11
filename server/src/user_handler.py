@@ -17,7 +17,7 @@ def get_user_ids_from_cids(cids: list[str]) -> tuple[list[int], list[str]]:
     with conn:
         with conn.cursor() as cur:
             query_data = """
-            SELECT userid, cid FROM userdata where cid IN ({})
+            SELECT userid, chalmersId FROM userdata where chalmersId IN ({})
             """.format(",".join(['%s']*len(cids)))
             cur.execute(query_data, cids)
             res = cur.fetchall()
@@ -37,7 +37,7 @@ def get_user(user_id: int) -> dict:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT cid, email, fullname FROM Userdata " +\
+                query_data = "SELECT chalmersId, userEmail, fullname FROM Userdata " +\
                     "WHERE userid = %s"
                 cur.execute(query_data, (user_id,))
                 data = cur.fetchone()
@@ -358,8 +358,8 @@ def get_users_on_course(course: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT userdata.userid, userdata.cid,
-                userdata.fullname, userdata.email, userincourse.userrole
+                query_data = """SELECT userdata.userid, userdata.chalmersId,
+                userdata.fullname, userdata.userEmail, userincourse.userrole
                 FROM public.userdata
                 JOIN public.userincourse ON
                 userdata.userid = userincourse.userid

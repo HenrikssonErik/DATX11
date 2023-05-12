@@ -70,7 +70,7 @@ class TestFileHandler(unittest.TestCase):
 
         mock_cursor.execute.assert_called_with(
             "INSERT INTO UserData " +
-            "(cid, email, passphrase, globalRole, fullName) " +
+            "(chalmersId, userEmail, passphrase, globalRole, fullName) " +
             "VALUES (%s, %s, %s, %s, %s ) " +
             "on conflict do nothing;",
             (
@@ -120,11 +120,11 @@ class TestFileHandler(unittest.TestCase):
         result = registration_query(cid, email, hashed_pass, role, name)
         mock_cursor.execute.assert_called_once_with(
             "INSERT INTO UserData " +
-            "(cid, email, passphrase, globalRole, fullName) " +
+            "(chalmersId, userEmail, passphrase, globalRole, fullName) " +
             "VALUES (%s, %s, %s, %s, %s ) " +
-            "ON CONFLICT (cid) DO UPDATE " +
+            "ON CONFLICT (chalmersId) DO UPDATE " +
             "SET passphrase = EXCLUDED.passphrase " +
-            "WHERE userdata.cid = EXCLUDED.cid and " +
+            "WHERE userdata.chalmersId = EXCLUDED.chalmersId and " +
             "userdata.passphrase is null;",
             (cid, email, hashed_pass, role, name)
         )
@@ -150,11 +150,11 @@ class TestFileHandler(unittest.TestCase):
 
         mock_cursor.execute.assert_called_once_with(
             "INSERT INTO UserData " +
-            "(cid, email, passphrase, globalRole, fullName) " +
+            "(chalmersId, userEmail, passphrase, globalRole, fullName) " +
             "VALUES (%s, %s, %s, %s, %s ) " +
-            "ON CONFLICT (cid) DO UPDATE " +
+            "ON CONFLICT (chalmersId) DO UPDATE " +
             "SET passphrase = EXCLUDED.passphrase " +
-            "WHERE userdata.cid = EXCLUDED.cid and " +
+            "WHERE userdata.chalmersId = EXCLUDED.chalmersId and " +
             "userdata.passphrase is null;",
             (cid, email, hashed_pass, role, name)
         )
@@ -203,8 +203,8 @@ class TestFileHandler(unittest.TestCase):
             tuple(expected_tuple), tuple(response))
         mock_cur.execute.assert_called_once_with(
             "UPDATE UserData " +
-            "SET verified = TRUE " +
-            "WHERE cid = %s " +
+            "SET verifiedAccount = TRUE " +
+            "WHERE chalmersId = %s " +
             "AND passphrase IS NOT NULL",
             (
                 random_cid,
@@ -226,8 +226,8 @@ class TestFileHandler(unittest.TestCase):
             tuple(expected_tuple), tuple(response))
         mock_cur.execute.assert_called_once_with(
             "UPDATE UserData " +
-            "SET verified = TRUE " +
-            "WHERE cid = %s " +
+            "SET verifiedAccount = TRUE " +
+            "WHERE chalmersId = %s " +
             "AND passphrase IS NOT NULL",
             (random_cid,)
         )
@@ -246,8 +246,8 @@ class TestFileHandler(unittest.TestCase):
             tuple(expected_tuple), tuple(response))
         mock_cur.execute.assert_called_once_with(
             "UPDATE UserData " +
-            "SET verified = TRUE " +
-            "WHERE cid = %s " +
+            "SET verifiedAccount = TRUE " +
+            "WHERE chalmersId = %s " +
             "AND passphrase IS NOT NULL",
             (random_cid,)
         )
@@ -323,7 +323,7 @@ class TestFileHandler(unittest.TestCase):
 
         mock_cur.execute.assert_called_once_with("UPDATE UserData " +
                                                  "SET passphrase = %s " +
-                                                 "WHERE cid = %s;",
+                                                 "WHERE chalmersId = %s;",
                                                  (passphrase, random_cid))
         self.assertEqual(actual_response, expected_response)
 
@@ -338,7 +338,7 @@ class TestFileHandler(unittest.TestCase):
         expected_response = ({'status': 'success'}, 200)
         mock_cur.execute.assert_called_once_with("UPDATE UserData " +
                                                  "SET passphrase = %s " +
-                                                 "WHERE cid = %s;",
+                                                 "WHERE chalmersId = %s;",
                                                  (passphrase, random_cid))
         self.assertEqual(actual_response, expected_response)
 
@@ -356,6 +356,6 @@ class TestFileHandler(unittest.TestCase):
 
         mock_cur.execute.assert_called_once_with("UPDATE UserData " +
                                                  "SET passphrase = %s " +
-                                                 "WHERE cid = %s;",
+                                                 "WHERE chalmersId = %s;",
                                                  (passphrase, random_cid))
         self.assertEqual(actual_response, expected_response)
