@@ -1,13 +1,13 @@
 --Will clear the whole database, be careful!!
-/*
-\c SPECIFYDATABASE --hydrant	
+
+\c testDatabase	
 \set QUIT true
 SET client_min_messages TO WARNING;
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 GRANT ALL ON SCHEMA public TO postgres;
 \set QUIET false
-*/
+
 ------------------------------------------------------------------------------
 CREATE TABLE UserData (
 	userId SERIAL NOT NULL,
@@ -148,14 +148,14 @@ CREATE TABLE SubmissionFeedback (
 		ON UPDATE CASCADE	
 );
 
-CREATE OR REPLACE FUNCTION set_submission_number_assignmentfeedback()
+CREATE OR REPLACE FUNCTION set_submission_number_SubmissionFeedback()
 RETURNS TRIGGER AS $$
 DECLARE
     max_submissionNumber INTEGER;
 BEGIN
     IF NEW.submissionNumber = 0 THEN
         SELECT COUNT(submissionNumber) + 1 INTO max_submissionNumber
-        FROM AssignmentFeedback
+        FROM SubmissionFeedback
         WHERE globalGroupId = NEW.globalGroupId
             AND courseId = NEW.courseId
             AND assignmentId = NEW.assignmentId;
@@ -163,7 +163,7 @@ BEGIN
             NEW.submissionNumber := max_submissionNumber;
         ELSE
             SELECT COUNT(submissionNumber) + 1 INTO NEW.submissionNumber
-            FROM AssignmentFeedback
+            FROM SubmissionFeedback
             WHERE globalGroupId = NEW.globalGroupId
                 AND courseId = NEW.courseId
                 AND assignmentId = NEW.assignmentId;
@@ -173,10 +173,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER increment_submission_assignmentfeedback
-BEFORE INSERT ON AssignmentFeedback
+CREATE OR REPLACE TRIGGER increment_submission_SubmissionFeedback
+BEFORE INSERT ON SubmissionFeedback
 FOR EACH ROW
-EXECUTE FUNCTION set_submission_number_assignmentfeedback();
+EXECUTE FUNCTION set_submission_number_SubmissionFeedback();
 
 
 ------------------------------------------------------------------------------
@@ -200,14 +200,14 @@ CREATE TABLE SubmittedAssignment (
 			ON UPDATE CASCADE
 	);
 
-CREATE OR REPLACE FUNCTION set_submission_number_assignmentfiles()
+CREATE OR REPLACE FUNCTION set_submission_number_SubmittedAssignment()
 RETURNS TRIGGER AS $$
 DECLARE
     max_submissionNumber INTEGER;
 BEGIN
     IF NEW.submissionNumber = 0 THEN
         SELECT COUNT(submissionNumber) + 1 INTO max_submissionNumber
-        FROM AssignmentFiles
+        FROM SubmittedAssignment
         WHERE groupId = NEW.groupId
             AND courseId = NEW.courseId
             AND assignmentId = NEW.assignmentId
@@ -216,7 +216,7 @@ BEGIN
             NEW.submissionNumber := max_submissionNumber;
         ELSE
             SELECT COUNT(submissionNumber) + 1 INTO NEW.submissionNumber
-            FROM AssignmentFiles
+            FROM SubmittedAssignment
             WHERE groupId = NEW.groupId
                 AND courseId = NEW.courseId
                 AND assignmentId = NEW.assignmentId
@@ -227,10 +227,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER increment_submission_assignmentfiles
-BEFORE INSERT ON AssignmentFiles
+CREATE OR REPLACE TRIGGER increment_submission_SubmittedAssignment
+BEFORE INSERT ON SubmittedAssignment
 FOR EACH ROW
-EXECUTE FUNCTION set_submission_number_assignmentfiles();
+EXECUTE FUNCTION set_submission_number_SubmittedAssignment();
 
 
 ------------------------------------------------------------------------------
