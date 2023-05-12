@@ -137,15 +137,15 @@ def add_group_to_course(course_id: int, user_id: int):
                 cur.execute(query, [course_id, user_id])
                 in_group = cur.fetchone()[0]
                 if not (in_group):
-                    query_one = """SELECT MAX(groupnumber) FROM Groups WHERE
-                    course = %s"""
+                    query_one = """SELECT MAX(groupNumberInCourse) FROM Groups WHERE
+                    courseId = %s"""
                     cur.execute(query_one, [course_id])
                     current_group: int = cur.fetchone()[0]
                     if current_group is None:
                         current_group = 0
 
-                    query_two = """Insert into Groups
-                        (course, groupnumber) values (%s,%s) """
+                    query_two = """INSERT INTO Groups
+                        (courseId, groupNumberInCourse) VALUES (%s,%s) """
                     cur.execute(query_two, [course_id, current_group + 1])
                     query_three = """INSERT INTO UserInGroup (userId, groupId)
                     SELECT %s, gd.groupid FROM GroupDetails gd WHERE
@@ -579,8 +579,8 @@ def get_group_number(course_id: int, group_id) -> int:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupnumber FROM Groups WHERE
-                course = %s and groupid = %s"""
+                query_data = """SELECT groupNumberInCourse FROM Groups WHERE
+                courseId = %s and globalGroupId = %s"""
                 cur.execute(query_data, (course_id, group_id))
                 data = cur.fetchone()
         conn.close()

@@ -167,9 +167,9 @@ def _get_course_id_from_group(group_id) -> int:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT course FROM
-                                groups
-                                WHERE groupid = %s """
+                query_data = """SELECT courseId FROM
+                                Groups
+                                WHERE globalGroupId = %s """
                 cur.execute(query_data, [group_id])
                 data = cur.fetchone()
         conn.close()
@@ -256,7 +256,8 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
                 cur.execute(query_two, [group_id])
                 emptyGroup: bool = cur.fetchone()[0]
                 if (emptyGroup):
-                    query_three = """delete from groups where groupid = %s """
+                    query_three = """DELETE FROM Groups WHERE 
+                                     globalGroupId = %s """
                     cur.execute(query_three, [group_id])
         conn.close()
     except Exception as e:
