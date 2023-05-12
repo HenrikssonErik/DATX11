@@ -78,9 +78,9 @@ def get_filenames(course: int, assignment: int) -> tuple:
     try:
         with conn:
             with conn.cursor() as cur:
-                query = """SELECT filename FROM filenames
-                        WHERE filenames.courseId   = %s
-                        AND filenames.assignment = %s
+                query = """SELECT assignmentFileName FROM RequiredFileNames
+                        WHERE RequiredFileNames.courseId   = %s
+                        AND RequiredFileNames.assignmentId = %s
                         """
 
                 cur.execute(query, (course, assignment))

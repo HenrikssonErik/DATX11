@@ -391,9 +391,9 @@ def add_filenames(file_names: list, course_id: int,
         with conn:
             with conn.cursor() as cur:
                 for file in file_names:
-                    query_one = """INSERT INTO FileNames (courseid, assignment,
-                                    filename) VALUES
-                                    (%s, %s, %s);"""
+                    query_one = """INSERT INTO RequiredFileNames 
+                                (courseId, assignmentId, assignmentFileName) 
+                                VALUES (%s, %s, %s);"""
                     cur.execute(query_one, [course_id, assignment, file])
 
         conn.close()
