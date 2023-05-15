@@ -253,7 +253,7 @@ def get_assignments(course_id: int) -> list[dict] | dict[str, str]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT Assignment, endDate, description, "\
+                query_data = "SELECT Assignmentid, endDate, description, "\
                     "assignmentName, maxScore, passScore FROM Assignments"\
                     " WHERE courseId = %s"
                 cur.execute(query_data, [course_id])
