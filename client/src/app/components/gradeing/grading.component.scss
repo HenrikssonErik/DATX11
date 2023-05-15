@@ -155,8 +155,15 @@
 }
 
 .resultText {
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 0px;
+}
+
+.names {
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 300;
+  margin-bottom: 0px;
 }
 
 .dateSort {
@@ -177,4 +184,17 @@
   width: 30px;
   height: 30px;
   animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.subtitle {
+  color: #b0bec5;
 }

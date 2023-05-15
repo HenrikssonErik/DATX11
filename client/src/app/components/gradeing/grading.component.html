@@ -47,8 +47,8 @@
             class="form-check-input"
             type="checkbox"
             id="checkbox1"
-            [checked]="sortGraded == false"
-            (click)="setGradedBoolean(false); filter()"
+            [checked]="sortNotGraded == true"
+            (click)="setNotGradedBoolean(); filter()"
           />
           <label class="form-check-label text-muted" for="checkbox1">
             No
@@ -62,7 +62,7 @@
             type="checkbox"
             id="checkbox2"
             [checked]="sortGraded == true"
-            (click)="setGradedBoolean(true); filter()"
+            (click)="setGradedBoolean(); filter()"
           />
           <label class="form-check-label text-muted" for="checkbox2">
             Yes
@@ -104,7 +104,7 @@
       type="search"
       id="form1"
       class="form-control"
-      placeholder="Search..."
+      placeholder="{{ 'Search...' | translate }}"
       aria-label="Search"
       [(ngModel)]="searchText"
       (input)="onSearchTextChanged()"
@@ -249,7 +249,8 @@
                     (click)="
                       openFeedBackModal(
                         submission.groupid,
-                        gradeingSubmission.Assignment
+                        gradeingSubmission.Assignment,
+                        submission.GroupNumber
                       )
                     "
                     class="testResult resultText"
@@ -339,7 +340,7 @@
                 </div>
                 <div class="row">
                   <div class="col flex-grow">
-                    <p class="header" translate>Leave_a_comment</p>
+                    <p class="header pt-3" translate>Leave_a_comment</p>
                     <fieldset
                       [disabled]="
                         (!form.get('gradeAgain')?.value &&
@@ -411,5 +412,7 @@
   </div>
 </div>
 <ng-template #noSubmissions>
-  <p class="mt-3" translate>No_assignments_found</p>
+  <div class="d-flex justify-content-center">
+    <p class="mt-3 subtitle" translate>No_assignments_found</p>
+  </div>
 </ng-template>

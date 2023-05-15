@@ -66,7 +66,7 @@ def sign_up() -> Response:
         from login_handler's user_registration-function,
         either successful or invalidated.
     """
-    response: tuple[dict[str, str], Literal[200, 400, 401, 406]] =\
+    response: tuple[dict[str, str], Literal[200, 400, 401, 406, 500]] =\
         user_registration(request.form)
     if (response[1] == 200):
         send_verification_email(
@@ -353,7 +353,7 @@ def get_tests() -> Response:
 
         res.headers = headers
         return res
-    return make_response("", 400)
+    return make_response({'status': 'No_Access'}, 401)
 
 
 @app.route('/getUserInfo', methods=['GET'])
@@ -550,7 +550,7 @@ def create_group() -> Response:
     course_id = data['Course']
 
     if (user_id):
-        if (user_handler.is_in_course(user_id, course_id)):
+        if (user_handler.is_in_course(user_id, course_id) and not user_handler.check_admin_or_course_teacher(user_id, course_id)):
             course_handler.add_group_to_course(course_id, user_id)
             return make_response("", 200)
         else:
@@ -582,7 +582,9 @@ def create_assignment() -> Response:
             return make_response(jsonify(res), 400)
         else:
             return make_response("", 200)
-    return make_response("", 400)
+        
+    return make_response({'status': 'No_Access'}, 401)
+    
 
 
 @app.route('/changeUserRole', methods=['POST'])

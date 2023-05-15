@@ -13,12 +13,12 @@ export interface TestResult {
     }[];
     unittest_feedback: {
       errors: [string, string][];
-      expected_failures: never[];
-      successes: never[];
-      failures: never[];
-      skipped: never[];
+      expected_failures: string[];
+      successes: string[];
+      failures: string[];
+      skipped: string[];
       tests_run: number;
-      unexpected_successes: never[];
+      unexpected_successes: string[];
       was_successful: boolean;
     };
   };

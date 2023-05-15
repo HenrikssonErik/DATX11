@@ -54,12 +54,6 @@ export class AssignmentsComponent implements OnInit {
             console.log(res);
           });
         }
-        if (!this.isAdmin) {
-          this.groupService.getMyGroup(id).subscribe((res) => {
-            this.myGroup = res;
-            console.log(res);
-          });
-        }
       });
     }
 

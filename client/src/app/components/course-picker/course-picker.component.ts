@@ -41,9 +41,11 @@ export class CoursePickerComponent implements OnInit {
 
     for (const course of this.courses) {
       // Check if all assignments in the course have due dates in the past
-      const allAssignmentsPassed = course.Assignments.every(
-        (assignment) => new Date(assignment.DueDate) < now
-      );
+      const allAssignmentsPassed =
+        Array.isArray(course.Assignments) &&
+        course.Assignments.every(
+          (assignment) => new Date(assignment.DueDate) < now
+        );
 
       if (allAssignmentsPassed && course.Year <= now.getFullYear()) {
         this.passedCourses.push(course);

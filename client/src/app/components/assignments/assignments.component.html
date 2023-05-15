@@ -101,7 +101,7 @@
         <h5 translate>Groups</h5>
 
         <button
-          *ngIf="!hasGroup()"
+          *ngIf="!hasGroup() && !isAdmin"
           class="btn btn-primary"
           (click)="createGroup(course.courseID)"
         >
@@ -120,7 +120,9 @@
                 class="loader"
               ></span>
               <span
-                *ngIf="!hasGroup() && !isLoadingMap.get(group.groupId)"
+                *ngIf="
+                  !hasGroup() && !isLoadingMap.get(group.groupId) && !isAdmin
+                "
                 class="joinButton"
                 (click)="
                   joinGroup(course.courseID, group.groupId);
@@ -197,7 +199,7 @@
             <!-- <h5><i class="fa-solid fa-ellipsis-vertical"></i></h5> -->
             <div>
               <button
-                [disabled]="datePassed(assignment.DueDate)"
+                [disabled]="datePassed(assignment.DueDate) || !hasGroup()"
                 class="btn btn-primary submitBtn"
                 (click)="
                   openModal(

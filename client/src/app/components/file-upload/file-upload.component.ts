@@ -193,16 +193,40 @@ export class FileUploadComponent {
         },
         error: (err) => {
           this.isLoading = false;
-          this.modalService.close();
-          this.toastr.error(
-            err.error.number_of_files,
-            'Something went wrong!',
-            {
-              closeButton: true,
+          let errorFiles = err.error.feedback.filter((file) => {
+            if (file.tested_file.file_name === 'Not allowed file name') {
+              return file;
             }
+          });
+          errorFiles.forEach((file) => {
+            this.toastr.error(
+              'File name: ' +
+                file.tested_file.file_name +
+                '<br /> File type: ' +
+                file.tested_file.file_type,
+              'Error with file: ' + file.tested_file.file,
+              {
+                closeButton: true,
+                timeOut: 10000,
+                progressBar: true,
+                enableHtml: true,
+              }
+            );
+          });
+          console.log(errorFiles);
+          if (err.error.number_of_files !== 'OK') {
+            this.toastr.error(err.error.number_of_files, 'Error!', {
+              closeButton: true,
+              timeOut: 10000,
+              progressBar: true,
+            });
+          }
+          const errorFileNames = errorFiles.map(
+            (file) => file.tested_file.file
           );
-          console.log(err.error);
-          //TODO: Handle the error
+          this.files = this.files.filter(
+            (file) => !errorFileNames.includes(file.name)
+          );
         },
         complete: () => {
           this.isLoading = false;

@@ -2,8 +2,8 @@ import { Component, Input } from '@angular/core';
 import { Course } from 'src/app/models/courses';
 import { SubmissionService } from 'src/app/services/submission.service';
 import { AssignmentSubmission, Submission } from 'src/app/models/submission';
-import { Subject } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime, map, takeUntil } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FeedbackTeacherViewModalComponent } from '../feedback-teacher-view-modal/feedback-teacher-view-modal.component';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -33,6 +33,7 @@ export class GradingComponent {
   fileNames?: string[];
   form!: FormGroup;
   sortGraded: boolean = false;
+  sortNotGraded: boolean = false;
   dateFilter: string = '';
   //TODO: Add type @Kvalle99
   groupMembers: any = {};
@@ -78,6 +79,7 @@ export class GradingComponent {
         next: (data: Submission[]) => {
           this.allAssignments = data;
           this.assignmentNumbers = this.getAssignmentNumbers(data);
+          this.isLoading = false;
         },
         error: (error) => {
           console.error('Failed to get data:', error);
@@ -100,8 +102,14 @@ export class GradingComponent {
     this.selectedAssignment = assignmentNr;
   }
 
-  setGradedBoolean(graded: boolean): void {
-    this.sortGraded = graded;
+  setGradedBoolean(): void {
+    this.sortGraded = !this.sortGraded;
+    this.sortGraded === true ? (this.sortNotGraded = false) : '';
+  }
+
+  setNotGradedBoolean(): void {
+    this.sortNotGraded = !this.sortNotGraded;
+    this.sortNotGraded === true ? (this.sortGraded = false) : '';
   }
 
   setDateSort(sort: string): void {
@@ -128,13 +136,14 @@ export class GradingComponent {
   }
 
   filterGraded(submissions: AssignmentSubmission[]): AssignmentSubmission[] {
-    console.log(submissions);
     if (this.sortGraded) {
       return submissions.filter((submission) => {
         return submission.grade !== null;
       });
-    } else {
+    } else if (this.sortNotGraded) {
       return submissions.filter((submission) => submission.grade === null);
+    } else {
+      return submissions;
     }
   }
 
@@ -163,35 +172,47 @@ export class GradingComponent {
     return tempList;
   }
 
-  filterSearch() {
-    this.searchTerm$
-      .pipe(takeUntil(this.unsubscribe$), debounceTime(200))
-      .subscribe((searchTerm: string) => {
-        console.log(searchTerm);
-        if (this.gradeingSubmission) {
-          console.log(this.gradeingSubmission);
-          this.gradeingSubmission = this.gradeingSubmission[0].filter(
-            (submission) =>
-              submission.GroupNumber.toString().includes(searchTerm)
-          );
-        }
-      });
+  filterSearch(
+    submissions: AssignmentSubmission[]
+  ): Observable<AssignmentSubmission[]> {
+    return this.searchTerm$.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(200),
+      map((searchTerm: string): AssignmentSubmission[] => {
+        return submissions.filter((sub: AssignmentSubmission): boolean =>
+          sub.GroupNumber.toString().includes(searchTerm)
+        );
+      })
+    );
   }
 
-  filter(): void {
+  filter(textSearch?: boolean): void {
     if (this.allAssignments && this.selectedAssignment) {
       let tempList: Submission[] = this.allAssignments?.slice();
       tempList = this.filterAssignment(tempList);
       let tempListSubmissions: AssignmentSubmission[] =
         tempList[0].Submissions.slice();
-      tempListSubmissions = this.filterGraded(tempListSubmissions);
+      if (this.sortGraded || this.sortNotGraded) {
+        tempListSubmissions = this.filterGraded(tempListSubmissions);
+      }
       tempListSubmissions = this.filterDate(tempListSubmissions);
-      this.isLoading = false;
-      this.gradeingSubmission = {
-        ...tempList[0],
-        Submissions: tempListSubmissions,
-      };
-      this.filterSearch();
+      if (textSearch) {
+        this.filterSearch(tempListSubmissions).subscribe(
+          (filteredSubmissions: AssignmentSubmission[]) => {
+            this.isLoading = false;
+            this.gradeingSubmission = {
+              ...tempList[0],
+              Submissions: filteredSubmissions,
+            };
+          }
+        );
+      } else {
+        this.isLoading = false;
+        this.gradeingSubmission = {
+          ...tempList[0],
+          Submissions: tempListSubmissions,
+        };
+      }
       this.setFileNames(this.selectedAssignment);
     }
   }
@@ -207,10 +228,15 @@ export class GradingComponent {
     this.getFileNames(assignmentNr);
   }
 
-  openFeedBackModal(group: number, assignmentNr: number) {
+  openFeedBackModal(
+    groupId: number,
+    assignmentNr: number,
+    groupNumber: number
+  ) {
     const modalRef = this.modalService.open(FeedbackTeacherViewModalComponent);
     modalRef.componentInstance.name = 'feedbackTeacherViewModalComponent';
-    modalRef.componentInstance.group = group;
+    modalRef.componentInstance.groupId = groupId;
+    modalRef.componentInstance.groupNumber = groupNumber;
     modalRef.componentInstance.assignmentNr = assignmentNr;
     modalRef.componentInstance.courseId = this.course.courseID;
   }
@@ -221,6 +247,7 @@ export class GradingComponent {
 
   onSearchTextChanged() {
     this.searchTerm$.next(this.searchText);
+    this.filter(true);
   }
 
   getSelectedAssignmentIndex() {
@@ -238,7 +265,6 @@ export class GradingComponent {
     assignmentNr: number,
     grade: boolean
   ) {
-    console.log(this.commentText);
     this.submissionService
       .setFeedback(
         this.course.courseID,
@@ -270,10 +296,10 @@ export class GradingComponent {
   }
 
   getGroupMembers(group: number) {
+    //TODO: Fattar fortfarande inte vafan som händer här. Varför returnas alltid en tom array?
+    //Borde inte returna nåt imo? HTMLen bryr väl sig ändå bara om this.groupMembers?
     this.groupService.getGroup(group, this.course.courseID).subscribe({
       next: (data: any) => {
-        console.log('grroup');
-        console.log(data);
         this.groupMembers[group] = data['users'];
       },
       error: (err) => {

@@ -22,6 +22,8 @@ export class TeacherSettingsComponent {
     Course: new FormControl({ value: '', disabled: true }),
   });
   course: Course = {} as Course;
+  id!: any;
+  loadingAssignments: boolean = false;
 
   constructor(
     private courseService: CourseService,
@@ -31,16 +33,24 @@ export class TeacherSettingsComponent {
   ) {}
 
   ngOnInit(): void {
-    const id = parseInt(this.route.snapshot.paramMap?.get('id') || '', 10);
-    if (!isNaN(id)) {
-      this.courseService.getCourse(id).subscribe((res: Course) => {
-        this.course = res;
-        this.form.get('Name')?.setValue(this.course.CourseName);
-        this.form.get('Course')?.setValue(this.course.Course);
-      });
+    this.id = parseInt(this.route.snapshot.paramMap?.get('id') || '', 10);
+    if (!isNaN(this.id)) {
+      this.updateCourse();
     }
   }
 
+  updateCourse() {
+    this.courseService.getCourse(this.id).subscribe((res: Course) => {
+      this.course = res;
+      this.form.get('Name')?.setValue(this.course.CourseName);
+      this.form.get('Course')?.setValue(this.course.Course);
+      this.sortAssignments();
+    });
+  }
+
+  sortAssignments() {
+    this.course.Assignments.sort((a, b) => a.AssignmentNr - b.AssignmentNr);
+  }
   editToggle(): void {
     this.form.get('Name')?.setValue(this.course.CourseName);
 
@@ -55,16 +65,18 @@ export class TeacherSettingsComponent {
     const modalRef = this.modalService.open(CreateAssignmentModalComponent);
     modalRef.componentInstance.name = 'CreateAssignmentModal';
     modalRef.componentInstance.course = this.course;
-    /**modalRef.componentInstance.activeModal.afterClosed.subscribe(() => {
-      console.log('in sub');
-      this.courseService
-        .getCourse(this.course.courseID)
-        .subscribe((res: Course) => {
-          this.course = res;
-          this.form.get('Name')?.setValue(this.course.CourseName);
-          this.form.get('Course')?.setValue(this.course.Course);
-        }); 
-    });*/
+
+    modalRef.result.then(
+      (result) => {
+        console.log('Modal closed with result:', result);
+        this.updateCourse();
+        // Do something with the result
+      },
+      (reason) => {
+        console.log('Modal dismissed with reason:', reason);
+        // Handle the modal being dismissed (e.g. user clicked outside of the modal)
+      }
+    );
   }
 
   openHandleUsersModal(): void {

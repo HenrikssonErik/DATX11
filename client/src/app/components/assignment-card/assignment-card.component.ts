@@ -18,6 +18,9 @@ export class AssignmentCardComponent {
   allowedFileTypes = ['text/x-python'];
   formatedDate!: string;
   filenames: string[] = [];
+  submissionFiles: string[] = [];
+  loadingSpinner: boolean = true;
+  loadingSubmissionSpinner: boolean = true;
 
   headers = new HttpHeaders()
     .append('Cookies', document.cookie)
@@ -46,12 +49,31 @@ export class AssignmentCardComponent {
 
     this.form.get('Date')?.setValue(this.formatedDate);
     this.form.get('Description')?.setValue(this.Assignment.Description);
+    this.updateSubmissionFilenames();
+    this.updateTestFilenames();
+  }
+
+  updateSubmissionFilenames() {
+    this.loadingSubmissionSpinner = true;
+    this.courseService
+      .getFileNames(this.courseID, this.Assignment.AssignmentNr)
+      .subscribe({
+        next: (res: string[]) => {
+          this.submissionFiles = res['Filenames'];
+          this.loadingSubmissionSpinner = false;
+        },
+      });
+  }
+
+  updateTestFilenames() {
+    this.loadingSpinner = true;
     this.courseService
       .getTestFileNames(this.courseID, this.Assignment.AssignmentNr)
       .subscribe({
         next: (response: string[]) => {
           console.log(response);
           this.filenames = response;
+          this.loadingSpinner = false;
         },
         error: (error: any) => {
           this.toastr.error('', error.error);
@@ -120,6 +142,7 @@ export class AssignmentCardComponent {
     this.form.controls['editMode'].setValue(false);
 
     if (this.Files.length > 0) {
+      this.loadingSpinner = true;
       this.changeTests();
     }
     if (this.form.get('AssignmentName')?.value != this.Assignment.Name) {
@@ -228,7 +251,7 @@ export class AssignmentCardComponent {
       });
   }
 
-  changeTests() {
+  async changeTests() {
     const fileData = new FormData();
     this.Files.forEach((file: File): void =>
       fileData.append('files', file, file.name)
@@ -245,8 +268,10 @@ export class AssignmentCardComponent {
         next: (response: any) => {
           try {
             if (response.status == 200) {
-              this.toastr.success('Unittests Updated', response.body);
-              //location.reload();
+              const [message, title]: string[] =
+                this.toastrResponse.getToastrResponse('tests_updated');
+              this.toastr.success(message, title);
+              this.updateTestFilenames();
             }
           } catch {
             throw new Error('unexpected_error');

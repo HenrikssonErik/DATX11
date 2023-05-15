@@ -13,12 +13,6 @@
             class="statusText passed"
             *ngIf="submission.Grade === true"
             translate
-            >Submission <span>{{ submission.Submission }}</span></span
-          >
-          <span
-            class="statusText passed"
-            *ngIf="submission.Grade === true"
-            translate
             >Passed</span
           >
           <span
@@ -33,18 +27,11 @@
             translate
             >Waiting_For_Review</span
           >
-          <span
-            class="statusText warning"
-            *ngIf="submission.Grade === null"
-            translate
-            >Waiting_For_Review</span
-          >
         </div>
       </ng-template>
       <ng-template ngbPanelContent>
         <div class="row text-muted">
           <div class="col-md-2">
-            <h6 translate>Test_Results</h6>
             <h6 translate>Test_Results</h6>
             <p>
               <span
@@ -66,7 +53,6 @@
             </p>
           </div>
           <div class="col-md-2">
-            <h6 translate>Test_Ran</h6>
             <h6 translate>Test_Ran</h6>
             <p>
               {{ submission.testfeedback.unittest_feedback.tests_run }}
@@ -169,6 +155,25 @@
                   <p>Test: {{ unitTestFailures.test }}</p>
                   <p>{{ unitTestFailures.error }}</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="row"
+          *ngIf="submission.testfeedback.unittest_feedback.successes.length > 0"
+        >
+          <div class="col-12">
+            <h6 class="text-muted" translate>Successful_Tests</h6>
+            <div
+              *ngFor="
+                let successes of submission.testfeedback.unittest_feedback
+                  .successes
+              "
+            >
+              <div class="card passed">
+                <p class="text-muted">{{ parseSuccesses(successes) }}</p>
               </div>
             </div>
           </div>
