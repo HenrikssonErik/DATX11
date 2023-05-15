@@ -479,7 +479,7 @@ def get_course_groups(course: int) -> list[dict[str, str | int]]:
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT groupNumberInCourse, globalGroupId,
-                array_agg(fullName) FROM GroupDetails WHERE courseCode = %s GROUP
+                array_agg(fullName) FROM GroupDetails WHERE courseid = %s GROUP
                 BY globalGroupId, groupNumberInCourse"""
                 cur.execute(query_data, [course])
                 data = cur.fetchall()
@@ -538,11 +538,11 @@ def get_assignment_overview(course: int) -> list[dict]:
 
                 assignments = cur.fetchall()
 
-                query_data = """SELECT DISTINCT ON (groupId) groupId, testPass,
-                teacherGrade, submission, score,  teacherfeedback, userid,
-                feedbackdate, createdDate FROM AssignmentFeedback WHERE
-                courseid = %s AND assignment = %s ORDER BY groupId,
-                submission DESC;"""
+                query_data = """SELECT DISTINCT ON (globalgroupId) globalgroupId, testPassed,
+                teacherGrade, submissionnumber, assignmentscore,  teacherfeedback, userid,
+                feedbackdate, createdDate FROM submissionFeedback WHERE
+                courseid = %s AND assignmentid = %s ORDER BY globalgroupId,
+                submissionnumber DESC;"""
                 return_list = []
                 for assignment in assignments:
                     overview_list = []
