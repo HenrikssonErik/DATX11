@@ -226,6 +226,7 @@ CREATE TABLE SubmittedAssignment (
 		fileData BYTEA NOT NULL, 
 		submissionDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'), 
 		PRIMARY KEY(globalGroupId, courseId, assignmentId, assignmentFileName, submissionNumber),
+		UNIQUE (globalGroupId, courseId, assignmentId, assignmentFileName, submissionNumber),
 		CONSTRAINT constraint_groupid_fkey FOREIGN KEY (globalGroupId) 
 			REFERENCES Groups (globalGroupId) 
 			ON DELETE CASCADE 
@@ -336,3 +337,20 @@ SELECT grp.globalGroupId, grp.groupNumberInCourse, grp.courseId, users.fullName
 FROM Groups grp
 LEFT JOIN UserInGroup userGroup ON grp.globalGroupId = userGroup.globalGroupId
 LEFT JOIN UserData users ON userGroup.userId = users.userId;
+
+
+------------------------------------------------------------------------------
+CREATE VIEW TotalFeedback AS (
+SELECT 	automaticFeedBack.globalGroupID, automaticFeedBack.courseId,
+		automaticFeedBack.assignmentId, automaticFeedBack.submissionNumber,
+		automaticFeedBack, teacherFeedback, teacherGrade, testPassed,
+		teacherfeedbackdate, createdDate, userId, assignmentScore
+FROM AutomaticFeedback
+LEFT OUTER JOIN 
+TeacherFeedback teacherFeedback  
+ON 
+	AutomaticFeedBack.globalGroupID = TeacherFeedback.globalGroupID AND
+	AutomaticFeedBack.courseId = TeacherFeedback.courseId AND
+	AutomaticFeedBack.assignmentId = TeacherFeedback.assignmentId AND
+	AutomaticFeedBack.submissionNumber = TeacherFeedback.submissionNumber);
+	
