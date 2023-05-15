@@ -292,7 +292,7 @@ def remove_existing_test_file(
             query_data = """DELETE FROM PythonTestFiles
                  WHERE PythonTestFiles.testFileName   = %s
                  AND   PythonTestFiles.courseId   = %s
-                 AND   PythonTestFiles.AssignmentId = %s;
+                 AND   PythonTestFiles.assignmentId = %s;
                  """
             cur.execute(query_data, (file_name, course_id, assignment))
     conn.close()
@@ -326,7 +326,7 @@ def get_test_file(course: int, assignment: int, file_name: str) -> io.BytesIO:
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
-            query_data = """SELECT FileData FROM PythonTestFiles 
+            query_data = """SELECT fileData FROM PythonTestFiles 
             WHERE testFileName = %s
             AND courseId = %s AND assignmentId = %s"""
             cur.execute(query_data, (('test_' + file_name), course,
@@ -464,13 +464,13 @@ def save_feedback_to_db(
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO AssignmentFeedback (
-                        groupid,
-                        courseid,
-                        \"assignment\",
-                        testfeedback,
-                        testpass,
-                        submission
+                INSERT INTO SubmissionFeedback (
+                        GlobalgroupId,
+                        courseId,
+                        \"assignmentId\",
+                        automaticFeedBack,
+                        testPassed,
+                        submissionNumber
                     )
                     VALUES(%s, %s, %s, %s, %s, 0)
                 """,
