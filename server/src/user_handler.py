@@ -17,7 +17,7 @@ def get_user_ids_from_cids(cids: list[str]) -> tuple[list[int], list[str]]:
     with conn:
         with conn.cursor() as cur:
             query_data = """
-            SELECT userid, cid FROM userdata where cid IN ({})
+            SELECT userid, chalmersId FROM userdata where chalmersId IN ({})
             """.format(",".join(['%s']*len(cids)))
             cur.execute(query_data, cids)
             res = cur.fetchall()
@@ -37,7 +37,7 @@ def get_user(user_id: int) -> dict[str, str | int]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT cid, email, fullname FROM Userdata " +\
+                query_data = "SELECT chalmersId, userEmail, fullname FROM Userdata " +\
                     "WHERE userid = %s"
                 cur.execute(query_data, (user_id,))
                 data = cur.fetchone()
@@ -81,9 +81,9 @@ def get_group(user_id: int, course_id: int) -> dict[str, str | list]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT groupid, groupnumber FROM " +\
-                    "userGroupCourseInfo " +\
-                    "WHERE userid = %s and courseid = %s"
+                query_data = "SELECT globalGroupId, groupNumberInCourse FROM " +\
+                    "UserGroupCourseInfo " +\
+                    "WHERE userId = %s and courseId = %s"
                 cur.execute(query_data, (user_id, course_id))
                 data = cur.fetchone()
         conn.close()
@@ -109,8 +109,8 @@ def _get_group_members(group_id: int) -> list[str]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT cid FROM usergroupinfo
-                            WHERE groupid = %s"""
+                query_data = """SELECT chalmersId FROM UserGroupInfo
+                            WHERE groupId = %s"""
                 cur.execute(query_data, [group_id])
                 data = cur.fetchall()
         conn.close()
@@ -143,12 +143,12 @@ def add_user_to_group(user_id: int, group_id: int) -> None:
                 with conn:
                     with conn.cursor() as cur:
                         query_one = """SELECT EXISTS(SELECT 1 FROM
-                        usergroupcourseinfo WHERE courseid=%s AND userid=%s) as
+                        UserGroupCourseInfo WHERE courseId=%s AND userId=%s) AS
                         exists_row;"""
                         cur.execute(query_one, [course_id, user_id])
                         in_group = cur.fetchone()[0]
                         if not (in_group):
-                            query_two = """INSERT into useringroup VALUES
+                            query_two = """INSERT INTO UserInGroup VALUES
                                            (%s, %s)"""
                             cur.execute(query_two, [user_id, group_id])
                         else:
@@ -167,9 +167,9 @@ def _get_course_id_from_group(group_id) -> int:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT course FROM
-                                groups
-                                WHERE groupid = %s """
+                query_data = """SELECT courseId FROM
+                                Groups
+                                WHERE globalGroupId = %s """
                 cur.execute(query_data, [group_id])
                 data = cur.fetchone()
         conn.close()
@@ -189,8 +189,8 @@ def add_users_to_course(user_ids: list[int], course_id: int):
         try:
             with conn:
                 with conn.cursor() as cur:
-                    query_data = "insert into userincourse values " + \
-                        "(%s,%s,%s) on conflict do nothing;"
+                    query_data = "INSERT INTO UserInCourse VALUES " + \
+                        "(%s,%s,%s) ON CONFLICT DO NOTHING;"
 
                     for id in user_ids:
                         cur.execute(query_data, [id, course_id, 'Student'])
@@ -215,7 +215,7 @@ def add_user_to_course(user_id: int, course_id: int, user_role: Role) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "INSERT into userincourse values " +\
+                query_data = "INSERT INTO UserInCourse VALUES " +\
                     "(%s, %s, %s)"
                 cur.execute(query_data, [user_id, course_id, user_role.name])
         conn.close()
@@ -231,7 +231,7 @@ def remove_user_from_course(user_id: int, course_id) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """Delete from userincourse where userid = %s AND
+                query_data = """DELETE FROM UserInCourse WHERE userid = %s AND
                 courseid = %s"""
                 cur.execute(query_data, [user_id, course_id])
         conn.close()
@@ -248,15 +248,16 @@ def remove_user_from_group(user_id: int, group_id: int) -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """DELETE from useringroup
-                                WHERE userid = %s AND groupid = %s """
+                query_data = """DELETE FROM UserInGroup
+                                WHERE userId = %s AND globalGroupId = %s """
                 cur.execute(query_data, [user_id, group_id])
                 query_two = """SELECT (fullname IS NULL)
-                AS is_empty FROM GroupDetails WHERE groupid = %s;"""
+                AS is_empty FROM GroupDetails WHERE globalGroupId = %s;"""
                 cur.execute(query_two, [group_id])
                 emptyGroup: bool = cur.fetchone()[0]
                 if (emptyGroup):
-                    query_three = """delete from groups where groupid = %s """
+                    query_three = """DELETE FROM Groups WHERE 
+                                     globalGroupId = %s """
                     cur.execute(query_three, [group_id])
         conn.close()
     except Exception as e:
@@ -338,8 +339,8 @@ def change_role_on_course(new_role: str, user_id: int,
         try:
             with conn:
                 with conn.cursor() as cur:
-                    query_data = """UPDATE userincourse SET userrole = %s
-                    WHERE userid = %s AND courseid = %s;"""
+                    query_data = """UPDATE UserInCourse SET userRole = %s
+                    WHERE userId = %s AND courseId = %s;"""
                     cur.execute(query_data, [new_role, user_id, course_id])
             conn.close()
         except Exception as e:
@@ -358,12 +359,12 @@ def get_users_on_course(course: int) -> tuple[list[dict[str, str | int]], int]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT userdata.userid, userdata.cid,
-                userdata.fullname, userdata.email, userincourse.userrole
-                FROM public.userdata
-                JOIN public.userincourse ON
-                userdata.userid = userincourse.userid
-                WHERE userincourse.courseid = %s;"""
+                query_data = """SELECT UserData.userId, UserData.chalmersId,
+                UserData.fullName, UserData.userEmail, UserInCourse.userRole
+                FROM public.UserData
+                JOIN public.UserInCourse ON
+                UserData.userId = UserInCourse.userid
+                WHERE UserInCourse.courseId = %s;"""
                 cur.execute(query_data, [course])
                 data = cur.fetchall()
         conn.close()
