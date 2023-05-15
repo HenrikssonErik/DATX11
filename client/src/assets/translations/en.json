@@ -156,5 +156,14 @@
   "Pep8_Results": "Pep8 Results",
   "No_Files": "No Files Found",
   "Submission_Files": "Files to submit:",
-  "Successful_Tests": "Successful Tests"
+  "Successful_Tests": "Successful Tests",
+  "create_course_subtext": "Quicky create a course here by filling in the form. To further tweak you course. Head to settings in the course settings panel.",
+  "Search_Users": "Search Users",
+  "SEARCH_BY": "You can search by cid, email or name",
+  "ONE_AT_A_TIME": "Or add one at a time",
+  "UPLOAD_MEMBERS": "Upload members from a CSV-file",
+  "USE_ONE_COLUMN": "Use one coulmn with the cid of each member. Don't use a header.",
+  "Add_members": "Add members",
+  "No_users_found": "No users found",
+  "Search...": "Search..."
 }

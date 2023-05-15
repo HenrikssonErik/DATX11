@@ -13,8 +13,16 @@ from .connector import get_conn_string
 __ALLOWED_EXTENSIONS = {'txt', 'pdf', 'py'}
 
 
-def handle_files(files: list[FileStorage], course: int, group: int,
-                 assignment: int) -> tuple:
+def handle_files(
+    files: list[FileStorage],
+    course: int,
+    group: int,
+    assignment: int
+) -> tuple[
+    list[dict[str, str]],
+    dict[str, dict | list | str],
+    int
+]:
     """Sanitizes files, checks for number of files,
     allowed file names and file types
     Returns: json object with feedback on submitted files
@@ -55,7 +63,7 @@ def handle_files(files: list[FileStorage], course: int, group: int,
         save_to_temp_and_database(
             files, response_items, group, course, assignment
         )
-        unittest_feedback = json.loads(
+        unittest_feedback: dict = json.loads(
             run_unit_tests_in_container(
                 course,
                 assignment,
@@ -64,8 +72,10 @@ def handle_files(files: list[FileStorage], course: int, group: int,
         )
 
         passed = unittest_feedback["was_successful"]
-        combined_feedback = {"general_tests_feedback": response_items,
-                             "unittest_feedback": unittest_feedback}
+        combined_feedback: dict[str, list | dict] = {
+            "general_tests_feedback": response_items,
+            "unittest_feedback": unittest_feedback
+        }
         save_feedback_to_db(course, assignment, group,
                             json.dumps(combined_feedback), passed)
 
@@ -92,7 +102,7 @@ def get_filenames(course: int, assignment: int) -> tuple:
         return ()
 
 
-def get_test_filenames(course: int, assignment: int) -> tuple:
+def get_test_filenames(course: int, assignment: int) -> list:
     conn = psycopg2.connect(dsn=get_conn_string())
     try:
         with conn:
@@ -120,7 +130,7 @@ def save_to_temp_and_database(
         group_id: int,
         course_id: int,
         assignment: int
-) -> None:
+):
     """Downloads the file to temp directory and then to saves into
     the database. Also checks pep8 and cyclomatic complexity.
     """
@@ -196,7 +206,7 @@ def allowed_file(filename: str) -> bool:
 def save_test_to_db(file: FileStorage, course_id: int, assignment: int):
     """Saves the teacher's tests to the database"""
 
-    file.filename = 'test_' + file.filename
+    file.filename = 'test_' + str(file.filename)
     remove_existing_test_file(file.filename, course_id, assignment)
     binary = psycopg2.Binary(file.stream.read())
 
@@ -309,7 +319,7 @@ def get_assignment_test_feedback_from_database(
     return data, 200
 
 
-def get_test_file(course: int, assignment: int, file_name: str):
+def get_test_file(course: int, assignment: int, file_name: str) -> io.BytesIO:
     """Retrieves file from database"""
 
     conn = psycopg2.connect(dsn=get_conn_string())
@@ -332,7 +342,7 @@ def get_assignment_file_from_database(
         assignment: int,
         file_name: str,
         submission: int
-):
+) -> io.BytesIO:
     """Retrieves file from database"""
 
     conn = psycopg2.connect(dsn=get_conn_string())

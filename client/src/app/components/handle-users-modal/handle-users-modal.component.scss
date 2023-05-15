@@ -10,6 +10,15 @@ label {
   color: #6c757d;
 }
 
+.close {
+  color: #6c757d;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #000;
+}
+
 .list-group-item {
   border-bottom: 1px solid #ccc;
   padding-top: 3px;
@@ -28,19 +37,12 @@ label {
 }
 
 .custom-file-upload {
-  height: 38px;
-  display: inline-block;
-  padding: 10px 12px;
-  font-size: 10px;
-  color: black;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 5px;
   cursor: pointer;
 }
 
 .custom-file-upload:hover {
-  background-color: rgb(215, 228, 219);
+  text-decoration: underline;
+  color: #26734d;
 }
 .remove {
   border: none;
@@ -70,4 +72,110 @@ label {
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
+}
+
+.form-control:focus {
+  border-color: rgba(38, 115, 77, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
+}
+
+.form-select:focus {
+  border-color: rgba(38, 115, 77, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(38, 115, 77, 0.25);
+}
+
+.form-select {
+  color: #6c757d;
+}
+
+.form-control {
+  color: #6c757d;
+}
+
+.delete {
+  cursor: pointer;
+  float: right;
+  color: #d40d12;
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #26734d;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+}
+
+.loaderMini {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #26734d;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.upload {
+  font-size: 25px;
+}
+
+.divider-mark {
+  background-color: #fff;
+  padding: 0 10px;
+  color: #26734d;
+  font-size: 14px;
+}
+
+.container-divider {
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #26734d;
+  line-height: 0.1em;
+  margin: 10px 0 20px;
+}
+
+.subtitle {
+  color: #b0bec5;
+}
+
+.removeCsv {
+  cursor: pointer;
+  color: #d40d12;
+}
+
+.csvHeader {
+  margin-left: 10px;
+}
+
+.csvFileNameHeader {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.btn-outline-primary {
+  color: #26734d !important;
+  border-color: #26734d !important;
+}
+
+.btn-outline-primary:hover {
+  color: #fff !important;
+  background-color: #26734d !important;
+  border-color: #26734d !important;
 }

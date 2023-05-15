@@ -14,13 +14,18 @@ def check_against_ldap(cid: str) -> tuple[str, str] | None:
     result = output.stdout.decode().strip()
 
     b_student = "student" in result.lower()
-    b_teacher = "employee" in result.lower()
+    b_employee = "employee" in result.lower()
     b_ta = "amanuens" in result.lower()
+    b_phd = "doktorand" in result.lower()
+    b_intern = "praktikant" in result.lower()
+    b_no_title = result.count(':')
     name = result.split(",")[0]
 
-    if (b_teacher and not b_ta):
-        return Role.Teacher.name, name
-    if (b_student):
+    if (b_ta or b_phd or b_student or b_no_title or b_intern):
         return Role.Student.name, name
+    elif (b_employee):
+        return Role.Teacher.name, name
     else:
-        return None
+        # Default to student, could only have the else statement
+        # but this will make future changes 'easier'
+        return Role.Student.name, name
