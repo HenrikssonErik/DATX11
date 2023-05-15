@@ -117,29 +117,69 @@ CREATE TABLE RequiredFileNames (
 		ON UPDATE CASCADE 
 		ON DELETE CASCADE
 );
+-------------------------------------------
+
+CREATE TABLE AutomaticFeedback (
+	globalGroupID INTEGER NOT NULL, 
+	courseId SERIAL NOT NULL,
+	assignmentId INTEGER NOT NULL, 
+	submissionNumber SERIAL NOT NULL,
+	automaticFeedBack JSON,
+	testPassed BOOLEAN NOT NULL DEFAULT FALSE,
+	createdDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'),
+	PRIMARY KEY (globalGroupId, courseId, assignmentId, submissionNumber),
+	CONSTRAINT constraint_groupid_fkey FOREIGN KEY (globalGroupId)
+		REFERENCES Groups(globalGroupId)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+    CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignmentId)
+        REFERENCES Assignments(courseId, assignmentId)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+		
+CREATE OR REPLACE FUNCTION set_submission_number_AutomaticFeedback()
+RETURNS TRIGGER AS $$
+DECLARE
+    max_submissionNumber INTEGER;
+BEGIN
+    IF NEW.submissionNumber = 0 THEN
+        SELECT COUNT(submissionNumber) + 1 INTO max_submissionNumber
+        FROM AutomaticFeedback
+        WHERE globalGroupId = NEW.globalGroupId
+            AND courseId = NEW.courseId
+            AND assignmentId = NEW.assignmentId;
+		SELECT COUNT(submissionNumber) + 1 INTO NEW.submissionNumber
+		FROM AutomaticFeedback
+		WHERE globalGroupId = NEW.globalGroupId
+			AND courseId = NEW.courseId
+			AND assignmentId = NEW.assignmentId;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 
-------------------------------------------
-CREATE TABLE SubmissionFeedback (
+CREATE OR REPLACE TRIGGER increment_submission_AutomaticFeedback
+BEFORE INSERT ON AutomaticFeedback
+FOR EACH ROW
+EXECUTE FUNCTION set_submission_number_AutomaticFeedback();
+
+
+--------------------------------------------------------------
+CREATE TABLE TeacherFeedback (
     globalGroupId INTEGER NOT NULL,
     courseId SERIAL NOT NULL,  
     assignmentId INTEGER NOT NULL,
     submissionNumber SERIAL NOT NULL,
-    automaticFeedback JSON,
     teacherFeedback TEXT,
-    testPassed BOOLEAN NOT NULL DEFAULT FALSE,
     teacherGrade BOOLEAN,
-	feedbackDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'),
-	createdDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'),
+	teacherFeedbackDate TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'),
 	assignmentScore INT DEFAULT 0,
 	userId INT,
     PRIMARY KEY (globalGroupId, courseId, assignmentId, submissionNumber),
-    CONSTRAINT constraint_groupid_fkey FOREIGN KEY (globalGroupId)
-        REFERENCES Groups(globalGroupId)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT constraint_assignment_course_fkey FOREIGN KEY (courseId, assignmentId)
-        REFERENCES Assignments(courseId, assignmentId)
+    CONSTRAINT constraint_fromAutomaticFeedback_fkey FOREIGN KEY (globalGroupId, assignmentId, submissionNumber, courseId)
+        REFERENCES AutomaticFeedback(globalGroupId, assignmentId, submissionNumber, courseId)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 	CONSTRAINT constraint_userId_fkey FOREIGN KEY (userId)
@@ -148,36 +188,33 @@ CREATE TABLE SubmissionFeedback (
 		ON UPDATE CASCADE	
 );
 
-CREATE OR REPLACE FUNCTION set_submission_number_SubmissionFeedback()
+	
+CREATE OR REPLACE FUNCTION set_submission_number_TeacherFeedback()
 RETURNS TRIGGER AS $$
 DECLARE
     max_submissionNumber INTEGER;
 BEGIN
     IF NEW.submissionNumber = 0 THEN
         SELECT COUNT(submissionNumber) + 1 INTO max_submissionNumber
-        FROM SubmissionFeedback
+        FROM TeacherFeedback
         WHERE globalGroupId = NEW.globalGroupId
             AND courseId = NEW.courseId
             AND assignmentId = NEW.assignmentId;
-        IF submissionNumber > 0 THEN
-            NEW.submissionNumber := max_submissionNumber;
-        ELSE
-            SELECT COUNT(submissionNumber) + 1 INTO NEW.submissionNumber
-            FROM SubmissionFeedback
-            WHERE globalGroupId = NEW.globalGroupId
-                AND courseId = NEW.courseId
-                AND assignmentId = NEW.assignmentId;
-        END IF;
+		SELECT COUNT(submissionNumber) + 1 INTO NEW.submissionNumber
+		FROM TeacherFeedback
+		WHERE globalGroupId = NEW.globalGroupId
+			AND courseId = NEW.courseId
+			AND assignmentId = NEW.assignmentId;
     END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER increment_submission_SubmissionFeedback
-BEFORE INSERT ON SubmissionFeedback
-FOR EACH ROW
-EXECUTE FUNCTION set_submission_number_SubmissionFeedback();
 
+CREATE OR REPLACE TRIGGER increment_submission_TeacherFeedback
+BEFORE INSERT ON TeacherFeedback
+FOR EACH ROW
+EXECUTE FUNCTION set_submission_number_TeacherFeedback();
 
 ------------------------------------------------------------------------------
 CREATE TABLE SubmittedAssignment (
