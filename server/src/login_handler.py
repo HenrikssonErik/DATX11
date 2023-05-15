@@ -69,7 +69,7 @@ def create_temp_users(cids: list[str]) -> list[str]:
     with conn:
         with conn.cursor() as cur:
             query = "INSERT INTO UserData " +\
-                    "(cid, email, passphrase, globalRole, fullName) " +\
+                    "(chalmersId, userEmail, passphrase, globalRole, fullName) " +\
                     "VALUES (%s, %s, %s, %s, %s ) " +\
                     "on conflict do nothing;"
             for cid in cids:
@@ -119,7 +119,7 @@ def update_pwd_in_db(cid: str, pwd: bytes) -> tuple[dict[str, str], int]:
 
                 query = "UPDATE UserData " +\
                         "SET passphrase = %s " +\
-                        "WHERE cid = %s;"
+                        "WHERE chalmersId = %s;"
 
                 cur.execute(query, (
                     pwd,
@@ -201,11 +201,11 @@ def registration_query(cid: str, email: str, hashed_pass: bytes,
                 #     "VALUES (%s, %s, %s, %s, %s ) "
 
                 query = "INSERT INTO UserData " +\
-                    "(cid, email, passphrase, globalRole, fullName) " +\
+                    "(chalmersId, userEmail, passphrase, globalRole, fullName) " +\
                     "VALUES (%s, %s, %s, %s, %s ) " +\
-                    "ON CONFLICT (cid) DO UPDATE " +\
+                    "ON CONFLICT (chalmersId) DO UPDATE " +\
                     "SET passphrase = EXCLUDED.passphrase " +\
-                    "WHERE userdata.cid = EXCLUDED.cid and " +\
+                    "WHERE userdata.chalmersId = EXCLUDED.chalmersId and " +\
                     "userdata.passphrase is null;"
 
                 cur.execute(query, (
@@ -234,9 +234,9 @@ def user_to_resend_verification_email(cid: str) -> tuple[dict[str, str], int]:
     with conn:
         with conn.cursor() as cur:
             try:
-                query_data = """SELECT email, verified
+                query_data = """SELECT userEmail, verifiedAccount
                             FROM UserData
-                            WHERE userdata.cid = %s
+                            WHERE userdata.chalmersId = %s
                                 AND userdata.passphrase IS NOT NULL"""
                 cur.execute(query_data, (cid,))
                 data = cur.fetchone()
@@ -261,9 +261,9 @@ def user_to_send_reset_pwd_email(cid: str) -> tuple[dict[str, str], int]:
     with conn:
         with conn.cursor() as cur:
             try:
-                query_data = """SELECT email
+                query_data = """SELECT userEmail
                             FROM UserData
-                            WHERE userdata.cid = %s
+                            WHERE userdata.chalmersId = %s
                                 AND userdata.passphrase IS NOT NULL"""
                 cur.execute(query_data, (cid,))
                 data = cur.fetchone()
@@ -291,9 +291,9 @@ def log_in(email: str, password: str) -> tuple[dict[str, str],
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT userId, passphrase, globalrole, verified
+                query_data = """SELECT userId, passphrase, globalrole, verifiedAccount
                             FROM UserData
-                            WHERE userdata.email = %s
+                            WHERE userdata.userEmail = %s
                             AND userdata.passphrase IS NOT NULL"""
                 cur.execute(query_data, (email,))
                 data = cur.fetchone()
@@ -378,8 +378,8 @@ def verify_user_in_db(cid: str) -> \
         with conn.cursor() as cur:
             try:
                 query = "UPDATE UserData " +\
-                    "SET verified = TRUE " +\
-                    "WHERE cid = %s " +\
+                    "SET verifiedAccount = TRUE " +\
+                    "WHERE chalmersId = %s " +\
                     "AND passphrase IS NOT NULL"
                 cur.execute(query, (
                     cid,

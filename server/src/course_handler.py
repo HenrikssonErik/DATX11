@@ -37,7 +37,7 @@ def get_courses_info(user_id: int) -> list[dict[str, str | int]]:
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT * FROM UserCourseInfo
-                            WHERE userid = %s"""
+                            WHERE userId = %s"""
                 cur.execute(query_data, (user_id,))
                 data = cur.fetchall()
         conn.close()
@@ -66,7 +66,7 @@ def get_course_info(user_id: int, course_id: int) -> dict[str, str | int]:
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT * FROM UserCourseInfo
-                            WHERE userid = %s AND courseid=%s"""
+                            WHERE userId = %s AND courseId=%s"""
                 cur.execute(query_data, [user_id, course_id])
                 data = cur.fetchone()
                 query_two = """SELECT ud.fullName FROM UserData ud JOIN
@@ -103,11 +103,12 @@ def get_progress(user_id: int) -> list[dict]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query = """SELECT af.courseId, COUNT(*) AS Completed FROM
-                UserGroupCourseInfo ugci JOIN AssignmentFeedback af ON
-                ugci.groupId = af.groupId AND ugci.courseId = af.courseId
-                WHERE ugci.userId = %s AND af.teacherGrade = TRUE GROUP BY
-                af.courseId;"""
+                query = """SELECT sf.courseId, COUNT(*) AS Completed FROM
+                UserGroupCourseInfo ugci JOIN SubmissionFeedback sf ON
+                ugci.globalGroupId = sf.globalGroupId AND 
+                ugci.courseId = sf.courseId
+                WHERE ugci.userId = %s AND sf.teacherGrade = TRUE GROUP BY
+                sf.courseId;"""
                 cur.execute(query, [user_id])
                 data = cur.fetchall()
         conn.close()
@@ -132,24 +133,24 @@ def add_group_to_course(course_id: int, user_id: int):
         with conn:
             with conn.cursor() as cur:
                 query = """SELECT EXISTS(SELECT 1 FROM
-                        usergroupcourseinfo WHERE courseid=%s AND userid=%s) as
+                        UserGroupCourseInfo WHERE courseId=%s AND userId=%s) AS
                         exists_row;"""
                 cur.execute(query, [course_id, user_id])
                 in_group = cur.fetchone()[0]
                 if not (in_group):
-                    query_one = """SELECT MAX(groupnumber) FROM Groups WHERE
-                    course = %s"""
+                    query_one = """SELECT MAX(groupNumberInCourse) FROM Groups WHERE
+                    courseId = %s"""
                     cur.execute(query_one, [course_id])
                     current_group: int = cur.fetchone()[0]
                     if current_group is None:
                         current_group = 0
 
-                    query_two = """Insert into Groups
-                        (course, groupnumber) values (%s,%s) """
+                    query_two = """INSERT INTO Groups
+                        (courseId, groupNumberInCourse) VALUES (%s,%s) """
                     cur.execute(query_two, [course_id, current_group + 1])
-                    query_three = """INSERT INTO UserInGroup (userId, groupId)
-                    SELECT %s, gd.groupid FROM GroupDetails gd WHERE
-                    gd.groupnumber = %s AND gd.course = %s;"""
+                    query_three = """INSERT INTO UserInGroup (userId, globalGroupId)
+                    SELECT %s, gd.globalGroupId FROM GroupDetails gd WHERE
+                    gd.groupNumberInCourse = %s AND gd.courseId = %s;"""
                     cur.execute(query_three, [user_id, current_group+1,
                                               course_id])
                 else:
@@ -171,13 +172,13 @@ def _create_course(course_name: str, course_abbr: str, year: int,
         with conn:
             with conn.cursor() as cur:
                 query_one = """Insert into Courses
-                                (courseName, course, teachingPeriod,
+                                (courseName, coursecode, teachingPeriod,
                                 courseYear) values (%s,%s,%s,%s) """
                 cur.execute(query_one, [course_name, course_abbr,
                                         teaching_period, year])
 
                 query_two = """select courseid from Courses
-                                where  (course = %s AND
+                                where  (coursecode = %s AND
                                 teachingperiod = %s AND courseyear = %s)"""
                 cur.execute(query_two, [course_abbr, teaching_period, year])
                 data = cur.fetchone()
@@ -210,7 +211,7 @@ def create_assignment(course_id: int, description: str, assignment_name: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """SELECT MAX(assignment) as max_assignment FROM
+                query_one = """SELECT MAX(assignmentid) as max_assignment FROM
                 Assignments WHERE courseid = %s;"""
                 cur.execute(query_one, [course_id])
                 data = cur.fetchone()
@@ -221,8 +222,8 @@ def create_assignment(course_id: int, description: str, assignment_name: int,
                     # since the "select max" call is done before insert we
                     # need to increment by 1
                     assignment_nr = data[0] + 1
-                query_two = """INSERT INTO Assignments (courseid, assignment,
-                enddate, description, name, maxscore, passscore) VALUES
+                query_two = """INSERT INTO Assignments (courseId, assignmentId,
+                endDate, description, assignmentName, maxScore, passScore) VALUES
                     (%s, 0, %s, %s, %s, %s, %s);"""
                 cur.execute(
                     query_two,
@@ -252,8 +253,9 @@ def get_assignments(course_id: int) -> list[dict] | dict[str, str]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = "SELECT assignment, endDate, description, name,"\
-                    "maxscore, passscore FROM Assignments WHERE courseid = %s"
+                query_data = "SELECT Assignment, endDate, description, "\
+                    "assignmentName, maxScore, passScore FROM Assignments"\
+                    " WHERE courseId = %s"
                 cur.execute(query_data, [course_id])
                 # data = [row[0] for row in cur.fetchall()]
                 data = cur.fetchall()
@@ -283,8 +285,8 @@ def change_description(new_desc: str, course_id: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """UPDATE assignments set description = %s
-                                WHERE courseid = %s and assignment = %s"""
+                query_data = """UPDATE Assignments SET description = %s
+                                WHERE courseId = %s AND assignmentId = %s"""
                 cur.execute(query_data, [new_desc, course_id, assignment])
 
         conn.close()
@@ -303,8 +305,8 @@ def change_assignment_name(new_name: str, course_id: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """UPDATE assignments set name = %s
-                                WHERE courseid = %s and assignment = %s"""
+                query_data = """UPDATE Assignments set assignmentName = %s
+                                WHERE courseId = %s and assignmentId = %s"""
                 cur.execute(query_data, [new_name, course_id, assignment])
 
         conn.close()
@@ -368,8 +370,8 @@ def change_end_date(course: int, assignment: int,
         try:
             with conn:
                 with conn.cursor() as cur:
-                    query_one = """UPDATE assignments SET enddate = %s
-                    WHERE courseid = %s AND assignment = %s;"""
+                    query_one = """UPDATE Assignments SET endDate = %s
+                    WHERE courseId = %s AND assignmentId = %s;"""
                     cur.execute(query_one, [new_date, course, assignment])
             conn.close()
             return
@@ -390,9 +392,9 @@ def add_filenames(file_names: list, course_id: int,
         with conn:
             with conn.cursor() as cur:
                 for file in file_names:
-                    query_one = """INSERT INTO FileNames (courseid, assignment,
-                                    filename) VALUES
-                                    (%s, %s, %s);"""
+                    query_one = """INSERT INTO RequiredFileNames 
+                                (courseId, assignmentId, assignmentFileName) 
+                                VALUES (%s, %s, %s);"""
                     cur.execute(query_one, [course_id, assignment, file])
 
         conn.close()
@@ -427,10 +429,10 @@ def get_assignment_feedback(course: int, assignment: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT submission, testpass,
-                testfeedback, teacherfeedback, teachergrade, userid,
-                feedbackdate FROM assignmentfeedback WHERE courseid = %s AND
-                groupid = %s AND assignment = %s"""
+                query_data = """SELECT submissionNumber, testPassed,
+                automaticFeedback, teacherFeedback, teacherGrade, userId,
+                feedbackDate FROM SubmissionFeedback WHERE courseId = %s AND
+                globalGroupId = %s AND assignmentId = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
 
@@ -476,9 +478,9 @@ def get_course_groups(course: int) -> list[dict[str, str | int]]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupnumber, groupid,
-                array_agg(fullname) FROM GroupDetails WHERE course = %s GROUP
-                BY groupid, groupnumber"""
+                query_data = """SELECT groupNumberInCourse, globalGroupId,
+                array_agg(fullName) FROM GroupDetails WHERE courseCode = %s GROUP
+                BY globalGroupId, groupNumberInCourse"""
                 cur.execute(query_data, [course])
                 data = cur.fetchall()
                 group_list = []
@@ -504,9 +506,9 @@ def get_course_group(course: int, group_id: int) -> dict[str, str | int]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupnumber,
-                array_agg(fullname) FROM GroupDetails WHERE course = %s and
-                groupid = %s GROUP BY groupid, groupnumber"""
+                query_data = """SELECT groupNumberInCourse,
+                array_agg(fullName) FROM GroupDetails WHERE courseCode = %s AND
+                globalGroupId = %s GROUP BY globalGroupId, groupNumberInCourse"""
                 cur.execute(query_data, [course, group_id])
                 data = cur.fetchone()
                 if data is None:
@@ -530,8 +532,8 @@ def get_assignment_overview(course: int) -> list[dict]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """ select assignment from assignments where
-                courseid = %s"""
+                query_one = """ SELECT assignmentId FROM Assignments WHERE
+                courseId = %s"""
                 cur.execute(query_one, [course])
 
                 assignments = cur.fetchall()
@@ -581,8 +583,8 @@ def get_group_number(course_id: int, group_id) -> int:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT groupnumber FROM Groups WHERE
-                course = %s and groupid = %s"""
+                query_data = """SELECT groupNumberInCourse FROM Groups WHERE
+                courseId = %s and globalGroupId = %s"""
                 cur.execute(query_data, (course_id, group_id))
                 data = cur.fetchone()
         conn.close()
@@ -602,8 +604,8 @@ def passed_deadline(course: int, assignment: int) -> bool:
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """select enddate from assignments
-                    WHERE courseid = %s AND assignment = %s;"""
+                query_one = """SELECT endDate FROM Assignments
+                    WHERE courseId = %s AND assignmentId = %s;"""
                 cur.execute(query_one, [course, assignment])
                 date = cur.fetchone()[0]
         conn.close()

@@ -39,8 +39,8 @@ class TestUserHandler(unittest.TestCase):
         user_handler.add_users_to_course(user_ids, course_id)
 
         mock_cursor.execute.assert_called_with(
-            "insert into userincourse values "
-            "(%s,%s,%s) on conflict do nothing;",
+            "INSERT INTO UserInCourse VALUES "
+            "(%s,%s,%s) ON CONFLICT DO NOTHING;",
             [user_ids[1], course_id, "Student"]
         )
         self.assertEqual(2, len(mock_cursor.mock_calls))
@@ -103,9 +103,9 @@ class TestUserHandler(unittest.TestCase):
             result = user_handler.get_group(user_id, course_id)
 
             mock_cursor.execute.assert_called_once_with(
-                "SELECT groupid, groupnumber FROM "
-                "userGroupCourseInfo "
-                "WHERE userid = %s and courseid = %s",
+                "SELECT globalGroupId, groupNumberInCourse FROM "
+                "UserGroupCourseInfo "
+                "WHERE userId = %s and courseId = %s",
                 (user_id, course_id)
             )
             self.assertEqual(
@@ -125,7 +125,7 @@ class TestUserHandler(unittest.TestCase):
             user_id, course_id, user_handler.Role.Student)
 
         mock_cursor.execute.assert_called_once_with(
-            "INSERT into userincourse values "
+            "INSERT INTO UserInCourse VALUES "
             "(%s, %s, %s)",
             [user_id, course_id, user_handler.Role.Student.name]
         )
@@ -138,11 +138,11 @@ class TestUserHandler(unittest.TestCase):
         mock_cursor.return_value = False
         user_handler.remove_user_from_group(user_id, group_id)
         mock_cursor.execute.assert_has_calls([
-            mock.call("""DELETE from useringroup
-                                WHERE userid = %s AND groupid = %s """,
+            mock.call("""DELETE from UserInGroup
+                                WHERE userId = %s AND groupId = %s """,
                       [user_id, group_id]),
-            mock.call("""SELECT (fullname IS NULL)
-                AS is_empty FROM GroupDetails WHERE groupid = %s;""",
+            mock.call("""SELECT (fullName IS NULL)
+                AS is_empty FROM GroupDetails WHERE globalGroupId = %s;""",
                       [group_id])
         ])
 
@@ -212,9 +212,9 @@ class TestUserHandler(unittest.TestCase):
             'Sebastian Kvaldén'
         )
         result = user_handler.get_user(user_id)
-        mock_cursor.execute.assert_called_once_with("SELECT cid, email, fullname FROM Userdata " +\
+        mock_cursor.execute.assert_called_once_with("SELECT chalmersId, userEmail, fullname FROM Userdata " +\
                     "WHERE userid = %s", (user_id,))
-        self.assertEqual(result, {'cid': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén', 'id': 1})
+        self.assertEqual(result, {'chalmersId': 'kvalden', 'email': 'kvalden@chalmers.se', 'fullname': 'Sebastian Kvaldén', 'id': 1})
 
     @patch('psycopg2.connect')
     def test_get_global_role(self, mock_connect):
