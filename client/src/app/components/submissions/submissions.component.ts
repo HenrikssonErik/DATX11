@@ -102,4 +102,12 @@ export class SubmissionsComponent {
       fileName
     );
   }
+
+  parseSuccesses(str: any): string {
+    const dotIndex = str.indexOf('.');
+    if (dotIndex !== -1) {
+      return str.substring(dotIndex + 1);
+    }
+    return 'Successfull test not found';
+  }
 }

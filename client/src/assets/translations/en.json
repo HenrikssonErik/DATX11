@@ -155,5 +155,6 @@
   "Failed_Tests": "Failed Tests",
   "Pep8_Results": "Pep8 Results",
   "No_Files": "No Files Found",
-  "Submission_Files": "Files to submit:"
+  "Submission_Files": "Files to submit:",
+  "Successful_Tests": "Successful Tests"
 }

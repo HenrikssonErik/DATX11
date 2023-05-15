@@ -155,5 +155,6 @@
   "Download_Template": "Ladda Ner Mall",
   "Graded_Failed": "Graded: Underkänd",
   "No_Files": "Inga Filer Hittades",
-  "Submission_Files": "Inlämningsfiler:"
+  "Submission_Files": "Inlämningsfiler:",
+  "Successful_Tests": "Lyckade Test"
 }

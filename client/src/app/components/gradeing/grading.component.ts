@@ -2,8 +2,8 @@ import { Component, Input } from '@angular/core';
 import { Course } from 'src/app/models/courses';
 import { SubmissionService } from 'src/app/services/submission.service';
 import { AssignmentSubmission, Submission } from 'src/app/models/submission';
-import { Subject } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime, map, takeUntil } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FeedbackTeacherViewModalComponent } from '../feedback-teacher-view-modal/feedback-teacher-view-modal.component';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -136,7 +136,6 @@ export class GradingComponent {
   }
 
   filterGraded(submissions: AssignmentSubmission[]): AssignmentSubmission[] {
-    console.log(submissions);
     if (this.sortGraded) {
       return submissions.filter((submission) => {
         return submission.grade !== null;
@@ -173,22 +172,21 @@ export class GradingComponent {
     return tempList;
   }
 
-  filterSearch() {
-    this.searchTerm$
-      .pipe(takeUntil(this.unsubscribe$), debounceTime(200))
-      .subscribe((searchTerm: string) => {
-        console.log(searchTerm);
-        if (this.gradeingSubmission) {
-          console.log(this.gradeingSubmission);
-          this.gradeingSubmission = this.gradeingSubmission[0].filter(
-            (submission) =>
-              submission.GroupNumber.toString().includes(searchTerm)
-          );
-        }
-      });
+  filterSearch(
+    submissions: AssignmentSubmission[]
+  ): Observable<AssignmentSubmission[]> {
+    return this.searchTerm$.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(200),
+      map((searchTerm: string): AssignmentSubmission[] => {
+        return submissions.filter((sub: AssignmentSubmission): boolean =>
+          sub.GroupNumber.toString().includes(searchTerm)
+        );
+      })
+    );
   }
 
-  filter(): void {
+  filter(textSearch?: boolean): void {
     if (this.allAssignments && this.selectedAssignment) {
       let tempList: Submission[] = this.allAssignments?.slice();
       tempList = this.filterAssignment(tempList);
@@ -198,12 +196,23 @@ export class GradingComponent {
         tempListSubmissions = this.filterGraded(tempListSubmissions);
       }
       tempListSubmissions = this.filterDate(tempListSubmissions);
-      this.isLoading = false;
-      this.gradeingSubmission = {
-        ...tempList[0],
-        Submissions: tempListSubmissions,
-      };
-      this.filterSearch();
+      if (textSearch) {
+        this.filterSearch(tempListSubmissions).subscribe(
+          (filteredSubmissions: AssignmentSubmission[]) => {
+            this.isLoading = false;
+            this.gradeingSubmission = {
+              ...tempList[0],
+              Submissions: filteredSubmissions,
+            };
+          }
+        );
+      } else {
+        this.isLoading = false;
+        this.gradeingSubmission = {
+          ...tempList[0],
+          Submissions: tempListSubmissions,
+        };
+      }
       this.setFileNames(this.selectedAssignment);
     }
   }
@@ -238,6 +247,7 @@ export class GradingComponent {
 
   onSearchTextChanged() {
     this.searchTerm$.next(this.searchText);
+    this.filter(true);
   }
 
   getSelectedAssignmentIndex() {
@@ -255,7 +265,6 @@ export class GradingComponent {
     assignmentNr: number,
     grade: boolean
   ) {
-    console.log(this.commentText);
     this.submissionService
       .setFeedback(
         this.course.courseID,
@@ -291,7 +300,6 @@ export class GradingComponent {
     //Borde inte returna nåt imo? HTMLen bryr väl sig ändå bara om this.groupMembers?
     this.groupService.getGroup(group, this.course.courseID).subscribe({
       next: (data: any) => {
-        console.log(data);
         this.groupMembers[group] = data['users'];
       },
       error: (err) => {
