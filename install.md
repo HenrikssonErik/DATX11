@@ -6,6 +6,7 @@
 
 # Getting Started Guide On Linux (Ubuntu)
 ## Requirements
+- [Go](https://go.dev/)
 - [Nodejs](https://nodejs.org/en/)
   - Npm
 - [Python 3](https://www.python.org/downloads/)
@@ -14,10 +15,8 @@
 ## 1. Installing Nodejs dependencies
 ```bash
 npm install -g @angular/cli
-cd client
+cd DATX11/client
 npm install
-cd ..
-cd ..
 ```
 
 ## 2. Installing Python 3 dependencies
@@ -28,13 +27,19 @@ source $VENV/bin/activate
 cd DATX11/server
 pip install -r requirements.txt
 deactivate
-cd ..
 ```
+
+## 3. Copy credential files
+Two files will need to be placed in `DATX11/server/src/`.
+* `connection_config.txt`
+* `mailconfig.cfg`
+
+File one is for the database credentials and the second file is for the mail credentials.
 
 ## 3. Start The Servers
 This step is needed to be done to start the servers each time. The variable `$VENV` will not exist if a new instance is used.
 ```bash
-(source ../$VENV"/bin/activate" && export FLASK_APP="server/src/app.py" && flask run --host 0.0.0.0) & (cd client && ng serve) && fg
+(source ../$VENV"/bin/activate" && export FLASK_APP="server/src/app.py" && flask run --host 0.0.0.0) & (cd client && ng serve)
 ```
 
 ## 4. Open website
@@ -45,15 +50,15 @@ This step is needed to be done to start the servers each time. The variable `$VE
 
 # Getting Started Guide On Windows
 ## Requirements
+- [Go](https://go.dev/)
 - [Nodejs](https://nodejs.org/en/)
 - [Python 3](https://www.python.org/downloads/)
 
 ## 1. Installing Nodejs dependencies
 ```batch
 npm install -g @angular/cli
-cd client
+cd DATX11/client
 npm install
-cd ..
 ```
 
 ## 2. Installing Python 3 dependencies
@@ -61,11 +66,17 @@ cd ..
 set VENV=YOUR\VENV\PATH
 py -m venv %VENV%
 %VENV%\Scripts\activate.bat
-cd server
+cd DATX11/server
 pip install -r requirements.txt
 deactivate
-cd ..
 ```
+
+## 3. Copy credential files
+Two files will need to be placed in `DATX11\server\src\`.
+* `connection_config.txt`
+* `mailconfig.cfg`
+
+File one is for the database credentials and the second file is for the mail credentials.
 
 ## 3. Start The Servers
 This step is needed to be done to start the servers each time. The variable `%VENV%` will not exist if a new instance is used.
