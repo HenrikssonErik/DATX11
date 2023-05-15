@@ -234,7 +234,7 @@ def remove_existing_assignment(file_name: str, group_id: int, course_id: int,
         with conn.cursor() as cur:
             query = """DELETE FROM SubmittedAssignment
                  WHERE SubmittedAssignment.assignmentFileName   = %s
-                 AND   SubmittedAssignment.groupId    = %s
+                 AND   SubmittedAssignment.globalGroupId    = %s
                  AND   SubmittedAssignment.courseId   = %s
                  AND   SubmittedAssignment.assignmentId = %s
                  AND   SubmittedAssignment.submissionNumber = %s;
@@ -308,8 +308,8 @@ def get_assignment_test_feedback_from_database(
         with conn.cursor() as cur:
             query_data = """
             SELECT submissionNumber, automaticFeedback, testPassed
-            FROM SubmissionFeedback WHERE
-            groupId = %s AND courseId = %s AND \"assignmentId\" = %s
+            FROM AutomaticFeedback WHERE
+            globalGroupId = %s AND courseId = %s AND \"assignmentId\" = %s
             """
 
             cur.execute(query_data, (group_id, course,
@@ -384,7 +384,7 @@ def get_unit_test_files_from_db(
                 """
                 SELECT testFileName, fileData FROM PythonTestFiles
                     WHERE PythonTestFiles.courseId     = %s
-                    AND PythonTestFiles.\"assignmentId\" = %s;
+                    AND PythonTestFiles.assignmentId= %s;
                 """,
                 (courseid, assignment)
             )
@@ -413,7 +413,7 @@ def get_all_assignment_files_from_db(
                 SELECT assignmentFileName, fileData FROM SubmittedAssignment
                     WHERE globalGroupId        = %s
                     AND   courseId       = %s
-                    AND   \"assignmentId\"   = %s;
+                    AND   assignmentId   = %s;
                 """,
                 (group_id, course_id, assignment)
             )
@@ -464,10 +464,10 @@ def save_feedback_to_db(
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO SubmissionFeedback (
-                        GlobalgroupId,
+                INSERT INTO AutomaticFeedback (
+                        globalgroupId,
                         courseId,
-                        \"assignmentId\",
+                        assignmentId,
                         automaticFeedBack,
                         testPassed,
                         submissionNumber

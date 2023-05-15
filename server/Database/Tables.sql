@@ -208,7 +208,7 @@ BEGIN
     IF NEW.submissionNumber = 0 THEN
         SELECT COUNT(submissionNumber) + 1 INTO max_submissionNumber
         FROM SubmittedAssignment
-        WHERE groupId = NEW.groupId
+        WHERE globalGroupId = NEW.globalGroupId
             AND courseId = NEW.courseId
             AND assignmentId = NEW.assignmentId
             AND assignmentFileName = NEW.assignmentFileName;
@@ -217,7 +217,7 @@ BEGIN
         ELSE
             SELECT COUNT(submissionNumber) + 1 INTO NEW.submissionNumber
             FROM SubmittedAssignment
-            WHERE groupId = NEW.groupId
+            WHERE globalGroupId = NEW.globalGroupId
                 AND courseId = NEW.courseId
                 AND assignmentId = NEW.assignmentId
                 AND assignmentFileName = NEW.assignmentFileName;

@@ -103,12 +103,12 @@ def get_progress(user_id: int) -> list[dict]:
     try:
         with conn:
             with conn.cursor() as cur:
-                query = """SELECT sf.courseId, COUNT(*) AS Completed FROM
-                UserGroupCourseInfo ugci JOIN SubmissionFeedback sf ON
-                ugci.globalGroupId = sf.globalGroupId AND 
-                ugci.courseId = sf.courseId
-                WHERE ugci.userId = %s AND sf.teacherGrade = TRUE GROUP BY
-                sf.courseId;"""
+                query = """SELECT tf.courseId, COUNT(*) AS Completed FROM
+                UserGroupCourseInfo ugci JOIN TotalFeedback tf ON
+                ugci.globalGroupId = tf.globalGroupId AND 
+                ugci.courseId = tf.courseId
+                WHERE ugci.userId = %s AND tf.teacherGrade = TRUE GROUP BY
+                tf.courseId;"""
                 cur.execute(query, [user_id])
                 data = cur.fetchall()
         conn.close()
@@ -343,13 +343,24 @@ def set_teacher_feedback(group_id: int, feedback: str, grade: bool,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_one = """UPDATE SubmissionFeedback SET
-                teacherFeedback = %s, teacherGrade = %s,
-                feedbackDate = (CURRENT_TIMESTAMP AT TIME ZONE
-                'Europe/Stockholm'), assignmentScore = %s, courseId = %s,
-                userId = %s WHERE globalGroupId = %s AND
-                submissionNubmer = %s AND assignmentId = %s;"""
+                query_one = """INSERT INTO TeacherFeedback 
+                                (teacherFeedback, teacherGrade, teacherFeedbackDate, 
+                                assignmentScore, courseId, userId, globalGroupId, 
+                                submissionNumber, assignmentId)
+                            VALUES 
+                                (%s, %s, 
+                                (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Stockholm'), 
+                                %s, %s, %s, %s, %s, %s)
+                            ON CONFLICT (courseId, globalgroupid, assignmentid, submissionnumber) DO 
+                            UPDATE SET
+                                teacherFeedback = %s, teacherGrade = %s,
+                                teacherFeedbackDate = (CURRENT_TIMESTAMP AT TIME ZONE
+                                'Europe/Stockholm'), assignmentScore = %s, courseId = %s,
+                                userId = %s WHERE TeacherFeedback.globalGroupId = %s AND
+                                TeacherFeedback.submissionNumber = %s AND TeacherFeedback.assignmentId = %s;"""
                 cur.execute(query_one, [feedback, grade, score, course,
+                                        teacher, group_id, submission,
+                                        assignment, feedback, grade, score, course,
                                         teacher, group_id, submission,
                                         assignment])
         conn.close()
@@ -429,10 +440,19 @@ def get_assignment_feedback(course: int, assignment: int,
     try:
         with conn:
             with conn.cursor() as cur:
-                query_data = """SELECT submissionNumber, testPassed,
-                automaticFeedback, teacherFeedback, teacherGrade, userId,
-                feedbackDate FROM SubmissionFeedback WHERE courseId = %s AND
-                globalGroupId = %s AND assignmentId = %s"""
+                query_data = """SELECT 
+                                    submissionNumber, 
+                                    testPassed,
+                                    automaticFeedback, 
+                                    teacherFeedback, 
+                                    teacherGrade, 
+                                    userId,
+                                    teacherfeedbackdate 
+                                FROM TotalFeedback 
+                                WHERE 
+                                    courseId = %s AND
+                                    globalGroupId = %s AND 
+                                    assignmentId = %s"""
                 cur.execute(query_data, (course, group, assignment))
                 data = cur.fetchall()
 
@@ -507,7 +527,7 @@ def get_course_group(course: int, group_id: int) -> dict[str, str | int]:
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT groupNumberInCourse,
-                array_agg(fullName) FROM GroupDetails WHERE courseCode = %s AND
+                array_agg(fullName) FROM GroupDetails WHERE courseId = %s AND
                 globalGroupId = %s GROUP BY globalGroupId, groupNumberInCourse"""
                 cur.execute(query_data, [course, group_id])
                 data = cur.fetchone()
@@ -539,10 +559,10 @@ def get_assignment_overview(course: int) -> list[dict]:
                 assignments = cur.fetchall()
 
                 query_data = """SELECT DISTINCT ON (globalgroupId) globalgroupId, testPassed,
-                teacherGrade, submissionnumber, assignmentscore,  teacherfeedback, userid,
-                feedbackdate, createdDate FROM submissionFeedback WHERE
-                courseid = %s AND assignmentid = %s ORDER BY globalgroupId,
-                submissionnumber DESC;"""
+                teacherGrade, submissionNumber, assignmentScore,  teacherFeedback, userId,
+                teacherfeedbackdate, createdDate FROM totalfeedback WHERE
+                courseId = %s AND assignmentId = %s ORDER BY globalGroupId,
+                submissionNumber DESC;"""
                 return_list = []
                 for assignment in assignments:
                     overview_list = []
