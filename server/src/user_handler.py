@@ -110,7 +110,7 @@ def _get_group_members(group_id: int) -> list[str]:
         with conn:
             with conn.cursor() as cur:
                 query_data = """SELECT chalmersId FROM UserGroupInfo
-                            WHERE groupId = %s"""
+                            WHERE globalGroupId = %s"""
                 cur.execute(query_data, [group_id])
                 data = cur.fetchall()
         conn.close()

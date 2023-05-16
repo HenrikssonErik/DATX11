@@ -234,7 +234,7 @@ def remove_existing_assignment(file_name: str, group_id: int, course_id: int,
         with conn.cursor() as cur:
             query = """DELETE FROM SubmittedAssignment
                  WHERE SubmittedAssignment.assignmentFileName   = %s
-                 AND   SubmittedAssignment.groupId    = %s
+                 AND   SubmittedAssignment.globalGroupId    = %s
                  AND   SubmittedAssignment.courseId   = %s
                  AND   SubmittedAssignment.assignmentId = %s
                  AND   SubmittedAssignment.submissionNumber = %s;
@@ -292,7 +292,7 @@ def remove_existing_test_file(
             query_data = """DELETE FROM PythonTestFiles
                  WHERE PythonTestFiles.testFileName   = %s
                  AND   PythonTestFiles.courseId   = %s
-                 AND   PythonTestFiles.AssignmentId = %s;
+                 AND   PythonTestFiles.assignmentId = %s;
                  """
             cur.execute(query_data, (file_name, course_id, assignment))
     conn.close()
@@ -308,8 +308,8 @@ def get_assignment_test_feedback_from_database(
         with conn.cursor() as cur:
             query_data = """
             SELECT submissionNumber, automaticFeedback, testPassed
-            FROM SubmissionFeedback WHERE
-            groupId = %s AND courseId = %s AND \"assignmentId\" = %s
+            FROM AutomaticFeedback WHERE
+            globalGroupId = %s AND courseId = %s AND \"assignmentId\" = %s
             """
 
             cur.execute(query_data, (group_id, course,
@@ -326,7 +326,7 @@ def get_test_file(course: int, assignment: int, file_name: str) -> io.BytesIO:
     conn = psycopg2.connect(dsn=get_conn_string())
     with conn:
         with conn.cursor() as cur:
-            query_data = """SELECT FileData FROM PythonTestFiles 
+            query_data = """SELECT fileData FROM PythonTestFiles 
             WHERE testFileName = %s
             AND courseId = %s AND assignmentId = %s"""
             cur.execute(query_data, (('test_' + file_name), course,
@@ -384,7 +384,7 @@ def get_unit_test_files_from_db(
                 """
                 SELECT testFileName, fileData FROM PythonTestFiles
                     WHERE PythonTestFiles.courseId     = %s
-                    AND PythonTestFiles.\"assignmentId\" = %s;
+                    AND PythonTestFiles.assignmentId= %s;
                 """,
                 (courseid, assignment)
             )
@@ -413,7 +413,7 @@ def get_all_assignment_files_from_db(
                 SELECT assignmentFileName, fileData FROM SubmittedAssignment
                     WHERE globalGroupId        = %s
                     AND   courseId       = %s
-                    AND   \"assignmentId\"   = %s;
+                    AND   assignmentId   = %s;
                 """,
                 (group_id, course_id, assignment)
             )
@@ -464,13 +464,13 @@ def save_feedback_to_db(
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO AssignmentFeedback (
-                        groupid,
-                        courseid,
-                        \"assignment\",
-                        testfeedback,
-                        testpass,
-                        submission
+                INSERT INTO AutomaticFeedback (
+                        globalgroupId,
+                        courseId,
+                        assignmentId,
+                        automaticFeedBack,
+                        testPassed,
+                        submissionNumber
                     )
                     VALUES(%s, %s, %s, %s, %s, 0)
                 """,

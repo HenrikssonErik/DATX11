@@ -119,7 +119,7 @@ if False:
             # clean up test files
             remove_existing_test_file("test_test_1.py", course_id, assignment)
 
-            # clean up assignmentfeedback
+            # clean up TotalFeedback
 
             # assert results
             self.assertTrue(all_feedback[-1][2])
