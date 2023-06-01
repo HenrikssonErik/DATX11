@@ -104,11 +104,18 @@ def get_progress(user_id: int) -> list[dict]:
         with conn:
             with conn.cursor() as cur:
                 query = """SELECT tf.courseId, COUNT(*) AS Completed FROM
-                UserGroupCourseInfo ugci JOIN TotalFeedback tf ON
-                ugci.globalGroupId = tf.globalGroupId AND 
-                ugci.courseId = tf.courseId
-                WHERE ugci.userId = %s AND tf.teacherGrade = TRUE GROUP BY
-                tf.courseId;"""
+                UserGroupCourseInfo ugci JOIN (SELECT courseId, assignmentId,
+                globalGroupId, MAX(submissionNumber) AS maxSubmissionNumber
+                FROM TotalFeedback GROUP BY courseId, assignmentId,
+                globalGroupId) maxSub ON
+                ugci.globalGroupId = maxSub.globalGroupId AND
+                ugci.courseId = maxSub.courseId JOIN TotalFeedback tf ON
+                ugci.globalGroupId = tf.globalGroupId AND
+                ugci.courseId = tf.courseId AND
+                tf.assignmentId = maxSub.assignmentId AND
+                tf.submissionNumber = maxSub.maxSubmissionNumber WHERE
+                ugci.userId = %s AND tf.teacherGrade = TRUE
+                GROUP BY tf.courseId;"""
                 cur.execute(query, [user_id])
                 data = cur.fetchall()
         conn.close()
