@@ -166,3 +166,4 @@ connection_config.txt
 
 #Configuration to mail protocol
 mailconfig.cfg
+secretkey.cfg

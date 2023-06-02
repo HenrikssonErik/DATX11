@@ -18,7 +18,8 @@ def create_key():
     or login/registration will fail
     """
     global __SECRET_KEY
-    __SECRET_KEY = random_string()
+    with open('./secretkey.cfg') as f:
+        __SECRET_KEY = f.readline()
 
 
 def random_string() -> str:
